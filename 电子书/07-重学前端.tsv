@@ -1,17 +1,5 @@
-# 前端发展史
-前端发展的三个时代名称	青铜时代（静态网页）→ 白银时代（前后端分离）→ 黄金时代（全端化）
-Web 1.0到Web 2.0的标志性技术	Ajax（如Gmail应用）
-黄金时代前端的重要变化	独立发布权限、工程体系建立、前端框架（React/Vue/Angular）竞争发展
-
-# 学习方法
-前端学习的两个核心方法论	1. 建立知识架构（逻辑性+完备性） 2. 追本溯源（研究技术背景和原始论文）
-JavaScript知识架构顶层划分	文法 → 语义 → 运行时（类型+执行过程）
-CSS属性opacity和display的本质区别	opacity是简单数值属性，display背后涉及完整布局体系（正常流/弹性布局/Grid）
-
 # 知识体系
-前端知识四大模块	1. JavaScript 2. CSS/HTML 3. 浏览器原理 4. 工程实践
 浏览器渲染核心流程	解析 → 构建DOM树 → 计算CSS → 渲染 → 合成 → 绘制
-前端工程实践五大方向	性能体系、工具链、持续集成、搭建系统、架构与基础库
 
 # JavaScript类型系统
 JavaScript的7种语言类型	Undefined、Null、Boolean、String、Number、Symbol、Object
@@ -36,7 +24,6 @@ CSSOM的作用	以对象形式操作CSS规则（如document.styleSheets）
 # 工程实践
 前端性能优化的核心目标	更快的加载速度（FMP/FCP）、更流畅的交互（FPS）
 工具链的关键组成	脚手架、本地服务器、代码检查、构建工具（如Webpack）
-搭建系统的核心价值	解决高重复性需求，提升开发效率（模块化+可视化配置）
 
 # 浮点数精度问题
 为什么0.1+0.2的结果不是0.3	IEEE754双精度浮点数存储限制（二进制无法精确表示0.1），实际值≈0.30000000000000004
@@ -649,3 +636,61 @@ iframe的使用场景建议是什么？	PC端历史包袱外避免使用，移�
 如何阅读Web标准文档？	配合代码实现理解，MDN是更友好选择
 项目技术选型的关键因素？	团队现状、业务需求、基础设施支持
 前端如何拓展职业边界？	学习Node/Electron，但需深入领域知识
+
+
+# 补充
+JavaScript中基本类型(如字符串)为什么能调用方法?	引擎自动装箱创建临时包装对象
+当使用'abc'.charAt(0)时，底层发生了什么?	1) 创建String临时对象 2) 调用charAt方法 3) 销毁对象
+JavaScript装箱操作产生的对象是永久的吗?为什么?	不是永久的，方法调用后立即销毁
+以下代码输出什么？"abc".prop = 123; console.log("abc".prop);	undefined（临时对象已销毁）
+显式装箱与隐式装箱的区别是什么?	显式: new String()创建持久对象，隐式: .运算符自动创建临时对象
+为什么123.toString()会报错而(123).toString()不会?	.被解析为小数点，括号强制识别为对象访问
+typeof new String('abc')的返回值是什么?	"object"（包装对象）
+typeof 'abc'的返回值是什么?	"string"（原始类型）
+布尔值true调用方法时会创建什么包装对象?	new Boolean(true)
+包装对象被销毁后，能否访问为其添加的属性?	不能，属性随临时对象一起销毁
+
+
+Object.defineProperty()的主要作用是什么？	精确控制对象属性的特征（可写性、可枚举性、可配置性）
+属性描述符中writable: false的作用是什么？	创建只读属性，阻止属性值被修改
+enumerable: false属性在枚举对象属性时会如何表现？	隐藏属性（不会出现在for...in循环或Object.keys()中）
+configurable: false的作用是什么？	阻止属性被删除或属性特征被修改
+默认使用Object.defineProperty()创建的属性特征是什么？	writable:false, enumerable:false, configurable:false
+在严格模式下尝试修改writable:false的属性会发生什么？	抛出TypeError错误
+如何用Object.defineProperty()实现属性值的验证？	通过定义setter函数添加验证逻辑
+getter/setter和普通属性描述符的区别是什么？	getter/setter允许自定义属性访问逻辑而不是直接存储值
+为什么在框架（如Vue.js）中会用到Object.defineProperty？	实现响应式数据追踪变化
+Object.defineProperty()和普通属性赋值的核心区别是什么？	defineProperty可以精确控制属性特征，普通赋值默认所有特征均为true
+能否同时定义value和getter/setter？为什么？	不能，会抛出错误（无法同时定义访问器和值/可写描述符）
+
+
+JavaScript中Symbol的主要作用是什么？	创建唯一标识符，避免属性名冲突
+为什么Symbol('desc') === Symbol('desc')返回false？	每个Symbol都是唯一的，即使描述相同也不相等
+如何获取对象的所有Symbol属性键？	使用Object.getOwnPropertySymbols()
+Symbol属性在for-in循环和Object.keys()中可见吗？	不可见，Symbol属性默认不可枚举
+如何使用Symbol创建"类私有"属性？	将Symbol作为属性键，利用不可枚举特性隐藏内部状态
+Symbol.for()和Symbol()的区别是什么？	Symbol.for()在全局注册表中创建共享Symbol，Symbol()创建唯一Symbol
+Symbol.keyFor()方法的作用是什么？	返回全局Symbol的描述文本
+哪个内置Symbol用于自定义对象的迭代行为？	Symbol.iterator
+Symbol如何避免多个第三方库的属性名冲突？	使用Symbol作为属性键，确保唯一性不受命名影响
+在JSON.stringify()中Symbol属性会被序列化吗？	不会，Symbol属性默认被忽略
+Symbol属性可以通过Object.assign()复制吗？	可以，Symbol属性会被复制到新对象中
+
+
+ES6 class的本质是什么？	基于原型继承的语法糖
+class中的方法实际定义在哪里？	在构造函数的原型对象上
+class的静态方法定义在哪里？	在构造函数本身上，而不是在prototype上
+ES6的extends关键字实现了什么？	更规范的继承机制
+使用extends时，如何设置原型链？	Object.setPrototypeOf(子类.prototype, 父类.prototype)
+super()在构造函数中的作用是什么？	调用父类的构造函数
+为什么在子类构造函数中必须先调用super()才能使用this？	ES6规范要求初始化this实例必须由父类完成
+class表达式和函数声明的关键区别是什么？	类声明不会提升，存在暂时性死区
+ES6类中的非方法变量定义会如何处理？	会创建全局变量（没有类级作用域）
+如何证明ES6 class本质是函数？	typeof 类名 返回 "function"
+ES6类和ES5原型继承的核心区别是什么？	语法更清晰，但底层机制相同
+class能实现真正的私有字段吗？	不能（ES2022前），但ES2022引入了#前缀的私有字段
+class支持多重继承吗？	不支持，只能单一继承
+class中的静态方法如何访问？	通过类名直接访问，而不是实例
+class创建实例是否必须使用new？	必须使用new，否则会报错
+子类如何继承父类的静态方法？	Object.setPrototypeOf(子类, 父类)
+class是否改变了JavaScript的核心继承模型？	没有，仍然是基于原型的继承
