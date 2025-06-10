@@ -1,0 +1,366 @@
+# 1 ~ 3
+Go语言的核心优势是什么？	"1. 原生并发支持（goroutine/channel） 2. 编译速度快 3. 部署简单 4. 丰富的标准库"	chap1,语言特性
+GOPATH的作用是什么？	"定义工作区目录结构（src/pkg/bin），存放项目代码、依赖包和可执行文件"	chap2,GOPATH
+GOROOT和GOPATH的区别？	"GOROOT是Go安装目录，GOPATH是工作区目录（可配置多个）"	chap2,环境变量
+命令源码文件的特征？	"1. 属于main包 2. 包含main函数 3. 可直接编译执行"	chap3,源码文件
+如何声明库源码文件？	"使用非main包声明（如package mylib），提供可复用函数/类型"	chap3,源码文件
+init函数的执行时机？	"1. 在main函数前自动执行 2. 每个包可包含多个init函数 3. 按导入顺序执行"	chap3,init函数
+Go程序的初始化顺序？	"1. 初始化导入的包 2. 执行包级变量声明 3. 执行init函数 4. 执行main函数"	chap3,初始化
+如何访问外部包的程序实体？	"1. 首字母大写的公开实体 2. 通过包名.实体名访问（如mylib.Func）"	chap3,访问控制
+多工作区时包的查找顺序？	"按GOPATH配置顺序查找（第一个匹配的包会被使用）"	chap2,GOPATH
+go install命令的作用？	"1. 编译库源码文件到pkg目录 2. 编译命令源码文件到bin目录"	chap2,命令工具
+
+如何自定义命令参数？	"使用flag包：flag.StringVar(&name, "name", "default", "description")"	chap3,flag包
+库源码文件如何被引用？	"通过import导入路径（如import "github.com/user/lib"）"	chap3,包导入
+工作区中src目录的作用？	"存储所有源码（.go文件），按包路径组织"	chap2,目录结构
+
+main函数的特殊要求？	"1. 无参数 2. 无返回值 3. 必须作为程序入口"	chap3,main函数,!核心
+跨包调用规则？	"只有首字母大写的程序实体（变量/函数/类型）可被外部访问"	chap3,访问控制,!核心
+GOPATH下的bin目录作用？	"存放go install生成的可执行文件（命令源码文件编译结果）"	chap2,目录结构,!核心
+
+同一个目录下能否有多个main包？	不能（所有文件必须同属一个包）
+init函数能否被显式调用？	不能（自动执行）
+小写字母开头的函数能否跨包调用？	不能（仅包内可见）
+
+# 4 ~ 6
+Go语言变量声明有哪几种方式？	"1. var name string  2. name := value  3. var name = value  4. 类型推断声明"	chap4,变量声明
+短变量声明(:=)的使用限制？	"只能在函数内部使用，支持重声明（需至少一个新变量）"	chap4,短变量声明
+类型推断的优势是什么？	"提升代码灵活性，便于重构（如函数返回类型变更不影响调用方）"	chap4,类型推断
+代码块划分的依据是什么？	"花括号{}显式划分，或隐式划分（如if/for语句的初始化子句）"	chap5,代码块
+变量屏蔽（shadowing）发生的条件？	"内层作用域声明同名变量，覆盖外层变量（不影响外层原始值）"	chap5,作用域
+如何访问被屏蔽的外层变量？	"通过外层代码块标识符访问（如pkg.Var），但无法跨函数访问"	chap5,变量屏蔽
+类型断言的正确写法？	"value, ok := interface{}(x).(T) （需双返回值避免panic）"	chap6,类型断言
+类型转换与类型断言的区别？	"转换：显式改变值类型  断言：判断接口值的动态类型"	chap6,类型系统
+潜在类型（underlying type）的作用？	"决定类型转换是否合法（如type MyInt int可转int）"	chap6,潜在类型
+哪些值是不可寻址的？	"常量、字面量、算术结果、临时表达式结果、部分字面量索引值"	chap6,寻址
+
+函数作为一等公民的体现？	"1. 赋值变量 2. 作为参数 3. 作为返回值"	chap4,函数特性
+类型别名(type A=B)与类型定义(type A B)的区别？	"别名：完全等价原类型  定义：创建新类型（需显式转换）"	chap6,类型定义
+不可寻址值的使用限制？	"1. 无法取址 2. 不能调用指针方法 3. 不能作为赋值左值"	chap6,寻址限制
+
+变量重声明（redeclaration）的条件？	"1. 同一代码块 2. 短变量声明 3. 至少一个新变量 4. 同类型"	chap4,变量重声明,!核心
+空接口interface{}的作用？	"承载任意类型值（类型断言的基础容器）"	chap6,空接口,!核心
+unsafe.Pointer的核心用途？	"实现任意指针类型与uintptr间的转换（绕过类型系统）"	chap6,指针操作,!核心
+
+类型断言失败会怎样？	单返回值形式引发panic（需用ok-idiom）
+变量屏蔽是否影响外层变量？	不影响（仅当前作用域生效）
+type MyInt int64能否直接赋值int64？	不能（需显式转换，因是不同的新类型）
+
+# 7 ~ 9
+数组与切片的本质区别是什么？	"数组：固定长度、值类型；切片：可变长度、引用类型（含指针/长度/容量）"	chap7,数组切片
+切片扩容规则是什么？	"1. 容量<1024：双倍扩容 2. 容量≥1024：1.25倍扩容 3. 超过原容量2倍时按需扩容"	chap7,切片扩容
+切片表达式s[2:5]的长度和容量如何计算？	"长度=3 (5-2) 容量=原容量-2（从索引2到底层数组末尾）"	chap7,切片操作
+container/list包中List的零值是否可用？	可用（延迟初始化机制），零值是长度为0的空链表	chap8,链表
+循环链表(ring)与双向链表(list)的核心区别？	"1. ring长度固定，list长度可变 2. ring无头尾概念 3. ring.Len()复杂度O(n)"	chap8,链表对比
+字典键类型的约束条件是什么？	必须支持判等操作（==和!=），因此函数/字典/切片不能作为键	chap9,字典约束
+值为nil的字典能进行哪些操作？	"读操作：安全返回零值 写操作：引发panic 删除操作：安全无操作"	chap9,字典nil
+字典扩容的触发条件？	负载因子（元素数量/桶数量）超过阈值（通常为6.5）	chap9,字典扩容
+
+如何正确估算切片容量？	"容量 = 原底层数组长度 - 切片起始索引（对数组切片时）"	chap7,切片容量
+list.Element值能否直接插入链表？	不能，必须通过list的方法插入（防止破坏内部关联）	chap8,链表安全
+字典访问不存在的键会怎样？	返回值类型零值（需用comma-ok模式区分是否存在）	chap9,字典访问
+
+切片共享底层数组会导致什么问题？	"多个切片修改数据相互影响（需用copy或完整切片表达式避免）"	chap7,切片陷阱,!核心
+list开箱即用的实现原理？	延迟初始化（首次操作时初始化内部结构）	chap8,链表原理,!核心
+字典并发读写会引发什么问题？	"fatal error: concurrent map read and map write"	chap9,并发安全,!核心
+
+
+# 10 ~ 12 
+通道的基本特性有哪些？	"1. 并发安全 2. 先进先出（FIFO） 3. 可作为参数传递 4. 有缓冲/无缓冲两种类型"	chap10,通道
+发送操作在什么情况下会阻塞？	"1. 缓冲通道已满 2. 无缓冲通道无接收方 3. 通道为nil"	chap10,阻塞
+接收操作在什么情况下会阻塞？	"1. 通道为空 2. 无缓冲通道无发送方 3. 通道为nil"	chap10,阻塞
+关闭通道的原则是什么？	"1. 仅发送方关闭 2. 不可重复关闭 3. 关闭后发送会panic"	chap10,关闭通道
+如何安全判断通道是否关闭？	"使用双返回值模式：v, ok := <-ch （ok=false表示关闭）"	chap10,通道关闭
+单向通道的作用是什么？	约束函数行为（只允许发送或只允许接收）	chap11,单向通道
+select语句的执行规则？	"1. 随机执行就绪的case 2. 无case时阻塞 3. 有default立即执行"	chap11,select
+select语句中的case表达式求值顺序？	按代码顺序从上到下依次求值	chap11,select
+带range的for语句处理通道时有何特性？	"1. 持续接收直到通道关闭 2. 通道为nil会永久阻塞"	chap11,range
+函数作为一等公民的体现？	"1. 可赋值给变量 2. 可作为参数传递 3. 可作为返回值"	chap12,函数特性
+高阶函数的定义？	"1. 接收函数作为参数 2. 返回函数作为结果"	chap12,高阶函数
+闭包的本质是什么？	捕获外部变量的函数（绑定自由变量）	chap12,闭包
+函数参数传递的规则？	"值类型传副本，引用类型传指针副本（浅拷贝）"	chap12,传参
+
+带缓冲通道与无缓冲通道的本质区别？	"带缓冲通道异步操作（可暂存元素），无缓冲通道同步操作（直接传递）"	chap10,通道类型
+如何触发通道操作的panic？	"1. 关闭nil通道 2. 重复关闭通道 3. 向已关闭通道发送数据"	chap10,panic
+select语句中default的作用？	避免阻塞，当所有case未就绪时立即执行	chap11,select
+闭包捕获外部变量的时机？	定义时捕获变量引用（非值拷贝）	chap12,闭包
+函数类型如何声明？	"type FuncType func(int) string"	chap12,函数类型
+
+如何避免通道操作导致的goroutine泄露？	"确保通道最终被关闭或通过select+超时机制"	chap10,goroutine泄露,!核心
+单向通道的典型应用场景？	"函数参数约束（如只允许发送的chan<- int）"	chap11,单向通道,!核心
+闭包为何能实现状态封装？	通过捕获并修改外部变量（如计数器）	chap12,闭包,!核心
+
+# 13 ~ 15
+结构体嵌入字段的作用是什么？	"1. 字段和方法提升到外部结构体 2. 实现类型组合（非继承） 3. 可通过外部结构体直接访问嵌入字段成员"	chap13,结构体
+方法屏蔽（shadowing）的发生条件是什么？	当外部结构体与嵌入字段存在同名方法时，外部结构体方法优先（无论签名是否相同）	chap13,方法冲突
+值接收者 vs 指针接收者的核心区别？	"1. 值接收者：操作副本，无法修改原值 2. 指针接收者：操作原值，可修改字段 3. 编译器自动转换值类型调用指针方法"	chap13,接收者
+Go语言是否支持继承？如何实现类似功能？	"不支持传统继承，通过结构体嵌入实现组合（composition），强调'has-a'而非'is-a'关系"	chap13,组合模式
+多层嵌入时的方法调用顺序？	"从外层向深层查找，外层方法优先；若外层无方法，则向嵌入字段逐层查找"	chap13,多层嵌入
+
+接口变量赋值时内部如何存储？	"1. 动态值被复制存储 2. 动态类型信息被记录 3. 创建iface结构（含类型指针和值指针）"	chap14,接口实现
+如何判断接口变量真正为nil？	仅当未初始化或显式赋值为nil时成立（赋值为具体类型的nil指针会使接口变量!=nil）	chap14,接口nil
+接口组合的设计优势有哪些？	"1. 解耦功能 2. 小接口组合成大接口 3. 提高代码复用（如io.Reader+io.Writer=io.ReadWriter）"	chap14,接口设计
+类型断言的两种安全写法？	"1. v, ok := varI.(ConcreteType) 2. switch v := varI.(type) { case ConcreteType: ... }"	chap14,类型断言
+空接口可以接收哪些类型的值？	任意类型（包括基础类型、结构体、指针、函数等）	chap14,空接口
+
+哪些值是不可寻址的？	"常量、字面量、算术结果、大部分表达式结果值（除切片索引）、函数/方法字面量、类型转换结果"	chap15,寻址限制
+不可寻址值的三大特征？	"1. 不可变（immutable） 2. 临时结果（temporary） 3. 不安全操作（unsafe）"	chap15,寻址规则
+指针方法在不可寻址值上的调用规则？	"编译器自动转换值类型调用指针方法（如dog.SetName()转(&dog).SetName())，但不可寻址值无法取址导致编译失败"	chap15,方法调用
+unsafe.Pointer的核心作用？	"1. 任意指针类型转换的中介 2. 与uintptr配合操作内存 3. 突破类型系统限制（需谨慎）"	chap15,unsafe
+如何安全使用unsafe.Pointer操作结构体字段？	"1. 获取结构体指针 2. 转unsafe.Pointer 3. 配合Offsetof计算字段偏移 4. 转目标指针类型"	chap15,unsafe操作
+
+结构体字段标签（Tag）的作用？	"通过反射读取，用于序列化/ORM等场景（如 `json:"name"`）"	chap13,高级特性
+接口的动态类型何时确定？	运行时根据赋值给接口的具体类型确定	chap14,接口原理
+切片字面量索引为何可寻址？	因切片底层是数组，索引指向具体数组元素地址	chap15,寻址例外
+unsafe.Sizeof和unsafe.Offsetof的区别？	"Sizeof获取类型大小，Offsetof获取字段在结构体中的偏移量"	chap15,unsafe工具
+何时会发生接口的动态派发（dynamic dispatch）？	通过接口变量调用方法时，根据动态类型决定具体方法实现	chap14,接口原理
+
+# 16 ~ 18
+go语句执行时，go函数何时被执行？	"go语句执行后，go函数会被放入G队列等待调度，执行时间滞后"	chap16,goroutine
+主goroutine结束会导致什么？	"整个程序退出，其他未执行完的goroutine会被终止"	chap16,主goroutine
+如何让主goroutine等待其他goroutine？	"1. time.Sleep  2. 通道同步  3. sync.WaitGroup"	chap17,同步
+怎样实现goroutine的顺序执行？	"使用通道或sync.Cond进行显式调度"	chap17,顺序控制
+携带range子句的for语句如何操作切片？	"range会复制原值，迭代变量仅代表索引（单变量时）"	chap18,range
+range表达式何时求值？	"仅在for语句开始时求值一次，结果被复制"	chap18,range
+switch语句的case表达式如何求值？	"从上到下顺序求值，第一个匹配的case被执行"	chap18,switch
+类型switch语句中case的顺序要求？	"case类型不能重复，且必须是具体类型"	chap18,类型switch
+
+非缓冲通道的通信特点？	"发送和接收操作会同步阻塞，直到配对操作就绪"	chap16,通道
+如何限制goroutine数量？	"使用带缓冲的通道作为信号量（semaphore）"	chap17,并发控制
+for-range遍历map的注意点？	"迭代顺序随机，每次运行可能不同"	chap18,map
+switch的fallthrough机制？	"显式使用fallthrough关键字执行下一个case"	chap18,switch
+
+Goroutine泄漏是指什么？	"启动的goroutine无法结束，长期占用内存"	chap16,内存泄漏,!核心
+如何避免goroutine阻塞导致泄漏？	"1. 使用带超时的select  2. 确保通道能被关闭"	chap16,资源管理,!核心
+range遍历数组时修改元素是否影响迭代？	"不影响（遍历的是原数组的副本）"	chap18,range,!核心
+类型断言失败时的处理方式？	"使用ok-idiom避免panic（val, ok := x.(T)）"	chap18,类型断言,!核心
+
+循环中启动goroutine使用循环变量	必须通过参数传递（避免闭包捕获同一变量）
+未初始化的通道会导致	goroutine永久阻塞（引发泄漏）
+类型switch中nil接口的处理	case nil可单独捕获
+
+
+# 19 ~ 22
+error类型是什么？	内置接口类型，定义方法：Error() string	chap19,error
+创建简单错误值的方法？	errors.New("错误描述")	chap19,errors
+带格式化信息的错误值？	fmt.Errorf("格式: %v", err)	chap19,fmt
+错误判断的三种惯用法？	1. 类型断言/switch 2. 判等操作 3. 错误信息匹配	chap19,错误处理
+os.IsExist的作用？	判断文件是否已存在的错误	chap19,os包
+net.Error接口的特点？	扩展接口，增加Timeout()/Temporary()方法	chap20,net
+构建错误值体系的两种方式？	1. 错误类型体系 2. 扁平错误值列表	chap20,错误设计
+panic触发后的执行流程？	1. 逆序执行defer 2. 打印堆栈 3. 程序崩溃	chap21,panic
+recover的使用条件？	必须在defer函数中直接调用才有效	chap22,recover
+defer的执行顺序特点？	后进先出(LIFO)，逆序执行	chap21,defer
+错误包装的最佳实践	使用fmt.Errorf("... %w", err)包裹底层错误，errors.Unwrap解包	chap20,错误包装
+自定义错误类型示例	type MyError struct{Msg string; Code int}; func (e *MyError) Error() string	chap20,自定义错误
+panic与error的区别	error预期错误，panic不可恢复严重错误	chap21,异常处理
+defer的常见用途	1. 资源释放 2. 解锁 3. 错误恢复	chap21,defer
+recover返回值类型	interface{}，需类型断言处理	chap22,类型断言
+错误值判等的风险	相同错误值可能分配不同内存地址，避免直接指针比较	chap19,!重要
+net.Timeout的应用场景	网络操作超时判断：if nerr, ok := err.(net.Error); ok && nerr.Timeout()	chap20,!核心
+panic中的recover要点	recover只在defer中生效，且需直接调用（不能嵌套函数）	chap22,!关键
+defer的参数捕获时机	参数在声明时立即求值，非执行时	chap21,!易错点
+
+defer中修改返回值	需使用命名返回值才能修改
+过度使用panic	会破坏错误处理流程，应作为最后手段
+
+
+# 23 ~ 26
+Go测试文件命名规则？	以`_test.go`结尾，如`mypkg_test.go`	chap23,测试
+表驱动测试的优势？	集中管理用例/减少重复代码/统一错误处理	chap23,测试
+`t.Run()`的作用？	创建子测试，支持独立运行和报告	chap23,子测试
+基准测试函数签名？	`func BenchmarkXxx(b *testing.B)`	chap24,基准测试
+`b.ResetTimer()`的作用？	排除初始化代码对计时的影响	chap24,基准测试
+pprof的两种分析模式？	采样模式(Runtime)和快照模式(Profile)	chap25,pprof
+生成CPU分析文件的命令？	`go test -bench=. -cpuprofile=cpu.out`	chap25,性能分析
+sync.Pool的核心作用？	减少GC压力，复用临时对象	chap26,内存优化
+竞态检测启用方式？	`go test -race` 或 `go build -race`	chap26,并发安全
+
+测试覆盖率查看方法	`go test -coverprofile=cover.out` + `go tool cover -html=cover.out`	chap23,覆盖率
+并发基准测试写法	在Benchmark函数内使用`b.RunParallel(func(pb *testing.PB){...})`	chap24,并发测试
+内存分析文件生成	`go test -bench=. -memprofile=mem.out`	chap25,内存分析
+火焰图生成步骤	1. 生成profile  2. `go tool pprof -http=:8080 cpu.out`	chap25,可视化
+sync.Pool的获取逻辑	优先从本地private获取，无则从shared列表获取，最后New	chap26,对象池
+
+测试函数执行顺序	按字母顺序执行，可使用`t.Run`控制子测试顺序	chap23,!注意
+性能测试循环要求	必须使用`b.N`作为循环次数，由框架动态调整	chap24,!关键
+pprof采样时间建议	至少运行30秒以上，`go test -bench=. -cpuprofile=cpu.out -benchtime=30s`	chap25,!重要
+sync.Pool的对象生命周期	每次GC周期会清空所有对象，不能用于持久化存储	chap26,!陷阱
+
+忘记重置计时器	导致初始化时间计入测试结果，造成偏差
+误用sync.Pool	1. 未重置对象状态 2. 期望对象持久化 3. 类型断言缺失
+pprof采样不足	短时间运行无法捕捉真实性能特征
+
+# 27 ~ 30
+sync.Cond的作用是什么？	基于互斥锁的协调工具，用于通知共享资源状态变化	chap27,条件变量
+条件变量必须配合什么使用？	互斥锁（sync.Mutex或sync.RWMutex）	chap27,互斥锁
+Wait方法的执行步骤？	1.加入通知队列 2.解锁互斥锁 3.阻塞等待 4.唤醒后重新加锁	chap28,Wait
+为什么条件检查要用for循环？	防止虚假唤醒和条件状态变化	chap28,!重要
+Signal和Broadcast的区别？	Signal唤醒一个等待的goroutine，Broadcast唤醒所有	chap28,通知
+原子操作的优势？	1. 无锁操作 2. 并发安全 3. 执行速度快	chap29,原子操作
+atomic包支持哪些数据类型？	int32, int64, uint32, uint64, uintptr, unsafe.Pointer	chap29,数据类型
+CAS操作是什么？	比较并交换（CompareAndSwap），相等时更新值	chap30,CAS
+atomic.Value的存储限制？	1. 不能存nil 2. 首次存储类型决定后续类型	chap30,atomic.Value
+
+条件变量初始化方法	sync.NewCond(l sync.Locker) 参数需实现Lock/Unlock	chap27,初始化
+Broadcast的应用场景	多个等待goroutine需要同时唤醒时使用	chap28,广播
+原子加法负值处理	对uint32使用^uint32(-N-1)或uint32(int32(-N))	chap29,负值
+Value类型的零值状态	零值Value可安全使用，首次Store后类型固定	chap30,零值
+
+条件变量通知的时机	应在解锁互斥锁后调用Signal/Broadcast	chap28,!关键
+原子操作与锁的选择	简单操作用原子，复杂逻辑用锁	chap30,!选择
+Value存储引用类型的风险	外部修改可能导致数据不一致	chap30,!陷阱
+
+# 31 ~ 33
+sync.WaitGroup的核心作用？	协调多个goroutine的执行流程（主goroutine等待子任务完成）	chap31,WaitGroup
+WaitGroup计数器的规则？	1. Add增加计数 2. Done减少计数 3. 归零时Wait解除阻塞 4. 不能为负值	chap31,计数器
+WaitGroup的正确使用模式？	先统一Add，再并发Done，最后Wait	chap31,使用模式
+context.Context的核心功能？	传递跨API的取消信号、截止时间和键值对	chap32,Context
+Context树的结构特点？	树形层次结构，取消信号从父节点传播到所有子节点	chap32,树结构
+WithValue的键设计原则？	使用自定义类型避免包间冲突（如type myKey struct{}）	chap32,键值对
+sync.Once的保证？	确保Do方法中的函数只执行一次（首次调用时）	chap33,Once
+Once.Do的阻塞行为？	并发调用时，其他goroutine会阻塞直到首次执行完成	chap33,并发安全
+
+WaitGroup复用注意事项	完成计数周期后需等待所有Wait返回才能复用	chap31,复用
+Context取消信号的触发方式	1. 手动cancel() 2. 超时自动触发 3. 父Context取消	chap32,取消
+Once执行失败的影响	不会重试，后续调用直接返回（需新建Once实例）	chap33,错误处理
+
+WaitGroup计数为负的后果？	立即panic	chap31,!关键
+Context值传递的安全风险	存储可变引用类型需深拷贝	chap32,!陷阱
+Once的函数执行要求	无参数无返回值（func()类型）	chap33,!重要
+
+忘记WaitGroup.Done	导致主goroutine永久阻塞
+未处理Context取消	资源泄漏（goroutine泄露）
+复制已使用的Once	失去单次执行保证
+
+
+
+# 34 ~ 37
+sync.Map如何避免锁竞争？	使用read/dirty双map结构，优先无锁读read字段	chap34,并发安全
+sync.Map的read字段特性？	原子访问，存储只读数据，可安全并发读	chap34,read字段
+sync.Map的dirty字段作用？	存储新写入数据，访问需加锁	chap34,dirty字段
+sync.Map的misses机制？	记录read未命中次数，达到阈值时dirty提升为read	chap34,misses
+Unicode代码点范围？	U+0000到U+10FFFF，共1114112个码位	chap35,Unicode
+UTF-8编码规则？	1-4字节变长编码，首字节高位1的个数表示总字节数	chap35,UTF-8
+Go字符串底层表示？	只读字节数组（UTF-8编码的字节序列）	chap35,字符串
+rune与byte区别？	rune代表Unicode码点（int32），byte代表单个字节（uint8）	chap35,字符类型
+strings.Builder高效原因？	避免多次内存分配和拷贝，支持原地扩容	chap37,Builder
+strings.Builder使用限制？	已使用后不可复制，非并发安全	chap37,使用约束
+strings.Reader高效原理？	维护已读计数，减少字符串复制	chap37,Reader
+strings.Reader的Seek方法作用？	移动读取位置，支持绝对/相对定位	chap37,Seek
+
+sync.Map删除操作流程	先标记read中的删除状态，再在dirty中物理删除	chap34,删除
+UTF-8兼容性	完全兼容ASCII（0-127码点）	chap35,兼容性
+字符串for-range行为	按rune迭代，自动解码UTF-8	chap35,迭代
+Builder的Reset方法	清空内容，可重用对象	chap37,重置
+Reader的Len方法	返回未读字节数	chap37,未读计数
+
+sync.Map适用场景	读多写少，键值类型稳定	chap34,!重要
+字符串不可变性	底层字节数组只读，拼接生成新字符串	chap35,!关键
+Builder的Grow方法	预分配内存避免多次扩容	chap37,!优化
+
+直接修改sync.Map的read	导致数据不一致（必须通过原子操作）
+误用string(len(bytes))	字节长度非字符长度
+Builder并发写入	引发数据竞争（需加锁）
+
+# 38 ~ 41
+bytes.Buffer的核心优势？	高效处理字节序列，支持读写/截断/导出等操作	chap38,Buffer
+bytes.Buffer的已读计数作用？	1.定位未读数据起始位置 2.实现扩容策略 3.控制导出范围	chap38,已读计数
+bytes.Buffer的扩容策略？	1.容量不足时倍增 2.超1024字节时增长25% 3.必要时内存拷贝	chap39,扩容
+bytes.Buffer内容泄露风险？	Bytes()和ReadSlice()返回底层数组引用，可能被外部修改	chap39,安全风险
+io.Reader扩展接口有哪些？	ReadWriter/ReadCloser/ReadWriteCloser/ReadSeeker等	chap40,接口
+io.ReaderAt接口特点？	纯只读操作，不影响已读计数，支持随机访问	chap40,ReaderAt
+io.WriterTo接口作用？	将Reader数据直接写入Writer，减少内存拷贝	chap40,WriterTo
+io.ByteReader与RuneReader区别？	前者读取单个字节，后者读取UTF-8字符	chap40,字符读取
+io.CopyN的工作机制？	1.优先调用WriterTo/ReaderFrom 2.循环读取写入 3.严格复制指定字节数	chap41,Copy
+io.LimitedReader功能？	限制最多读取N字节，超出返回EOF	chap41,LimitedReader
+
+bytes.Buffer重置方法	Buffer.Reset() 重用缓冲区，清空内容	chap38,重用
+io.SectionReader应用场景	读取文件的指定区间（如分块下载）	chap40,区间读取
+io.Pipe同步机制	通过无缓冲通道实现读写同步	chap41,管道
+io.MultiReader作用	串联多个Reader，按顺序读取	chap41,多源读取
+
+bytes.Buffer零值状态	开箱即用，空缓冲区 ready to use	chap38,!重要
+io.EOF特殊含义	表示流结束而非错误，需单独处理	chap40,!关键
+io.Copy优化策略	32KB缓冲+大文件直拷，避免内存浪费	chap41,!优化
+
+未重置bytes.Buffer	导致旧数据污染新内容
+忽略io.EOF判断	造成数据截断错误
+误用WriteTo/ReaderFrom	引发递归调用死锁
+
+# 42 ~ 45
+bufio.Reader的核心作用？	减少I/O系统调用次数，通过缓冲区提升读取效率	chap42,Reader
+bufio.Reader的缓冲区压缩触发条件？	已读计数>0且缓冲区空闲空间不足时移动未读数据到头部	chap42,缓冲区管理
+bufio.Reader.Peek方法的特点？	预览数据但不移动读取位置，不更新已读计数	chap43,Peek
+bufio.Reader.ReadSlice的风险？	返回底层缓冲区切片，可能被后续操作覆盖（内容泄露）	chap43,安全风险
+os.File实现的接口有哪些？	io.Reader/Writer/Closer/Seeker/ReaderAt/WriterAt	chap44,File
+os.OpenFile的flag参数作用？	指定文件操作模式（只读/只写/追加/创建等）	chap45,打开模式
+os.FileMode的权限位含义？	9个比特位分3组：所有者|组用户|其他用户的读写执行权限	chap45,权限
+os.O_EXCL标志的用途？	必须与O_CREATE同用，确保文件不存在才创建	chap45,排他创建
+
+bufio.Writer刷新时机	1.缓冲区满 2.显式Flush 3.写入字节/字符时空间不足	chap42,刷新
+os文件描述符的本质	非负整数，标识内核文件表中的条目	chap44,文件描述符
+os.Truncate原理	截断已读计数后的未读部分，调整文件大小	chap45,截断
+
+ReadSlice与ReadBytes区别	前者返回底层切片（快但危险），后者返回新分配切片（安全）	chap43,!关键
+O_SYNC模式代价	每次写入都同步到磁盘，性能大幅下降	chap45,!注意
+文件权限八进制表示	0755 = 所有者RWX, 组用户RX, 其他用户RX	chap45,!重要
+
+未处理bufio.Reader返回的错误	导致数据截断或程序阻塞
+误用ReadSlice返回的切片	后续读取导致数据覆盖
+忽略O_EXCL标志	可能覆盖已存在的配置文件
+
+# 46 ~ 49
+net.Dial的network参数9个可选值？	"tcp/tcp4/tcp6/udp/udp4/udp6/unix/unixgram/unixpacket"	chap46,网络协议
+net.DialTimeout超时时间的含义？	从调用开始到建立完整网络连接的总时间上限（含DNS解析）	chap46,超时控制
+http.Client.Transport字段的作用？	实现HTTP事务处理（发送请求+接收响应），可复用连接	chap47,HTTP核心
+http.Transport空闲连接管理参数？	IdleConnTimeout(90s), MaxIdleConns(100), MaxIdleConnsPerHost(2)	chap47,连接池
+启动CPU采样的标准方法？	runtime/pprof.StartCPUProfile + StopCPUProfile	chap48,CPU分析
+内存采样频率如何设置？	runtime.MemProfileRate = N（每分配N字节采样一次）	chap49,内存分析
+如何获取阻塞分析数据？	runtime.SetBlockProfileRate + pprof.Lookup("block")	chap49,阻塞分析
+为HTTP服务添加性能分析接口？	导入net/http/pprof包，自动注册/debug/pprof路由	chap49,集成分析
+
+HTTP持久连接原理	Connection: keep-alive头，复用TCP连接减少握手	chap47,HTTP特性
+O_SYNC模式代价	每次写入都同步磁盘，性能大幅下降	chap47,文件IO
+go tool pprof交互命令	top10/list/web等可视化分析性能瓶颈	chap48,工具使用
+runtime/trace用途	跟踪goroutine调度/GC事件/网络阻塞等微观行为	chap49,跟踪分析
+
+关键性能配置项	IdleConnTimeout=90s, MaxIdleConnsPerHost=2（避免连接泄露）	chap47,!重要
+生产环境pprof风险	暴露调试接口可能导致敏感信息泄露	chap49,!安全
+采样频率权衡	过高影响性能，过低丢失关键信息（内存采样默认512KB）	chap49,!调优
+
+未设置http.Client超时	可能导致请求永久挂起
+MaxIdleConnsPerHost过低	高频请求时频繁建连
+生产环境暴露pprof	遭受性能分析攻击
+
+
+###
+
+GOPATH多工作区查找顺序？	从左到右顺序查找	基础概念,GOPATH
+命令源码文件接受的参数类型？	布尔/整数/浮点/字符串/time.Duration	基础概念,flag
+解决同名包冲突的方法？	别名导入(import alias)或点导入(import .)	基础概念,导入
+可重名变量的屏蔽规则？	内层变量屏蔽外层同名变量	基础概念,作用域
+切片缩容的正确方式？	创建新切片并拷贝数据(避免内存泄露)	数据类型,切片
+字典并发安全的保证？	非安全，需用sync.Map或加锁	数据类型,字典
+通道长度与容量的关系？	长度=元素数，满时长度=容量	数据类型,通道
+select中关闭通道的处理？	赋nil屏蔽分支	并发,select
+结构体嵌入指针的注意事项？	注意字段/方法屏蔽和初始化	数据类型,结构体
+原子值vs互斥锁的选择依据？	数据类型/操作复杂度/代码集中度	并发,同步
+Context撤销信号传递方式？	深度优先(子节点优先接收)	并发,Context
+临时对象池的维护要点？	预填充+及时归还+有效New函数	并发,Pool
+io.CopyN的优化策略？	优先调用WriterTo/ReaderFrom	标准库,io
+文件权限位的含义？	9位分3组：所有者|组|其他用户的读写执行	标准库,文件
+HTTP服务优雅停止方法？	server.Shutdown()等待活跃连接完成	网络,HTTP
+CPU采样的标准方法？	pprof.StartCPUProfile + StopCPUProfile	性能,分析
+内存采样频率设置？	runtime.MemProfileRate = N(字节)	性能,分析
+阻塞分析数据获取？	runtime.SetBlockProfileRate + pprof.Lookup("block")	性能,分析
+
+空结构体的用途	零内存占位符(如map[int]struct{})	!高效
+接口值为nil时调用方法	可调用，但引用字段会panic	!陷阱
+通道传递元素的复制方式	浅拷贝(仅复制值非底层数据)	!关键
+net.Conn超时设置方法	Set[Read|Write]Deadline(需循环内设置)	!网络
+
+未处理同名包冲突	导致编译失败
+忽略字典并发安全	引发运行时panic
+未重置原子值	造成状态污染
+循环内未设超时	导致连接长期阻塞

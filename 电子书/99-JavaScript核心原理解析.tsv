@@ -1,0 +1,27 @@
+什么是JavaScript规范中的"引用"类型？	引用是表达式求值的结果，用于属性存取（如obj.x）和函数调用，存储目标对象和属性名，支持动态解析。
+delete 0 的行为是什么？	delete 0 返回true（无错误），但实际无效，因为delete只能删除对象属性；值不能被删除。
+var x = y = 100; 的问题是什么？	y未声明，导致泄漏为全局变量；正确做法是分别声明，如var x = 100, y = 100;避免隐式全局污染。
+表达式和语句的核心区别？	表达式求值返回结果值（如1+2=3），语句执行返回完成记录（如throw）；表达式可嵌套，语句控制执行流。
+解释a.x = a = {n:2}; 的执行顺序。	先计算左侧a.x（引用原始a），再计算右侧a = {n:2}（覆盖a），最后将新对象赋给原始a的x属性，可能导致属性丢失。
+箭头函数x => x 的本质是什么？	是单参数匿名函数表达式，省略大括号时直接返回值；无自身this，继承外层作用域，用于函数式编程。
+for (let x of [1,2,3]) 的开销为何大？	每次迭代创建新作用域实例（iterationEnv），存储迭代变量；开销类似函数递归，因引擎需管理多个环境。
+yield 关键字如何工作？	在生成器函数中暂停执行，返回{value, done}；function* 生成迭代器，.next()恢复执行，用于异步流控制。
+throw 1; 为什么被称为"最简单语句"？	只返回throw类型完成记录，无复杂求值；ECMAScript规范中仅3行实现：求值表达式、取GetValue、返回ThrowCompletion。
+对象和数组的本质区别？	对象是关联数组（键值对），数组是索引数组（有序序列）；两者可互转，如[...obj]需Symbol.iterator迭代器。
+super.xxx() 如何绑定this？	通过当前方法的[[HomeObject]]找到父类，super.xxx触发函数调用，this值从环境复制（非super自身），依赖执行上下文。
+export default function() {} 的问题？	无法导出匿名函数表达式，因export default需绑定标识符；规范中处理为"default"名字的引用。
+new X 的执行过程？	调用构造函数：1. 创建this对象（原型为X.prototype）；2. 执行构造函数代码；3. 若有return对象则覆盖this。
+Object.create(new.target.prototype) 的作用？	在类构造器中创建实例，new.target指向子类，用于自定义根类（如extends null时手动设置原型）。
+解构赋值[a, b] = {a, b} 如何工作？	右侧对象需实现Symbol.iterator（如Object.values(this)），左侧数组模板绑定变量；本质是数据结构转换。
+
+
+JavaScript 中对象和数组的本质是什么？	对象是关联数组（键值对集合），数组是索引数组（有序序列）。数组是对象的特例，索引即属性名（如 arr[0] 等价于 arr["0"]）。
+解构赋值 [a, b] = {a, b} 如何使其可执行？	需为 Object.prototype 添加 Symbol.iterator 方法（如 yield* Object.values(this)），使对象可迭代转换为值序列。
+展开语法 ...obj 会处理原型链属性吗？	不会。展开语法仅处理对象自身的可枚举属性，忽略原型链属性和不可枚举属性（如 Object.create() 添加的属性）。
+迭代器协议要求对象实现什么方法？	[Symbol.iterator]() 方法，返回含 next() 方法的对象。next() 返回 {value, done}，支持 return()/throw() 处理中断。
+生成器函数中 yield 如何实现双向通信？	yield 暂停执行返回 {value, done}；下次 next(arg) 恢复时，arg 作为 yield 表达式的值传入（如 function* gen() { const x = yield 10 }）。
+执行上下文包含哪些核心组件？	变量环境（VariableEnvironment）、词法环境（LexicalEnvironment）、this 绑定（ThisBinding）。函数上下文还有闭包存储。
+new.target 在构造函数中的作用是什么？	指向 new 调用的类或函数。用于检测是否通过 new 调用（如 if (!new.target) throw error），或在派生类中访问父类构造器。
+派生类（有 extends）的实例如何创建？	this 由父类构造器创建，子类需先调用 super() 初始化父类，才能访问 this 和添加子类属性（否则 ReferenceError）。
+ES6 模块在导入导出阶段会执行代码吗？	不会。模块装配阶段只处理静态的 import/export 绑定，代码执行推迟到模块求值阶段（顶层代码执行时）。
+引用类型（Reference）由哪三部分组成？	基对象（base）、属性名（name）、严格模式标志（strict）。用于描述 obj.x 等表达式，存储对象和属性信息。

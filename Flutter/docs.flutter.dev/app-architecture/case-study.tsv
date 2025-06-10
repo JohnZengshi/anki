@@ -1,0 +1,34 @@
+案例研究应用名称？	Compass（行程规划应用）。
+应用架构模式？	MVVM（遵循Flutter官方架构指南）。
+核心功能示例？	1.用户账户展示 2.行程列表 3.新建行程 4.登出。
+代码组织原则？	按功能+类型混合组织（feature-type hybrid）。
+项目目录结构？	lib/data, lib/domain, lib/ui, test, testing。
+UI层代码位置？	lib/ui/<功能名>/view_model + widgets。
+共享UI组件位置？	lib/ui/core/ui（品牌化共享组件）。
+领域模型位置？	lib/domain/models（数据层和UI层共用）。
+数据层结构？	lib/data/repositories + services + model。
+多环境入口文件？	main_development.dart, main_staging.dart, main.dart。
+测试目录结构？	test/ 镜像lib结构（test/data, test/ui等）。
+测试工具目录？	testing/（包含mock和测试工具）。
+状态管理方案？	ChangeNotifier + Listenable。
+命令模式应用？	ViewModel暴露命令供视图绑定事件。
+依赖注入方案？	使用package:provider实现。
+视图-ViewModel关系？	1:1对应（每个功能独立配对）。
+仓库核心职责？	1.数据转换 2.缓存 3.错误处理 4.重试逻辑。
+服务层特点？	无状态，仅封装API端点。
+领域层使用策略？	按需添加（非必需）。
+测试覆盖重点？	各层独立测试（数据层/UI层/工具类）。
+代码冲突预防？	功能模块化隔离（减少多人开发冲突）。
+新成员上手关键？	清晰目录结构+架构文档。
+路由管理位置？	lib/routing（集中管理导航）。
+工具类位置？	lib/utils（辅助函数和扩展）。
+配置管理位置？	lib/config（环境变量/常量）。
+主题管理位置？	lib/ui/core/themes（品牌主题定义）。
+API模型位置？	lib/data/model（原始API数据结构）。
+领域模型价值？	转换API数据为应用可用格式。
+视图模型测试关键？	模拟仓库依赖，验证状态变更。
+可扩展性体现？	1.清晰分层 2.依赖抽象 3.模块化功能。
+替代状态管理方案？	Riverpod, flutter_bloc, signals等。
+数据流替代方案？	可使用Stream替代方法调用。
+领域层决策因素？	团队需求+复杂度（无标准答案）。
+核心架构原则？	单向数据流+关注点分离+单一数据源。

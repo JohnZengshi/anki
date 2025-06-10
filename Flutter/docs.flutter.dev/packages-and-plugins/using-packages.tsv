@@ -1,0 +1,22 @@
+包(package)和插件(plugin)的关系？	插件是特殊类型的包（全称plugin package）。
+包的最小组成？	包含pubspec.yaml文件的目录。
+插件包的独特价值？	提供跨平台功能（如相机/浏览器调用）。
+官方包资源库？	pub.dev（含Google和社区开发的包）。
+Flutter Favorites是什么？	pub.dev上官方推荐的首选包集合。
+添加包依赖的三步？	1.pubspec.yaml声明 2.flutter pub get 3.Dart导入。
+命令行添加依赖？	flutter pub add 包名（如flutter pub add css_colors）。
+命令行移除依赖？	flutter pub remove 包名。
+依赖安装后的必要操作？	完全重启应用（热重载不更新平台代码）。
+冲突解决核心方法？	1.版本范围约束 2.依赖覆盖(dependency_overrides)。
+版本范围推荐写法？	使用插入符语法：^5.4.0（兼容5.4.0到6.0.0）。
+强制版本覆盖示例？	dependency_overrides: url_launcher: '5.4.0'。
+Android专属冲突解决？	Gradle配置中force强制版本。
+包版本锁定机制？	pubspec.lock文件记录具体安装版本。
+更新包命令？	flutter pub upgrade（更新到允许的最新版）。
+本地包依赖方式？	path: ../本地包路径/。
+Git仓库依赖方式？	git: url: https://github.com/...。
+Git子目录依赖？	添加path参数：git: url:... path: 子目录/。
+css_colors包作用？	提供CSS颜色常量（如CSSColors.orange）。
+url_launcher插件功能？	调用平台默认浏览器打开URL。
+插件包的特殊性？	包含平台原生代码（Kotlin/Swift等）。
+版本约束严格限制？	避免固定版本：image_picker: '5.4.3'（不推荐）。

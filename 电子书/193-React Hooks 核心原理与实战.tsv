@@ -1,0 +1,38 @@
+Hooks 的设计目标是什么？	解决 Class 组件逻辑复用难、生命周期分散问题，提升函数组件能力
+useEffect 的依赖数组为空时何时执行？	仅在组件首次挂载时执行，相当于 componentDidMount
+如何避免子组件因回调函数变化而重复渲染？	用 useCallback 缓存回调函数，依赖项变化时更新
+useMemo 和 useCallback 的本质区别是什么？	useMemo 缓存计算结果，useCallback 缓存函数引用
+useRef 有哪些典型使用场景？	1) 存储跨渲染数据（如定时器ID） 2) 访问 DOM 节点
+在函数组件中如何读取 Context 值？	使用 useContext(ContextObject) 直接获取最近 Provider 的值
+自定义 Hook 的命名规范是什么？	必须以 "use" 开头（如 useWindowSize），内部可调用其他 Hooks
+如何实现监听浏览器窗口大小变化的 Hook？	useEffect 中添加 resize 事件监听，返回清理函数移除监听
+什么是"状态最小化"原则？	不存储可通过计算得到的数据（如从 URL 直接读取参数而非复制到 state）
+扩展点机制如何解决组件耦合问题？	通过全局注册机制（如 register('event', fn)），避免组件间直接导入
+表单处理中受控组件 vs 非受控组件的区别？	受控：value + onChange 绑定状态；非受控：用 ref 读取 DOM 值
+如何用 Hook 实现表单校验？	在 useForm 中管理 errors 状态，为每个字段配置验证函数
+容器模式如何解决 Hooks 的条件执行问题？	通过条件渲染组件隔离 Hooks 执行（如 if (!visible) return null）
+Redux 在函数组件中的核心 API 有哪些？	useSelector 读取状态，useDispatch 触发 action
+异步 Action 在 Redux 中的实现原理是什么？	redux-thunk 中间件：若 action 是函数则执行它，可延迟 dispatch
+
+React Hooks的两个核心优势是什么？	逻辑复用（替代高阶组件）和关注分离（聚合业务逻辑代码）
+为什么React要引入Hooks机制？	解决Class组件逻辑复用困难、生命周期方法分散问题，让函数组件具备状态管理能力
+useEffect的四种执行时机分别对应什么场景？	1. 无依赖项：每次render后执行<br>2. 空依赖项[]：componentDidMount<br>3. 有依赖项[deps]：首次+依赖变化执行<br>4. 返回函数：componentWillUnmount
+如何避免useCallback重复创建函数？	用useCallback包裹函数并指定依赖项，如：<br>const fn = useCallback(() => {...}, [dep])
+useMemo和useCallback的本质区别是什么？	useMemo缓存计算结果，useCallback缓存函数引用
+为什么说Context是"全局变量"？需注意什么？	Context跨组件共享数据，但会：<br>1. 增加调试难度<br>2. 降低组件复用性（需Provider父链）
+表单开发中受控组件 vs 非受控组件的核心区别？	受控：value+onChange完全由React控制<br>非受控：用ref读取DOM值，性能更好但难动态响应
+自定义Hook的命名规范是什么？	必须以"use"开头（如useWindowSize），内部调用其他Hooks
+如何实现"按条件执行Hooks"？	容器模式：将条件判断提升到父组件，如：<br>if(!visible) return null; <br>return <HookComponent/>
+Redux处理异步Action的核心机制是什么？	redux-thunk中间件：若action是函数则执行它，可延迟dispatch
+
+
+Hooks 调用必须遵守什么核心规则？	必须在组件顶层作用域调用，不能置于条件/循环语句中
+如何解决"条件渲染中需要调用 Hooks"的问题？	使用容器模式：将条件判断提升到父组件，通过props控制子组件渲染
+容器模式的实现原理是什么？	父组件根据条件返回null或渲染子组件，确保子组件内Hooks始终被执行
+Render Props 模式的本质是什么？	将UI渲染逻辑通过函数prop（通常命名为render或children）传递给组件
+Render Props 最适合什么场景？	重用UI渲染逻辑（如列表折叠、动态表格），尤其当Hooks无法封装UI时
+ListWithMore组件如何实现"显示更多"功能？	通过max属性控制可见项数量，隐藏项放入Popover，均使用renderItem函数渲染
+为什么Hooks不能完全替代Render Props？	Hooks擅长封装数据逻辑，但无法直接重用包含UI结构的渲染逻辑
+如何设计可复用的折叠列表组件？	接收renderItem函数+max属性，内部实现切片逻辑和Popover交互
+容器模式中父组件的职责是什么？	仅做条件判断，不包含业务逻辑，确保子组件Hooks稳定执行
+Render Props 命名的常见约定是什么？	可使用children属性或任意命名（如renderItems），本质是函数类型的prop

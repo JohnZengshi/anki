@@ -1,0 +1,19 @@
+Flutter中显示数据列表的基本组件是什么？	ListView。
+适合少量列表项的ListView构造方式是什么？	使用标准ListView构造函数配合children属性。
+ListView中使用什么组件结构化列表项？	ListTile。
+ListTile的基本结构是什么？	包含leading（前置图标）、title（主文本）等属性。
+如何创建包含地图图标的列表项？	ListTile(leading: Icon(Icons.map), title: Text('Map'))。
+如何创建包含相册图标的列表项？	ListTile(leading: Icon(Icons.photo_album), title: Text('Album'))。
+如何创建包含电话图标的列表项？	ListTile(leading: Icon(Icons.phone), title: Text('Phone'))。
+ListView的children属性接受什么类型？	<Widget>列表（如const <Widget>[...]）。
+如何为ListView添加多个列表项？	在children数组中添加多个ListTile实例。
+基础列表布局的基本结构是什么？	MaterialApp > Scaffold > AppBar + ListView。
+如何设置ListView的应用标题？	在MaterialApp的title属性和AppBar的title中设置。
+静态列表适合什么场景？	仅包含少量固定项目的列表。
+ListTile的leading属性通常放置什么？	图标（如Icons.map）或其他前置组件。
+为什么示例中使用const修饰ListTile？	优化性能（组件在编译时恒定不变）。
+基础列表布局中body属性放置什么？	ListView组件。
+如何创建垂直滚动列表？	默认ListView即提供垂直滚动功能。
+ListTile组件来自哪个库？	Material库（需导入package:flutter/material.dart）。
+如何添加列表项间的分隔线？	使用Divider组件（文档未展示但常用）。
+如何使列表项可点击？	添加onTap回调函数（文档未展示但常用）。

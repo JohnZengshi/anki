@@ -1,0 +1,10 @@
+glb文件在浏览器中会每次从服务器下载吗？	不一定。可通过HTTP缓存、Service Worker等策略避免重复下载。
+最优的glb文件缓存方案是什么？	配置HTTP响应头：<br>Cache-Control: public, max-age=2592000（30天）<br>配合ETag或Last-Modified验证。
+Cache-Control头部中"max-age=3600"的含义？	资源可被缓存3600秒（1小时），期间浏览器直接读取缓存不请求服务器。
+Cache-Control中no-cache和no-store的区别？	no-cache：需向服务器验证缓存有效性（304则用缓存）<br>no-store：完全禁止缓存，始终重新下载。
+如何强制客户端更新修改过的glb文件？	方法1：文件名添加哈希（如model.abcd12.glb）<br>方法2：缩短max-age时间并启用ETag验证。
+Service Worker适合什么缓存场景？	需离线使用/PWA应用/精细控制缓存策略时（如Cache First/Stale-While-Revalidate）。
+LocalStorage为什么不适合缓存glb文件？	1. 存储空间小（仅5-10MB）<br>2. 仅支持字符串<br>3. 需手动管理二进制转换。
+IndexedDB能缓存glb吗？有什么缺点？	能存储二进制，但缺点：<br>1. 需手动实现Blob转换<br>2. 缓存更新逻辑复杂<br>3. 用户可能清除数据。
+ETag如何减少glb文件传输？	首次请求返回ETag哈希值，后续请求携带If-None-Match头部，若文件未变则服务器返回304（不传输文件）。
+Nginx中如何配置glb缓存？	location ~* \\.glb$ {<br>&nbsp;&nbsp;add_header Cache-Control "public, max-age=2592000";<br>}

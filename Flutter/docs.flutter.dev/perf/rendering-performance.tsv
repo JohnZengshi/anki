@@ -1,0 +1,20 @@
+渲染性能分析的首选工具是什么？	DevTools中的Performance View。
+调试模式为什么不能反映真实性能？	包含调试开销，不具生产环境代表性。
+性能分析的正确构建模式？	Profile模式（flutter run --profile）。
+检测过度UI重建的方法？	使用DevTools的"Show performance data"功能。
+处理大型列表的常见错误？	直接构建子项而非使用ListView。
+移动端首次动画卡顿的原因？	着色器编译问题（Shader Jank）。
+解决移动端首次动画卡顿的方法？	参考"Reduce shader animation jank on mobile"文档。
+Web优化的核心策略？	1.摇树优化 2.延迟加载 3.图片预加载。
+Web优化中提高感知性能的方法？	1.图片占位符 2.禁用过渡动画。
+Flutter高性能渲染的基础？	Skia引擎快速创建/销毁Widget的能力。
+避免渲染卡顿的关键原则？	最小化每帧UI变化范围。
+动画帧率分析的最佳实践？	在Profile模式下分析。
+Web优化的资源加载技巧？	预加载关键图片资源。
+如何减少不必要的UI重建？	通过DevTools跟踪Widget重建次数。
+ListView的性能优势？	仅构建可见项，惰性加载。
+移动/Web优化的关注点差异？	移动：着色器编译；Web：资源加载和感知性能。
+文档提到的Web优化参考资源？	Flutter Gallery应用的优化经验文章。
+Flutter默认高性能的原因？	架构设计避免常见性能陷阱。
+何时需要深度优化？	当出现jank（非流畅动画）时。
+Web导航体验优化？	禁用非必要过渡动画提高响应速度。

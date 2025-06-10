@@ -1,0 +1,23 @@
+Flutter的性能目标是多少？	60fps（每帧16ms）或120fps（120Hz设备）。
+什么是jank（卡顿）？	UI渲染不流畅，单帧耗时远超16ms导致掉帧。
+性能分析的正确设备选择？	用户可能使用的最慢物理设备（非模拟器）。
+性能分析的正确构建模式？	Profile模式（保留性能追踪功能）。
+命令行启用Profile模式？	flutter run --profile。
+性能覆盖图显示什么？	UI线程和光栅线程的耗时统计（最近300帧）。
+性能覆盖图的白线意义？	16ms分界线（超过表示低于60fps）。
+红色竖条表示什么？	当前帧超时（UI线程红：Dart代码耗时；光栅线程红：渲染复杂）。
+UI线程负责什么？	执行Dart代码，构建层树（layer tree）。
+光栅线程负责什么？	将层树渲染为像素（调用Skia/Impeller）。
+平台线程负责什么？	运行插件代码（不显示在性能覆盖图中）。
+如何开启性能覆盖图？	1.DevTools检查器 2.命令行按P键 3.代码设置。
+UI线程出现红条如何排查？	分析Dart代码性能（使用DevTools时间线）。
+光栅线程红条的常见原因？	1.saveLayer调用 2.透明度叠加 3.复杂裁剪/阴影。
+如何检测saveLayer调用？	开启PerformanceOverlayLayer.checkerboardOffscreenLayers查看闪烁框。
+图片缓存如何检测？	开启检查器查看静态图像的棋盘格（无闪烁表示已缓存）。
+优化静态图像缓存？	用RepaintBoundary包裹图像。
+如何排查动画性能？	1.放慢动画速度（5x） 2.检查首帧/全程卡顿 3.避免裁剪。
+Widget重建分析工具？	Android Studio的Widget重建设计器（Show performance data）。
+性能基准测试内容？	1.卡顿率 2.安装包大小 3.电池效率 4.启动时间。
+Web性能分析限制？	DevTools无法连接Profile模式Web应用（用Chrome DevTools）。
+层树是什么？	轻量级设备无关的绘制指令集合。
+saveLayer为什么昂贵？	创建离屏缓冲区，导致GPU渲染目标切换。

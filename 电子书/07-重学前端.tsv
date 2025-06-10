@@ -1,0 +1,651 @@
+# 前端发展史
+前端发展的三个时代名称	青铜时代（静态网页）→ 白银时代（前后端分离）→ 黄金时代（全端化）
+Web 1.0到Web 2.0的标志性技术	Ajax（如Gmail应用）
+黄金时代前端的重要变化	独立发布权限、工程体系建立、前端框架（React/Vue/Angular）竞争发展
+
+# 学习方法
+前端学习的两个核心方法论	1. 建立知识架构（逻辑性+完备性） 2. 追本溯源（研究技术背景和原始论文）
+JavaScript知识架构顶层划分	文法 → 语义 → 运行时（类型+执行过程）
+CSS属性opacity和display的本质区别	opacity是简单数值属性，display背后涉及完整布局体系（正常流/弹性布局/Grid）
+
+# 知识体系
+前端知识四大模块	1. JavaScript 2. CSS/HTML 3. 浏览器原理 4. 工程实践
+浏览器渲染核心流程	解析 → 构建DOM树 → 计算CSS → 渲染 → 合成 → 绘制
+前端工程实践五大方向	性能体系、工具链、持续集成、搭建系统、架构与基础库
+
+# JavaScript类型系统
+JavaScript的7种语言类型	Undefined、Null、Boolean、String、Number、Symbol、Object
+用void 0代替undefined的原因	undefined是变量可被篡改，void 0可确保获取真正的未定义值
+0.1+0.2≠0.3的根本原因	浮点数精度问题（IEEE 754双精度标准），应使用Math.abs(a+b-c)<=Number.EPSILON比较
+Symbol的核心特性	唯一性（描述相同也不相等）、不可枚举、可作为对象非字符串key
+类型转换的装箱操作原理	"."运算符自动创建临时对象（如"abc".charAt(0)实际创建String包装对象）
+
+# 对象系统
+对象的三个本质特征	唯一标识性（内存地址）、有状态、有行为
+JavaScript对象的两类属性	数据属性（value/writable/enumerable/configurable）、访问器属性（getter/setter）
+Object.defineProperty的作用	精确控制属性特征（如设置writable:false创建不可写属性）
+原型系统的核心规则	1. 对象通过[[prototype]]链继承 2. 属性查找沿原型链回溯直至找到或为null
+new运算符的三步操作	1. 以构造器prototype为原型创建对象 2. 执行构造器绑定this 3. 返回对象（或构造器返回值）
+ES6 class的实质	语法糖（底层仍基于原型继承），通过extends实现更规范的继承
+
+# 浏览器API
+BOM与DOM的核心区别	BOM操作浏览器窗口（如window），DOM操作文档结构（如document）
+CSSOM的作用	以对象形式操作CSS规则（如document.styleSheets）
+事件传播的三个阶段	捕获 → 目标 → 冒泡
+
+# 工程实践
+前端性能优化的核心目标	更快的加载速度（FMP/FCP）、更流畅的交互（FPS）
+工具链的关键组成	脚手架、本地服务器、代码检查、构建工具（如Webpack）
+搭建系统的核心价值	解决高重复性需求，提升开发效率（模块化+可视化配置）
+
+# 浮点数精度问题
+为什么0.1+0.2的结果不是0.3	IEEE754双精度浮点数存储限制（二进制无法精确表示0.1），实际值≈0.30000000000000004
+正确比较浮点数的方法	Math.abs(0.1+0.2-0.3) <= Number.EPSILON
+
+# 原型链
+实现tiger继承cat的原型链代码	var tiger = Object.create(cat, {say:{value:()=>console.log("roar!")}})
+Object.create(null)创建的对象特点	无原型链（无法调用toString等方法），纯净数据容器
+
+# 属性描述符
+使对象属性不可删除的配置	Object.defineProperty(obj,'prop',{configurable:false})
+检测属性可枚举性的方法	Object.getOwnPropertyDescriptor(obj,'prop').enumerable
+
+
+
+# JavaScript对象分类
+JavaScript对象分为哪几大类？	宿主对象、内置对象（含固有/原生对象）、普通对象
+宿主对象的行为由什么决定？	由JavaScript宿主环境（如浏览器）决定
+举例说明浏览器提供的宿主对象	window、document、Image构造器
+什么是固有对象(Intrinsic Objects)？	标准规定随JS运行时自动创建的对象实例（如全局对象属性）
+列举三个固有对象例子	Array、Date、RegExp（标准规定自动创建）
+原生对象(Native Objects)如何创建？	用户通过内置构造器（如new Array()）或特殊语法创建
+为什么原生对象无法用class继承？	内部使用私有字段（如[[DateValue]]），破坏原型继承
+普通对象(Ordinary Objects)的特征？	由{}、Object构造器或class创建，支持原型继承
+
+# 函数与构造器
+函数对象的核心特征是什么？	具有[[call]]私有字段
+构造器对象的核心特征是什么？	具有[[construct]]私有字段
+Date作为函数调用时返回什么？	当前日期字符串（如"Wed Jun 09 2021..."）
+Date作为构造器调用时返回什么？	Date对象实例
+Image构造器能否作为函数调用？	否，会抛出错误
+箭头函数能否作为构造器？	不能，new (a=>0)会报错
+用户定义函数的[[call]]和[[construct]]关系？	执行相同代码，但调用方式不同
+
+# 特殊对象行为
+Array对象的特殊行为是什么？	length属性自动随下标变化
+Object.prototype的特殊限制？	不能重新设置原型
+String对象的属性访问特性？	正整数索引返回对应字符（如'abc'[1]='b'）
+Arguments对象的特性？	非负整数属性与函数参数变量联动
+bind后的函数有何特殊？	与原函数关联，保留绑定上下文
+
+# 执行机制
+宏观任务(Macrotask)由谁发起？	宿主环境（如setTimeout）
+微观任务(Microtask)由谁发起？	JS引擎（如Promise.then）
+任务执行顺序规则？	微观任务优先于宏观任务
+如何分析异步代码执行顺序？	1.划分宏任务 2.分析微任务 3.确定执行次序
+Promise.resolve()产生的任务类型？	微观任务
+setTimeout(fn,0)产生的任务类型？	宏观任务
+
+# 闭包与上下文
+闭包的本质是什么？	携带定义时环境的函数（环境+标识符列表+函数体）
+执行上下文在ES2018包含哪些部分？	词法环境、变量环境、代码位置、函数引用等
+var声明的核心特征？	函数作用域，穿透块级作用域
+let声明的核心改进？	块级作用域（for/if/try等语句内有效）
+Realm的核心作用？	提供独立内置对象集（如iframe环境）
+
+# 函数类型
+ES2018定义的8种函数类型？	普通函数、箭头函数、类方法、生成器函数、类、异步普通函数、异步箭头函数、异步生成器函数
+普通函数中this如何确定？	由调用时的引用决定（如obj.fn()的this为obj）
+箭头函数中this如何确定？	继承定义时外层this（与调用方式无关）
+类方法中this的特性？	默认严格模式，未绑定调用时为undefined
+call/apply能否改变箭头函数的this？	不能，但可传参
+哪些函数类型支持new操作？	仅普通函数和类
+
+# 语句执行
+Completion Record的三个字段？	[[type]]（break/return等）、[[value]]、[[target]]
+try中包含return时finally是否执行？	是，finally始终执行
+finally中包含return时会发生什么？	覆盖try/catch中的返回值
+带标签语句的核心用途？	配合break/continue跳出多层循环（如break outer）
+语句块中非normal类型的影响？	中断后续语句执行（如return后的代码不执行）
+
+# 词法分析
+为什么12.toString()会报错？	12.被解析为数字直接量，点号成为小数部分
+正确访问数字属性方法？	12 .toString() 或 (12).toString()
+数字直接量支持的进制表示？	十进制、二进制(0b)、八进制(0o)、十六进制(0x)
+字符串模板的词法处理特点？	被拆分为模板头、中段、尾（如`a${b}c`拆为三部分）
+正则表达式直接量的限制？	第一个字符不能是*（避免与注释冲突）
+
+# 函数类型与this
+以下代码输出为什么是undefined？ 
+class C{showThis(){console.log(this)}}
+let o=new C(); let fn=o.showThis; fn()	类方法默认严格模式，未绑定调用时this为undefined
+
+# 任务系统
+为什么Promise.then在setTimeout前执行？	Promise产生微任务，setTimeout产生宏任务，微任务优先
+
+
+# 四则运算解释器
+解释器实现的四个主要步骤？	词法分析、语法分析、构建AST、解释执行
+词法分析的作用？	将字符串流转换为token流
+在四则运算词法分析中，如何处理数字？	连续数字字符组合成Number token
+语法分析阶段使用的分析方法是？	LL算法（递归下降）
+四则运算语法中，AdditiveExpression的产生式是什么？	AdditiveExpression ::= MultiplicativeExpression | AdditiveExpression '+' MultiplicativeExpression | AdditiveExpression '-' MultiplicativeExpression
+构建AST时，加法节点如何表示？	{type:"AdditiveExpression", operator:"+", children:[左操作数,运算符,右操作数]}
+解释执行阶段如何计算表达式？	后序遍历AST，递归计算子节点
+如何扩展解释器支持括号？	在语法规则中加入带括号的PrimaryExpression产生式
+
+# 分号规则
+JavaScript自动插入分号的三条规则？	1.换行符+下个符号不合法时插入 2.换行符+语法禁止换行处插入 3.源代码结束处不完整时插入
+什么情况下会触发"no LineTerminator here"规则？	当语法结构明确禁止换行符的位置（如return后）
+哪些语法结构有"no LineTerminator here"限制？	return/break/continue/throw/后自增减/async/箭头函数/yield
+不写分号时，以什么字符开头会导致问题？	括号(()、数组([])、正则(//)、模板字符串(`)
+如何避免IIFE因分号缺失导致的错误？	在IIFE前加分号或在行首加!
+以下代码为何报错？a = b\n(function(){})()	换行后函数调用被解释为b的参数
+
+# 模块与脚本
+脚本(script)与模块(module)的核心区别？	模块支持import/export，脚本不支持
+在HTML中如何引入模块？	<script type="module" src="...">
+import声明有哪两种基本形式？	import "mod"（执行模块）和 import v from "mod"（导入默认导出）
+export声明有哪两种主要形式？	独立export声明（export {x}）和在声明前加export关键字
+export default的特殊行为？	导出一个匿名值，导入时可任意命名
+以下代码输出什么？模块a: export var a=1; export function modify(){a=2} 模块b: import {a,modify} from "./a"; console.log(a); modify(); console.log(a)	1和2（导入绑定是动态引用）
+
+# 预处理机制
+JavaScript预处理阶段处理哪些声明？	var/function/class/const/let
+var声明的预处理特点？	声明提升到作用域顶部，初始化为undefined
+function声明的预处理特点？	声明+赋值整体提升
+class声明的预处理特点？	声明提升但形成暂时性死区（TDZ），提前访问报错
+以下代码输出？console.log(foo); function foo(){}	foo函数体（函数声明整体提升）
+以下代码输出？console.log(c); class c{}	报错（class声明前不可访问）
+
+# 语句类型
+普通语句与声明型语句的关键区别？	声明型语句响应预处理，普通语句只有执行过程
+哪些语句属于声明型语句？	var/let/const/function/class
+for...in循环的特点？	遍历对象可枚举属性（含原型链），顺序不确定
+for...of循环的机制？	基于迭代器协议(Iterator)遍历
+如何使普通对象可用于for...of？	实现[Symbol.iterator]方法
+try...catch...finally中，finally何时执行？	无论是否异常都会执行（即使try/catch中有return）
+
+# 表达式
+什么是表达式语句？	能产生值的语法结构（函数调用/赋值/自增减等）
+PrimaryExpression包含哪些？	直接量/this/变量/括号表达式
+MemberExpression有哪些形式？	属性访问(a.b/a["b"])/模板调用(f`x`)/带参数new(new Cls())
+左值表达式(LeftHandSideExpression)指什么？	可放在赋值运算符左边的表达式（变量/属性访问等）
+乘方运算符(**)的特点？	右结合（如2**3**2=2**(3**2)=512）
+逗号运算符的作用？	连接表达式，返回最后一个表达式的值
+
+# 分号陷阱案例
+为何这段代码报错？[1,2,3].forEach()\n[4,5,6].forEach()	数组直接量换行被解释为下标访问：1[4,5,6].forEach
+
+# 模块绑定
+模块a中: export let a=1; export function inc(){a++} 模块b中: import {a,inc} from './a'; inc(); console.log(a)	输出2（模块绑定是动态引用）
+
+# 暂时性死区
+以下代码输出？ let x=1; { console.log(x); let x=2 }	报错（块内let声明导致暂时性死区）
+
+
+# HTML语义标签
+语义类标签的主要作用是什么？	增强可读性、利于SEO、支持读屏软件、便于团队维护
+div和span在什么场景下使用是合理的？	软件界面（非富文本）场景
+ul/ol误用的常见错误是什么？	所有并列关系都用ul/ol，造成冗余标签
+em标签和strong标签的本质区别？	em表示重音（强调发音），strong表示重要性
+ruby标签的作用是什么？	用于文字注音或注解（如日文中的注音）
+figure和figcaption的典型用法？	包裹图片/代码/表格等独立内容，figcaption为其标题
+dfn标签的使用场景？	包裹被定义的术语（通常在定义句中出现）
+abbr标签必须配合什么属性使用？	title属性（填写完整形式）
+time标签的datetime属性作用？	提供机器可读的时间格式（如"2015-07-09"）
+article和body的结构相似性体现在？	都可以包含header/section/footer等结构
+
+# HTML元信息标签
+head标签必须包含什么子标签？	至少一个title标签
+title和h1标签的核心区别？	title用于无上下文场景（收藏夹/分享卡片），需完整概括；h1用于页面内有上下文场景
+base标签为什么被认为危险？	改变全局链接基准地址，易与JavaScript冲突
+推荐用什么代替base标签？	JavaScript动态设置链接基准
+charset型meta标签应放在head的什么位置？	第一个子元素位置（避免乱码）
+http-equiv="content-type"的作用等价于？	HTTP头中的Content-Type字段
+viewport meta的user-scalable=no可能带来什么问题？	移动端视力障碍用户无法缩放页面
+哪些meta的name值是预定义的标准？	application-name/author/description/generator/keywords/referrer/theme-color
+theme-color meta影响什么？	浏览器窗口边框或Tab的颜色（不影响页面内容）
+
+# CSS语法结构
+CSS顶层样式表由哪两种规则组成？	at-rule（@规则）和qualified rule（普通规则）
+@charset的作用和限制？	声明CSS文件字符编码，必须出现在样式表最开头
+@import可以引入什么？	另一个CSS文件的全部内容（除@charset）
+@media的典型应用场景？	根据设备类型应用不同样式（如print媒体类型）
+@page用于什么输出场景？	分页媒体（如打印页面时）
+@counter-style的作用？	自定义列表项标记样式
+@keyframes的核心产出？	定义动画关键帧序列
+@font-face的经典应用？	自定义字体（如图标字体技术）
+普通规则由哪两部分构成？	选择器和声明区块
+CSS选择器语法中双竖线||的作用？	选中特定列（如表格中选列）
+
+# CSS函数
+calc()函数的最大优势？	支持混合单位运算（如100% - 20px）
+attr()函数的作用？	使CSS属性值可读取HTML属性值
+toggle()函数的典型场景？	在多个值之间循环切换（如列表项交替样式）
+clamp()函数的参数意义？	clamp(最小值, 基准值, 最大值)
+var()函数通常配合什么使用？	CSS自定义属性（以--开头的属性）
+哪些CSS属性会接受函数值？	transform/easing-function/content等
+cubic-bezier()属于哪类函数？	缓动函数（定义动画速度曲线）
+url()函数可以用于哪些属性？	background-image/cursor/list-style-image等
+
+# 语义标签误用案例
+以下代码问题在哪？<ul><li>苹果</li><li>香蕉</li><li>橘子</li></ul>	若仅为并列词语展示（非列表项），应使用纯文本+逗号而非ul
+
+
+# CSS选择器
+CSS选择器分为哪四种结构？	简单选择器、复合选择器、复杂选择器、选择器列表
+如何选中SVG中的a元素？	使用带命名空间的类型选择器：svg|a { ... }
+全体选择器用什么符号表示？	*（星号）
+属性选择器[att~=val]的作用？	检查元素属性值是否包含用空格分隔的val
+:root伪类的作用是什么？	表示文档树的根元素（在scoped CSS中特别有用）
+:empty伪类会忽略什么类型的子节点？	空白文本节点
+:nth-child(2n+1)匹配哪些元素？	奇数位置的子元素
+:any-link和:link的区别？	:any-link匹配所有链接元素，:link只匹配未访问链接
+:focus-within伪类的作用？	匹配包含获得焦点子元素的父元素
+选择器优先级的三元组(a,b,c)分别代表？	a=ID选择器数, b=类/伪类数, c=标签/伪元素数
+计算选择器优先级时为什么用大进制数？	避免出现256个class等于1个ID的历史问题
+选择器列表(逗号分隔)如何计算优先级？	每个选择器独立计算，不合并计算优先级
+为什么建议避免复杂选择器？	影响代码可读性和维护性，可能造成性能问题
+::first-letter可以设置哪些CSS属性？	字体/颜色/背景/内外边距/边框/文本装饰等文本相关属性
+::before必须指定什么属性才生效？	content属性
+伪元素content属性支持什么特殊值？	counter()函数（用于生成计数器）
+
+# HTML链接
+link标签的两种主要类型？	超链接型（被动）和外部资源型（主动下载）
+rel="canonical"的作用？	提示搜索引擎保留哪个URL作为主URL
+如何引入页面RSS订阅？	<link rel="alternate" type="application/rss+xml" href="...">
+rel="preload"的作用？	提前加载href指定的资源（不执行）
+rel="modulepreload"的作用？	预加载JS模块（下载不执行）
+为什么建议页面必须有icon型link？	避免浏览器自动请求不存在的/favicon.ico
+a标签的rel="nofollow"作用？	告诉搜索引擎不要追踪此链接
+a标签的rel="noopener"作用？	阻止新页面通过window.opener访问原页面
+area标签必须配合哪些标签使用？	和<map>标签
+area的热区形状有哪三种？	圆形(circle)、矩形(rect)、多边形(poly)
+如何定义多边形热区坐标？	coords属性提供至少6个值表示各顶点坐标
+
+# CSS排版
+正常流排版的基本规则？	"依次排列，排不下了换行"
+float在正常流中的行为可比喻为？	文字环绕效果
+margin折叠的本质原因？	元素规定了自身周围至少需要的空间
+格式化上下文(formatting context)是什么？	CSS排版过程中的当前状态
+块级格式化上下文如何排列元素？	垂直方向顺次排列
+行内级格式化上下文如何排列元素？	水平方向顺次排列
+哪些元素会创建新块级格式化上下文？	浮动/绝对定位元素/inline-blocks/table-cells/overflow非visible
+等分布局中inline-block出现间隙的原因？	HTML中的换行和空格被当作文本节点
+解决inline-block间隙的方法？	父容器font-size:0 或 移除HTML空格换行
+自适应宽布局中为什么用负margin？	抵消固定宽度元素占用的空间
+为什么自适应宽布局要加padding-left？	将内容从重叠区域"挤"出来显示
+
+# 替换型元素
+替换型元素的定义？	引入外部文件替换自身位置的标签
+为什么引入CSS用href而JS用src？	link非替换型元素用href，script作为替换型元素用src
+data URI的格式示例？	data:image/svg+xml,<svg>...</svg>
+为什么建议给img指定宽高？	避免加载后重排（reflow）
+img的alt属性为什么重要？	对视障用户关键，提升可访问性
+srcset和sizes属性的作用？	根据屏幕条件选择不同图片源
+picture和srcset的区别？	picture使用source元素，支持更复杂的媒体查询
+video为什么推荐用source而非src？	解决不同浏览器视频格式兼容问题
+track标签的kind="captions"作用？	提供音频内容的文字描述（适合听障人士）
+audio与video的主要区别？	audio没有严重的格式兼容问题
+iframe的sandbox模式解决了什么问题？	提供安全隔离，避免跨域问题
+srcdoc属性的作用？	直接在iframe中嵌入HTML内容
+
+
+# HTML标准分析
+HTML标准中描述元素的6个部分是什么？	Categories, Contexts, Content model, Tag omission, Content attributes, DOM interface
+如何用JavaScript获取HTML标准中所有元素定义？	document.querySelectorAll(".element")
+Flex布局主要解决传统CSS的哪三大问题？	垂直居中、两列等高、自适应宽
+Flex排版的核心属性是什么？	display:flex 和 flex属性
+Flex容器和Flex项分别指什么？	display:flex的元素是容器，子元素是flex项
+Flex布局中主轴和交叉轴如何定义？	延伸方向是主轴，垂直方向是交叉轴
+Flex分行算法的第一步是什么？	把flex项分行，flex属性项主轴尺寸视为0
+Flex布局实现垂直居中的关键属性？	justify-content:center; align-content:center; align-items:center;
+两列等高布局的关键属性？	align-items:stretch
+自适应宽布局的关键实现？	给元素添加flex属性
+HSL颜色模型的三个维度？	色相(H)、纯度(S)、明度(L)
+RGBA中的A代表什么？	Alpha通道（透明度）
+CSS渐变有哪两种主要类型？	线性渐变(linear-gradient)和放射性渐变(radial-gradient)
+线性渐变的方向参数有哪些写法？	to bottom/top/left/right, 角度(120deg), 弧度(3.14rad)
+DTD的全称是什么？	Document Type Definition（文档类型定义）
+HTML4.01的三种DTD类型？	严格模式、过渡模式、frameset模式
+HTML5的DTD写法？	<!DOCTYPE html>
+SGML规定的HTML基本语法节点类型？	标签、文本、注释、DTD、处理信息
+文本实体转义的基本格式？	&开头;结尾（如&lt;代表<）
+HTML中必须转义的字符有哪些？	< 和 &（文本节点中）
+如何获取浏览器已实现的CSS属性？	Object.keys(document.body.style).filter(e => !e.match(/^webkit/))
+从W3C标准提取CSS属性的选择器？	.propdef [data-dfn-type=property]
+
+# CSS排版与渲染
+Flex布局中如何计算flex项位置？	三步：分行 → 计算主轴尺寸位置 → 计算交叉轴尺寸位置
+Flex主轴尺寸计算的特殊情况？	容器未指定主轴尺寸时，所有flex尺寸视为0
+Flex如何分配主轴剩余空间？	按flex项比例分配，无flex项时用justify-content
+align-content和align-items区别？	align-content分配行间空间，align-items控制行内对齐
+HSL相比RGB的优势？	更符合人类颜色认知（语义化颜色）
+为什么金色(gold)的CSS表现不佳？	金属色需要反光效果，单一色值无法表现
+线性渐变的color-stop支持哪些单位？	百分比(10%)、固定值(28px)、无单位
+放射性渐变的参数结构？	radial-gradient(形状 尺寸 at 位置, 颜色...)
+CSS中产生形状的关键属性？	border, box-shadow, border-radius
+替代CSS形状的高级方案？	datauri+svg
+RGB颜色中数值范围？	0-255（每个通道1字节）
+CMYK中K代表什么？	黑色(Key)，因印刷经济性单独设置
+CSS颜色系统中真彩色指？	RGB每个通道8位(256级)
+文本实体&amp;表示什么字符？	&
+HTML注释中如何包含-->？	拆分成多个注释节点
+CDATA节点的核心作用？	避免转义，可直接包含<和&字符
+
+# 实验与技巧
+用Flex实现垂直居中的代码要点？	父容器flex+三个center对齐属性
+两列等高布局的关键代码？	父容器align-items:stretch
+自适应宽布局中flex:1的作用？	自动填充剩余空间
+用HSL实现动态变色按钮的原理？	周期性改变hue值生成新颜色
+从W3C标准爬取CSS属性的步骤？	1.获取标准列表 2.iframe加载 3.选择器提取
+处理iframe加载事件的技巧？	用Promise封装load事件
+HTML标准中Categories如何解析？	正则匹配分类内容（如Flow content）
+Content Model解析的难点？	条件语句（if element has src attribute）
+用position:absolute模拟Flex的思路？	计算位置并绝对定位（简化版可单行固定高度）
+CSS渐变创建金属质感的技巧？	多色阶渐变（如gold-yellow-gold）
+CSS颜色名称的缺点？	部分名称（金银）与实际视觉效果不符
+CSS属性挖掘实验的价值？	建立属性-标准映射关系，系统学习CSS
+
+
+# ARIA可访问性
+ARIA的全称是什么？	Accessible Rich Internet Applications
+ARIA的主要作用是什么？	提供一组属性增强网页可访问性，帮助辅助技术理解界面
+可访问性仅服务于视觉障碍用户吗？	不是，它服务于各种设备、环境和人群的访问需求
+ARIA的核心属性是什么？	role属性，用于定义元素的交互角色
+checkbox角色对应的关键属性是什么？	aria-checked和aria-labelledby
+button角色对应的关键属性是什么？	aria-pressed和aria-expanded
+Landmark角色包含哪些常见类型？	navigation, search, banner, main, complementary, contentinfo
+dialog角色有什么特殊行为？	可能产生"焦点陷阱"，阻止焦点离开对话框区域
+
+
+# 浏览器工作原理
+浏览器工作的六个阶段是什么？	请求页面→构建DOM树→计算CSS→排版→渲染→绘制
+HTTP协议基于什么协议？	TCP协议，使用Request-Response模式
+HTTP请求的第一行叫什么？	request line，包含方法、路径和协议版本
+HTTP响应状态码200表示什么？	请求成功
+HTTP响应状态码304表示什么？	资源未修改，使用客户端缓存
+HTTPS的两个主要作用是什么？	确认服务端身份，防止数据被窃听或篡改
+HTTP/2的两大改进是什么？	服务端推送和TCP连接复用
+
+
+# HTML解析与DOM构建
+HTML解析使用的核心技术是什么？	状态机（80种状态）
+状态机实现的关键代码特征？	每个状态是函数，返回下一个状态函数
+DOM树构建使用的数据结构？	栈（stack）
+遇到开始标签时栈如何变化？	入栈新节点，设为当前节点
+遇到结束标签时栈如何变化？	出栈节点，检查是否匹配
+文本节点如何处理？	合并相邻文本节点
+HTML解析的容错处理依据？	W3C的tree-construction规则
+
+
+# CSS计算与排版
+CSS计算发生在DOM构建前还是后？	同步进行，边构建DOM边计算样式
+后代选择器"空格"如何实现？	满足前段条件后检查所有子代
+后继选择器"~"如何实现？	检查父元素相同的后续节点
+子代选择器">"如何实现？	检查直接子节点
+直接后继选择器"+"如何实现？	作为特殊flag匹配一次后失效
+正常流排版的基本原理？	顺次排布+折行，类似文字书写
+绝对定位元素排版特点？	脱离正常流，由top/left定位
+浮动元素排版特点？	先排入正常流再移动到边界
+
+
+# 渲染与绘制
+渲染(render)在图形学的定义？	将模型转换为位图的过程
+浏览器渲染的基本单位？	每个元素对应的盒（box）
+哪两类内容需要不同渲染方式？	图形（背景/边框等）和文字
+字体渲染的关键库？	Freetype（处理像素/矢量字形）
+合成(compositing)的目的是什么？	减少绘制次数，提升性能
+合成策略如何确定？	根据position/transform等属性猜测变化元素
+will-change属性的作用？	提示浏览器合成策略优化
+脏矩形算法是什么？	将屏幕分矩形区域，只重绘受影响区域
+
+# 关键概念对比
+HTTP方法GET和POST的区别？	GET用于获取资源，POST用于提交数据
+HTTP状态码301和302的区别？	301永久重定向，302临时重定向
+正常流/绝对定位/浮动排版区别？	正常流：顺序布局；绝对定位：脱离流；浮动：先流后移
+渲染/合成/绘制的关系？	渲染生成位图→合成优化位图→绘制到屏幕
+RGB/CMYK/HSL颜色模型区别？	RGB：光三原色；CMYK：印刷四色；HSL：色相饱和度明度
+
+# DOM节点类型
+DOM树形结构中所有节点的统一接口是什么？	Node
+列举6种主要的DOM节点类型。	Document, Element, Text, Comment, DocumentType, DocumentFragment
+DocumentFragment节点的主要用途是什么？	高性能地批量添加节点
+哪些节点没有对应的HTML写法？	Document 和 DocumentFragment
+
+# Node接口
+Node接口中表示父节点的属性是什么？	parentNode
+Node接口中表示子节点列表的属性是什么？	childNodes
+Node接口中用于在父节点的子节点列表末尾添加节点的API是什么？	appendChild
+Node接口中用于在父节点的指定子节点前插入新节点的API是什么？	insertBefore
+Node接口中用于替换一个子节点的API是什么？	replaceChild
+Node接口中用于比较两个节点关系的API是什么？	compareDocumentPosition
+Node接口中用于检查一个节点是否包含另一个节点的API是什么？	contains
+Node接口中用于复制节点的API是什么？	cloneNode
+
+# 创建节点
+创建元素节点的方法是什么？	document.createElement
+创建文本节点的方法是什么？	document.createTextNode
+创建注释节点的方法是什么？	document.createComment
+创建文档片段的方法是什么？	document.createDocumentFragment
+
+# Element与Attribute
+Element接口中获取元素属性的方法是什么？	getAttribute
+Element接口中设置元素属性的方法是什么？	setAttribute
+Element接口中删除元素属性的方法是什么？	removeAttribute
+Element接口中检查元素是否有某个属性的方法是什么？	hasAttribute
+Element接口中获取属性节点的方法是什么？	getAttributeNode
+Element接口中设置属性节点的方法是什么？	setAttributeNode
+
+# 查找元素
+document对象中通过CSS选择器查找单个元素的方法是什么？	querySelector
+document对象中通过CSS选择器查找多个元素的方法是什么？	querySelectorAll
+document对象中通过id查找元素的方法是什么？	getElementById
+document对象中通过name属性查找元素的方法是什么？	getElementsByName
+document对象中通过标签名查找元素的方法是什么？	getElementsByTagName
+document对象中通过类名查找元素的方法是什么？	getElementsByClassName
+为什么建议使用getElement系列API而不是querySelector？	性能更高，且返回的集合是动态更新的
+
+# 遍历DOM
+DOM标准中用于遍历节点的两个主要API是什么？	NodeIterator 和 TreeWalker
+创建NodeIterator的方法是什么？	document.createNodeIterator
+NodeIterator的nextNode方法返回什么？	下一个节点，如果没有则返回null
+TreeWalker相比NodeIterator多出的能力是什么？	可以在DOM树上自由移动当前节点（如parentNode, firstChild等）
+
+# Range API
+Range对象表示什么？	HTML文档中的一个连续范围
+创建Range对象的方法是什么？	new Range()
+设置Range起点的方法是什么？	setStart
+设置Range终点的方法是什么？	setEnd
+从用户选中区域创建Range的方法是什么？	document.getSelection().getRangeAt(0)
+提取Range内容的方法是什么？	extractContents
+在Range位置插入节点的方法是什么？	insertNode
+
+
+# CSSOM
+CSSOM包含哪两个部分？	描述样式表和规则等CSS的模型部分（CSSOM）和跟元素视图相关的View部分（CSSOM View）
+获取文档中所有样式表的方法是什么？	document.styleSheets
+向样式表中插入新规则的方法是什么？	document.styleSheets[0].insertRule
+从样式表中删除规则的方法是什么？	document.styleSheets[0].deleteRule
+获取元素最终计算样式的方法是什么？	window.getComputedStyle
+
+
+# CSSOM View
+CSSOM View主要包含哪三个部分？	窗口API、滚动API、布局API
+改变浏览器窗口大小的API是什么？	resizeTo 和 resizeBy
+获取视口横向滚动距离的属性是什么？	scrollX 或 pageXOffset
+获取视口纵向滚动距离的属性是什么？	scrollY 或 pageYOffset
+使页面滚动到特定位置的API是什么？	scroll 或 scrollTo
+使页面滚动特定距离的API是什么？	scrollBy
+获取元素在交叉轴方向的高度的属性是什么？	scrollHeight
+使元素滚动到可见区域的API是什么？	scrollIntoView
+
+
+# 布局API
+获取视口高度的属性是什么？	window.innerHeight
+获取设备物理像素与CSS像素比率的属性是什么？	window.devicePixelRatio
+获取元素所有盒占据的客户端矩形区域的API是什么？	getClientRects
+获取元素包裹所有盒的矩形区域的API是什么？	getBoundingClientRect
+
+
+# 浏览器事件
+浏览器事件的三个主要来源是什么？	键盘、鼠标、触摸屏
+事件传播的捕获过程是怎样的？	从外向内（从根节点到目标节点）
+事件传播的冒泡过程是怎样的？	从内向外（从目标节点到根节点）
+addEventListener的第三个参数可以是什么？	布尔值（true表示捕获，false表示冒泡）或对象（包含capture、once、passive等选项）
+
+
+# 焦点系统
+焦点系统的作用是什么？	处理键盘事件，确定键盘事件的目标元素
+使元素获得焦点的方法是什么？	focus()
+使元素失去焦点的方法是什么？	blur()
+
+# 自定义事件
+创建自定义事件的方法是什么？	new Event(type, options)
+触发自定义事件的方法是什么？	dispatchEvent
+
+
+# 性能优化
+性能优化体系的四个步骤是什么？	现状评估和建立指标、技术方案、执行、结果评估和监控
+前端性能的三个重要方面是什么？	页面加载性能、动画与操作性能、内存和电量消耗
+为什么使用"秒开率"作为性能指标？	1秒内打开的用户体验较好，且避免超长加载用户对平均值的影响
+
+
+# 工具链
+工具链设计需要满足的两个基本要求是什么？	版本一致、避免冲突
+工具链一般覆盖前端开发的哪些任务？	初始化项目、运行和调试、测试、发布
+
+# 持续集成
+前端持续集成的两个主要措施是什么？	预览环境、规则校验
+规则校验的三种方法是什么？	页面结构扫描、运行时数据采集、代码扫描
+
+
+# 搭建系统
+搭建系统的目标是什么？	解决大量简单页面的生产问题
+搭建系统的三种设计思路是什么？	模板化搭建、模块化搭建、数据驱动界面
+搭建系统中的数据按用途分为哪两类？	界面配置数据、内容数据
+搭建系统中的模板由谁生产？	前端工程师
+
+
+# 前端架构
+前端架构解决的三个核心问题是什么？	组件化、适配性、单页应用
+适配性主要适配屏幕的哪三个要素？	单位英寸像素数（PPI）、设备像素比率（DPR）、分辨率
+单页应用（SPA）的主要技术难点是什么？	逻辑页面解耦、独立开发和发布、保持前进后退历史
+
+
+# 组件化方案
+列举5种主流的组件化方案。	Web Component、Vue、React、Angular、自研
+Web Component的主要优势是什么？	无需额外运行时支持，与现代浏览器兼容
+Vue框架的两个主要特点是什么？	符合传统HTML/CSS/JS书写习惯、MVVM模式
+React框架的特点是什么？	JSX语法、可配合React Native开发客户端应用
+
+# 兼容性与适配性
+适配分辨率的主要CSS单位是什么？	vw
+适配DPR的主要CSS规则是什么？	viewport
+适配PPI的主要CSS规则是什么？	media
+
+# 实际应用
+如何高效添加多个DOM节点？	使用DocumentFragment批量操作
+如何获取元素最终渲染尺寸？	使用getBoundingClientRect()
+如何实现事件委托？	在父元素监听事件，利用冒泡机制处理子元素事件
+为什么移动端开发需要viewport配置？	适配不同设备的DPR（设备像素比）
+SPA应用如何保持前进后退历史？	使用URL的Hash部分并监听onhashchange事件
+
+# 前端图形学基础
+前端引入图形学的主要动机是什么？	解决传统前端无法实现的先进交互效果（如光影效果）
+浏览器图形学的技术栈依赖关系是什么？	OpenGL → 浏览器渲染引擎 → 前端应用
+Photoshop中实现图形效果的核心技术是什么？	滤镜（Filter）
+设计稿中的图形可分为哪三类？	图案（Pattern）、图片（Photo）、形状（Shape）
+
+# 图形渲染技术
+如何用代码实现云雾效果？	叠加多张不同比例的噪声图（Noise）
+分形图形的特点是什么？	局部与整体相似，可无限延伸
+Julia Set分形图的特点是什么？	不同常数产生完全不同的图形
+如何实现色相变化效果？	将RGB转HSV修改色相后转回RGB
+绿幕技术的原理是什么？	通过颜色阈值分离前景和背景
+前端实现3D图形的常用库有哪些？	ThreeJS和BabylonJS
+
+# 图形学基础设施
+为什么需要GCanvas？	解决Weex/React Native等原生方案中缺失Canvas的问题
+GCanvas的主要作用是什么？	在原生应用环境中提供Canvas绘制能力
+G3D与ThreeJS的主要区别是什么？	更强调底层管理能力和交互支持（点选/拖拽/顶点变形）
+
+# 交互基础设施演进
+MVC架构提出的时间？	1979年左右
+MVP模式的提出者和时间？	Mike于1995年提出
+MVVM模式的提出背景？	2005年微软架构师为WPF设计
+FLUX模式的出现时间和背景？	2014年Facebook为React设计
+REDUX的出现时间？	2015年
+
+# 现代交互体系
+交互的本质是什么？	操作（输入）和看（输出）
+Binding模式解决的核心问题是什么？	减少JS与Native通讯次数提升性能
+手势识别中pan事件的触发条件？	手指移动超过10px
+手势识别中tap事件的触发条件？	手指快速离开屏幕
+手势识别中press事件的触发条件？	按压超过1.5秒
+陀螺仪数据的核心问题是什么？	0-360度跳变导致计算困难
+现代视图层的核心职责变化？	从被动展示变为同时处理输入输出
+
+# 前端趋势预测
+2019年图形学的发展方向？	2D/3D应用普及，替代PS滤镜效果
+前端包管理的主要问题？	安全问题和依赖过多导致的性能问题
+AI与前端的结合点？	视觉识别和智能研发（如自动切图）
+三大框架(Vue/React/Angular)的预测？	稳定发展，生态持续成熟
+
+# 实际应用
+如何实现设计师的云雾效果需求？	叠加多张不同比例的噪声图(noise)
+如何动态改变图片主色调？	RGB转HSV修改色相后转回RGB
+在Weex环境中如何解决Canvas缺失问题？	使用GCanvas
+如何优化手势事件的性能？	采用Binding模式减少JS-Native通讯
+
+# JavaScript基础
+对象方法中name(){}与name:function(){}的主要区别是什么？	函数的name属性不同，后者可命名用于递归
+const声明数组时push操作是否允许？	允许，const仅禁止重新赋值而非修改内容
+如何冻结对象防止篡改？	使用Object.freeze()
+创建自定义事件的方法是什么？	new Event(type, options)
+触发自定义事件的方法是什么？	dispatchEvent
+
+# 异步与事件循环
+Promise.then中setTimeout的执行顺序特点？	微任务发起的宏任务最后入队执行
+同步请求为什么不被推荐？	会阻塞JavaScript执行线程
+new Promise中setTimeout(resolve)与setTimeout(()=>resolve())的区别？	传参需求不同，无参时可简写
+事件传播的捕获过程是怎样的？	从外向内（根节点到目标节点）
+事件传播的冒泡过程是怎样的？	从内向外（目标节点到根节点）
+
+# CSS与渲染
+为什么推荐使用flex布局替代float？	避免margin兼容问题，更符合现代布局需求
+CSSOM包含哪两个主要部分？	描述样式表的模型部分(CSSOM)和视图相关部分(CSSOM View)
+适配不同屏幕的三个核心要素是什么？	PPI(像素密度)、DPR(设备像素比)、分辨率
+分辨率适配推荐使用什么CSS单位？	vw单位
+CSS规则匹配为什么从右向左？	对复杂选择器更高效，可快速过滤不匹配元素
+
+# 浏览器原理
+DOM树构建与CSSOM构建的先后关系？	CSSOM规则部分先构建，视图部分与DOM同步构建
+浏览器如何检测鼠标事件目标？	从外向内逐级分配，事件捕获确定目标
+修改DOM元素位置会触发什么渲染过程？	重排影响相关元素，重绘影响视觉变化
+位图缓存如何优化渲染性能？	父子元素分别缓存位图，位置变化只需合成
+
+# 工程实践
+前端性能监控主要收集哪些数据？	window.onerror错误和window.performance指标
+搭建系统如何实现逻辑页面独立发布？	发布JavaScript渲染文件+公共HTML载体
+为什么活动页面适合模板化开发？	通过参数化解决多变性需求
+单元测试在什么场景最有效？	框架和基础库开发中效果显著
+
+# HTML与语义化
+footer标签必须明确什么关联关系？	需指明所属内容区域（如文章/章节）
+为什么alt属性不能被figureCaption替代？	alt描述图片内容，figureCaption可能是编号
+style标签为什么不支持src属性？	已有link标签满足外部样式需求
+iframe的使用场景建议是什么？	PC端历史包袱外避免使用，移动端禁用
+
+# 架构与学习
+前端架构解决的三个核心问题？	组件化、适配性、单页应用(SPA)
+2019年前端三大框架发展趋势？	Vue/React/Angular稳定发展，生态持续成熟
+图形学在前端的应用方向？	替代PS滤镜效果，实现2D/3D渲染
+如何建立有效的前端知识体系？	通过写作梳理知识，形成可检索的架构
+
+# 综合问题
+为什么术语中保留英文原词？	避免翻译失真，便于查阅标准文档
+如何阅读Web标准文档？	配合代码实现理解，MDN是更友好选择
+项目技术选型的关键因素？	团队现状、业务需求、基础设施支持
+前端如何拓展职业边界？	学习Node/Electron，但需深入领域知识

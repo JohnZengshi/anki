@@ -1,0 +1,28 @@
+UI层的两个核心组件？	视图(View)和视图模型(ViewModel)。
+视图与视图模型的关系？	1:1对应关系（每个视图有专属ViewModel）。
+视图模型的核心职责？	1.管理UI状态 2.处理UI逻辑 3.向视图暴露命令。
+视图的核心职责？	1.显示数据 2.监听状态更新 3.绑定用户事件。
+UI状态的定义？	渲染视图所需数据的不可变快照。
+如何确保UI状态不可变？	使用freezed包生成不可变数据类（含copyWith/toJson）。
+视图模型如何通知更新？	继承ChangeNotifier并调用notifyListeners()。
+视图监听更新的组件？	ListenableBuilder（监听ViewModel变化）。
+视图模型依赖什么？	数据仓库(Repository)实例（通过构造函数注入）。
+视图模型保存仓库的方式？	私有成员（防止视图直接访问数据层）。
+视图的典型构造函数？	接收key和对应的ViewModel实例。
+命令模式(Command)的作用？	封装用户事件处理逻辑，管理执行状态。
+Command类的核心状态？	running(执行中)/completed(成功)/error(失败)。
+Command执行流程？	1.设置running=true 2.执行异步操作 3.更新结果 4.设置running=false。
+视图如何处理初始加载？	通过Command.running状态显示加载指示器。
+视图如何处理加载错误？	通过Command.error状态显示错误提示和重试按钮。
+命令对象的创建时机？	在视图模型构造函数中初始化。
+用户事件处理流程？	视图调用ViewModel命令→命令调用仓库方法→更新数据。
+删除操作的具体流程？	1.视图调用deleteBooking.execute() 2.ViewModel调用_bookingRepository.delete() 3.成功后更新本地状态。
+替代ChangeNotifier的方案？	Riverpod, flutter_bloc, signals等状态管理库。
+多仓库依赖如何处理？	视图模型构造函数接收多个仓库实例（如BookingRepository+UserRepository）。
+命令参数化实现？	使用Command0(无参)/Command1(单参)等具体实现类。
+预加载数据不存在时？	Command对象持久化状态，视图根据命令状态渲染。
+SliverList中如何绑定事件？	通过itemBuilder传递onDismissed等回调到ViewModel命令。
+视图模型命令调用后注意？	需手动调用notifyListeners()通知视图更新。
+freezed数据类示例？	@freezed class User { const factory User({required String name, required String picture}) = _User; }。
+ListenableBuilder的位置？	包裹需要响应状态变化的部分（非整个页面）。
+命令执行中的UI反馈？	通过Command.running状态显示加载指示器。

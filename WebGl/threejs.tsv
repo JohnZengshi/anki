@@ -1,0 +1,70 @@
+什么是React Three Fiber？	React Three Fiber是Three.js的React渲染器，允许在React组件中声明式地构建Three.js场景。它提供了Canvas组件作为场景容器，支持JSX语法创建3D对象。
+@react-three/drei库的主要作用是什么？	@react-three/drei是React Three Fiber的辅助库，提供了大量预制组件和工具，如CameraControls、Html、Sky、SoftShadows、TransformControls、useGLTF等，简化3D场景开发。
+Canvas组件的gl属性有哪些重要配置？	gl属性配置WebGL渲染器：antialias(抗锯齿)、alpha(透明度)、powerPreference(性能偏好)、stencil(模板缓冲)、depth(深度缓冲)、logarithmicDepthBuffer(对数深度缓冲)、preserveDrawingBuffer(保留绘图缓冲)等。
+Three.js中有哪些主要的光源类型？	主要光源类型包括：ambientLight(环境光，提供整体照明)、directionalLight(方向光，模拟太阳光)、pointLight(点光源，从一点向四周发光)、spotLight(聚光灯，锥形光束)。每种光源都有intensity、color、position等属性。
+ambientLight环境光的特点是什么？	ambientLight提供均匀的全局照明，没有方向性，不产生阴影。常用于提供场景的基础亮度，避免场景过暗。可设置intensity(强度)和color(颜色)属性。
+pointLight点光源的主要属性有哪些？	pointLight主要属性：position(位置)、color(颜色)、intensity(强度)、distance(影响距离)、decay(衰减系数)、castShadow(是否投射阴影)。点光源从一点向四周均匀发光。
+useGLTF Hook的作用是什么？	useGLTF用于加载GLTF/GLB格式的3D模型文件，返回包含nodes(节点)、materials(材质)、cameras(相机)、scenes(场景)的对象。支持预加载和缓存机制。
+GLTF模型加载后如何访问其中的网格对象？	通过useGLTF返回的nodes对象访问，如nodes["meshName"]。可以使用primitive组件渲染：<primitive object={nodes["meshName"]} />，或者clone()方法创建副本避免共享引用。
+Three.js中Vector3的常用方法有哪些？	Vector3常用方法：clone()(克隆)、copy()(复制)、add()(相加)、sub()(相减)、multiply()(相乘)、normalize()(归一化)、length()(长度)、distance()(距离)、lerp()(线性插值)、applyMatrix4()(应用矩阵变换)。
+group组件在Three.js中的作用是什么？	group用于将多个3D对象组合在一起，可以统一设置position、rotation、scale等变换属性。子对象的变换是相对于group的局部坐标系，便于管理复杂的3D场景结构。
+如何在React Three Fiber中创建自定义几何体？	可以直接使用Three.js几何体类，如new THREE.PlaneGeometry(width, height)，然后通过primitive组件渲染：<primitive object={geometry} />，或使用内置几何体组件如<planeGeometry args={[width, height]} />。
+ShaderMaterial的基本结构是什么？	ShaderMaterial包含uniforms(统一变量)、vertexShader(顶点着色器)、fragmentShader(片段着色器)等属性。uniforms用于传递数据到着色器，vertexShader处理顶点变换，fragmentShader处理像素颜色。
+GLSL着色器中precision声明的作用是什么？	precision声明指定浮点数精度：highp(高精度)、mediump(中精度)、lowp(低精度)。移动设备上通常使用mediump平衡性能和精度，桌面设备可使用highp获得更好效果。
+useFrame Hook的用途是什么？	useFrame用于在每帧渲染时执行代码，接收(state, delta)参数。state包含场景状态信息，delta是帧间时间差。常用于动画、物理模拟、相机控制等需要持续更新的逻辑。
+Three.js中材质的transparent和opacity属性如何使用？	transparent设为true启用透明度，opacity设置透明度值(0-1)。transparent为false时opacity无效。透明材质会影响渲染顺序和性能，需要合理使用。
+depthTest属性的作用是什么？	depthTest控制是否进行深度测试，默认为true。设为false时对象不会被其他对象遮挡，常用于UI元素、特效等需要始终显示在前面的对象。
+blending混合模式有哪些类型？	主要混合模式：THREE.NormalBlending(正常)、THREE.AdditiveBlending(相加，用于发光效果)、THREE.SubtractiveBlending(相减)、THREE.MultiplyBlending(相乘)等。不同混合模式产生不同的视觉效果。
+Line组件如何创建3D线条？	Line组件通过points属性接收Vector3数组定义线条路径，可设置color(颜色)、lineWidth(线宽)、dashed(虚线)、transparent(透明)等属性。支持实线和虚线效果。
+虚线材质的dashScale、dashSize、gapSize属性含义？	dashScale控制虚线缩放比例，dashSize设置实线段长度，gapSize设置间隙长度。这些属性配合dashed=true使用，创建各种虚线效果。
+Html组件的作用是什么？	Html组件将HTML/React元素嵌入到3D场景中，可设置position(3D位置)、center(居中)、distanceFactor(距离因子)等属性。常用于创建3D标签、UI面板等。
+createPortal在3D场景中的应用？	createPortal将React组件渲染到DOM的其他位置，在3D场景中常用于将控制面板等UI组件渲染到document.body，避免被3D变换影响。
+Suspense组件在3D场景中的作用？	Suspense用于处理异步加载的3D资源，如GLTF模型。提供fallback属性显示加载状态，确保在资源加载完成前显示占位内容，提升用户体验。
+CameraControls的主要功能是什么？	CameraControls提供相机交互控制，支持旋转、缩放、平移等操作。可设置minDistance/maxDistance(缩放范围)、minPolarAngle/maxPolarAngle(俯仰角范围)等限制。
+如何实现相机的平滑过渡？	使用CameraControls的setPosition()和setTarget()方法，第三个参数设为true启用动画过渡。结合updateMatrixWorld()确保变换矩阵更新，实现平滑的相机切换效果。
+EffectComposer后处理的基本概念？	EffectComposer用于后处理效果，将多个效果组合应用到渲染结果上。常见效果包括Outline(轮廓)、N8AO(环境光遮蔽)、ToneMapping(色调映射)、TiltShift(移轴效果)等。
+Outline轮廓效果的主要参数？	Outline主要参数：visibleEdgeColor(可见边缘颜色)、hiddenEdgeColor(隐藏边缘颜色)、blur(模糊)、width(宽度)、edgeStrength(边缘强度)。用于突出显示选中对象。
+Select和Selection组件的用途？	Select用于标记可选择的对象，Selection提供选择上下文。配合后处理效果可以实现对象高亮、轮廓等选择反馈效果。
+Bvh组件的作用是什么？	Bvh(Bounding Volume Hierarchy)提供空间分割优化，提高射线检测性能。firstHitOnly属性设为true时只检测第一个相交对象，适用于点击选择等场景。
+TransformControls的功能？	TransformControls提供3D对象的可视化变换控制，支持平移、旋转、缩放操作。在开发阶段用于调整对象位置，生产环境通常禁用。
+raycast属性的作用？	raycast控制对象是否参与射线检测，设为() => null可禁用射线检测。常用于装饰性对象、UI元素等不需要交互的对象，避免干扰点击检测。
+如何优化Three.js场景性能？	性能优化方法：合理设置相机far/near值、禁用不必要的阴影、使用LOD(细节层次)、合并几何体、复用材质、使用instancing、启用frustum culling等。
+frameloop="demand"的作用？	frameloop="demand"启用按需渲染模式，只在场景变化时重新渲染，可显著降低CPU/GPU使用率。但会影响某些性能监控工具的正常工作。
+如何在Three.js中实现动画？	动画实现方式：useFrame Hook进行逐帧更新、使用react-spring等动画库、Three.js内置的AnimationMixer、手动插值计算、使用easing函数实现缓动效果等。
+easing.dampE函数的用途？	easing.dampE用于实现平滑的欧拉角插值动画，常用于相机跟随鼠标的平滑旋转效果。参数包括目标对象、目标值、阻尼系数、时间增量。
+如何处理3D模型的材质？	材质处理：通过useGLTF获取materials对象、使用clone()创建材质副本、动态修改材质属性、使用MeshStandardMaterial等标准材质、自定义ShaderMaterial等。
+castShadow和receiveShadow的区别？	castShadow使对象投射阴影，receiveShadow使对象接收阴影。需要在光源上启用castShadow，在Canvas上启用shadows，才能看到阴影效果。
+Sky组件的参数含义？	Sky组件模拟天空效果，主要参数：inclination(太阳倾斜角)、distance(距离)、azimuth(方位角)等。可创建不同时间的天空效果，提供环境照明。
+SoftShadows的作用？	SoftShadows提供柔和阴影效果，通过多次采样实现阴影边缘的平滑过渡，比硬阴影更真实自然，但会增加渲染开销。
+如何实现3D对象的点击交互？	通过onClick事件处理点击，使用onPointerOver/onPointerOut处理悬停，配合useState管理交互状态。可结合Select组件实现选择反馈效果。
+useMemo在3D场景中的重要性？	useMemo用于缓存计算结果，避免每帧重新计算几何体、材质等开销较大的对象。在3D场景中合理使用useMemo可显著提升性能。
+useRef在Three.js中的应用？	useRef用于获取3D对象的引用，便于在useFrame中直接操作对象属性，如位置、旋转等。避免通过props传递造成的性能开销。
+如何实现3D文字显示？	3D文字实现方式：使用Html组件嵌入HTML文字、TextGeometry创建3D文字几何体、使用贴图将文字渲染到平面、Canvas纹理动态生成文字等。
+Three.js中的世界坐标和局部坐标？	局部坐标是相对于父对象的坐标系，世界坐标是场景的全局坐标系。使用getWorldPosition()获取世界坐标，updateMatrixWorld()更新变换矩阵。
+如何实现相机跟随效果？	相机跟随实现：在useFrame中更新相机位置、使用lookAt()方法朝向目标、结合lerp()实现平滑跟随、使用CameraControls的setTarget()方法等。
+Three.js中的四元数(Quaternion)用途？	四元数用于表示3D旋转，避免万向锁问题。提供slerp()球面线性插值、setFromEuler()从欧拉角设置、multiply()组合旋转等方法。
+如何实现粒子系统？	粒子系统实现：使用Points对象、BufferGeometry存储粒子数据、在useFrame中更新粒子位置、使用PointsMaterial设置粒子外观、instancing优化大量粒子渲染。
+Three.js中的纹理(Texture)如何使用？	纹理使用：useTexture Hook加载图片、设置wrapS/wrapT包装模式、magFilter/minFilter过滤方式、repeat重复次数、offset偏移等属性。
+如何实现LOD(Level of Detail)？	LOD实现：使用THREE.LOD对象、添加不同精度的模型、设置距离阈值、在useFrame中更新LOD、根据相机距离自动切换模型精度。
+instancing实例化渲染的优势？	instancing可以高效渲染大量相同几何体，只需一次绘制调用。使用InstancedMesh、设置instanceMatrix属性、通过setMatrixAt()设置每个实例的变换矩阵。
+如何实现水面效果？	水面效果实现：使用PlaneGeometry创建水面、ShaderMaterial编写水波着色器、在useFrame中更新时间uniform、使用法线贴图增加细节、反射/折射效果等。
+Three.js中的包围盒(BoundingBox)用途？	包围盒用于碰撞检测、视锥剔除、自动相机定位等。使用Box3类、computeBoundingBox()计算、intersectsBox()检测相交、expandByObject()扩展等方法。
+如何实现镜面反射效果？	镜面反射实现：使用Reflector组件、设置反射平面、配置反射纹理分辨率、调整反射强度、结合环境贴图增强效果等。
+Three.js中的雾效(Fog)如何设置？	雾效设置：scene.fog = new THREE.Fog(color, near, far)线性雾、THREE.FogExp2(color, density)指数雾。影响材质的fog属性，创建距离感和氛围效果。
+如何实现天空盒(Skybox)？	天空盒实现：使用CubeTextureLoader加载立方体贴图、设置scene.background、或使用SphereGeometry + 全景贴图、Sky组件等方式创建天空效果。
+Three.js中的光照贴图(Lightmap)？	光照贴图预计算静态光照信息，提高渲染性能。设置材质的lightMap属性、配置lightMapIntensity强度、使用第二套UV坐标等。
+如何实现体积光效果？	体积光实现：使用ShaderMaterial创建光柱效果、在片段着色器中计算光线散射、结合深度信息、使用噪声纹理增加细节等。
+Three.js中的骨骼动画如何实现？	骨骼动画使用：加载包含骨骼的GLTF模型、使用AnimationMixer播放动画、AnimationAction控制播放状态、在useFrame中更新mixer等。
+如何优化移动设备上的3D性能？	移动优化：降低模型精度、减少纹理分辨率、使用较低的着色器精度、禁用复杂后处理效果、合理设置渲染距离、使用简化的材质等。
+
+
+3D模块内存占用1.6G的主要原因有哪些？	1. 多个大型GLTF模型同时加载 <br>2. 后处理效果开销（EffectComposer multisampling=4，Outline效果大尺寸缓冲区）<br>3. 重复渲染和材质实例化（太阳能板组件创建多个SelectedMesh实例）
+如何优化GLTF模型的内存占用？	1. 使用useGLTF.preload()预加载模型<br>2. 在组件卸载时清理资源：geometry.dispose()、material.dispose()、纹理dispose()<br>3. 使用共享材质实例避免重复创建<br>4. 条件渲染，只加载当前需要的楼层模型
+后处理效果如何优化内存？	1. 降低multisampling从4到1<br>2. 禁用stencilBuffer<br>3. 禁用Outline的blur效果<br>4. 限制Outline width最大值：Math.min(size.width * 0.5, 1024)<br>5. 降低edgeStrength从10到5
+Canvas配置有哪些内存优化选项？	1. precision: "mediump" 使用中等精度<br>2. 减少far裁剪面距离从50000到10000<br>3. frameloop="demand" 启用按需渲染<br>4. dpr={Math.min(window.devicePixelRatio, 2)} 限制像素比<br>5. 保持antialias: false
+如何优化几何体和材质的实例化？	1. 使用useMemo创建共享材质实例<br>2. 避免在map中重复创建材质<br>3. 考虑使用InstancedMesh替代多个独立mesh<br>4. 确保材质在组件间共享而不是重复创建
+如何监控3D应用的内存使用？	使用useMemoryMonitor hook：<br>```javascript<br>setInterval(() => {<br>  console.log({<br>    used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB',<br>    total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB'<br>  });<br>}, 5000);<br>```
+条件渲染在3D场景中如何实现？	1. 使用状态管理当前显示的楼层<br>2. 只渲染当前楼层组件，卸载其他楼层<br>3. 使用Suspense包装异步加载的组件<br>4. 避免同时渲染多个大型3D场景
+资源清理的最佳实践是什么？	在useEffect的cleanup函数中：<br>1. 遍历nodes清理geometry.dispose()<br>2. 遍历materials清理material.dispose()<br>3. 清理材质中的纹理资源<br>4. 确保在组件卸载时执行清理
+优化后预期的内存减少效果？	总体从1.6G降低到400-600MB：<br>• 模型优化：减少30-40%<br>• 后处理优化：减少20-30%<br>• 材质共享：减少10-20%<br>• 按需渲染：减少15-25%
+Three.js中材质共享的实现方式？	```javascript<br>const sharedMaterial = useMemo(() => materials["材质.10"], [materials]);<br>// 在多个mesh中使用同一个材质实例<br><mesh material={sharedMaterial} /><br>```

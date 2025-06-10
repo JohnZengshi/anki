@@ -1,0 +1,2331 @@
+
+22 | 浏览器DOM：你知道HTML的节点有哪几种吗？
+
+
+
+
+你好，我是 winter。
+
+今天我们进入浏览器 API 的学习, 这一节课，我们来学习一下 DOM API。
+
+DOM API 是最早被设计出来的一批 API，也是用途最广的 API，所以早年的技术社区，常常用 DOM 来泛指浏览器中所有的 API。不过今天这里我们要介绍的 DOM，指的就是狭义的文档对象模型。
+
+
+
+
+
+DOM API 介绍
+
+
+首先我们先来讲一讲什么叫做文档对象模型。
+
+顾名思义，文档对象模型是用来描述文档，这里的文档，是特指 HTML 文档（也用于 XML 文档，但是本课不讨论 XML）。同时它又是一个“对象模型”，这意味着它使用的是对象这样的概念来描述 HTML 文档。
+
+说起 HTML 文档，这是大家最熟悉的东西了，我们都知道，HTML 文档是一个由标签嵌套而成的树形结构，因此，DOM 也是使用树形的对象模型来描述一个 HTML 文档。
+
+DOM API 大致会包含 4 个部分。
+
+节点：DOM 树形结构中的节点相关 API。
+
+事件：触发和监听事件相关 API。
+
+Range：操作文字范围相关 API。
+
+遍历：遍历 DOM 需要的 API。
+
+
+
+事件相关 API 和事件模型，我们会用单独的课程讲解，所以我们本篇文章重点会为你介绍节点和遍历相关 API。
+
+DOM API 数量很多，我希望给你提供一个理解 DOM API 设计的思路，避免单靠机械的方式去死记硬背。
+
+
+
+
+
+节点
+
+
+DOM 的树形结构所有的节点有统一的接口 Node，我们按照继承关系，给你介绍一下节点的类型。
+
+
+
+在这些节点中，除了 Document 和 DocumentFrangment，都有与之对应的 HTML 写法，我们可以看一下。
+
+Element: <tagname>...</tagname>
+
+Text: text
+
+Comment: <!-- comments -->
+
+DocumentType: <!Doctype html>
+
+ProcessingInstruction: <?a 1?>
+
+
+
+我们在编写 HTML 代码并且运行后，就会在内存中得到这样一棵 DOM 树，HTML 的写法会被转化成对应的文档模型，而我们则可以通过 JavaScript 等语言去访问这个文档模型。
+
+这里我们每天都需要用到，要重点掌握的是：Document、Element、Text 节点。
+
+DocumentFragment 也非常有用，它常常被用来高性能地批量添加节点。因为 Comment、DocumentType 和 ProcessingInstruction 很少需要运行时去修改和操作，所以有所了解即可。
+
+
+
+
+
+Node
+
+
+Node 是 DOM 树继承关系的根节点，它定义了 DOM 节点在 DOM 树上的操作，首先，Node 提供了一组属性，来表示它在 DOM 树中的关系，它们是：
+
+parentNode
+
+childNodes
+
+firstChild
+
+lastChild
+
+nextSibling
+
+previousSibling
+
+
+
+从命名上，我们可以很清晰地看出，这一组属性提供了前、后、父、子关系，有了这几个属性，我们可以很方便地根据相对位置获取元素。当然，Node 中也提供了操作 DOM 树的 API，主要有下面几种。
+
+appendChild
+
+insertBefore
+
+removeChild
+
+replaceChild
+
+
+
+这个命名跟上面一样，我们基本可以知道 API 的作用。这几个 API 的设计可以说是饱受诟病。其中最主要的批评是它不对称——只有 before，没有 after，而 jQuery 等框架都对其做了补充。
+
+实际上，appendChild 和 insertBefore 的这个设计，是一个“最小原则”的设计，这两个 API 是满足插入任意位置的必要 API，而 insertAfter，则可以由这两个 API 实现出来。
+
+我个人其实不太喜欢这个设计，对我而言，insertAt(pos) 更符合审美一些。当然，不论喜不喜欢，这个标准已经确定，我们还是必须要掌握它。
+
+这里从设计的角度还想要谈一点，那就是，所有这几个修改型的 API，全都是在父元素上操作的，比如我们要想实现“删除一个元素的上一个元素”，必须要先用 parentNode 获取其父元素。
+
+这样的设计是符合面向对象的基本原则的。还记得我们在 JavaScript 对象部分讲的对象基本特征吗？“拥有哪些子元素”是父元素的一种状态，所以修改状态，应该是父元素的行为。这个设计我认为是 DOM API 中好的部分。
+
+到此为止，Node 提供的 API 已经可以很方便（大概吧）地对树进行增、删、遍历等操作了。
+
+除此之外，Node 还提供了一些高级 API，我们来认识一下它们。
+
+compareDocumentPosition 是一个用于比较两个节点中关系的函数。
+
+contains 检查一个节点是否包含另一个节点的函数。
+
+isEqualNode 检查两个节点是否完全相同。
+
+isSameNode 检查两个节点是否是同一个节点，实际上在 JavaScript 中可以用“===”。
+
+cloneNode 复制一个节点，如果传入参数 true，则会连同子元素做深拷贝。
+
+
+
+DOM 标准规定了节点必须从文档的 create 方法创建出来，不能够使用原生的 JavaScript 的 new 运算。于是 document 对象有这些方法。
+
+createElement
+
+createTextNode
+
+createCDATASection
+
+createComment
+
+createProcessingInstruction
+
+createDocumentFragment
+
+createDocumentType
+
+
+
+上面的这些方法都是用于创建对应的节点类型。你可以自己尝试一下。
+
+
+
+
+
+Element 与 Attribute
+
+
+Node 提供了树形结构上节点相关的操作。而大部分时候，我们比较关注的是元素。Element 表示元素，它是 Node 的子类。
+
+元素对应了 HTML 中的标签，它既有子节点，又有属性。所以 Element 子类中，有一系列操作属性的方法。
+
+我们需要注意，对 DOM 而言，Attribute 和 Property 是完全不同的含义，只有特性场景下，两者才会互相关联（这里在后面我会详细讲解，今天的文章里我就不展开了）。
+
+首先，我们可以把元素的 Attribute 当作字符串来看待，这样就有以下的 API：
+
+getAttribute
+
+setAttribute
+
+removeAttribute
+
+hasAttribute
+
+
+
+如果你追求极致的性能，还可以把 Attribute 当作节点：
+
+getAttributeNode
+
+setAttributeNode
+
+
+
+此外，如果你喜欢 property 一样的访问 attribute，还可以使用 attributes 对象，比如 document.body.attributes.class = “a” 等效于 document.body.setAttribute(“class”, “a”)。
+
+
+
+
+
+查找元素
+
+
+document 节点提供了查找元素的能力。比如有下面的几种。
+
+querySelector
+
+querySelectorAll
+
+getElementById
+
+getElementsByName
+
+getElementsByTagName
+
+getElementsByClassName
+
+
+
+我们需要注意，getElementById、getElementsByName、getElementsByTagName、getElementsByClassName，这几个 API 的性能高于 querySelector。
+
+而 getElementsByName、getElementsByTagName、getElementsByClassName 获取的集合并非数组，而是一个能够动态更新的集合。
+
+我们看一个例子：
+
+var collection = document.getElementsByClassName('winter');
+
+console.log(collection.length);
+
+var winter = document.createElement('div');
+
+winter.setAttribute('class', 'winter')
+
+document.documentElement.appendChild(winter)
+
+console.log(collection.length);
+
+
+
+在这段代码中，我们先获取了页面的 className 为 winter 的元素集合，不出意外的话，应该是空。
+
+我们通过 console.log 可以看到集合的大小为 0。之后我们添加了一个 class 为 winter 的 div，这时候我们再看集合，可以发现，集合中出现了新添加的元素。
+
+这说明浏览器内部是有高速的索引机制，来动态更新这样的集合的。所以，尽管 querySelector 系列的 API 非常强大，我们还是应该尽量使用 getElement 系列的 API。
+
+
+
+
+
+遍历
+
+
+前面已经提到过，通过 Node 的相关属性，我们可以用 JavaScript 遍历整个树。实际上，DOM API 中还提供了 NodeIterator 和 TreeWalker 来遍历树。
+
+比起直接用属性来遍历，NodeIterator 和 TreeWalker 提供了过滤功能，还可以把属性节点也包含在遍历之内。
+
+NodeIterator 的基本用法示例如下：
+
+var iterator = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT, null, false);
+
+var node;
+
+while(node = iterator.nextNode())
+
+{
+
+console.log(node);
+
+}
+
+
+
+这个 API 的设计非常老派，这么讲的原因主要有两点，一是循环并没有类似“hasNext”这样的方法，而是直接以 nextNode 返回 null 来标志结束，二是第二个参数是掩码，这两个设计都是传统 C 语言里比较常见的用法。
+
+放到今天看，这个迭代器无法匹配 JavaScript 的迭代器语法，而且 JavaScript 位运算并不高效，掩码的设计就徒增复杂性了。
+
+这里请你注意一下这个例子中的处理方法，通常掩码型参数，我们都是用按位或运算来叠加。而针对这种返回 null 表示结束的迭代器，我使用了在 while 循环条件中赋值，来保证循环次数和调用 next 次数严格一致（但这样写可能违反了某些编码规范）。
+
+我们再来看一下 TreeWalker 的用法。
+
+var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, null, false)
+
+var node;
+
+while(node = walker.nextNode())
+
+{
+
+if(node.tagName === "p")
+
+node.nextSibling();
+
+console.log(node);
+
+}
+
+
+
+比起 NodeIterator，TreeWalker 多了在 DOM 树上自由移动当前节点的能力，一般来说，这种 API 用于“跳过”某些节点，或者重复遍历某些节点。
+
+总的来说，我个人不太喜欢 TreeWalker 和 NodeIterator 这两个 API，建议需要遍历 DOM 的时候，直接使用递归和 Node 的属性。
+
+
+
+
+
+Range
+
+
+Range API 是一个比较专业的领域，如果不做富文本编辑类的业务，不需要太深入。这里我们就仅介绍概念和给出基本用法的示例，你只要掌握即可。
+
+Range API 表示一个 HTML 上的范围，这个范围是以文字为最小单位的，所以 Range 不一定包含完整的节点，它可能是 Text 节点中的一段，也可以是头尾两个 Text 的一部分加上中间的元素。
+
+我们通过 Range API 可以比节点 API 更精确地操作 DOM 树，凡是 节点 API 能做到的，Range API 都可以做到，而且可以做到更高性能，但是 Range API 使用起来比较麻烦，所以在实际项目中，并不常用，只有做底层框架和富文本编辑对它有强需求。
+
+创建 Range 一般是通过设置它的起止来实现，我们可以看一个例子：
+
+var range = new Range(),
+
+firstText = p.childNodes[1],
+
+secondText = em.firstChild
+
+range.setStart(firstText, 9) // do not forget the leading space
+
+range.setEnd(secondText, 4)
+
+
+
+此外，通过 Range 也可以从用户选中区域创建，这样的 Range 用于处理用户选中区域:
+
+var range = document.getSelection().getRangeAt(0);
+
+
+
+更改 Range 选中区段内容的方式主要是取出和插入，分别由 extractContents 和 insertNode 来实现。
+
+var fragment = range.extractContents()
+
+range.insertNode(document.createTextNode("aaaa"))
+
+
+
+最后我们看一个完整的例子。
+
+var range = new Range(),
+
+firstText = p.childNodes[1],
+
+secondText = em.firstChild
+
+range.setStart(firstText, 9) // do not forget the leading space
+
+range.setEnd(secondText, 4)
+
+
+
+var fragment = range.extractContents()
+
+range.insertNode(document.createTextNode("aaaa"))
+
+
+
+这个例子展示了如何使用 range 来取出元素和在特定位置添加新元素。
+
+
+
+
+
+总结
+
+
+在今天的文章中，我们一起了解了 DOM API 的内容。DOM API 大致会包含 4 个部分。
+
+节点：DOM 树形结构中的节点相关 API。
+
+事件：触发和监听事件相关 API。
+
+Range：操作文字范围相关 API。
+
+遍历：遍历 DOM 需要的 API。
+
+
+
+DOM API 中还提供了 NodeIterator 和 TreeWalker 来遍历树。比起直接用属性来遍历，NodeIterator 和 TreeWalker 提供了过滤功能，还可以把属性节点也包含在遍历之内。
+
+除此之外，我们还谈到了 Range 的一些基础知识点，这里你掌握即可。
+
+最后，我给你留了一个题目，请你用 DOM API 来实现遍历整个 DOM 树，把所有的元素的 tagName 打印出来。
+
+
+
+* * *
+
+
+
+
+
+补充阅读：命名空间
+
+
+我们本课介绍的所有 API，特意忽略了命名空间。
+
+在 HTML 场景中，需要考虑命名空间的场景不多。最主要的场景是 SVG。创建元素和属性相关的 API 都有带命名空间的版本：
+
+document createElementNS
+
+createAttributeNS
+
+
+
+
+
+Element getAttributeNS
+
+setAttributeNS
+
+getAttributeNodeNS
+
+setAttributeNodeNS
+
+removeAttributeNS
+
+hasAttributeNS
+
+attributes.setNamedItemNS
+
+attributes.getNamedItemNS
+
+attributes.removeNamedItemNS
+
+
+
+
+
+若要创建 Document 或者 Doctype，也必须要考虑命名空间问题。DOM 要求从 document.implementation 来创建。
+
+document.implementation.createDocument
+
+document.implementation.createDocumentType
+
+
+
+除此之外，还提供了一个快捷方式，你也可以动手尝试一下。
+
+document.implementation.createHTMLDocument
+
+
+
+
+
+猜你喜欢
+
+
+
+
+
+25 | 浏览器CSSOM：如何获取一个元素的准确位置
+
+
+
+
+你好，我是 winter。
+
+在前面的课程中，我们已经学习了 DOM 相关的 API，狭义的 DOM API 仅仅包含 DOM 树形结构相关的内容。今天，我们再来学习一类新的 API：CSSOM。
+
+我想，你在最初接触浏览器 API 的时候，应该都有跟我类似的想法：“好想要 element.width、element.height 这样的 API 啊”。
+
+这样的 API 可以直接获取元素的显示相关信息，它们是非常符合人的第一印象直觉的设计，但是，偏偏 DOM API 中没有这样的内容。
+
+随着学习的深入，我才知道，这样的设计是有背后的逻辑的，正如 HTML 和 CSS 分别承担了语义和表现的分工，DOM 和 CSSOM 也有语义和表现的分工。
+
+DOM 中的所有的属性都是用来表现语义的属性，CSSOM 的则都是表现的属性，width 和 height 这类显示相关的属性，都属于我们今天要讲的 CSSOM。
+
+顾名思义，CSSOM 是 CSS 的对象模型，在 W3C 标准中，它包含两个部分：描述样式表和规则等 CSS 的模型部分（CSSOM），和跟元素视图相关的 View 部分（CSSOM View）。
+
+在实际使用中，CSSOM View 比 CSSOM 更常用一些，因为我们很少需要用代码去动态地管理样式表。
+
+在今天的文章中，我来分别为你介绍这两部分的 API。
+
+
+
+
+
+CSSOM
+
+
+首先我们来介绍下 CSS 中样式表的模型，也就是 CSSOM 的本体。
+
+我们通常创建样式表也都是使用 HTML 标签来做到的，我们用 style 标签和 link 标签创建样式表，例如：
+
+<style title="Hello">
+
+a {
+
+color:red;
+
+}
+
+</style>
+
+<link rel="stylesheet" title="x" href="data:text/css,p%7Bcolor:blue%7D">
+
+
+
+我们创建好样式表后，还有可能要对它进行一些操作。如果我们以 DOM 的角度去理解的话，这些标签在 DOM 中是一个节点，它们有节点的内容、属性，这两个标签中，CSS 代码有的在属性、有的在子节点。这两个标签也遵循 DOM 节点的操作规则，所以可以使用 DOM API 去访问。
+
+但是，这样做的后果是我们需要去写很多分支逻辑，并且，要想解析 CSS 代码结构也不是一件简单的事情，所以，这种情况下，我们直接使用 CSSOM API 去操作它们生成的样式表，这是一个更好的选择。
+
+我们首先了解一下 CSSOM API 的基本用法，一般来说，我们需要先获取文档中所有的样式表：
+
+document.styleSheets
+
+
+
+document 的 styleSheets 属性表示文档中的所有样式表，这是一个只读的列表，我们可以用方括号运算符下标访问样式表，也可以使用 item 方法来访问，它有 length 属性表示文档中的样式表数量。
+
+样式表只能使用 style 标签或者 link 标签创建（对 XML 来说，还可以使用，咱们暂且不表）。
+
+我们虽然无法用 CSSOM API 来创建样式表，但是我们可以修改样式表中的内容。
+
+document.styleSheets[0].insertRule("p { color:pink; }", 0)
+
+document.styleSheets[0].removeRule(0)
+
+
+
+更进一步，我们可以获取样式表中特定的规则（Rule），并且对它进行一定的操作，具体来说，就是使用它的 cssRules 属性来实现：
+
+document.styleSheets[0].cssRules
+
+
+
+这里取到的规则列表，同样是支持 item、length 和下标运算。
+
+不过，这里的 Rules 可就没那么简单了，它可能是 CSS 的 at-rule，也可能是普通的样式规则。不同的 rule 类型，具有不同的属性。
+
+我们在 CSS 语法部分，已经为你整理过 at-rule 的完整列表，多数 at-rule 都对应着一个 rule 类型：
+
+CSSStyleRule
+
+CSSCharsetRule
+
+CSSImportRule
+
+CSSMediaRule
+
+CSSFontFaceRule
+
+CSSPageRule
+
+CSSNamespaceRule
+
+CSSKeyframesRule
+
+CSSKeyframeRule
+
+CSSSupportsRule
+
+
+
+具体的规则支持的属性，建议你可以用到的时候，再去查阅 MDN 或者 W3C 的文档，在我们的文章中，仅为你详细介绍最常用的 CSSStyleRule。
+
+CSSStyleRule 有两个属性：selectorText 和 style，分别表示一个规则的选择器部分和样式部分。
+
+selector 部分是一个字符串，这里显然偷懒了没有设计进一步的选择器模型，我们按照选择器语法设置即可。
+
+style 部分是一个样式表，它跟我们元素的 style 属性是一样的类型，所以我们可以像修改内联样式一样，直接改变属性修改规则中的具体 CSS 属性定义，也可以使用 cssText 这样的工具属性。
+
+此外，CSSOM 还提供了一个非常重要的方法，来获取一个元素最终经过 CSS 计算得到的属性：
+
+window.getComputedStyle(elt, pseudoElt);
+
+
+
+其中第一个参数就是我们要获取属性的元素，第二个参数是可选的，用于选择伪元素。
+
+好了，到此为止，我们可以使用 CSSOM API 自由地修改页面已经生效的样式表了。接下来，我们来一起关注一下视图的问题。
+
+
+
+
+
+CSSOM View
+
+
+CSSOM View 这一部分的 API，可以视为 DOM API 的扩展，它在原本的 Element 接口上，添加了显示相关的功能，这些功能，又可以分成三个部分：窗口部分，滚动部分和布局部分，下面我来分别带你了解一下。
+
+
+
+
+
+窗口 API
+
+
+窗口 API 用于操作浏览器窗口的位置、尺寸等。
+
+moveTo(x, y) 窗口移动到屏幕的特定坐标；
+
+moveBy(x, y) 窗口移动特定距离；
+
+resizeTo(x, y) 改变窗口大小到特定尺寸；
+
+resizeBy(x, y) 改变窗口大小特定尺寸。
+
+
+
+此外，窗口 API 还规定了 window.open() 的第三个参数：
+
+window.open("about:blank", "_blank" ,"width=100,height=100,left=100,right=100" )
+
+
+
+一些浏览器出于安全考虑没有实现，也不适用于移动端浏览器，这部分你仅需简单了解即可。下面我们来了解一下滚动 API。
+
+
+
+
+
+滚动 API
+
+
+要想理解滚动，首先我们必须要建立一个概念，在 PC 时代，浏览器可视区域的滚动和内部元素的滚动关系是比较模糊的，但是在移动端越来越重要的今天，两者必须分开看待，两者的性能和行为都有区别。
+
+
+
+
+
+视口滚动 API
+
+
+可视区域（视口）滚动行为由 window 对象上的一组 API 控制，我们先来了解一下：
+
+scrollX 是视口的属性，表示 X 方向上的当前滚动距离，有别名 pageXOffset；
+
+scrollY 是视口的属性，表示 Y 方向上的当前滚动距离，有别名 pageYOffset；
+
+scroll(x, y) 使得页面滚动到特定的位置，有别名 scrollTo，支持传入配置型参数 {top, left}；
+
+scrollBy(x, y) 使得页面滚动特定的距离，支持传入配置型参数 {top, left}。
+
+
+
+通过这些属性和方法，我们可以读取视口的滚动位置和操纵视口滚动。不过，要想监听视口滚动事件，我们需要在 document 对象上绑定事件监听函数：
+
+document.addEventListener("scroll", function(event){
+
+//......
+
+})
+
+
+
+视口滚动 API 是页面的顶层容器的滚动，大部分移动端浏览器都会采用一些性能优化，它和元素滚动不完全一样，请大家一定建立这个区分的意识。
+
+
+
+
+
+元素滚动 API
+
+
+接下来我们来认识一下元素滚动 API，在 Element 类（参见 DOM 部分），为了支持滚动，加入了以下 API。
+
+scrollTop 元素的属性，表示 Y 方向上的当前滚动距离。
+
+scrollLeft 元素的属性，表示 X 方向上的当前滚动距离。
+
+scrollWidth 元素的属性，表示元素内部的滚动内容的宽度，一般来说会大于等于元素宽度。
+
+scrollHeight 元素的属性，表示元素内部的滚动内容的高度，一般来说会大于等于元素高度。
+
+scroll(x, y) 使得元素滚动到特定的位置，有别名 scrollTo，支持传入配置型参数 {top, left}。
+
+scrollBy(x, y) 使得元素滚动到特定的位置，支持传入配置型参数 {top, left}。
+
+scrollIntoView(arg) 滚动元素所在的父元素，使得元素滚动到可见区域，可以通过 arg 来指定滚到中间、开始或者就近。
+
+
+
+除此之外，可滚动的元素也支持 scroll 事件，我们在元素上监听它的事件即可：
+
+element.addEventListener("scroll", function(event){
+
+//......
+
+})
+
+
+
+这里你需要注意一点，元素部分的 API 设计与视口滚动命名风格上略有差异，你在使用的时候不要记混。
+
+
+
+
+
+布局 API
+
+
+最后我们来介绍一下布局 API，这是整个 CSSOM 中最常用到的部分，我们同样要分成全局 API 和元素上的 API。
+
+
+
+
+
+全局尺寸信息
+
+
+window 对象上提供了一些全局的尺寸信息，它是通过属性来提供的，我们一起来了解一下来这些属性。
+
+
+
+window.innerHeight, window.innerWidth 这两个属性表示视口的大小。
+
+
+
+window.outerWidth, window.outerHeight 这两个属性表示浏览器窗口占据的大小，很多浏览器没有实现，一般来说这两个属性无关紧要。
+
+
+
+window.devicePixelRatio 这个属性非常重要，表示物理像素和 CSS 像素单位的倍率关系，Retina 屏这个值是 2，后来也出现了一些 3 倍的 Android 屏。
+
+
+
+window.screen （屏幕尺寸相关的信息）
+
+window.screen.width, window.screen.height 设备的屏幕尺寸。
+
+window.screen.availWidth, window.screen.availHeight 设备屏幕的可渲染区域尺寸，一些 Android 机器会把屏幕的一部分预留做固定按钮，所以有这两个属性，实际上一般浏览器不会实现的这么细致。
+
+window.screen.colorDepth, window.screen.pixelDepth 这两个属性是固定值 24，应该是为了以后预留。
+
+
+
+
+
+虽然 window 有这么多相关信息，在我看来，我们主要使用的是 innerHeight、innerWidth 和 devicePixelRatio 三个属性，因为我们前端开发工作只需要跟视口打交道，其它信息大概了解即可。
+
+
+
+
+
+元素的布局信息
+
+
+最后我们来到了本节课一开始提到的问题，我们是否能够取到一个元素的宽（width）和高（height）呢？
+
+实际上，我们首先应该从脑中消除“元素有宽高”这样的概念，我们课程中已经多次提到了，有些元素可能产生多个盒，事实上，只有盒有宽和高，元素是没有的。
+
+所以我们获取宽高的对象应该是“盒”，于是 CSSOM View 为 Element 类添加了两个方法：
+
+getClientRects();
+
+getBoundingClientRect()。
+
+
+
+getClientRects 会返回一个列表，里面包含元素对应的每一个盒所占据的客户端矩形区域，这里每一个矩形区域可以用 x, y, width, height 来获取它的位置和尺寸。
+
+getBoundingClientRect ，这个 API 的设计更接近我们脑海中的元素盒的概念，它返回元素对应的所有盒的包裹的矩形区域，需要注意，这个 API 获取的区域会包括当 overflow 为 visible 时的子元素区域。
+
+根据实际的精确度需要，我们可以选择何时使用这两个 API。
+
+这两个 API 获取的矩形区域都是相对于视口的坐标，这意味着，这些区域都是受滚动影响的。
+
+如果我们要获取相对坐标，或者包含滚动区域的坐标，需要一点小技巧：
+
+var offsetX = document.documentElement.getBoundingClientRect().x - element.getBoundingClientRect().x;
+
+
+
+如这段代码所示，我们只需要获取文档跟节点的位置，再相减即可得到它们的坐标。
+
+这两个 API 的兼容性非常好，定义又非常清晰，建议你如果是用 JavaScript 实现视觉效果时，尽量使用这两个 API。
+
+
+
+
+
+结语
+
+
+今天我们一起学习了 CSSOM 这一类型的 API。我们首先就说到了，就像 HTML 和 CSS 分别承担了语义和表现的分工，DOM 和 CSSOM 也有语义和表现的分工。
+
+CSSOM 是 CSS 的对象模型，在 W3C 标准中，它包含两个部分：描述样式表和规则等 CSS 的模型部分（CSSOM），和跟元素视图相关的 View 部分（CSSOM View）。
+
+最后留给你一个问题，写好欢迎留言来讨论，请找一个网页，用我们今天讲的 API，把页面上的所有盒的轮廓画到一个 canvas 元素上。
+
+
+
+
+
+猜你喜欢
+
+
+
+
+
+36 | 浏览器事件：为什么会有捕获过程和冒泡过程？
+
+
+
+
+你好，我是 winter。这一节课，我们进入了浏览器的部分，一起来学习一下事件。
+
+
+
+
+
+事件概述
+
+
+在开始接触具体的 API 之前，我们要先了解一下事件。一般来说，事件来自输入设备，我们平时的个人设备上，输入设备有三种：
+
+键盘；
+
+鼠标；
+
+触摸屏。
+
+
+
+这其中，触摸屏和鼠标又有一定的共性，它们被称作 pointer 设备，所谓 pointer 设备，是指它的输入最终会被抽象成屏幕上面的一个点。但是触摸屏和鼠标又有一定区别，它们的精度、反应时间和支持的点的数量都不一样。
+
+我们现代的 UI 系统，都源自 WIMP 系统。WIMP 即 Window Icon Menu Pointer 四个要素，它最初由施乐公司研发，后来被微软和苹果两家公司应用在了自己的操作系统上（关于这个还有一段有趣的故事，我附在文末了）。
+
+WIMP 是如此成功，以至于今天很多的前端工程师会有一个观点，认为我们能够“点击一个按钮”，实际上并非如此，我们只能够点击鼠标上的按钮或者触摸屏，是操作系统和浏览器把这个信息对应到了一个逻辑上的按钮，再使得它的视图对点击事件有反应。这就引出了我们第一个要讲解的机制：捕获与冒泡。
+
+
+
+
+
+捕获与冒泡
+
+
+很多文章会讲到捕获过程是从外向内，冒泡过程是从内向外，但是这里我希望讲清楚，为什么会有捕获过程和冒泡过程。
+
+我们刚提到，实际上点击事件来自触摸屏或者鼠标，鼠标点击并没有位置信息，但是一般操作系统会根据位移的累积计算出来，跟触摸屏一样，提供一个坐标给浏览器。
+
+那么，把这个坐标转换为具体的元素上事件的过程，就是捕获过程了。而冒泡过程，则是符合人类理解逻辑的：当你按电视机开关时，你也按到了电视机。
+
+所以我们可以认为，捕获是计算机处理事件的逻辑，而冒泡是人类处理事件的逻辑。
+
+以下代码展示了事件传播顺序：
+
+<body>
+
+<input id="i"/>
+
+</body>
+
+
+
+document.body.addEventListener("mousedown", () => {
+
+console.log("key1")
+
+}, true)
+
+
+
+document.getElementById("i").addEventListener("mousedown", () => {
+
+console.log("key2")
+
+}, true)
+
+
+
+document.body.addEventListener("mousedown", () => {
+
+console.log("key11")
+
+}, false)
+
+
+
+document.getElementById("i").addEventListener("mousedown", () => {
+
+console.log("key22")
+
+}, false)
+
+
+
+我们监听了 body 和一个 body 的子元素上的鼠标按下事件，捕获和冒泡分别监听，可以看到，最终产生的顺序是：
+
+“key1”
+
+“key2”
+
+“key22”
+
+“key11”
+
+
+
+这是捕获和冒泡发生的完整顺序。
+
+在一个事件发生时，捕获过程跟冒泡过程总是先后发生，跟你是否监听毫无关联。
+
+在我们实际监听事件时，我建议这样使用冒泡和捕获机制：默认使用冒泡模式，当开发组件时，遇到需要父元素控制子元素的行为，可以使用捕获机制。
+
+理解了冒泡和捕获的过程，我们 zai 看监听事件的 API，就非常容易理解了。
+
+addEventListener 有三个参数：
+
+事件名称；
+
+事件处理函数；
+
+捕获还是冒泡。
+
+
+
+事件处理函数不一定是函数，也可以是个 JavaScript 具有 handleEvent 方法的对象，看下例子：
+
+var o = {
+
+handleEvent: event => console.log(event)
+
+}
+
+document.body.addEventListener("keydown", o, false);
+
+
+
+第三个参数不一定是 bool 值，也可以是个对象，它提供了更多选项。
+
+once：只执行一次。
+
+passive：承诺此事件监听不会调用 preventDefault，这有助于性能。
+
+useCapture：是否捕获（否则冒泡）。
+
+
+
+实际使用，在现代浏览器中，还可以不传第三个参数，我建议默认不传第三个参数，因为我认为冒泡是符合正常的人类心智模型的，大部分业务开发者不需要关心捕获过程。除非你是组件或者库的使用者，那就总是需要关心冒泡和捕获了。
+
+
+
+
+
+焦点
+
+
+我们讲完了 pointer 事件是由坐标控制，而我们还没有讲到键盘事件。
+
+键盘事件是由焦点系统控制的，一般来说，操作系统也会提供一套焦点系统，但是现代浏览器一般都选择在自己的系统内覆盖原本的焦点系统。
+
+焦点系统也是视障用户访问的重要入口，所以设计合理的焦点系统是非常重要的产品需求，尤其是不少国家对可访问性有明确的法律要求。
+
+在旧时代，有一个经典的问题是如何去掉输入框上的虚线框，这个虚线框就是 Windows 焦点系统附带的 UI 表现。
+
+现在 Windows 的焦点已经不是用虚线框表示了，但是焦点系统的设计几十年间没有太大变化。
+
+焦点系统认为整个 UI 系统中，有且仅有一个“聚焦”的元素，所有的键盘事件的目标元素都是这个聚焦元素。
+
+Tab 键被用来切换到下一个可聚焦的元素，焦点系统占用了 Tab 键，但是可以用 JavaScript 来阻止这个行为。
+
+浏览器 API 还提供了 API 来操作焦点，如：
+
+document.body.focus();
+
+
+
+document.body.blur();
+
+
+
+其实原本键盘事件不需要捕获过程，但是为了跟 pointer 设备保持一致，也规定了从外向内传播的捕获过程。
+
+
+
+
+
+自定义事件
+
+
+除了来自输入设备的事件，还可以自定义事件，实际上事件也是一种非常好的代码架构，但是 DOM API 中的事件并不能用于普通对象，所以很遗憾，我们只能在 DOM 元素上使用自定义事件。
+
+自定义事件的代码示例如下（来自 MDN）：
+
+var evt = new Event("look", {"bubbles":true, "cancelable":false});
+
+document.dispatchEvent(evt);
+
+
+
+这里使用 Event 构造器来创造了一个新的事件，然后调用 dispatchEvent 来在特定元素上触发。
+
+我们可以给这个 Event 添加自定义属性、方法。
+
+注意，这里旧的自定义事件方法（使用 document.createEvent 和 initEvent）已经被废弃。
+
+
+
+
+
+总结
+
+
+今天这一节课，我们讲了浏览器中的事件。
+
+我们分别介绍了事件的捕获与冒泡机制、焦点机制和自定义事件。
+
+捕获与冒泡机制来自 pointer 设备输入的处理，捕获是计算机处理输入的逻辑，冒泡是人类理解事件的思维，捕获总是在冒泡之前发生。
+
+焦点机制则来自操作系统的思路，用于处理键盘事件。除了我们讲到的这些，随着输入设备的不断丰富，还有很多新的事件加入，如 Geolocation 和陀螺仪等。
+
+最后给你留个小问题。请你找出你所知道的所有事件类型，和它们的目标元素类型。
+
+
+
+
+
+WIMP 的小故事
+
+
+WIMP 是由 Alan Kay 主导设计的，这位巨匠，同时也是面向对象之父和 Smalltalk 语言之父。
+
+乔布斯曾经受邀参观施乐，他见到当时的 WIMP 界面，认为非常惊艳，不久后就领导苹果研究了新一代麦金塔系统。
+
+后来，在某次当面对话中，乔布斯指责比尔盖茨抄袭了 WIMP 的设计，盖茨淡定地回答：“史蒂夫，我觉得应该用另一种方式看待这个问题。这就像我们有个叫施乐的有钱邻居，当我闯进去想偷走电视时，却发现你已经这么干了。”
+
+但是不论如何，苹果和微软的数十代操作系统，极大地发展了这个体系，才有了我们今天的 UI 界面。
+
+
+
+
+
+37 | 浏览器API（小实验）：动手整理全部API
+
+
+
+
+你好，我是 winter。今天我们来讲讲浏览器 API。
+
+浏览器的 API 数目繁多，我们在之前的课程中，已经一起学习了其中几个比较有体系的部分：比如之前讲到过的 DOM 和 CSSOM 等等。但是，如果你留意过，会发现我们讲到的 API 仍然是标准中非常小的一部分。
+
+这里，我们不可能把课程变成一本厚厚的 API 参考手册，所以这一节课，我设计了一个实验，我们一起来给 API 分分类。
+
+我们按照每个 API 所在的标准来分类。所以，我们用代码来反射浏览器环境中全局对象的属性，然后我们用 JavaScript 的 filter 方法来逐步过滤掉已知的属性。
+
+接下来，我们整理 API 的方法如下：
+
+从 Window 的属性中，找到 API 名称；
+
+查阅 MDN 或者 Google，找到 API 所在的标准；
+
+阅读标准，手工或者用代码整理出标准中包含的 API；
+
+用代码在 Window 的属性中过滤掉标准中涉及的 API。
+
+
+
+重复这个过程，我们可以找到所有的 API 对应的标准。首先我们先把前面已经讲过的 API 过滤掉。
+
+##JavaScript 中规定的 API
+
+大部分的 API 属于 Window 对象（或者说全局对象），我们可以用反射来看一看现行浏览器中已经实现的 API，我这里使用 Mac 下的 Chrome 72.0.3626.121 版本。
+
+我们首先调用 Object.getOwnPropertyNames(window)。在我的环境中，可以看到，共有 821 个属性。
+
+这里包含了 JavaScript 标准规定的属性，我们做一下过滤：
+
+{
+
+let js = new Set();
+
+let objects = ["BigInt", "BigInt64Array", "BigUint64Array", "Infinity", "NaN", "undefined", "eval", "isFinite", "isNaN", "parseFloat", "parseInt", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Array", "Date", "RegExp", "Promise", "Proxy", "Map", "WeakMap", "Set", "WeakSet", "Function", "Boolean", "String", "Number", "Symbol", "Object", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "ArrayBuffer", "SharedArrayBuffer", "DataView", "Float32Array", "Float64Array", "Int8Array", "Int16Array", "Int32Array", "Uint8Array", "Uint16Array", "Uint32Array", "Uint8ClampedArray", "Atomics", "JSON", "Math", "Reflect", "escape", "unescape"];
+
+objects.forEach(o => js.add(o));
+
+let names = Object.getOwnPropertyNames(window)
+
+names = names.filter(e => !js.has(e));
+
+}
+
+
+
+这一部分我们已经在 JavaScript 部分讲解过了（JavaScript 对象：你知道全部的对象分类吗），所以这里我就采用手工的方式过滤出来。
+
+
+
+
+
+DOM 中的元素构造器
+
+
+接下来我们看看已经讲过的 DOM 部分，DOM 部分包含了 document 属性和一系列的构造器，我们可以用 JavaScript 的 prototype 来过滤构造器。
+
+names = names.filter( e => {
+
+try {
+
+return !(window[e].prototype instanceof Node)
+
+} catch(err) {
+
+return true;
+
+}
+
+}).filter( e => e != "Node")
+
+
+
+这里我们把所有 Node 的子类都过滤掉，再把 Node 本身也过滤掉，这是非常大的一批了。
+
+
+
+
+
+Window 对象上的属性
+
+
+接下来我们要找到 Window 对象的定义，我们在下面链接中可以找到。
+
+https://html.spec.whatwg.org/#window
+
+
+
+这里有一个 Window 接口，是使用 WebIDL 定义的，我们手工把其中的函数和属性整理出来，如下：
+
+
+
+window,self,document,name,location,history,customElements,locationbar,menubar, personalbar,scrollbars,statusbar,toolbar,status,close,closed,stop,focus, blur,frames,length,top,opener,parent,frameElement,open,navigator,applicationCache,alert,confirm,prompt,print,postMessage
+
+
+
+接下来，我们编写代码，把这些函数和属性，从浏览器 Window 对象的属性中去掉，JavaScript 代码如下：
+
+{
+
+let names = Object.getOwnPropertyNames(window)
+
+let js = new Set();
+
+let objects = ["BigInt", "BigInt64Array", "BigUint64Array", "Infinity", "NaN", "undefined", "eval", "isFinite", "isNaN", "parseFloat", "parseInt", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Array", "Date", "RegExp", "Promise", "Proxy", "Map", "WeakMap", "Set", "WeakSet", "Function", "Boolean", "String", "Number", "Symbol", "Object", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "ArrayBuffer", "SharedArrayBuffer", "DataView", "Float32Array", "Float64Array", "Int8Array", "Int16Array", "Int32Array", "Uint8Array", "Uint16Array", "Uint32Array", "Uint8ClampedArray", "Atomics", "JSON", "Math", "Reflect", "escape", "unescape"];
+
+objects.forEach(o => js.add(o));
+
+names = names.filter(e => !js.has(e));
+
+
+
+names = names.filter( e => {
+
+try {
+
+return !(window[e].prototype instanceof Node)
+
+} catch(err) {
+
+return true;
+
+}
+
+}).filter( e => e != "Node")
+
+
+
+let windowprops = new Set();
+
+objects = ["window", "self", "document", "name", "location", "history", "customElements", "locationbar", "menubar", " personalbar", "scrollbars", "statusbar", "toolbar", "status", "close", "closed", "stop", "focus", " blur", "frames", "length", "top", "opener", "parent", "frameElement", "open", "navigator", "applicationCache", "alert", "confirm", "prompt", "print", "postMessage", "console"];
+
+objects.forEach(o => windowprops.add(o));
+
+names = names.filter(e => !windowprops.has(e));
+
+}
+
+
+
+我们还要过滤掉所有的事件，也就是 on 开头的属性。
+
+names = names.filter( e => !e.match(/^on/))
+
+
+
+webkit 前缀的私有属性我们也过滤掉：
+
+names = names.filter( e => !e.match(/^webkit/))
+
+
+
+除此之外，我们在 HTML 标准中还能找到所有的接口，这些我们也过滤掉：
+
+
+
+let interfaces = new Set();
+
+objects = ["ApplicationCache", "AudioTrack", "AudioTrackList", "BarProp", "BeforeUnloadEvent", "BroadcastChannel", "CanvasGradient", "CanvasPattern", "CanvasRenderingContext2D", "CloseEvent", "CustomElementRegistry", "DOMStringList", "DOMStringMap", "DataTransfer", "DataTransferItem", "DataTransferItemList", "DedicatedWorkerGlobalScope", "Document", "DragEvent", "ErrorEvent", "EventSource", "External", "FormDataEvent", "HTMLAllCollection", "HashChangeEvent", "History", "ImageBitmap", "ImageBitmapRenderingContext", "ImageData", "Location", "MediaError", "MessageChannel", "MessageEvent", "MessagePort", "MimeType", "MimeTypeArray", "Navigator", "OffscreenCanvas", "OffscreenCanvasRenderingContext2D", "PageTransitionEvent", "Path2D", "Plugin", "PluginArray", "PopStateEvent", "PromiseRejectionEvent", "RadioNodeList", "SharedWorker", "SharedWorkerGlobalScope", "Storage", "StorageEvent", "TextMetrics", "TextTrack", "TextTrackCue", "TextTrackCueList", "TextTrackList", "TimeRanges", "TrackEvent", "ValidityState", "VideoTrack", "VideoTrackList", "WebSocket", "Window", "Worker", "WorkerGlobalScope", "WorkerLocation", "WorkerNavigator"];
+
+objects.forEach(o => interfaces.add(o));
+
+
+
+names = names.filter(e => !interfaces.has(e));
+
+
+
+
+
+这样过滤之后，我们已经过滤掉了所有的事件、Window 对象、JavaScript 全局对象和 DOM 相关的属性，但是，竟然还剩余了很多属性！你是不是很惊讶呢？好了，接下来我们才进入今天的正题。
+
+
+
+
+
+其它属性
+
+
+这些既不属于 Window 对象，又不属于 JavaScript 语言的 Global 对象的属性，它们究竟是什么呢？
+
+我们可以一个一个来查看这些属性，来发现一些我们以前没有关注过的标准。
+
+首先，我们要把过滤的代码做一下抽象，写成一个函数：
+
+function filterOut(names, props) {
+
+let set = new Set();
+
+props.forEach(o => set.add(o));
+
+return names.filter(e => !set.has(e));
+
+}
+
+
+
+每次执行完 filter 函数，都会剩下一些属性，接下来，我们找到剩下的属性来看一看。
+
+
+
+
+
+ECMAScript 2018 Internationalization API
+
+
+在我的浏览器环境中，第一个属性是：Intl。
+
+查找这些属性来历的最佳文档是 MDN，当然，你也可以使用 Google。
+
+总之，经过查阅，我发现，它属于 ECMA402 标准，这份标准是 JavaScript 的一个扩展，它包含了国际化相关的内容：
+
+http://www.ecma-international.org/ecma-402/5.0/index.html#Title
+
+
+
+ECMA402 中，只有一个全局属性 Intl，我们也把它过滤掉：
+
+names = names.filter(e => e != "Intl")
+
+
+
+再来看看还有什么属性。
+
+
+
+
+
+Streams 标准
+
+
+接下来我看到的属性是： ByteLengthQueuingStrategy。
+
+同样经过查阅，它来自 WHATWG 的 Streams 标准：
+
+https://streams.spec.whatwg.org/#blqs-class
+
+不过，跟 ECMA402 不同，Streams 标准中还有一些其它属性，这里我手工查阅了这份标准，并做了整理。
+
+接下来，我们用代码把它们跟 ByteLengthQueuingStrategy 一起过滤掉：
+
+names = filterOut(names, ["ReadableStream", "ReadableStreamDefaultReader", "ReadableStreamBYOBReader", "ReadableStreamDefaultController", "ReadableByteStreamController", "ReadableStreamBYOBRequest", "WritableStream", "WritableStreamDefaultWriter", "WritableStreamDefaultController", "TransformStream", "TransformStreamDefaultController", "ByteLengthQueuingStrategy", "CountQueuingStrategy"]);
+
+
+
+好了，过滤之后，又少了一些属性，我们继续往下看。
+
+
+
+
+
+WebGL
+
+
+接下来我看到的属性是：WebGLContext​Event。
+
+显然，这个属性来自 WebGL 标准：
+
+https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15
+
+
+
+我们在这份标准中找到了一些别的属性，我们把它一起过滤掉：
+
+names = filterOut(names, ["WebGLContextEvent","WebGLObject", "WebGLBuffer", "WebGLFramebuffer", "WebGLProgram", "WebGLRenderbuffer", "WebGLShader", "WebGLTexture", "WebGLUniformLocation", "WebGLActiveInfo", "WebGLShaderPrecisionFormat", "WebGLRenderingContext"]);
+
+
+
+过滤掉 WebGL，我们继续往下看。
+
+
+
+
+
+Web Audio API
+
+
+下一个属性是 WaveShaperNode。这个属性名听起来就跟声音有关，这个属性来自 W3C 的 Web Audio API 标准。
+
+我们来看一下标准：
+
+https://www.w3.org/TR/webaudio/
+
+
+
+Web Audio API 中有大量的属性，这里我用代码做了过滤。得到了以下列表：
+
+["AudioContext", "AudioNode", "AnalyserNode", "AudioBuffer", "AudioBufferSourceNode", "AudioDestinationNode", "AudioParam", "AudioListener", "AudioWorklet", "AudioWorkletGlobalScope", "AudioWorkletNode", "AudioWorkletProcessor", "BiquadFilterNode", "ChannelMergerNode", "ChannelSplitterNode", "ConstantSourceNode", "ConvolverNode", "DelayNode", "DynamicsCompressorNode", "GainNode", "IIRFilterNode", "MediaElementAudioSourceNode", "MediaStreamAudioSourceNode", "MediaStreamTrackAudioSourceNode", "MediaStreamAudioDestinationNode", "PannerNode", "PeriodicWave", "OscillatorNode", "StereoPannerNode", "WaveShaperNode", "ScriptProcessorNode", "AudioProcessingEvent"]
+
+
+
+于是我们把它们也过滤掉：
+
+
+
+names = filterOut(names, ["AudioContext", "AudioNode", "AnalyserNode", "AudioBuffer", "AudioBufferSourceNode", "AudioDestinationNode", "AudioParam", "AudioListener", "AudioWorklet", "AudioWorkletGlobalScope", "AudioWorkletNode", "AudioWorkletProcessor", "BiquadFilterNode", "ChannelMergerNode", "ChannelSplitterNode", "ConstantSourceNode", "ConvolverNode", "DelayNode", "DynamicsCompressorNode", "GainNode", "IIRFilterNode", "MediaElementAudioSourceNode", "MediaStreamAudioSourceNode", "MediaStreamTrackAudioSourceNode", "MediaStreamAudioDestinationNode", "PannerNode", "PeriodicWave", "OscillatorNode", "StereoPannerNode", "WaveShaperNode", "ScriptProcessorNode", "AudioProcessingEvent"]);
+
+
+
+我们继续看下一个属性。
+
+
+
+
+
+Encoding 标准
+
+
+在我的环境中，下一个属性是 TextDecoder，经过查阅得知，这个属性也来自一份 WHATWG 的标准，Encoding：
+
+https://encoding.spec.whatwg.org/#dom-textencoder
+
+
+
+这份标准仅仅包含四个接口，我们把它们过滤掉：
+
+names = filterOut(names, ["TextDecoder", "TextEncoder", "TextDecoderStream", "TextEncoderStream"]);
+
+
+
+我们继续来看下一个属性。
+
+
+
+
+
+Web Background Synchronization
+
+
+下一个属性是 SyncManager，这个属性比较特殊，它并没有被标准化，但是我们仍然可以找到它的来源文档：
+
+https://wicg.github.io/BackgroundSync/spec/#sync-manager-interface
+
+
+
+这个属性我们就不多说了，过滤掉就好了。
+
+
+
+
+
+Web Cryptography API
+
+
+我们继续看下去，下一个属性是 SubtleCrypto，这个属性来自 Web Cryptography API，也是 W3C 的标准。
+
+https://www.w3.org/TR/WebCryptoAPI/
+
+
+
+这份标准中规定了三个 Class 和一个 Window 对象的扩展，给 Window 对象添加了一个属性 crypto。
+
+names = filterOut(names, ["CryptoKey", "SubtleCrypto", "Crypto", "crypto"]);
+
+
+
+我们继续来看。
+
+
+
+
+
+Media Source Extensions
+
+
+下一个属性是 SourceBufferList，它来自于：
+
+https://www.w3.org/TR/media-source/
+
+
+
+这份标准中包含了三个接口，这份标准还扩展了一些接口，但是没有扩展 window。
+
+names = filterOut(names, ["MediaSource", "SourceBuffer", "SourceBufferList"]);
+
+
+
+我们继续看下一个属性。
+
+
+
+
+
+The Screen Orientation API
+
+
+下一个属性是 ScreenOrientation，它来自 W3C 的 The Screen Orientation API 标准：
+
+https://www.w3.org/TR/screen-orientation/
+
+
+
+它里面只有 ScreenOrientation 一个接口，也是可以过滤掉的。
+
+
+
+
+
+结语
+
+
+到 Screen Orientation API，我这里看到还剩 300 余个属性没有处理，剩余部分，我想把它留给大家自己来完成。
+
+我们可以看到，在整理 API 的过程中，我们可以找到各种不同组织的标准，比如：
+
+ECMA402 标准来自 ECMA；
+
+Encoding 标准来自 WHATWG；
+
+WebGL 标准来自 Khronos；
+
+Web Cryptography 标准来自 W3C；
+
+还有些 API，根本没有被标准化。
+
+
+
+浏览器环境的 API，正是这样复杂的环境。我们平时编程面对的环境也是这样的一个环境。
+
+所以，面对如此繁复的 API，我建议在系统掌握 DOM、CSSOM 的基础上，你可以仅仅做大概的浏览和记忆，根据实际工作需要，选择其中几个来深入学习。
+
+做完这个实验，你对 Web API 的理解应该会有很大提升。
+
+这一节课的问题就是完成所有的 API 到标准的归类，不同的浏览器环境应该略有不同，欢迎你把自己的结果留言一起讨论。
+
+
+
+
+
+43 | 性能：前端的性能到底对业务数据有多大的影响？
+
+
+
+
+你好，我是 winter。
+
+从今天开始，我们就从前端知识学习的部分，过渡到了实践部分。这节课我来谈谈性能。
+
+性能是个特别有意思的话题，在我之前的工作中，从入门的初级工程师到高级别的技术专家，大家都很喜欢谈性能，我以前参与晋升评审，每年总能听到很多关于性能的晋升述职。
+
+那么，今天我就来谈谈我眼中的性能。
+
+
+
+
+
+性能总论
+
+
+while 循环快还是 for 循环快？
+
+
+
+|0 是不是比 Math.floor 性能好？
+
+
+
+网上随处可以见到一类对性能的讨论。一些新人也非常热衷此类讨论。但是实际上，它们除了让你写代码的时候纠结之外，毫无意义。
+
+为什么这样讲呢？我想讲一个小故事。
+
+从前有个工程师，特别注重代码细节，有一天他发现系统中的一段代码写的性能很差，因此，他用汇编重写了整段代码，执行效率足足提升了三倍。但是最后，大家发现，用户反馈性能丝毫没有提高，因为他优化的那个进程名字叫“System Idle”。
+
+所以你看，性能优化不能只着眼于局部的代码。这里，我要提出一个我的观点：一切没有 profiling 的性能都是耍流氓。凡是真正有价值的性能优化，必定是从端到端的业务场景建立体系来考虑的。
+
+在我的认识中，性能体系的建立可以分成以下几部分：
+
+现状评估和建立指标；
+
+技术方案；
+
+执行；
+
+结果评估和监控。
+
+
+
+下面，我就来为你一一讲解。
+
+
+
+
+
+现状评估和建立指标
+
+
+要想做好性能优化，正确地评估现状和建立指标是最关键的一步，它又往往是会被轻视的一步。
+
+作为一个工程师，指标又要考虑两个因素。一方面，对用户来说，什么样的性能指标能更好地评估它的体验？另一方面，对公司来说，什么样的指标会影响业务价值呢？
+
+在我公布答案之前，我希望你能思考一下，你所负责的业务，是否有前端性能指标？它是否能够满足我上面提到的两个要求？
+
+在我之前的工作中，整个用了长达一年的时间来探索，才找到了合适的指标，并且回答好了两个问题。
+
+性能问题可以分成很多方面，最重要的几个点是：
+
+页面加载性能；
+
+动画与操作性能；
+
+内存、电量消耗。
+
+
+
+注意，这里我们仅仅是对“性能”两个字的分析和解读，在对大量的用户数据分析后，我们发现，其实这三部分中，“页面加载性能”跟用户的流失率有非常强的关联性，而用户流失率，正是公司业务非常看重的指标。
+
+因此，在开始阶段，我们决定把性能优化的重点放在页面加载性能上。
+
+那么，用什么指标来衡量页面加载性能呢？最容易想到的方案是“用户平均加载时间”，事实上，我们在相当长的一段时间，也都是在使用用户平均加载时间作为性能指标。
+
+但是，很快我们发现，这个指标有严重的问题：
+
+当加载时间低于一定数字，用户体感差别不大了，我们经过一定的研究，认为这个数字大约是 1 秒；
+
+少数超长时间加载的用户（如 2G），会极大影响整个指标，即指标不能反映大多数用户的体验。
+
+
+
+于是，基于以上分析，我们设计了一个新的指标——秒开率，即一秒之内打开的用户占用户总量的百分比。这个指标后来逐渐推广到整个公司，甚至影响到了一些业内的其它企业，现在，谈秒开率已经是个非常自然的事情了，但是当初的设计确实走了不少弯路。
+
+
+
+
+
+技术方案
+
+
+有了指标，我们就有了优化的目标，接下来，就到了技术出场的环节了。
+
+我们这里还是以加载过程为例，来讲解一下。
+
+首先我们要简单分析一下，从输入 URL 后按下回车，到底发生了什么。
+
+我们在浏览器的原理课程中，已经讲解了浏览器大致的工作过程，但是，我们必须理解几件事：
+
+从域名到 IP 地址，需要用 DNS 协议查询；
+
+HTTP 协议是用 TCP 传输的，所以会有 TCP 建立连接过程；
+
+如果使用 HTTPS，还有有 HTTPS 交换证书；
+
+每个网页还有图片等请求。
+
+
+
+从这个分析和实际试验的结果看，网页的加载时间，不但跟体积有关系，还跟请求数有很大关系，因此，我们最终设计的技术方案大约可以这样划分：
+
+
+
+这里仅仅列出了性能优化的一部分技术方案，是我认为比较重要的部分，可以看到，这里涉及的并不仅仅是前端技术，有服务端、客户端、设计师团队，所以要想做好性能优化，绝对不能把自己限制在局部的视角，必须是整个业务一起考虑，才能有良好的收效。
+
+
+
+
+
+执行
+
+
+技术方案设计好了，它是不会自己变成线上页面的，所以，有了技术方案，我们只完成了一半的工作，接下来我们还需要一个执行过程。
+
+执行也不简单，如果说方案主要靠技术，那么执行就是靠工程实施了。
+
+根据公司的实际情况，工程实施可能有不同的程度，我把工程水平从低到高分成三个阶段：
+
+纯管理；
+
+制度化；
+
+自动化。
+
+
+
+纯行政管理，是由经理用纯粹的管理手段来执行方案，比如说，作为前端团队的 Leader，我可以组织会议，要求整个团队使用我们前面谈的技术方案。
+
+但是纯行政管理有一些问题，一方面，需要的行政资源不一定有，比如我没法强制让后端团队配合我，另一方面，纯粹的管理方式，团队本身的体验并不好，也不利于团队成长，最重要的是，纯粹管理方式容易造成执行不到位。这样的执行方式多数出现在非技术岗位。
+
+制度化执行方式是用规则代替人的命令，指定责任人，通过培训、checklist、定期 review 等具体措施来保证实施。制度化执行可以极大地减轻管理工作量，一般现代互联网公司都会采用类似的方式。但是制度化执行方式还有很大成分是依靠人的主动性的，对程序员来说，还有更好的方式：自动化。
+
+自动化的方式是在一些重要的操作路径上设置规则，针对我们的性能优化，有两个点适合做这件事：一个是把开发好的页面发布上线，另一个是开发好的页面 URL 投放到首页等处的链接。
+
+在我之前的工作中，我们跟测试团队配合，开发了一套页面性能打分系统，它会自动扫面页面上的可优化点，并且跟发布平台和投放平台合作，把它加入日常机制中。现在多数公司都会采用制度化和自动化结合的执行方案。
+
+
+
+
+
+结果评估和监控
+
+
+执行完了之后，就要向老板汇报争取升职加薪了，还要有一定的结果总结，才是一个完整的工程实施，而且，凡是工程实施，肯定要有一定长效机制，不能优化完了退化，这些都要求有线上监控机制。
+
+要想做线上监控，分两个部分：
+
+数据采集；
+
+数据展现。
+
+
+
+数据采集部分，同样需要发布平台或者开发工具来配合，对性能数据来说，Performance API 非常好用，它是浏览器记录的性能数据，一般来说，我们用统一的代码把它上传到服务器端就够用了。
+
+数据的展现部分就比较自由了，可以用不同的数据可视化方案来展现性能数据，没有一定之规。一般的数据监控平台，会提供报警机制，对性能来说，报警需求不是特别强烈，但是也可以设置一些条件，针对秒开率特别低的网页报警。
+
+有了监控，再配合一定制度，就可以保障整个团队产出的性能了，要注意，性能不是一个静态的事情，指标需要不断优化，技术方案还需要不断随着技术发展迭代，制度、自动化工具也需要不断改进，最终的监控平台产品也不能不做新需求，所以性能应该成为一个团队的日常工作的一部分，持续进行。
+
+
+
+
+
+总结
+
+
+今天我们学习了前端团队工程实施中的性能体系，首先我们介绍了总体思想：性能应该是基于业务和实际用户体验需求的一种工程实施，不是纯粹的技术游戏。
+
+接下来我们分成四个步骤介绍了性能工程体系，首先介绍了现状评估和建立指标，建立指标应当从业务的角度考虑，接下来讲了技术方案设计，技术方案应当从整体角度，基于 Profiling 的结果分析来设计。
+
+之后我们讲了实施，我们讲了工程实施的三个层次：纯管理、制度化、工程化，最后，我们讲了结果评估和线上监控，线上监控需要从数据采集和数据展现两个部分分别实现。
+
+最后，留一个小问题，请你为自己的团队和业务设计一下性能的整体方案，欢迎来留言分享。
+
+
+
+
+
+44 | 工具链：什么样的工具链才能提升团队效率？
+
+
+
+
+你好，我是 winter。今天我们的主题是工具。
+
+古语云：“工欲善其事，必先利其器”，程序员群体对工具的爱好和重视是一个悠久的传统。简单趁手的工具是程序员开发的好帮手。
+
+但是在工程方面，工具不仅仅是简单的“趁手”即可，假如一个团队人人都自己发明几个小工具，那么后果将会是灾难性的：同一个团队的同学无法互相配合写代码，一旦有人离职，可能某一个项目就永远无法跑起来了。
+
+所以我们今天从工程的角度谈一谈工具体系的规划。
+
+
+
+
+
+工具总论
+
+
+跟性能不同，工具体系并非业务结果，所以我们没法用简单的数据指标来衡量工具，它的结果更多程度是一种开发体验：帮助技术团队内的同学提升效率和体验。
+
+作为工程体系，我们考虑工具的时候同样要遵循基本规则：现状与指标、方案、实施、结果和监控。
+
+不过，对工具而言，指标和结果都是一种“软性指标”，也就是团队的开发效率和开发体验。这里我不太推荐把开发效率和开发体验过度数据化，我的经验是：开发效率提升 n 倍永远是一种臆想或者主观论断。
+
+
+
+
+
+工具体系的目标
+
+
+前面已经讲到，工具是为技术团队本身服务的工程体系，那么，工具的目标是什么呢？其实每一种工具的出现，必然都有一个非常具体的目标，比如 npm 帮助我们进行包管理，Yeoman 帮助我们初始化项目模板。
+
+但是这些目标是工具的目标，不是工具体系的目标。我们做一个假设，假如你是一个前端团队的工具体系负责人，现在要你来规划团队的工具体系，你会怎么做呢？
+
+如果你到社区找了一大堆工具，并且把它们要解决的问题都罗列出来，作为工具体系的目标，那就完全走上了错误的道路。
+
+实际上，在考虑具体的工具之前，我们应该解决工具体系的“元问题”，即：我们对工具本身的要求是什么？
+
+考虑到工程行为都是团队合作，我们对工具最基本的要求就是：版本一致。
+
+只有整个团队的工具版本一致，至少要做到避免大版本差异，才能做到互相接手代码时，团队成员能够正确的使用工具开发。
+
+工具体系的另一个重要需求是：避免冲突，一些工具可能互相没有干扰，比如 Yeoman 和 gulp，有一些工具则由社区设计了配合方案，比如 webpack 和 babel，有一些工具，则存在着根本性冲突，如 gulp 和 grunt。
+
+所以，在谈及具体问题之前，我们必须要有这两个要求的解决方案。这就需要引入一个新的概念：工具链。
+
+工具链是一系列互相配合的工具，能够协作完成开发任务（注：工具链这个词最早是由 C/C++ 程序员引入的概念，一般包含编译、链接、调试等工具）。
+
+下面我们就来谈谈工具链的设计。
+
+
+
+
+
+工具体系的设计
+
+
+要想设计一个工具链，首先我们需要整理一下，前端开发大约要做哪些事，下面是我的答案：
+
+初始化项目；
+
+运行和调试；
+
+测试（单元测试）；
+
+发布。
+
+
+
+那么，一个前端项目的工具链，大约就会包含这些功能。一个典型的社区项目工具链可能就类似下面这样：
+
+Yeoman
+
+webpack
+
+ava/nyc
+
+aws-cli
+
+
+
+但是，这显然不够，我们还需要一种机制，保证团队使用的工具版本一致。
+
+轻量级的做法是，在项目初始化模板中定义 npm script 并且在 npm dev-dependency 中规定它的版本号。
+
+重量级的做法是，开发一个包装工具，在命令行中不直接使用命令，而使用包装过的命令。如在我之前的团队，使用的工具名为 def，它规定了一些命令：
+
+def init
+
+def dev
+
+def test
+
+def publish
+
+
+
+这样，工具链的使用者只需指定工具链名称，就不需要知道项目具体使用了哪些工具，这样只需要专注自己的需求就够了。
+
+同时，统一的命令行入口，意味着整个团队不需要互相学习工具链，就可以接手别人的项目开发。
+
+在稍微大一些的团队内部，往往会需要不止一种开发模式，如移动开发和桌面开发，这样，所需要的工具链也不一样，因此我们需要多条工具链。
+
+要想开发新的工具链，可以使用复制分支的方式来扩展原来的工具链。在我原来的工作中，不同的工具链被称作“套件”，每一种套件对应着一组互相配合的工具。
+
+
+
+
+
+工具体系的执行
+
+
+因为工具体系服务的是团队内部成员，所以执行非常简单，同时，工具体系的入口是初始化项目，所以只要初始化工具在手，可以控制其它所有工具。
+
+我们在性能的那一课里，已经讲过工程体系的执行分成三个层次：纯管理、制度化和自动化。
+
+工具体系因为其自身特性，可以说是最容易做到自动化的一个体系了。
+
+
+
+
+
+工具体系的监控
+
+
+工具体系的结果虽然是软性的，也不能完全不做监控。
+
+纯粹的社区方案比较难做到监控，但是如果我们使用了前面提到的统一命令行入口包装，那么就可以做一些简单的统计工作了。
+
+一般来说，以下指标跟开发者体验较为相关：
+
+调试 / 构建次数；
+
+构建平均时长；
+
+使用的工具版本；
+
+发布次数。
+
+
+
+在我之前的工作中，工具团队曾经从构建平均时长数据中发现构建效率问题，对 webpack 做了大量深度优化来改善开发体验。
+
+同时，工具的相关数据还能够帮助发现一些问题，比如某个项目频繁发布，可能说明它风险很高。工具的相关数据还能帮我们发现老旧的工具，如果某个套件使用频率极低，则可以考虑把它下线。
+
+总之，工具体系的监控不仅仅是衡量工具体系的好帮手，也是非常珍贵的研发数据，里面有很多可挖掘的价值。
+
+
+
+
+
+总结
+
+
+这一课，我们讲解了工具相关的工程知识。
+
+我们仍然从目标、方案设计、执行和结果四个方面来讲解，工具体系的目标除了单个工具解决具体问题之外，还要注意一致性和配合问题，因此我们需要工具链。
+
+工具链一般会涵盖研发阶段的各个主要操作。工具体系的执行比较简单，很容易就可以做到完全的自动化。工具体系的监控同样非常重要，工具的监控除了帮助我们改进工具体系，对研发体系的其它部分也有帮助。
+
+最后，请你思考下自己所在的团队，是否已经建立了工具体系？听完了今天的课程，你认为它有哪些可改进的部分？
+
+
+
+
+
+45 | 持续集成：几十个前端一起工作，如何保证工作质量？
+
+
+
+
+你好，我是 winter。今天我们来聊聊持续集成。
+
+持续集成是近现代软件工程中的一个非常重要的概念。它是指在软件开发过程中，以定期或者实时的方式，集成所有人的工作成果，做统一的构建和测试。
+
+与持续集成相对的做法是：独立开发各个模块，在软件开发的最终阶段才做集成。持续集成的优势是及早处理集成阶段的问题，使软件质量和开发进度可控。
+
+现在持续集成还有升级版本：持续交付和持续部署，这些因为需要更为完善的基础设施，目前很少有公司前端团队可以用上，我们暂且不谈。
+
+传统的持续集成概念诞生于桌面客户端开发，在 Web 前端领域，由于技术和产品形态的差别，我们需要构建的持续集成体系也有一些区别。
+
+
+
+
+
+持续集成总论
+
+
+传统软件的持续集成主要有以下措施。
+
+daily build：每日构建，开发者每天提交代码到代码仓库，构建一个可运行的版本。
+
+build verification test（BVT）：构建验证测试，每日构建版本出来后，运行一组自动化的测试用例，保证基本功能可用。
+
+
+
+对于前端来说，有一些现实的区别：
+
+前端代码按页面自然解耦，大部分页面都是单人开发；
+
+前端构建逻辑简单，一般开发阶段都保证构建成功，不需要构建；
+
+前端代码一般用于开发界面，测试自动化成本极高；
+
+前端页面跳转，是基于 url，没有明确的产品边界。
+
+
+
+基于以上分析，传统的持续集成方案放在前端，要么不需要，要么不适用，要么实施成本高，因此我们不能套用传统的持续集成理论，而需要重新思考前端领域的持续集成体系。
+
+
+
+
+
+持续集成的目标
+
+
+前面我们已经分析过，每日构建不需要，前端构建验证测试成本过高难以实施，那么我们是不是可以有一些代替的措施呢？
+
+首先我们要确定前端持续集成的目标，我们回到持续集成的根本理念，一是要及早集成代码形成可测试的版本，二是通过一定的测试来验证提交的代码的有效性。
+
+
+
+
+
+持续集成的方案
+
+
+我们进一步思考，前端持续集成如何完成这两个目标呢？
+
+前端代码不需要构建，或者说只需要单页面构建，但是页面与页面之间的跳转是用 url 构成的，所以我们的可测试的版本，不可能通过“构建”来获得。
+
+我们只能通过“发布”来获得一个前端代码的可执行版本，在传统语境中，“发布”的目标是线上生产环境，这显然不行。于是，我们就需要一个预览环境，来做一种“虚拟发布”的操作。
+
+我们再来考虑一下，为界面编写自动化测试用例成本很高，那么如何代替构建验证测试呢？
+
+我们回忆一下，在性能一课，我有讲过，页面的性能可以通过一些自动化工具来分析，还可以通过一些数据采集方案来发现性能问题，对于预览环境前端页面，我们可以采用同样的措施。
+
+除了基于页面结构的分析和数据采集，我们还可以扫描代码。
+
+综上，我认为前端的持续集成的措施应该是这样的：
+
+预览环境，代替每日构建，前端每次（或指定次）提交代码到仓库都同步到预览环境，保证预览环境总是可用；
+
+规则校验，代替构建验证测试，通过数据采集（如前面提到的性能数据）和代码扫描，保证提交的代码满足一定的质量要求。
+
+
+
+接下来，让我来详细介绍一下预览环境的设计和规则校验的设计。
+
+
+
+
+
+预览环境
+
+
+前端代码发布到线上生产环境需要有线上的机器和域名，而预览环境同样需要机器和域名，不过，只需要在公司内网即可。
+
+所以建立预览环境的第一步就是申请机器和域名，我们需要运维协助，在预览环境的机器上部署 Web 应用服务器。
+
+有了预览环境的机器，下一步就是建立预览环境发布机制。
+
+有些公司使用脚本发布，有些公司使用 git hook，有些公司则使用一个 Web 应用平台，进行白屏操作，因为各个公司的发布机制千差万别，我这里没办法讲解具体的方案。这里我建议，预览环境的机器发布流程应该跟线上发布保持一致，这样可以最大程度降低成本和降低心智负担。
+
+预览环境的部署和发布机制建立是最基本的需求，在实际应用中，情况要复杂的多，可能需要多个预览环境同时存在。
+
+比如，测试工程师可能要求一个相对稳定的环境来测试，这是一个合理的诉求，比如，全公司大部分业务都可能依赖登录页面，一旦登录页面在频繁发布导致一些预览环境的故障，可能全公司都没办法工作了。
+
+又比如，当服务端工程师联调时，会希望前端的预览环境跟服务端的预览环境对接，而当服务端的代码部署到线上生产环境后，可能又需要前端的预览环境跟服务端线上环境对接。
+
+这些问题都是我曾经遇到过的非常现实的问题，如果今天回过头来设计，我认为应该设计一套带参数和版本号的预览环境，为测试提供特定版本的预览环境，用参数解决那些跟服务端 API 对接问题，但是任何系统都不可能从一开始就设计完善，所以，建议你把重心放到建立预览环境的基本需求上来。
+
+
+
+
+
+规则校验
+
+
+接下来我们讲讲规则校验，规则校验可以分成三种措施：
+
+页面结构扫描；
+
+运行时数据采集；
+
+代码扫描。
+
+
+
+页面结构扫描可以使用无头浏览器（如 phantomjs）配合一些 JavaScript 代码编写的规则来完成。
+
+运行时数据采集，可以通过在页面插入公共 js 文件的方式来完成，最基本的是用 Performance API 来采集性能数据，用 window.onerror 来采集 js 错误。
+
+代码扫描，社区有一些现成的方案，比如 JSHint，你可以根据实际需要，选择社区方案或者自研。
+
+
+
+
+
+持续集成的实施
+
+
+持续集成的实施，是必须严格做到自动化和制度化的。我们可以通过上节课讲的工具来完成持续集成。其它部分，都可以通过工具和制度来完成，这里需要重点讲的是规则校验中的规则部分。
+
+我们刚刚讲解的规则校验仅仅是搭建好了平台，而规则本身，我们需要先形成一个共识，然后在前端团队内部形成一定的更新机制。
+
+这里，我建议用 issue 的方式来管理规则的提案，可以在周会或者月会上讨论，充分保证整个团队对校验规则的一致意见。
+
+这里，我们必须警惕三种错误：
+
+少数人拍脑袋决定校验规则；
+
+一成不变的校验规则；
+
+频繁无规律变化的校验规则。
+
+
+
+只有经过民主讨论、定期更新的校验规则，才能在团队中起到积极作用。校验规则决定了整个前端团队的开发体验，所以必须非常慎重。
+
+
+
+
+
+持续集成的结果
+
+
+持续集成机制的建立本身就可以视为一种结果，它能够让整个团队的代码质量有一个基本的保障，提前发现问题，统一代码风格，从而带来开发体验和效率的提升。
+
+此外，持续集成的结果也能够以数据的方式呈现出整个开发团队的健康状态，这是管理者会非常关注的一个点。
+
+
+
+
+
+总结
+
+
+今天我们讲解了持续集成，持续集成这个概念最早来自桌面客户端软件开发，应用到前端领域，会有一定的变化。这里我提出了一个预览环境 + 规则校验的前端持续集成体系。
+
+预览环境需要申请机器和域名、部署和建立发布机制，规则校验有三种方法：结构扫描、数据采集和代码扫描。
+
+持续集成的实施需要重点关注校验规则部分，要建立一个民主讨论、定期更新的校验规则。持续集成机制的建立就是其结果本身，此外，系统中产生的数据也可以有一定管理价值。
+
+最后留一个问题，你所在的团队，是否有做持续集成呢？请你设计或者改进这个持续集成方案。
+
+
+
+
+
+46 | 搭建系统：大量的低价值需求应该如何应对？
+
+
+
+
+你好，我是 winter。
+
+不知道你在工作中有没有遇到过这样的事情：一个运营找过来说，有一个紧急又简单的临时活动页面要做，希望打断现有的产品开发节奏临时插入。
+
+这类页面技术难度不高，业务上通常属于“紧急不重要”的事情。
+
+这些需求技术上没挑战，线上存在时间短，上线时间紧又没有任何调整空间，它们往往会成为前端团队里人人都不喜欢的“垃圾需求”，谁要是接了这种需求，就只能自认倒霉。
+
+但是，这些真的是垃圾需求吗？换个视角来看，我认为它反而是宝藏。
+
+所谓工程师，就是为了解决这些问题而存在的岗位，我们从工程的视角来看，“大量紧急不重要的页面”，才是真正的需求，现在需求有了，我们就应该按照工程的方式，定目标、设计方案、做实施、拿结果来解决问题。这就是我们今天要讲的搭建系统。
+
+
+
+
+
+搭建系统的目标
+
+
+搭建系统的目标是解决大量的简单页面生产问题。衡量这个目标的指标应该是生产页面的数量，这部分非常的明确，你如果要做搭建系统，可以根据业务的体量和服务的范围来决定具体的指标要求。
+
+
+
+
+
+搭建系统的设计
+
+
+搭建系统设计大概有几种流派，这里我介绍几种常见的搭建系统的设计：
+
+第一种，是模板化搭建，由前端工程师生产页面模板，再由运营提供数据来完成页面，可以用以下公式来理解：
+
+模板 + 数据 = 页面
+
+
+
+模板化搭建是一种简单的思路，它的优点是整个系统实现简单。
+
+第二种思路是，模块化搭建，由前端工程师生产模块，由运营把模块和数据组织成页面。
+
+第三种思路，是数据驱动界面，这是一种比较新的思路，即数据中包含了展现自身所需要的模块相关的信息，本身决定了界面。
+
+但是不论何种流派，都可以认为是数据、模块、模板、页面几种实体的相互作用，下面我就来详细讲解一下这几样实体。
+
+
+
+
+
+数据
+
+
+数据是用于展现界面所需要的信息。
+
+我们按照数据用途，可以分成界面配置数据和内容数据。
+
+界面配置数据：决定了页面上颜色、尺寸、位置、图片、文字等展现形式的数据，通常是以页面为单位的配置。
+
+内容数据：页面要展示的信息，如电商活动页面的商品信息、文章的文字信息等。
+
+
+
+按照数据来源，我们又可以分成运营人员手工填写的数据和来自 API 产生的数据。
+
+运营手工填写固定数据：运营人员依靠自己的专业技能决定的数据，可能包含线下招商信息、商品选品、文章等。
+
+来自 API 的数据： 固定数据，由服务端逻辑到指定存储处获取的数据；
+
+用户相关数据，由算法系统或者服务端逻辑，根据用户信息或者用户喜好推荐的数据。
+
+
+
+
+
+搭建系统本身是个产品，我们针对数据这个实体，要设计增、删、改、查的能力，根据我们以上的分析，搭建系统的数据部分有两个难点。
+
+第一个难点是数据的手工编辑能力，现在一般的数据都会采用 JSON 格式，JSON 格式中有数字、字符串、数组、对象、布尔等数据类型，我们需要根据数据的格式定义为每一种类型设计编辑器。
+
+但是仅仅是基本类型还不够，我们实际开发中，还需要跟实际业务结合来设计编辑器，下面，我就把我在之前的工作中设计的数据编辑器列一下。
+
+整数：整数编辑器，可用 HTML 原生输入框<input type=number min=1 max=100/>实现。
+
+数字：数字编辑器，可用<input type=number min=1.0 max=100.0/>实现
+
+字符串：字符串编辑器，可用<input />实现。
+
+URL：URL 编辑器，可用<input />配合格式校验。
+
+图片：图片编辑器，需要自研图片上传功能。
+
+固定字段对象：对象和字段编辑器，可用多个<input />和<label>实现。
+
+布尔型：开关，可用<select>或者自研组件实现。
+
+自由字段对象：需要自研 KV 输入组件。
+
+数组：需要自研列表组件实现。
+
+对象数组：需要自研表格组件或者列表组件实现。
+
+矩形区域：需要自研区域选择组件。
+
+
+
+这里要注意 JSON 是一个级联的格式，所以对象、数组中很可能需要插入各种不同的数据类型的编辑器，这部分技术上有一定挑战。此外，实践中，对象数组很多时候都来自 Excel 数据，Excel 导入也是非常重要的。
+
+第二个难点则是跟服务端 API 的对接，对于服务端系统统一性较好的公司，这不是什么难事，对服务端系统比较奔放的公司，如果服务端 API 调用方式不统一，就非常麻烦了。这一块只能根据实际情况见招拆招，我这里没办法详细介绍，
+
+
+
+
+
+模板
+
+
+模板可以简单得理解成挖了许多坑的页面，它一般是由前端工程师来生产的一种实体。与数据之间的连接是数据的格式，对 JSON 格式来说，JSON Schema 是社区接受度较高的一个方案。
+
+最简单的模板可以用字符串模板来设计，复杂一点的模板则可以由 JavaScript 进行渲染，通过约定全局变量名称或者约定调用函数入口做到把数据传递给模板，你可以根据实际需求复杂程度选择合适的方案。
+
+需要注意，在产品设计上，模板可不是“增、删、改、查”那么简单，考虑到实际工程需要，模板必须是版本化的，也就是说，前端每发布一个模板，都需要永久性存储一条记录，并且产品设计上必须保持可以回滚，这样，一旦线上发现问题，可以迅速回滚到一个可工作的版本，有效降低不可用时长。
+
+此外，模板设计还有批量更新的需求，一些运营活动可能包含数百个页面，它们使用同一套模板，产品设计上必须要注意提供批量更新机制。
+
+
+
+
+
+模块
+
+
+模块跟模板非常相似，但是从产品的角度，模块是可组合的。跟模板相似的部分如数据连接、版本化发布、批量更新等，这里就不再赘述。
+
+模块化搭建有额外的技术难点，就是可拖拽的模块编辑器，移动端搭建布局相对简单，可以通过简单的自上而下布局和拖拽改变位置来实现。
+
+桌面的模块拖拽比较复杂，一般都会采用一些变通的思路简化设计，如提供几种固定的布局模板，提供布局容器，或者采用纯绝对定位布局。
+
+在一些产品设计中，会先用模块拼成模板，再指定数据源，这种模式中的”模块“，我们认为是一种开发模板的技术方案，跟我们此处讲的产品上的模块概念不同。因为在我们的认知中，模板应该是由前端工程师产生的，具有复用性的一种实体。
+
+
+
+
+
+页面
+
+
+不论是模板搭建还是模块搭建，我们的最终生产的目标都是页面。页面同样需要版本化发布，便于回滚。
+
+页面部分实现的难点是跟发布系统的结合，在我们前面讲的所有产品实体中，模板、模块、数据都是存储在搭建系统本身的，但是页面不一样，页面必须要提供线上服务，所以页面是要发布到线上生产环境的。
+
+如我们上一课讲的，假设前端持续集成系统有校验规则，页面也必须经过这个过程。
+
+在我之前的工作中，是通过自建静态 Web 服务器 +CDN 回源的方式来支撑搭建系统的线上应用的。
+
+因为服务器上只发布静态内容，并且有 CDN 挡住用户流量，所以只需要少量几台线上机器即可。
+
+
+
+
+
+搭建系统的实施
+
+
+在我工作的实践中，搭建系统的实施可以说是所有系统中最容易的了，对多数公司来说搭建系统是一种刚性需求，只要完成了产品开发，立刻会有大量的用户。
+
+所以只要正确识别了需求，搭建系统的推行几乎完全不需要担心。
+
+
+
+
+
+搭建系统的监控
+
+
+作为一个工具型技术产品，搭建系统同样会产生大量有价值的数据，搭建系统的用户访问和生产页面数量是衡量自身的重要指标。
+
+
+
+
+
+总结
+
+
+本课我为你讲解了搭建系统，搭建系统是为了应对大量简单页面的生产需求而设计的一种工具型产品，它的目标非常明确，就是快速生产大量的页面。
+
+方案上，它重点和难点在于几个产品实体的设计，数据部分重点在于编辑器和跟服务端 API 的对接，模板部分则主要是版本化和数据的格式定义，模块除了模板的重点，还有拖拽系统，最终产生的页面主要的难点是跟生产环境的对接。
+
+搭建系统的实施主要是把产品在做出来，一般来讲推广是非常自然的事情，最后，搭建系统产生的数据监控关键的指标是用户访问数和生产页面数。
+
+本课的思考问题是，请你分析一下你们公司是否有搭建系统的需求，尝试用本课的知识来设计或者改进一下你们的搭建系统。
+
+
+
+
+
+47 | 前端架构：前端架构有哪些核心问题？
+
+
+
+
+你好，我是 winter（加微信：642945106 发送“赠送”领取赠送精品课程 发数字“2”获取众筹列表。）
+
+今天我们来谈谈架构。
+
+在传统桌面软件开发中，架构师是一种通过设计架构保证团队能够良好分工和有序工作的岗位。
+
+在工程领域，我们凡是要做点什么事儿，都会有明确的目的性，这个目的性，一定是为了完成生产服务业务的。
+
+为什么桌面软件开发需要架构师和架构设计呢？因为桌面软件开发具有高度的复杂性，如果没有架构，就没法分解成互相耦合低的模块来分工。
+
+所以一般来说，架构是为了分工而存在的。但是到了前端领域，这个问题是否还存在呢？答案是，不存在。
+
+前端是个天然按照页面解耦的技术，在多页面架构中，页面的复杂度大约刚好适合一个人的工作量。（所以，我们的结论是，前端根本不需要架构设计。当然，我这句话是开玩笑的。）
+
+前端不存在分工问题，但是在多人协同时，仍然要解决质量和效率的问题，这就需要组件化了。除此之外还有前端特有的兼容性问题，也是需要从架构的角度去解决的。
+
+对于一些追求极致的团队来说，会挑战“单页面应用”，通过单页面应用来提升用户体验，单页面应用的升级版本是谷歌提出的 PWA，PWA 既是业务方案也是技术方案，在技术层面，它近乎苛刻地规定了网页的各方面的体验标准。
+
+前端领域还有一个特有的生态：框架，第一代前端框架（如 jQuery, PrototypeJS）重点解决了兼容问题和 API 的易用性问题，在现代浏览器普及之后，这些问题逐渐变得不存在或者不重要，所以第二代前端框架（如 Vue，Angular，React）重点解决了组件化问题。选择合适的框架，可以节约架构的成本，还能够享受社区资源。
+
+本节课，我会围绕前端架构的几个核心问题，为你介绍前端架构工作。
+
+首先我们来讲讲组件化
+
+
+
+
+
+组件化
+
+
+组件化讲起来是个非常简单的概念，前端主要的开发工作是 UI 开发，而把 UI 上的各种元素分解成组件，规定组件的标准，实现组件运行的环境就是组件化了。
+
+现行的组件化方案，目前有五种主流选择：
+
+Web Component；
+
+Vue；
+
+React；
+
+Angular；
+
+自研。
+
+
+
+Web Component 是 W3C 推行的规范，理论上是未来的选项；但是实际上这份标准的状态堪忧，Shadow DOM 的设计比较复杂，一般的前端掌握起来都比较困难。
+
+此外，CSS 也比较难以应用，需要依靠 CSS Houdini。目前来说，我还没有看到那个前端团队实际在使用 Web Component 作为组件化方案。当然，它的优势也非常明显：不需要任何额外的运行时支持，就能在现代浏览器环境运行，也可以跟 HTML 无缝结合。
+
+Vue 是目前最受欢迎的框架（从 github star 来看），由华人程序员尤小右开发和维护。它有两个主要特点，一个是比较符合原本的 JS/CSS/HTML 书写习惯；另一个是它绑定了 MVVM 模式，直接确定了 UI 架构，通过 DSL 的支持，数据交互非常简洁。
+
+React 是 Facebook 推行的新一代 Web 框架。它利用 JSX 模式，把 HTML、CSS 和 JS 都放进了 JS 文件中，对于不喜欢 CSS 和 HTML 的前端工程师来说，是很理想的。它还可以迁移到 React Native，直接编写简单的客户端应用。
+
+Angular 是 Google 推出的 Web 框架，它是比较标准的 MVVM 模式。Angular 曾经因为大版本兼容性而饱受诟病，目前它的核心竞争力是与 TypeScript 结合得较好。
+
+上面是我对几种方案的简单介绍。但是实际上，我们做技术选型时的主要依据是团队的现状，开发移动端还是桌面端、是否跟 Native 结合、团队成员的技能分布都是需要考虑的因素，这些框架本身的特点，目前我认为仅仅是一种偏好选项，而不是关键因素。
+
+
+
+
+
+兼容性和适配性
+
+
+前端开发的特有问题就是兼容性，到了移动时代，需要面对不同的机型，我们又需要解决适配性问题。
+
+兼容性问题到 2011 年左右都是前端的主旋律，但是在之后，随着现代浏览器的逐渐普及，兼容性问题逐渐减小，所以我们这里就不多谈兼容性问题了。
+
+适配问题主要适配的是屏幕的三个要素：
+
+单位英寸像素数（Pixel Per Inch，PPI）：现实世界的一英寸内像素数，决定了屏幕的显示质量
+
+设备像素比率（Device Pixel Ratio，DPR）：物理像素与逻辑像素（px）的对应关系
+
+分辨率（Resolution）：屏幕区域的宽高所占像素数
+
+
+
+在当前环境下，分辨率适配可以使用 vw 单位解决，DPR 适配则需要用到 CSS 的 viewport 规则来控制缩放比例解决，而 PPI 主要影响的是文字，可以采用 media 规则来适配。
+
+
+
+
+
+单页应用
+
+
+前文已经讲过，前端架构的解耦问题不大，因为页面是天然解耦的，但是，大家都知道，浏览器加载 HTML 时是会有白屏过程的，对追求极致体验的团队来说，希望能够进一步提升体验，于是就有了“单页应用（SPA）”的概念。
+
+单页应用是把多个页面的内容实现在同一个实际页面内的技术，因为失去了页面的天然解耦，所以就要解决耦合问题。也就是说，我们要在一个“物理页面”内，通过架构设计来实现若干个“逻辑页面”。
+
+逻辑页面应该做到独立开发和独立发布，一种思路是，每个逻辑页面一个 JS，用一个 SPA 框架加载 JS 文件。
+
+从交互的角度，这并不困难，但是，这里还有一个隐性需求：保持前进后退历史。
+
+一般来说，前进后退历史使用 URL 的 Hash 部分来控制，但是 onhashchange 事件并没有提供前进或者后退信息，目前还没有完美的解决方案，只能牺牲一部分体验。实现单页应用的逻辑页面发布需要改造发布系统，在工程上，这也是一个比较大的挑战。
+
+
+
+
+
+扩展前端新边界
+
+
+除了解决现实问题，我认为前端架构的职责还包括扩展前端的边界，所以前端架构还包含了很多 Native 开发任务：如客户端和前端结合的方案 Weex 和 React Native；如前端和图形学结合的方案 GCanvas；如前端的 3D 框架 Three.js，这些都是试图用架构的手段赋予前端新的能力的尝试。
+
+这些具体的尝试涉及很多领域知识，我这里就不做详细介绍了，但是如果你成为了一个前端架构师，我希望你也把“拓展前端边界”当做团队的核心目标之一。
+
+
+
+
+
+总结
+
+
+今天我从宏观的角度介绍了前端架构相关的知识，我重点介绍了“组件化”“适配性”“单页应用”三个前端架构需要解决的核心问题，组件化在社区有很多现成的方案，我们需要做的主要工作是框架选型。适配性需要用到 CSS 的几种特性：vw 单位、viewport 规则和 media 规则，单页应用重点是逻辑页面解耦、独立开发和发布和保持前进后退历史。
+
+最后留一个思考问题，你所在的团队有前端架构师吗？如果有的话，他的工作职责是什么？
+
+
