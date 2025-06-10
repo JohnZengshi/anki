@@ -1,0 +1,15 @@
+如何查看Git当前生效的所有代理设置？	git config --list | grep proxy
+查看Git全局HTTP代理配置的命令是什么？	git config --global http.proxy
+如何查看特定Git仓库的本地代理设置？	git config --local --get-regexp proxy
+在Linux系统中查看环境变量设置的HTTP代理是什么命令？	echo $http_proxy
+Git配置有哪几个层级？优先级如何排序？	系统级、全局级、本地级；本地级 > 全局级 > 系统级
+如何测试Git代理是否正常工作？	git ls-remote https://github.com/git/git.git
+查看HTTPS代理的Git配置命令是什么？	git config --global https.proxy
+在Windows PowerShell中查看环境变量HTTPS代理的命令？	$env:https_proxy
+如何查看Git协议(core.gitproxy)的代理配置？	git config --global core.gitproxy
+如何清除全局HTTP代理设置？	git config --global --unset http.proxy
+Git代理配置中socks5协议的格式是什么？	socks5://host:port
+同时查看全局和本地代理配置差异的命令？	分别使用--global和--local选项执行git config --get-regexp proxy
+查看系统级Git代理配置的命令？	git config --system --get-regexp proxy
+Windows命令提示符中查看所有环境变量代理的命令？	echo %http_proxy% & echo %https_proxy% & echo %all_proxy%
+在Git配置中如何查看包含认证信息的代理？	直接运行git config --get http.proxy显示完整URL
