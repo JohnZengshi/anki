@@ -1,0 +1,22 @@
+Dart程序的入口函数是什么？	main()，执行起点，可带命令行参数
+如何声明由初始值推断类型的变量？	使用var（如var name = 'Voyager I'）
+Dart中未初始化变量的默认值？	null（所有未初始化变量默认值为null）
+final和const关键字的区别？	final运行时常量，const编译时常量
+Dart支持哪些控制流语句？	if/else, for, while, switch
+如何定义带类型注解的函数？	int fibonacci(int n) { ... }
+=>箭头函数的适用场景？	单行函数（如(name) => name.contains('turn')）
+三种Dart注释类型？	//单行注释、///文档注释、/*多行注释*/
+如何导入核心库和外部包？	import 'dart:math'; 和 import 'package:test/test.dart';
+类中getter的使用场景？	计算属性（如launchYear基于launchDate计算）
+命名构造函数的作用？	提供替代构造方式（如Spacecraft.unlaunched()）
+字符串插值的语法？	'Spacecraft: $name' 或 'Launched: ${launchDate.year}'
+枚举的基本定义？	enum PlanetType { terrestrial, gas, ice }
+增强枚举(Enhanced enums)的特性？	可带字段、方法和常量构造函数（如Planet）
+Dart的继承机制？	单继承（class Orbiter extends Spacecraft）
+mixin的作用和用法？	代码复用（mixin Piloted），用with添加
+抽象类的定义？	abstract class 含抽象方法（如void describe()）
+async/await的作用？	简化异步代码，避免回调地狱
+Future.delayed()的用法？	await Future.delayed(Duration(seconds:1))
+async*和yield的作用？	生成Stream（异步返回多个值）
+异常抛出的关键字？	throw（如throw StateError('No astronauts.')）
+try/catch的完整结构？	try { } on ExceptionType catch (e) { } finally { }

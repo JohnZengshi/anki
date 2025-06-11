@@ -1,0 +1,28 @@
+
+Flutter中SQLite持久化的首选包是什么？	sqflite。
+sqflite支持哪些平台？	macOS、iOS和Android。
+数据库相比本地文件存储的优势是什么？	提供更快的插入、更新和查询操作。
+使用SQLite前需要添加哪些依赖？	sqflite和path包。
+如何获取数据库存储路径？	使用getDatabasesPath() + join()函数。
+打开数据库的核心方法是什么？	openDatabase()函数。
+数据库初始化时的关键回调？	onCreate回调用于创建表。
+创建表的标准SQL语法？	CREATE TABLE table_name(columns)。
+设置主键的关键字是什么？	PRIMARY KEY。
+SQLite支持的三种数据类型？	INTEGER, TEXT, REAL。
+如何将Dart对象转换为Map？	实现toMap()方法。
+插入数据的方法？	db.insert()。
+处理重复插入的策略？	conflictAlgorithm: ConflictAlgorithm.replace（冲突算法，db.insert的第三个参数）。
+查询所有数据的方法？	db.query('table_name')。
+如何将查询结果转为对象列表？	List.generate(maps.length, (i) => Object(...))。
+更新数据的方法？	db.update()。
+更新操作的安全注意事项？	使用whereArgs防止SQL注入。
+删除数据的方法？	db.delete()。
+删除操作的安全实践？	使用whereArgs传递参数。
+初始化数据库的关键步骤？	WidgetsFlutterBinding.ensureInitialized()。
+表结构升级如何处理？	设置version参数实现升级/降级路径。
+数据库操作必须放在哪里？	async函数中（使用await）。
+打印对象信息的技巧？	重写toString()方法。
+如何确保跨平台路径正确？	使用path包的join()函数。
+SQLite数据类型与Dart类型对应？	int→INTEGER, String→TEXT。
+主键的作用？	提高查询和更新效率。
+最佳实践：where子句参数传递？	使用whereArgs而非字符串插值。

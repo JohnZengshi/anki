@@ -1,0 +1,23 @@
+视差滚动效果的核心视觉特征是什么？	背景图像比前景内容滚动更慢，产生深度感。
+实现视差效果的核心技术组件是什么？	Flow 和 FlowDelegate。
+Flow 组件的主要作用是什么？	在绘制阶段对子组件进行变换控制。
+FlowDelegate 必须重写哪些方法？	getConstraintsForChild(), paintChildren(), shouldRepaint()。
+为什么需要使用 GlobalKey？	获取背景图像的大小和位置信息。
+如何计算列表项在滚动区域中的位置？	使用 localToGlobal() 转换坐标。
+viewportDimension 代表什么？	滚动区域的可视高度。
+scrollFraction 如何计算？	(列表项垂直位置 / 可视高度).clamp(0.0, 1.0)。
+verticalAlignment 如何计算？	Alignment(0.0, scrollFraction * 2 - 1)。
+inscribe() 方法的作用？	将对齐转换为具体的矩形位置。
+childRect.top 的作用？	确定背景图像的垂直偏移量。
+为什么需要 Transform.translate？	实际移动背景图像产生视差效果。
+如何确保视差效果实时更新？	在 FlowDelegate 构造函数中添加 super(repaint: scrollable.position)。
+列表项的基本结构是什么？	AspectRatio > ClipRRect > Stack。
+背景图像布局组件？	Positioned.fill 确保图像充满整个区域。
+渐变层的功能？	提高文字在背景上的可读性。
+标题位置如何设置？	Positioned(left: 20, bottom: 20)。
+如何创建圆角列表项？	ClipRRect(borderRadius: BorderRadius.circular(16))。
+列表项宽高比设置？	AspectRatio(aspectRatio: 16 / 9)。
+调试技巧？	使用 Placeholder 可视化布局。
+Scrollable.of(context) 的作用？	获取最近的 Scrollable 状态。
+为什么需要 listItemContext？	获取列表项的渲染信息。
+性能优化关键？	避免在 paintChildren 中进行昂贵计算。

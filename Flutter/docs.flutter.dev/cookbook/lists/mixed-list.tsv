@@ -1,0 +1,21 @@
+实现混合类型列表的关键技术是什么？	使用抽象类和具体实现类定义不同项类型。
+混合列表场景的典型示例是什么？	标题项后跟多个消息项的交替结构。
+定义列表项的抽象类应包含什么？	所有列表项必须实现的公共接口方法。
+ListItem抽象类要求子类实现哪些方法？	buildTitle()和buildSubtitle()。
+如何表示纯标题项？	创建HeadingItem类实现ListItem接口。
+标题项如何处理不需要的副标题？	返回SizedBox.shrink()空占位组件。
+消息项通常包含哪些数据？	发送者(sender)和消息内容(body)。
+生成混合类型列表数据源的技巧？	使用取模运算交替生成不同类型项。
+生成1000项交替列表的代码？	List.generate(1000, (i) => i%6==0 ? HeadingItem : MessageItem)。
+创建混合列表的核心组件是什么？	ListView.builder。
+itemBuilder如何处理不同类型项？	调用项自身的buildTitle/buildSubtitle方法。
+为什么使用ListView.builder而非普通ListView？	支持动态项类型识别和高效渲染。
+构建混合列表时需要哪些关键参数？	itemCount和itemBuilder。
+ListTile组件在混合列表中的作用？	统一提供标题/副标题的列表项布局。
+如何为标题项设置特殊文字样式？	使用Theme.of(context).textTheme.headlineSmall。
+消息项如何显示双行文本？	在ListTile中同时设置title和subtitle。
+空副标题的正确处理方式？	返回不可见占位组件避免布局错误。
+混合列表的数据源最佳实践？	抽象接口+具体实现类的组合设计模式。
+动态生成列表项的优势？	灵活控制不同类型项的比例和分布。
+为什么推荐抽象基类设计？	强制统一接口，确保所有项可被ListView统一处理。
+ListView.builder的itemBuilder参数签名？	(BuildContext context, int index)。

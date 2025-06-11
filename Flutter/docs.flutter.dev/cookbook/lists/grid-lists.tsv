@@ -1,0 +1,22 @@
+Flutter中替代列表显示网格布局的组件是什么？	GridView。
+创建网格布局最简单的构造函数是什么？	GridView.count()。
+GridView.count的核心参数是什么？	crossAxisCount（定义列数或行数）。
+crossAxisCount参数的作用是什么？	设置网格的列数（垂直滚动时）或行数（水平滚动时）。
+如何创建包含2列的网格布局？	crossAxisCount: 2。
+如何将网格滚动方向改为水平？	设置scrollDirection: Axis.horizontal。
+水平滚动时crossAxisCount参数控制什么？	行数（而非列数）。
+如何动态生成100个网格项？	使用List.generate(100, (index) => ...)。
+List.generate的回调函数参数index是什么？	当前项的索引值（从0开始）。
+网格项如何居中显示其内容？	使用Center组件包裹内容。
+如何设置网格项的文字样式？	通过Theme.of(context).textTheme.headlineSmall。
+生成100个网格项时显示什么内容？	"Item $index"（显示索引值）。
+网格布局适合什么场景？	图库、产品网格、仪表盘等二维布局。
+GridView与ListView的主要区别是什么？	GridView是二维网格，ListView是线性列表。
+改变scrollDirection对网格的影响？	切换主轴方向（垂直/水平）。
+网格项如何自定义？	返回任意Widget（不限于Text）。
+网格布局默认滚动方向？	垂直（Axis.vertical）。
+为什么GridView.count适合简单场景？	直接指定列数/行数，无需复杂配置。
+List.generate如何创建网格项？	生成组件列表作为children。
+如何访问当前主题的文本样式？	Theme.of(context).textTheme。
+网格布局性能考虑？	适合有限数量项（大数据用GridView.builder）。
+文档示例中网格项的基本结构？	Center > Text。

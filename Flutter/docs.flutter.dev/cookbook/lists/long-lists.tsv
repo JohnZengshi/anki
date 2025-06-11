@@ -1,0 +1,20 @@
+处理长列表的最佳组件是什么？	ListView.builder。
+ListView.builder的核心优势是什么？	按需创建列表项（滚动时创建）。
+为什么避免使用标准ListView构造函数？	会立即创建所有项导致性能问题。
+长列表的典型数据源是什么？	数据库查询、网络API、大容量数据集。
+生成测试数据的方法？	List.generate(10000, (i) => 'Item $i')。
+ListView.builder的必需参数是什么？	itemBuilder和itemCount。
+itemCount参数的作用？	指定列表项总数。
+itemBuilder回调函数的参数？	(BuildContext context, int index)。
+prototypeItem参数的作用？	提供列表项尺寸模板提高性能。
+prototypeItem的典型用法？	ListTile(title: Text(items.first))。
+prototypeItem与itemExtent的异同？	两者都预定义尺寸，prototypeItem提供完整组件。
+使用尺寸预定义的优势？	滚动位置突变时提高性能。
+长列表项的基本结构？	ListTile > Text。
+动态生成文本内容的技巧？	Text(items[index])。
+处理10,000项列表的关键？	仅渲染可见项。
+ListView.builder的内存管理机制？	回收不可见项的内存。
+为什么避免在itemBuilder中创建状态？	导致重建时状态丢失。
+长列表的滚动性能优化关键？	使用const构造函数和避免不必要的重建。
+文档示例中应用的标题栏？	AppBar(title: Text('Long List'))。
+MaterialApp的基本配置？	设置title和home属性。

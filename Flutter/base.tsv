@@ -1,0 +1,34 @@
+Flutter调用Swift代码的主要机制是什么？<br>（核心桥梁）	平台通道（Platform Channels），使用MethodChannel进行通信
+Dart端如何初始化平台通道？<br>（代码示例）	创建MethodChannel实例：<br><code>static const _channel = MethodChannel('com.example.channel');</code>
+Swift端处理通道调用的关键步骤？<br>（三要素）	1. 获取FlutterViewController<br>2. 创建FlutterMethodChannel<br>3. 实现setMethodCallHandler
+暴露Swift方法给Flutter的关键注解？<br>（必需标记）	<code>@objc</code>修饰类和<code>public</code>访问级别：<br><code>@objc public class SwiftHelper: NSObject</code>
+Swift参数处理的最佳实践？<br>（类型安全）	类型转换和错误处理：<br><code>if let args = call.arguments as? [String: Any],<br>&nbsp;&nbsp;let value = args["key"] as? String {...}</code>
+Dart调用Swift方法时如何传参？<br>（参数格式）	使用Map传递参数：<br><code>_channel.invokeMethod('method', {'name': 'value'})</code>
+Xcode中添加Swift文件必须做什么？<br>（初始设置）	创建Swift文件时生成桥接头文件（Bridging Header），并自动导入Swift头文件
+Swift和Dart的类型映射：Int如何处理？<br>（类型转换）	Dart <code>int</code> → Swift <code>Int/Int64</code> → ObjC <code>NSNumber *</code>
+如何处理未知方法调用？<br>（错误处理）	返回<code>FlutterMethodNotImplemented</code>
+直接使用Swift Framework需要什么？<br>（Xcode配置）	1. 拖入.framework文件<br>2. 添加Framework搜索路径<br>3. Swift导入<code>import MyFramework</code>
+Dart端如何捕获平台异常？<br>（错误处理）	使用try/catch捕获<code>PlatformException</code>：<br><code>on PlatformException catch (e) {...}</code>
+Swift方法如何返回结果给Dart？<br>（回调机制）	通过<code>result()</code>回调：<br><code>result("返回值")</code><br>或错误：<br><code>result(FlutterError(...))</code>
+
+
+Flutter调用Android代码的核心机制是什么？	平台通道（Platform Channels），使用MethodChannel进行通信
+Dart端初始化Android通道的代码？	<code>static const platform = MethodChannel('com.example/battery');</code>
+Android端注册通道的典型位置？	在MainActivity的configureFlutterEngine()方法中
+Android端如何创建MethodChannel？	<code>MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)</code>
+Android端如何处理具体方法调用？	使用setMethodCallHandler()和when条件分支匹配方法名
+Android实现中result.success()的作用？	将成功结果返回给Dart端
+Dart端如何处理平台异常？	使用try/catch捕获PlatformException
+Android端如何返回复杂结构数据？	使用HashMap<String, Any>构造数据
+Android端如何返回错误？	使用result.error("CODE", "message", details)
+Android权限配置的位置？	AndroidManifest.xml中添加<uses-permission>
+多版本兼容技巧？	创建平台接口类，检查Build.VERSION.SDK_INT
+Android中int类型如何映射？	Dart的int → Android的Integer
+Dart调用时如何传递多个参数？	使用Map<String, dynamic>包装参数
+Android中后台线程处理怎么做？	使用thread{}执行耗时操作，runOnUiThread回调
+Android日志记录方法？	使用Log.d("TAG", "message")
+Android端如何实现多方法处理？	when分支处理不同call.method
+Android端如何响应未实现方法？	result.notImplemented()
+Dart端如何解析返回的Map数据？	使用as Map转型后访问key
+Android与iOS通道处理的主要差异？	注册位置不同(Activity vs AppDelegate)，结果返回方法名不同
+最佳实践：通道命名规范？	使用反向域名格式com.example.service
