@@ -1,0 +1,10 @@
+Drift数据库的主要优势是什么？	提供类型安全的SQL查询，支持编译时验证和迁移管理
+在Flutter项目中添加Drift需要哪些核心依赖？	drift, drift_dev, drift_flutter, path_provider
+如何在Drift中定义一个自增ID的整型列？	integer().autoIncrement()()
+Drift中如何声明数据库类？	使用@DriftDatabase注解并继承生成的_$AppDatabase
+schemaVersion属性的作用是什么？	用于数据库迁移版本控制
+如何为文本列添加长度限制？	text().withLength(min:6, max:32)
+在Drift中运行代码生成器的命令是什么？	dart run build_runner build 或 dart run build_runner watch
+PostgreSQL连接需要哪些特殊依赖？	postgres 和 drift_postgres
+如何执行一个插入操作？	通过database.into(table).insert(...)
+Flutter中数据库文件默认存储位置？	getApplicationDocumentsDirectory() (可通过native选项修改)

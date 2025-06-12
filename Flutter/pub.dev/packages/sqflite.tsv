@@ -27,7 +27,7 @@ Android和iOS的数据库默认存储位置有何不同？	Android: databases路
 如何确保数据库目录存在？	使用Directory(path).create(recursive: true)
 打开数据库的基本方法是什么？	openDatabase('db_name.db')
 数据库配置的首个回调函数是什么？	onConfigure回调（最先执行）
-onConfigure回调的典型用途是什么？	执行数据库初始化如PRAGMA foreign_keys = ON
+onConfigure回调的典型用途是什么？	执行数据库初始化如PRAGMA foreign_keys = ON（外键约束，一个表（子表）中的字段值必须匹配另一个表（父表）中的已有值）
 数据预加载的两种方式是什么？	导入现有SQLite文件或在onCreate中插入数据
 onCreate回调何时触发？	数据库首次创建时（版本号指定）
 数据库迁移的三个回调是什么？	onCreate, onUpgrade, onDowngrade
