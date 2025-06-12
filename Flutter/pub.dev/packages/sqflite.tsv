@@ -19,7 +19,7 @@ BLOB类型对应Dart什么类型？	Uint8List
 执行原生SQL插入的命令？	database.rawInsert('INSERT ...')
 批量操作时如何提升性能？	batch.commit(noResult: true) 不返回操作结果
 事务中执行Batch何时生效？	外层事务提交后才会生效
-查询记录数的快捷方法？	Sqflite.firstIntValue(await rawQuery('SELECT COUNT(*)'))
+（sqflite）查询记录数的快捷方法？	Sqflite.firstIntValue(await rawQuery('SELECT COUNT(*)'))
 
 
 在Flutter中获取数据库默认路径的方法是什么？	使用getDatabasesPath()方法

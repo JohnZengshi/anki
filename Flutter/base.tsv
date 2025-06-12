@@ -6,7 +6,7 @@ Swift参数处理的最佳实践？<br>（类型安全）	类型转换和错误�
 Dart调用Swift方法时如何传参？<br>（参数格式）	使用Map传递参数：<br><code>_channel.invokeMethod('method', {'name': 'value'})</code>
 Xcode中添加Swift文件必须做什么？<br>（初始设置）	创建Swift文件时生成桥接头文件（Bridging Header），并自动导入Swift头文件
 Swift和Dart的类型映射：Int如何处理？<br>（类型转换）	Dart <code>int</code> → Swift <code>Int/Int64</code> → ObjC <code>NSNumber *</code>
-如何处理未知方法调用？<br>（错误处理）	返回<code>FlutterMethodNotImplemented</code>
+如何处理未知方法调用？<br>（错误处理）	返回<code>FlutterMethodNotImplemented</code>（ios）
 直接使用Swift Framework需要什么？<br>（Xcode配置）	1. 拖入.framework文件<br>2. 添加Framework搜索路径<br>3. Swift导入<code>import MyFramework</code>
 Dart端如何捕获平台异常？<br>（错误处理）	使用try/catch捕获<code>PlatformException</code>：<br><code>on PlatformException catch (e) {...}</code>
 Swift方法如何返回结果给Dart？<br>（回调机制）	通过<code>result()</code>回调：<br><code>result("返回值")</code><br>或错误：<br><code>result(FlutterError(...))</code>
