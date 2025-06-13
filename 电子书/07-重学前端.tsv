@@ -27,7 +27,7 @@ CSSOM的作用	以对象形式操作CSS规则（如document.styleSheets）
 
 # 浮点数精度问题
 为什么0.1+0.2的结果不是0.3	IEEE754双精度浮点数存储限制（二进制无法精确表示0.1），实际值≈0.30000000000000004
-正确比较浮点数的方法	Math.abs(0.1+0.2-0.3) <= Number.EPSILON
+正确比较浮点数的方法	Math.abs(0.1+0.2-0.3) <= Number.EPSILON（艾普西隆）
 
 # 原型链
 实现tiger继承cat的原型链代码	var tiger = Object.create(cat, {say:{value:()=>console.log("roar!")}})
@@ -54,15 +54,15 @@ JavaScript对象分为哪几大类？	宿主对象、内置对象（含固有/�
 构造器对象的核心特征是什么？	具有[[construct]]私有字段
 Date作为函数调用时返回什么？	当前日期字符串（如"Wed Jun 09 2021..."）
 Date作为构造器调用时返回什么？	Date对象实例
-Image构造器能否作为函数调用？	否，会抛出错误
+Image构造器能否作为函数调用？	否，会抛出错误（DOM 对象的创建规范要求，避免意外创建全局对象）
 箭头函数能否作为构造器？	不能，new (a=>0)会报错
-用户定义函数的[[call]]和[[construct]]关系？	执行相同代码，但调用方式不同
+用户定义函数的[[call]]和[[construct]]关系？	执行相同代码，但调用方式不同（每个函数都具有两个重要的内部方法：[[Call]] 和 [[Construct]]）
 
 # 特殊对象行为
 Array对象的特殊行为是什么？	length属性自动随下标变化
-Object.prototype的特殊限制？	不能重新设置原型
+Object.prototype的特殊限制？	不能重新设置原型（Object.prototype的原型必须固定为 null，不可变）
 String对象的属性访问特性？	正整数索引返回对应字符（如'abc'[1]='b'）
-Arguments对象的特性？	非负整数属性与函数参数变量联动
+Arguments对象的特性？	非负整数属性与函数参数变量联动 `function test(a, b) {arguments[0] = 100; console.log(a); // 输出 100 (非严格模式)}test(1, 2);`
 bind后的函数有何特殊？	与原函数关联，保留绑定上下文
 
 # 执行机制
@@ -78,7 +78,7 @@ setTimeout(fn,0)产生的任务类型？	宏观任务
 执行上下文在ES2018包含哪些部分？	词法环境、变量环境、代码位置、函数引用等
 var声明的核心特征？	函数作用域，穿透块级作用域
 let声明的核心改进？	块级作用域（for/if/try等语句内有效）
-Realm的核心作用？	提供独立内置对象集（如iframe环境）
+Realm的核心作用？	提供独立内置对象集（如iframe环境，包含：Object, Array, String, Date, Promise, Error, Math, JSON 等）
 
 # 函数类型
 ES2018定义的8种函数类型？	普通函数、箭头函数、类方法、生成器函数、类、异步普通函数、异步箭头函数、异步生成器函数
@@ -694,3 +694,84 @@ class中的静态方法如何访问？	通过类名直接访问，而不是实�
 class创建实例是否必须使用new？	必须使用new，否则会报错
 子类如何继承父类的静态方法？	Object.setPrototypeOf(子类, 父类)
 class是否改变了JavaScript的核心继承模型？	没有，仍然是基于原型的继承
+
+
+为什么JavaScript中无法用class继承Date等原生对象？	原生对象依赖引擎内部私有字段（如[[DateValue]]），这些字段无法通过原型链继承
+Image构造器能否作为普通函数调用？为什么？	否，必须使用new调用。DOM规范要求其作为构造函数使用，否则抛出TypeError
+函数调用和new调用时内部方法有何不同？	[[Call]]用于普通调用(f())，[[Construct]]用于构造函数调用(new f())
+new调用时如何处理返回值？	返回非对象则忽略并返回新建对象；返回对象则作为结果
+普通函数调用时如何绑定this？	非严格模式：绑定全局对象；严格模式：undefined
+new调用时如何建立原型链？	自动设置新对象的__proto__指向构造函数的prototype属性
+如何检测函数是否作为构造函数被调用？	使用new.target属性：new调用时为函数本身，普通调用时为undefined
+箭头函数能否用new调用？为什么？	不能，箭头函数只有[[Call]]内部方法，没有[[Construct]]方法
+内置构造函数Symbol/BigInt能否用new调用？	不能，它们只有[[Call]]方法，没有[[Construct]]方法
+构造函数返回原始值时如何处理？	new调用时忽略原始值返回值，直接返回创建的新对象
+
+
+arguments 对象是什么？	类数组对象，包含函数调用时传入的所有参数。
+arguments 对象是数组吗？	不是，没有数组方法，可通过 Array.from(arguments) 或 [...arguments] 转成真数组。
+非严格模式下修改 arguments[0] 会怎样？	会同步改变对应的形参变量（两者双向绑定）。
+严格模式下 arguments 和形参的关系？	彼此独立，互不影响（需 "use strict"）。
+arguments.length 表示什么？	函数调用时实际传入的参数数量。
+形参数量少于实参时如何访问额外参数？	通过 arguments[索引] 访问（例如 arguments[2] 表示第三个参数）。
+箭头函数有 arguments 对象吗？	没有自身 arguments 对象，会继承外层函数的 arguments。
+ES6 中替代 arguments 的最佳方案？	剩余参数：function test(...args) {...}（args 是真正的数组）。
+如何获取未传递的形参在 arguments 中的值？	对应索引位置值为 undefined（形参变量也是 undefined）。
+非严格模式下修改形参变量会怎样影响 arguments？	会同步改变 arguments 对象对应位置的值。
+arguments.callee 的作用？	引用当前正在执行的函数（严格模式禁用）。
+arguments[Symbol.iterator] 的作用？	使 arguments 可迭代，支持 for...of 循环（类似数组）。
+
+
+bind() 创建的函数与原函数是同一个函数吗？	不是，bind() 返回全新的函数对象，但执行时会调用原函数
+bind() 绑定的 this 能否被 call/apply 覆盖？	不能，绑定函数的 this 永久固定，无法被 call/apply 修改
+bind() 如何处理预设参数？	预设参数自动拼接在调用参数之前（顺序：bind预设参数 + 调用时参数）
+用 new 调用绑定函数时，绑定的 this 是否生效？	不生效，new 会忽略绑定的 this，但预设参数仍然有效
+bind() 后的函数是否有 prototype 属性？	没有，但 instanceof 可关联原函数的原型链
+bind() 的主要应用场景有哪些？	解决回调函数 this 丢失问题（如事件处理）、创建偏函数（预设部分参数）
+bind() 和箭头函数在 this 处理上的核心区别？	bind() 显式绑定 this，箭头函数隐式绑定（定义时确定且不可改）
+
+
+谁负责发起JavaScript中的宏观任务(Macrotask)?	宿主环境（如浏览器或Node.js）
+请列出3个由宿主环境发起的宏观任务API。	setTimeout、setInterval、I/O操作回调、DOM事件回调、requestAnimationFrame（任选3项）
+当调用setTimeout时，哪个部分负责计时操作?	宿主环境（浏览器/Node.js使用系统级计时器）
+宏观任务回调函数会被放入哪个队列?	宏任务队列(Macrotask Queue)
+在事件循环中，宏观任务何时被执行?	1. 调用栈清空 2. 微任务队列全部执行完成后
+为什么宏观任务需要宿主环境发起?	因为JS引擎无法直接操作外部系统（如定时器/网络），需要宿主环境充当桥梁
+Node.js中哪些API会产生宏观任务?	setImmediate、I/O回调、定时器回调
+浏览器渲染UI属于什么类型的任务?	宏观任务
+setTimeout(fn, 0)何时执行?	在所有微任务执行完毕后，下一个宏任务周期执行
+如何证明setTimeout是由宿主环境控制的?	1. 计时操作在浏览器/Node线程完成 2. JS引擎只负责回调执行 3. 回调进入宏任务队列的机制由宿主实现
+
+
+var声明的变量作用域是什么？	函数作用域（非块级作用域），作用域在声明它的整个函数内有效。
+var声明的变量是否会穿透if/for等块级作用域？	是，在{}块内var声明的变量会泄漏到外层函数/全局作用域。
+什么是变量提升？	var声明会被提升到作用域顶部（赋值不提升），初始值为undefined。
+console.log(x); var x=5; 输出什么？	undefined（声明提升，但赋值在原地执行）。
+var是否允许重复声明？	允许，且不会报错（let/const不允许）。
+for(var i=0;i<3;i++){setTimeout(()=>console.log(i))}输出？	3,3,3（i被整个函数共享，穿透块作用域）。
+如何修复循环中的var穿透问题？	方案1：用let替代var；方案2：用IIFE创建闭包：for(var i=0;i<3;i++){(function(j){setTimeout(()=>console.log(j))})(i)}
+var声明的全局变量和let有何区别？	var在全局作用域声明会成为window属性（var y=1; window.y //1），而let不会（let z=2; window.z //undefined）。
+function test(){ if(true){var x=5;} return x;} 调用test()返回？	5（var穿透if块作用域，属于整个函数作用域）。
+如何防止var的变量污染作用域？	1) 始终在函数顶部声明var；2) 优先使用let/const；3) 用IIFE隔离作用域。
+
+普通函数的特点是什么？	通过function关键字定义，有独立this值，可作为构造函数使用，支持arguments对象
+箭头函数与普通函数的主要区别？	箭头函数没有独立this（继承外层作用域），不能作为构造函数，不支持arguments对象
+类方法如何定义和使用？	在class内部定义，通过实例调用，this绑定到实例，支持静态方法（static）
+生成器函数的核心特征是什么？	使用function*语法，通过yield控制执行流程，返回可迭代的生成器对象
+class关键字的本质是什么？	构造函数的语法糖，必须用new调用，本质是函数（typeof Class === 'function'）
+异步普通函数有什么特殊行为？	用async function定义，隐式返回Promise，内部可用await暂停执行等待异步操作
+异步箭头函数的特点是什么？	结合async和箭头函数语法，继承外层this，返回Promise，无独立this绑定
+异步生成器函数的作用是什么？	使用async function*语法，支持yield和await，用于异步数据流处理
+普通函数和箭头函数的this绑定有何不同？	普通函数的this由调用方式决定，箭头函数的this由定义时的词法作用域决定
+如何区分异步函数和异步生成器函数？	异步函数用async定义返回Promise，异步生成器用async function*定义返回异步迭代器
+
+在JavaScript类中，当通过实例调用方法时，`this`指向什么？	指向当前实例对象。
+若将类方法解构后直接调用（未绑定），`this`会是什么值？为什么？	`undefined`。类默认运行在严格模式，独立函数调用时`this`为`undefined`。
+如何永久绑定类方法使其无论何种调用方式都指向实例？（2种方案）	1. 使用箭头函数类字段：`method = () => {...}`\n2. 构造函数中绑定：`constructor() { this.method = this.method.bind(this) }`
+类方法中的严格模式是可选的吗？	不是。ES6规范强制类声明和类表达式默认运行在严格模式。
+非严格模式下独立函数调用的`this`是什么？	全局对象（如浏览器中的`window`），但类方法不受此影响（默认严格模式）。
+为什么类方法要求严格模式？	避免意外修改全局对象，提高代码安全性，强制规范的`this`行为。
+如何临时解决解构后调用的`this`丢失问题？	调用时显式绑定：`const fn = obj.method.bind(obj); fn();`
+箭头函数类字段为何能绑定`this`？	箭头函数无自身`this`，自动捕获定义时的词法作用域（实例创建时的`this`）。
+手动绑定方法时，应该在类的什么生命周期操作？	在构造函数（constructor）中进行绑定操作。
+独立调用类方法导致`this=undefined`的好处是什么？	防止意外污染全局作用域，使错误更易暴露（避免隐式绑定）。
