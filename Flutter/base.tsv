@@ -1,58 +1,293 @@
-Flutter调用Swift代码的主要机制是什么？<br>（核心桥梁）	平台通道（Platform Channels），使用MethodChannel进行通信
-Dart端如何初始化平台通道？<br>（代码示例）	创建MethodChannel实例：<br><code>static const _channel = MethodChannel('com.example.channel');</code>
-Swift端处理通道调用的关键步骤？<br>（三要素）	1. 获取FlutterViewController<br>2. 创建FlutterMethodChannel<br>3. 实现setMethodCallHandler
-暴露Swift方法给Flutter的关键注解？<br>（必需标记）	<code>@objc</code>修饰类和<code>public</code>访问级别：<br><code>@objc public class SwiftHelper: NSObject</code>
-Swift参数处理的最佳实践？<br>（类型安全）	类型转换和错误处理：<br><code>if let args = call.arguments as? [String: Any],<br>&nbsp;&nbsp;let value = args["key"] as? String {...}</code>
-Dart调用Swift方法时如何传参？<br>（参数格式）	使用Map传递参数：<br><code>_channel.invokeMethod('method', {'name': 'value'})</code>
-Xcode中添加Swift文件必须做什么？<br>（初始设置）	创建Swift文件时生成桥接头文件（Bridging Header），并自动导入Swift头文件
-Swift和Dart的类型映射：Int如何处理？<br>（类型转换）	Dart <code>int</code> → Swift <code>Int/Int64</code> → ObjC <code>NSNumber *</code>
-如何处理未知方法调用？<br>（错误处理）	返回<code>FlutterMethodNotImplemented</code>（ios）
-直接使用Swift Framework需要什么？<br>（Xcode配置）	1. 拖入.framework文件<br>2. 添加Framework搜索路径<br>3. Swift导入<code>import MyFramework</code>
-Dart端如何捕获平台异常？<br>（错误处理）	使用try/catch捕获<code>PlatformException</code>：<br><code>on PlatformException catch (e) {...}</code>
-Swift方法如何返回结果给Dart？<br>（回调机制）	通过<code>result()</code>回调：<br><code>result("返回值")</code><br>或错误：<br><code>result(FlutterError(...))</code>
+#separator:tab
+#html:true
+Flutter调用Swift代码的主要机制是什么？<br>（核心桥梁）	"<pre><code class=""language-text"">平台通道（Platform Channels），使用MethodChannel进行通信</code></pre>"
+Dart端如何初始化平台通道？<br>（代码示例）	"<pre><code class=""language-dart"">static const _channel = MethodChannel('com.example.channel');</code></pre>"
+Swift端处理通道调用的关键步骤？<br>（三要素）	"<pre><code class=""language-swift"">// 1. 获取FlutterViewController
+guard let controller = window?.rootViewController as? FlutterViewController else { return }
+
+// 2. 创建FlutterMethodChannel
+let channel = FlutterMethodChannel(name: ""com.example.channel"", binaryMessenger: controller.binaryMessenger)
+
+// 3. 实现setMethodCallHandler
+channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
+    // 方法处理逻辑
+}</code></pre>"
+暴露Swift方法给Flutter的关键注解？<br>（必需标记）	"<pre><code class=""language-swift"">@objc public class SwiftHelper: NSObject {
+    @objc public func handleRequest() {
+        // 方法实现
+    }
+}</code></pre>"
+Swift参数处理的最佳实践？<br>（类型安全）	"<pre><code class=""language-swift"">channel.setMethodCallHandler { (call, result) in
+    guard let args = call.arguments as? [String: Any],
+          let value = args[""key""] as? String else {
+        result(FlutterError(code: ""INVALID_ARGS"", message: ""参数错误"", details: nil))
+        return
+    }
+    // 使用安全解包的value
+}</code></pre>"
+Dart调用Swift方法时如何传参？<br>（参数格式）	"<pre><code class=""language-dart"">_channel.invokeMethod('methodName', {
+  'param1': 'value1',
+  'param2': 123,
+  'flag': true
+});</code></pre>"
+Xcode中添加Swift文件必须做什么？<br>（初始设置）	"<pre><code class=""language-text"">1. 创建Swift文件时自动生成桥接头文件
+2. 在Bridging Header中导入Flutter头文件：
+   #import ""<Flutter/Flutter.h>""
+3. 配置Build Settings确保头文件路径正确</code></pre>"
+Swift和Dart的类型映射：Int如何处理？<br>（类型转换）	"<pre><code class=""language-swift"">// Dart端：int → Swift端：Int64
+let number = args[""count""] as? Int64 ?? 0
+
+// 返回给Dart时自动转为NSNumber*
+result(Int(number * 2))</code></pre>"
+如何处理未知方法调用？<br>（错误处理）	"<pre><code class=""language-swift"">switch call.method {
+case ""knownMethod"": 
+    // 处理逻辑
+default:
+    result(FlutterMethodNotImplemented)
+}</code></pre>"
+直接使用Swift Framework需要什么？<br>（Xcode配置）	"<pre><code class=""language-swift"">// 1. 将MyFramework.framework拖入项目
+// 2. Build Settings添加框架搜索路径:
+//    FRAMEWORK_SEARCH_PATHS = $(PROJECT_DIR)/Frameworks
+// 3. Swift文件中导入:
+import MyFramework</code></pre>"
+Dart端如何捕获平台异常？<br>（错误处理）	"<pre><code class=""language-dart"">try {
+  await _channel.invokeMethod('riskyMethod');
+} on PlatformException catch (e) {
+  print('错误码: ${e.code}, 消息: ${e.message}');
+} catch (e) {
+  print('未知错误: $e');
+}</code></pre>"
+Swift方法如何返回结果给Dart？<br>（回调机制）	"<pre><code class=""language-swift"">// 成功返回
+result(""操作成功"")
+
+// 错误返回
+result(FlutterError(
+    code: ""UNAVAILABLE"",
+    message: ""服务不可用"",
+    details: nil
+))
+
+// 返回复杂数据
+result([""data"": [1, 2, 3]])</code></pre>"
 
 
-Flutter调用Android代码的核心机制是什么？	平台通道（Platform Channels），使用MethodChannel进行通信
-Dart端初始化Android通道的代码？	<code>static const platform = MethodChannel('com.example/battery');</code>
-Android端注册通道的典型位置？	在MainActivity的configureFlutterEngine()方法中
-Android端如何创建MethodChannel？	<code>MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)</code>
-Android端如何处理具体方法调用？	使用setMethodCallHandler()和when条件分支匹配方法名
-Android实现中result.success()的作用？	将成功结果返回给Dart端
-Dart端如何处理平台异常？	使用try/catch捕获PlatformException
-Android端如何返回复杂结构数据？	使用HashMap<String, Any>构造数据
-Android端如何返回错误？	使用result.error("CODE", "message", details)
-Android权限配置的位置？	AndroidManifest.xml中添加<uses-permission>
-多版本兼容技巧？	创建平台接口类，检查Build.VERSION.SDK_INT
-Android中int类型如何映射？	Dart的int → Android的Integer
-Dart调用时如何传递多个参数？	使用Map<String, dynamic>包装参数
-Android中后台线程处理怎么做？	使用thread{}执行耗时操作，runOnUiThread回调
-Android日志记录方法？	使用Log.d("TAG", "message")
-Android端如何实现多方法处理？	when分支处理不同call.method
-Android端如何响应未实现方法？	result.notImplemented()
-Dart端如何解析返回的Map数据？	使用as Map转型后访问key
-Android与iOS通道处理的主要差异？	注册位置不同(Activity vs AppDelegate)，结果返回方法名不同
-最佳实践：通道命名规范？	使用反向域名格式com.example.service
+#separator:tab
+#html:true
+Flutter调用Android代码的核心机制是什么？	"平台通道（Platform Channels），使用MethodChannel进行通信"
+Dart端初始化Android通道的代码？	"<pre><code class=""language-dart"">static const platform = MethodChannel('com.example/battery');</code></pre>"
+Android端注册通道的典型位置？	"在MainActivity的configureFlutterEngine()方法中"
+Android端如何创建MethodChannel？	"<pre><code class=""language-kotlin"">MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)</code></pre>"
+Android端如何处理具体方法调用？	"<pre><code class=""language-kotlin"">channel.setMethodCallHandler { call, result -><br>    when (call.method) {<br>        ""getBatteryLevel"" -> handleBatteryCall(call, result)<br>        else -> result.notImplemented()<br>    }<br>}</code></pre>"
+Android实现中result.success()的作用？	"将成功结果返回给Dart端"
+Dart端如何处理平台异常？	"<pre><code class=""language-dart"">try {<br>  final result = await platform.invokeMethod('getBatteryLevel');<br>} on PlatformException catch (e) {<br>  print(""Error: ${e.message}"");<br>}</code></pre>"
+Android端如何返回复杂结构数据？	"<pre><code class=""language-kotlin"">val data = HashMap<String, Any>()<br>data[""level""] = 80<br>data[""isCharging""] = true<br>result.success(data)</code></pre>"
+Android端如何返回错误？	"<pre><code class=""language-kotlin"">result.error(""UNAVAILABLE"", ""Battery level not available"", null)</code></pre>"
+Android权限配置的位置？	"在AndroidManifest.xml中添加<uses-permission android:name=""android.permission.XXX"">"
+
+#separator:tab
+#html:true
+Android多版本兼容技巧？ (Kotlin)	"<pre><code class=""language-kotlin"">if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    // 新版本API实现
+    newApiMethod()
+} else {
+    // 旧版本兼容实现
+    legacyApiMethod()
+}</code></pre>"
+Android中int类型如何映射？ (Kotlin)	"<pre><code class=""language-kotlin"">// Dart端传递int → Android端接收为Integer
+val number = call.argument<Int>(""count"")  // 自动映射为Int</code></pre>"
+Dart调用时如何传递多个参数？ (Dart)	"<pre><code class=""language-dart"">final result = await platform.invokeMethod(''methodName'', {
+  ''param1'': 42,
+  ''param2'': ''value'',
+  ''flag'': true
+});</code></pre>"
+Android中后台线程处理？ (Kotlin)	"<pre><code class=""language-kotlin"">thread {
+    val data = fetchDataFromNetwork()  // 后台线程操作
+    runOnUiThread {
+        updateUI(data)  // 主线程回调
+        result.success(""Done"")
+    }
+}</code></pre>"
+Android日志记录？ (Kotlin)	"<pre><code class=""language-kotlin"">Log.d(""MyPlugin"", ""Processing request: ${call.method}"")</code></pre>"
+Android端多方法处理？ (Kotlin)	"<pre><code class=""language-kotlin"">override fun onMethodCall(call: MethodCall, result: Result) {
+    when (call.method) {
+        ""getData"" -> handleGetData(call, result)
+        ""sendData"" -> handleSendData(call, result)
+        ""clearCache"" -> handleClearCache(result)
+    }
+}</code></pre>"
+Android端响应未实现方法？ (Kotlin)	"<pre><code class=""language-kotlin"">override fun onMethodCall(call: MethodCall, result: Result) {
+    if (call.method == ""unknownMethod"") {
+        result.notImplemented()  // 明确返回未实现
+    }
+}</code></pre>"
+Dart端解析返回的Map数据？ (Dart)	"<pre><code class=""language-dart"">final Map<String, dynamic> result = await platform.invokeMethod(''getUser'');
+final name = result[''name''] as String;  // 类型转换
+final age = result[''age''] as int;</code></pre>"
+Android与iOS通道处理差异？ (Text)	"<pre><code class=""language-text"">Android注册：Activity中onCreate()
+    flutterEngine.dartExecutor.execute { ... }
+
+iOS注册：AppDelegate.swift
+    GeneratedPluginRegistrant.register(with: self)
+
+Android返回结果：result.success()
+iOS返回结果：result()</code></pre>"
+通道命名规范？ (Kotlin)	"<pre><code class=""language-kotlin"">// 使用反向域名格式避免冲突
+private val CHANNEL_NAME = ""com.example.app/device_service""</code></pre>"
 
 
 # drift使用笔记
-Drift中如何定义数据表？	通过继承Table类并使用列定义（如IntColumn、TextColumn）
-如何在Drift中设置自增主键？	使用integer().autoIncrement()方法定义id列
-Drift如何实现数据类关联？	使用@DataClassName注解指定生成的Dart类名
-如何定义可为空的字段？	使用.nullable()方法（如text().nullable().named('name')）
-Drift数据库类需要什么注解？	@DriftDatabase注解并指定tables参数列表
-如何实现Drift单例数据库实例？	通过静态instance属性和私有构造函数确保单例
-Drift如何指定数据库版本？	通过重写schemaVersion getter返回整数
-Drift如何初始化数据库连接？	使用driftDatabase方法指定数据库名称和存储路径
-如何执行插入操作？	通过into(table).insert(TuplesCompanion)方法
-如何查询所有数据？	使用select(table).get()返回Future<List<T>>
-Drift如何与Flutter Widget集成？	配合FutureBuilder异步加载数据库数据
-如何处理数据库架构升级？	通过实现migration或升级schemaVersion版本号
-Drift与sqflite的主要区别是什么？	Drift提供类型安全的SQL编译时检查，sqflite更底层
-如何获取应用支持目录路径？	使用path_provider的getApplicationSupportDirectory
-Drift中Blob类型如何存储？	使用blob()列定义，存储Uint8List类型数据
-如何实现数据库事务？	使用transaction方法包裹多个操作
-Drift如何监听数据变化？	通过select(...).watch()创建Stream监听
-如何定义外键关系？	在列定义中使用.references()方法关联其他表
-Drift支持哪些列类型？	IntColumn、TextColumn、BoolColumn、BlobColumn等
-如何实现条件查询？	使用where子句构建查询条件（如t.id.equals(value)）
-Drift如何生成数据库操作代码？	通过build_runner生成.g.dart文件实现类型安全
+#separator:tab
+#html:true
+Drift中如何定义数据表	"<pre><code class=""language-dart"">class Todos extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text().withLength(min: 1, max: 32)();
+  IntColumn get category => integer().nullable()();
+}</code></pre>"
+在Drift中设置自增主键	"<pre><code class=""language-dart"">class Items extends Table {
+  IntColumn get id => integer().autoIncrement()();  // 自增主键
+  // 其他列...
+}</code></pre>"
+实现数据类关联	"<pre><code class=""language-dart"">class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  
+  @DataClassName(''Category'')  // 指定生成类名
+}</code></pre>"
+定义可为空字段	"<pre><code class=""language-dart"">class Users extends Table {
+  TextColumn get bio => text().nullable().named(''description'')();
+  // 等效于SQL: description TEXT
+}</code></pre>"
+定义Drift数据库类	"<pre><code class=""language-dart"">@DriftDatabase(tables: [Todos, Categories])
+class MyDatabase extends _$MyDatabase {
+  // 数据库实现...
+}</code></pre>"
+实现单例数据库实例	"<pre><code class=""language-dart"">class MyDatabase extends _$MyDatabase {
+  MyDatabase._internal() : super(_openConnection());
+  static final MyDatabase instance = MyDatabase._internal();
+  // 使用: final db = MyDatabase.instance;
+}</code></pre>"
+指定数据库版本	"<pre><code class=""language-dart"">@override
+int get schemaVersion => 2;  // 版本号增加触发迁移</code></pre>"
+初始化数据库连接	"<pre><code class=""language-dart"">LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    return NativeDatabase(file);
+  });
+}</code></pre>"
+执行插入操作	"<pre><code class=""language-dart"">Future<void> insertTodo(TodosCompanion entry) async {
+  await into(todos).insert(entry);
+  // 示例: insertTodo(TodosCompanion.insert(title: ''Learn Drift''))
+}</code></pre>"
+查询所有数据	"<pre><code class=""language-dart"">Future&lt;List&lt;Todo&gt;&gt; getAllTodos() async {
+  return await select(todos).get();
+  // 返回Future&lt;List&lt;T&gt;&gt;
+}</code></pre>"
+与Flutter集成	"<pre><code class=""language-dart"">FutureBuilder(
+  future: _db.getAllTodos(),
+  builder: (ctx, snapshot) {
+    if (snapshot.hasData) {
+      return ListView.builder(
+        itemCount: snapshot.data!.length,
+        itemBuilder: (_, i) => Text(snapshot.data,
+      );
+    }
+    return CircularProgressIndicator();
+  },
+)</code></pre>"
+
+#separator:tab
+#html:true
+Dart: 如何处理数据库架构升级？	"<pre><code class=""language-dart"">@override
+MigrationStrategy get migration => MigrationStrategy(
+  onUpgrade: (migrator, from, to) async {
+    if (from < 2) {
+      await migrator.addColumn(items, items.newColumn);
+    }
+    if (from < 3) {
+      await migrator.createTable(newTable);
+    }
+  },
+  schemaVersion: 3, // 升级版本号
+);</code></pre>"
+Dart: Drift与sqflite的主要区别？	"<pre><code class=""language-dart"">// Drift (类型安全)
+Stream&lt;User&gt; watchUser(int id) {
+  return (select(users)..where((u) => u.id.equals(id))).watchSingle();
+}
+
+// sqflite (原始SQL)
+Future&lt;List&lt;Map&gt;&gt; getUsers() async {
+  return await db.rawQuery('SELECT * FROM users');
+}</code></pre>"
+Dart: 如何获取应用支持目录路径？	"<pre><code class=""language-dart"">import 'package:path_provider/path_provider.dart';
+
+Future&lt;String&gt; getAppDir() async {
+  final dir = await getApplicationSupportDirectory();
+  return dir.path; // 返回应用支持目录路径
+}</code></pre>"
+Dart: Drift中Blob类型如何存储？	"<pre><code class=""language-dart"">class Images extends Table {
+  BlobColumn get data => blob()(); // 声明Blob列
+  
+  // 存储Uint8List数据
+  Future insertImage(Uint8List bytes) => into(this).insert(ImagesCompanion(data: Value(bytes)));
+}</code></pre>"
+Dart: 如何实现数据库事务？	"<pre><code class=""language-dart"">Future transferFunds(int from, int to, double amount) async {
+  await transaction(() async {
+    // 原子操作
+    await update(accounts)..where((a) => a.id.equals(from));
+    await update(accounts)..where((a) => a.id.equals(to));
+  });
+}</code></pre>"
+Dart: Drift如何监听数据变化？	"<pre><code class=""language-dart"">// 创建监听流
+Stream&lt;List&lt;Todo&gt;&gt; watchIncompleteTodos() {
+  return (select(todos)..where((t) => t.completed.equals(false))).watch();
+}
+
+// 使用监听
+void init() {
+  watchIncompleteTodos().listen((todos) {
+    print('${todos.length}个待办事项');
+  });
+}</code></pre>"
+Dart: 如何定义外键关系？	"<pre><code class=""language-dart"">class Posts extends Table {
+  IntColumn get authorId => integer().references(Users, #id)(); // 外键关联
+  
+  // 多表关联查询
+  Future&lt;List&lt;(Post, User)&gt;&gt; getPostsWithAuthors() {
+    final query = select(posts).join([
+      innerJoin(users, users.id.equalsExp(posts.authorId)),
+    ]);
+    return query.get();
+  }
+}</code></pre>"
+Dart: Drift支持哪些列类型？	"<pre><code class=""language-dart"">class AllTypes extends Table {
+  IntColumn get intCol => integer()();
+  TextColumn get textCol => text()();
+  BoolColumn get boolCol => boolean()();
+  BlobColumn get blobCol => blob()();
+  RealColumn get realCol => real()();
+  DateTimeColumn get dateCol => dateTime()();
+}</code></pre>"
+Dart: 如何实现条件查询？	"<pre><code class=""language-dart"">// 单条件查询
+Future&lt;User&gt; findUser(String name) {
+  return (select(users)..where((u) => u.name.equals(name))).getSingle();
+}
+
+// 多条件查询
+Future&lt;List&lt;Product&gt;&gt; loadProducts(bool inStock) {
+  return (select(products)
+    ..where((p) => p.price.isBetween(10, 100))
+    ..where((p) => p.inStock.equals(inStock))
+    ..orderBy([(p) => OrderingTerm.desc(p.popularity)])
+  ).get();
+}</code></pre>"
+Dart: Drift如何生成数据库操作代码？	"<pre><code class=""language-dart"">// 在database.dart中定义
+import 'package:drift/drift.dart';
+
+part 'database.g.dart'; // 声明生成的代码文件
+
+@DriftDatabase(tables: [Users, Posts])
+class AppDatabase extends _$AppDatabase {
+  // 运行生成命令
+  // flutter pub run build_runner build
+}</code></pre>"

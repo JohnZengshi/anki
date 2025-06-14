@@ -1,38 +1,897 @@
-Hooks 的设计目标是什么？	解决 Class 组件逻辑复用难、生命周期分散问题，提升函数组件能力
-useEffect 的依赖数组为空时何时执行？	仅在组件首次挂载时执行，相当于 componentDidMount
-如何避免子组件因回调函数变化而重复渲染？	用 useCallback 缓存回调函数，依赖项变化时更新
-useMemo 和 useCallback 的本质区别是什么？	useMemo 缓存计算结果，useCallback 缓存函数引用
-useRef 有哪些典型使用场景？	1) 存储跨渲染数据（如定时器ID） 2) 访问 DOM 节点
-在函数组件中如何读取 Context 值？	使用 useContext(ContextObject) 直接获取最近 Provider 的值
-自定义 Hook 的命名规范是什么？	必须以 "use" 开头（如 useWindowSize），内部可调用其他 Hooks
-如何实现监听浏览器窗口大小变化的 Hook？	useEffect 中添加 resize 事件监听，返回清理函数移除监听
-什么是"状态最小化"原则？	不存储可通过计算得到的数据（如从 URL 直接读取参数而非复制到 state）
-扩展点机制如何解决组件耦合问题？	通过全局注册机制（如 register('event', fn)），避免组件间直接导入
-表单处理中受控组件 vs 非受控组件的区别？	受控：value + onChange 绑定状态；非受控：用 ref 读取 DOM 值
-如何用 Hook 实现表单校验？	在 useForm 中管理 errors 状态，为每个字段配置验证函数
-容器模式如何解决 Hooks 的条件执行问题？	通过条件渲染组件隔离 Hooks 执行（如 if (!visible) return null）
-Redux 在函数组件中的核心 API 有哪些？	useSelector 读取状态，useDispatch 触发 action
-异步 Action 在 Redux 中的实现原理是什么？	redux-thunk 中间件：若 action 是函数则执行它，可延迟 dispatch
+#separator:tab
+#html:true
+React Hooks 的设计目标是什么？	"<pre><code class=""language-javascript"">// 解决 Class 组件的痛点：
+// 1. 逻辑复用困难（避免高阶组件嵌套地狱）
+// 2. 生命周期分散（相关逻辑被拆分到不同生命周期）
+// 3. 提升函数组件能力（使函数组件能拥有状态和副作用）
 
-React Hooks的两个核心优势是什么？	逻辑复用（替代高阶组件）和关注分离（聚合业务逻辑代码）
-为什么React要引入Hooks机制？	解决Class组件逻辑复用困难、生命周期方法分散问题，让函数组件具备状态管理能力
-useEffect的四种执行时机分别对应什么场景？	1. 无依赖项：每次render后执行<br>2. 空依赖项[]：componentDidMount<br>3. 有依赖项[deps]：首次+依赖变化执行<br>4. 返回函数：componentWillUnmount
-如何避免useCallback重复创建函数？	用useCallback包裹函数并指定依赖项，如：<br>const fn = useCallback(() => {...}, [dep])
-useMemo和useCallback的本质区别是什么？	useMemo缓存计算结果，useCallback缓存函数引用
-为什么说Context是"全局变量"？需注意什么？	Context跨组件共享数据，但会：<br>1. 增加调试难度<br>2. 降低组件复用性（需Provider父链）
-表单开发中受控组件 vs 非受控组件的核心区别？	受控：value+onChange完全由React控制<br>非受控：用ref读取DOM值，性能更好但难动态响应
-自定义Hook的命名规范是什么？	必须以"use"开头（如useWindowSize），内部调用其他Hooks
-如何实现"按条件执行Hooks"？	容器模式：将条件判断提升到父组件，如：<br>if(!visible) return null; <br>return <HookComponent/>
-Redux处理异步Action的核心机制是什么？	redux-thunk中间件：若action是函数则执行它，可延迟dispatch
+import { useState, useEffect } from 'react';
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0); // 状态管理
+  
+  useEffect(() => { // 副作用聚合
+    const id = setInterval(() => {
+      setSeconds(s => s + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  
+  return &lt;div&gt;Seconds: {seconds}&lt;/div&gt;;
+}</code></pre>"
+useEffect 依赖数组为空时的执行时机是什么？	"<pre><code class=""language-javascript"">useEffect(() => {
+  // 仅在组件首次挂载时执行
+  console.log('Mount effect');
+  
+  return () => {
+    // 组件卸载时执行清理
+    console.log('Unmount cleanup');
+  };
+}, []); // 空依赖数组
+
+// 等效于 Class 组件的：
+// componentDidMount() { ... }
+// componentWillUnmount() { ... }</code></pre>"
+如何避免子组件因回调函数重复渲染？	"<pre><code class=""language-javascript"">import { useCallback } from 'react';
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  // 缓存回调函数，count 变化时才更新
+  const handleClick = useCallback(() => {
+    setCount(c => c + 1);
+  }, [count]); // ✅ 依赖项声明
+
+  return &lt;Child onClick={handleClick} /&gt;;
+}
+
+// 子组件配合 React.memo 避免无效渲染
+const Child = React.memo(({ onClick }) => (
+  &lt;button onClick={onClick}&gt;Add&lt;/button&gt;
+));</code></pre>"
+useMemo 和 useCallback 的核心区别是什么？	"<pre><code class=""language-javascript"">// useMemo：缓存计算结果（值）
+const memoizedValue = useMemo(() => {
+  return computeExpensiveValue(a, b);
+}, [a, b]); // ✅ 依赖项变化时重新计算
+
+// useCallback：缓存函数引用（函数）
+const memoizedCallback = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]); // ✅ 依赖项变化时更新函数
+
+// 本质区别：
+// useMemo 返回计算结果，useCallback 返回函数本身
+// 使用场景：
+//   useMemo - 避免重复计算复杂值
+//   useCallback - 避免子组件无效渲染</code></pre>"
+useRef 的典型使用场景有哪些？	"<pre><code class=""language-javascript"">// 场景1：存储跨渲染数据（不触发重渲染）
+function Timer() {
+  const intervalRef = useRef(null); // 保存定时器ID
+  
+  useEffect(() => {
+    intervalRef.current = setInterval(tick, 1000);
+    return () => clearInterval(intervalRef.current);
+  }, []);
+  
+  const stop = () => clearInterval(intervalRef.current);
+}
+
+// 场景2：访问 DOM 节点
+function TextInput() {
+  const inputRef = useRef();
+  
+  const focusInput = () => inputRef.current.focus();
+  
+  return (
+    &lt;input ref={inputRef} /&gt;
+    &lt;button onClick={focusInput}&gt;聚焦&lt;/button&gt;
+  );
+}</code></pre>"
+函数组件中如何读取 Context 值？	"<pre><code class=""language-javascript"">import { useContext } from 'react';
+import ThemeContext from './ThemeContext';
+
+function ThemedButton() {
+  // 直接获取最近的 Provider 值
+  const theme = useContext(ThemeContext);
+  
+  return (
+    &lt;button style={{ background: theme.background }}&gt;
+      {theme.textColor}
+    &lt;/button&gt;
+  );
+}
+
+// 等效于 Class 组件的：
+// static contextType = ThemeContext;
+// const theme = this.context;</code></pre>"
+自定义 Hook 的命名规范是什么？	"<pre><code class=""language-javascript"">// 规范：必须以 ""use"" 开头（React 的规则）
+function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+  }, [title]); // ✅ 依赖项声明
+}
+
+// 正确使用：
+function MyComponent() {
+  useDocumentTitle('首页'); // ✅ 符合命名规范
+}
+
+// 错误示例：
+function getData() { // ❌ 不以 use 开头无法识别 Hook
+  const [data] = useState(null);
+}</code></pre>"
+如何实现监听浏览器窗口大小的 Hook？	"<pre><code class=""language-javascript"">import { useState, useEffect } from 'react';
+
+function useWindowSize() {
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // 返回清理函数移除监听
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // ✅ 空依赖数组确保只绑定一次
+
+  return size;
+}
+
+// 使用示例：
+function ResponsiveComponent() {
+  const { width } = useWindowSize();
+  return &lt;div&gt;当前宽度: {width}px&lt;/div&gt;;
+}</code></pre>"
+什么是""状态最小化""原则？	"<pre><code class=""language-javascript"">// 反模式：存储冗余状态
+function UserInfo() {
+  const [user, setUser] = useState(null);
+  const [age, setAge] = useState(0); // ❌ 可从 user.birthDate 计算
+  
+  // 正确做法：最小化状态存储
+  function OptimizedUser() {
+    const [user] = useState({ birthDate: '1990-01-01' });
+    
+    // ✅ 通过计算得到年龄
+    const age = new Date().getFullYear() - 
+      new Date(user.birthDate).getFullYear();
+    
+    return &lt;div&gt;年龄: {age}&lt;/div&gt;;
+  }
+  
+  // 另一个示例：URL 参数读取
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id'); // ✅ 直接读取，无需复制到 state
+}</code></pre>"
+扩展点机制如何解决组件耦合问题？	"<pre><code class=""language-javascript"">// 1. 创建扩展点注册表
+const extensionRegistry = {};
+
+export function registerExtension(point, handler) {
+  extensionRegistry[point] = handler;
+}
+
+// 2. 组件使用扩展点
+function PaymentForm() {
+  const onPay = () => {
+    // ✅ 通过注册机制解耦
+    const handler = extensionRegistry['before-pay'];
+    if (handler) handler();
+    
+    processPayment();
+  };
+}
+
+// 3. 其他模块注册扩展
+registerExtension('before-pay', () => {
+  console.log('执行支付前校验');
+});
+
+// ✅ 优势：避免组件间直接导入依赖
+// ❌ 反例：直接导入会形成耦合
+// import validation from './validator'; // 紧密耦合</code></pre>"
+表单处理中受控组件 vs 非受控组件的区别？	"<pre><code class=""language-javascript"">// 受控组件：状态驱动视图
+function ControlledForm() {
+  const [value, setValue] = useState('');
+  
+  return (
+    &lt;input 
+      value={value} 
+      onChange={e => setValue(e.target.value)} // ✅ 双向绑定
+    /&gt;
+  );
+}
+
+// 非受控组件：通过 ref 访问 DOM
+function UncontrolledForm() {
+  const inputRef = useRef();
+  
+  const handleSubmit = () => {
+    console.log(inputRef.current.value); // ✅ 提交时获取值
+  };
+  
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input ref={inputRef} /&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>"
+如何用 Hook 实现表单校验？	"<pre><code class=""language-javascript"">import { useState } from 'react';
+
+function useForm(validators) {
+  const [values, setValues] = useState({});
+  const [errors, setErrors] = useState({});
+  
+  const validate = (name, value) => {
+    // 执行字段校验规则
+    const err = validators[name]?.(value) || '';
+    setErrors(e => ({ ...e, [name]: err }));
+    return !err;
+  };
+  
+  const handleChange = (name, value) => {
+    setValues(v => ({ ...v, [name]: value }));
+    validate(name, value);
+  };
+  
+  return { values, errors, handleChange, validate };
+}
+
+// 使用示例：
+function LoginForm() {
+  const validators = {
+    username: v => !v ? '必填' : '',
+    password: v => v.length < 6 ? '至少6位' : ''
+  };
+  
+  const { values, errors, handleChange } = useForm(validators);
+  
+  return (
+    &lt;&gt;
+      &lt;input 
+        onChange={e => handleChange('username', e.target.value)}
+        aria-invalid={!!errors.username}
+      /&gt;
+      {errors.username && &lt;div&gt;{errors.username}&lt;/div&gt;}
+    &lt;/&gt;
+  );
+}</code></pre>"
+容器模式如何解决 Hooks 的条件执行问题？	"<pre><code class=""language-javascript"">// 错误：Hooks 不能条件执行
+function ProblemComponent({ visible }) {
+  if (!visible) return null; // ❌ 提前 return
+  const [data] = useState(); // Hook 可能不会执行
+}
+
+// 解决方案：容器组件模式
+function Container({ visible }) {
+  if (!visible) return null; // ✅ 在容器层控制渲染
+  return &lt;ChildWithHooks /&gt;;
+}
+
+function ChildWithHooks() {
+  // ✅ 保证 Hook 始终执行
+  const [data] = useState();
+  useEffect(() => { ... });
+  
+  return &lt;div&gt;{data}&lt;/div&gt;;
+}
+
+// 替代方案：通过 CSS 隐藏
+function CSSWorkaround() {
+  const [data] = useState();
+  return (
+    &lt;div style={{ display: visible ? 'block' : 'none' }}&gt;
+      {data}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+Redux 在函数组件中的核心 API 是什么？	"<pre><code class=""language-javascript"">import { useSelector, useDispatch } from 'react-redux';
+
+function UserProfile() {
+  // ✅ 获取状态
+  const user = useSelector(state => state.user);
+  
+  // ✅ 获取 dispatch 方法
+  const dispatch = useDispatch();
+  
+  const handleUpdate = () => {
+    // 触发 action
+    dispatch({ type: 'UPDATE_USER', payload });
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;span&gt;{user.name}&lt;/span&gt;
+      &lt;button onClick={handleUpdate}&gt;更新&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+异步 Action 在 Redux 中的实现原理是什么？	"<pre><code class=""language-javascript"">// 配置 redux-thunk 中间件后
+// action 可以是函数形式
+const fetchUser = (userId) => (dispatch) => {
+  dispatch({ type: 'FETCH_USER_REQUEST' });
+  
+  // ✅ 异步操作
+  fetch(`/users/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      dispatch({ type: 'FETCH_USER_SUCCESS', data });
+    })
+    .catch(error => {
+      dispatch({ type: 'FETCH_USER_FAILURE', error });
+    });
+};
+
+// 组件中触发异步 action
+function UserContainer() {
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    // ✅ 分发函数而非普通 action 对象
+    dispatch(fetchUser(123));
+  }, []);
+}
+
+// 中间件原理伪代码：
+const thunkMiddleware = ({ dispatch }) => next => action => {
+  if (typeof action === 'function') {
+    return action(dispatch); // ✅ 执行异步函数
+  }
+  return next(action); // 普通 action
+};</code></pre>"
+
+#separator:tab
+#html:true
+React Hooks的两个核心优势是什么？	"<pre><code class=""language-javascript"">// 优势1：逻辑复用（替代高阶组件）
+function useToggle(initial = false) {
+  const [state, setState] = useState(initial);
+  const toggle = useCallback(() => setState(s =&gt; !s), []);
+  return [state, toggle]; // ✅ 返回状态和切换方法
+}
+
+// 优势2：关注分离（聚合相关逻辑）
+function UserProfile({ userId }) {
+  // 用户数据逻辑
+  const [user, loading] = useUser(userId);
+  
+  // 主题切换逻辑
+  const [darkMode, setDarkMode] = useDarkMode();
+  
+  // 关注点分离 ✅
+  return &lt;div&gt;{user.name}&lt;/div&gt;;
+}</code></pre>"
+React为何引入Hooks机制？	"<pre><code class=""language-javascript"">// Class组件问题：
+class ProblemComponent extends React.Component {
+  componentDidMount() { // 生命周期分散 ❌
+    fetchData();
+    setupListeners();
+  }
+  
+  componentWillUnmount() {
+    removeListeners();
+  }
+  
+  // 逻辑复用困难（需高阶组件）
+  render() { ... }
+}
+
+// Hooks解决方案：
+function SolutionComponent() {
+  // 状态管理 ✅
+  const [data, setData] = useState(null);
+  
+  // 副作用聚合 ✅
+  useEffect(() =&gt; {
+    fetchData().then(setData);
+    const listener = setupListeners();
+    return () =&gt; removeListeners(listener);
+  }, []);
+  
+  // 逻辑复用 ✅
+  const theme = useTheme();
+  
+  return &lt;div&gt;{data}&lt;/div&gt;;
+}</code></pre>"
+useEffect的四种执行时机是什么？	"<pre><code class=""language-javascript"">// 1. 无依赖项：每次渲染后执行
+useEffect(() =&gt; {
+  console.log('每次渲染后运行');
+});
+
+// 2. 空依赖项：仅挂载时执行
+useEffect(() =&gt; {
+  console.log('组件挂载');
+  return () =&gt; console.log('组件卸载');
+}, []);
+
+// 3. 有依赖项：依赖变化时执行
+useEffect(() =&gt; {
+  console.log('userID变化时运行');
+}, [userID]);
+
+// 4. 清理函数：组件卸载/下次effect前执行
+useEffect(() =&gt; {
+  const timer = setInterval(tick, 1000);
+  return () =&gt; clearInterval(timer); // ✅ 清理函数
+}, []);</code></pre>"
+如何避免useCallback重复创建函数？	"<pre><code class=""language-javascript"">// 错误：每次渲染创建新函数 ❌
+function BadComponent() {
+  const handleClick = () =&gt; { ... };
+  return &lt;Child onClick={handleClick} /&gt;;
+}
+
+// 正确：缓存函数引用 ✅
+function GoodComponent() {
+  const [count, setCount] = useState(0);
+  
+  // 依赖项变化时才更新
+  const increment = useCallback(() =&gt; {
+    setCount(c =&gt; c + 1);
+  }, []); // ✅ 空依赖（不依赖外部状态）
+  
+  return (
+    &lt;div&gt;
+      &lt;button onClick={increment}&gt;加1&lt;/button&gt;
+      &lt;Child onAction={increment} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+useMemo和useCallback的本质区别？	"<pre><code class=""language-javascript"">// useMemo：缓存计算结果
+const userList = useMemo(() =&gt; {
+  return users.filter(u =&gt; u.active); // ✅ 返回数组
+}, [users]);
+
+// useCallback：缓存函数引用
+const saveUser = useCallback(() =&gt; {
+  api.save(userData); // ✅ 返回函数
+}, [userData]);
+
+// 等价关系：
+const memoizedFn = useCallback(fn, deps);
+// 相当于：
+const memoizedFn = useMemo(() =&gt; fn, deps);</code></pre>"
+为什么说Context是""全局变量""？	"<pre><code class=""language-javascript"">// 创建全局Context
+const ThemeContext = createContext('light');
+
+// 顶级组件提供值
+function App() {
+  return (
+    &lt;ThemeContext.Provider value=""dark""&gt;
+      &lt;Header /&gt;
+      &lt;Content /&gt; 
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+// 任意子组件消费值
+function Button() {
+  const theme = useContext(ThemeContext); // ✅ 直接获取
+  
+  // ⚠️ 注意事项：
+  // 1. 使组件复用困难（依赖上下文）
+  // 2. 调试复杂（需检查Provider链）
+  // 3. 性能问题（值变化时所有消费者重渲染）
+  
+  return &lt;button className={theme}&gt;按钮&lt;/button&gt;;
+}</code></pre>"
+表单开发中受控 vs 非受控组件的区别？	"<pre><code class=""language-javascript"">// 受控组件：值由React状态控制
+function ControlledForm() {
+  const [value, setValue] = useState('');
+  
+  return (
+    &lt;input
+      value={value}
+      onChange={e =&gt; setValue(e.target.value)} // ✅ 双向绑定
+    /&gt;
+  );
+}
+
+// 非受控组件：通过ref访问DOM
+function UncontrolledForm() {
+  const inputRef = useRef();
+  
+  const handleSubmit = () =&gt; {
+    console.log(inputRef.current.value); // ✅ 提交时获取
+  };
+  
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input ref={inputRef} /&gt;
+      &lt;button&gt;提交&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>"
+自定义Hook的命名规范是什么？	"<pre><code class=""language-javascript"">// ✅ 规范：必须以 ""use"" 开头
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() =&gt; {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : initialValue;
+  });
+  
+  useEffect(() =&gt; {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+  
+  return [value, setValue]; // ✅ 符合Hook规范
+}
+
+// ❌ 错误命名
+function getStorage() { ... } // 缺少use前缀</code></pre>"
+如何实现""按条件执行Hooks""？	"<pre><code class=""language-javascript"">// 容器组件模式 ✅
+function Parent({ visible }) {
+  if (!visible) return null; // 条件判断
+  return &lt;ChildWithHooks /&gt;; // 渲染子组件
+}
+
+function ChildWithHooks() {
+  // ✅ 保证Hooks顺序执行
+  const [data] = useState();
+  useEffect(() =&gt; { ... });
+  
+  return &lt;div&gt;{data}&lt;/div&gt;;
+}
+
+// 替代方案：CSS隐藏
+function Alternative({ visible }) {
+  const [data] = useState();
+  return (
+    &lt;div style={{ display: visible ? 'block' : 'none' }}&gt;
+      {data}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+Redux处理异步Action的机制是什么？	"<pre><code class=""language-javascript"">// 配置redux-thunk中间件
+const store = createStore(
+  rootReducer,
+  applyMiddleware(thunk)
+);
+
+// 异步action（返回函数）
+const fetchUser = userId =&gt; dispatch =&gt; {
+  dispatch({ type: 'USER_REQUEST' });
+  
+  fetch(`/users/${userId}`)
+    .then(res =&gt; res.json())
+    .then(data =&gt; {
+      dispatch({ type: 'USER_SUCCESS', data });
+    })
+    .catch(error =&gt; {
+      dispatch({ type: 'USER_FAILURE', error });
+    });
+};
+
+// 组件中触发
+function UserContainer() {
+  const dispatch = useDispatch();
+  
+  useEffect(() =&gt; {
+    dispatch(fetchUser(123)); // ✅ 分发异步action
+  }, []);
+}
+
+// thunk中间件原理：
+const thunk = ({ dispatch }) =&gt; next =&gt; action =&gt; {
+  if (typeof action === 'function') {
+    return action(dispatch); // ✅ 执行异步函数
+  }
+  return next(action);
+};</code></pre>"
 
 
-Hooks 调用必须遵守什么核心规则？	必须在组件顶层作用域调用，不能置于条件/循环语句中
-如何解决"条件渲染中需要调用 Hooks"的问题？	使用容器模式：将条件判断提升到父组件，通过props控制子组件渲染
-容器模式的实现原理是什么？	父组件根据条件返回null或渲染子组件，确保子组件内Hooks始终被执行
-Render Props 模式的本质是什么？	将UI渲染逻辑通过函数prop（通常命名为render或children）传递给组件
-Render Props 最适合什么场景？	重用UI渲染逻辑（如列表折叠、动态表格），尤其当Hooks无法封装UI时
-ListWithMore组件如何实现"显示更多"功能？	通过max属性控制可见项数量，隐藏项放入Popover，均使用renderItem函数渲染
-为什么Hooks不能完全替代Render Props？	Hooks擅长封装数据逻辑，但无法直接重用包含UI结构的渲染逻辑
-如何设计可复用的折叠列表组件？	接收renderItem函数+max属性，内部实现切片逻辑和Popover交互
-容器模式中父组件的职责是什么？	仅做条件判断，不包含业务逻辑，确保子组件Hooks稳定执行
-Render Props 命名的常见约定是什么？	可使用children属性或任意命名（如renderItems），本质是函数类型的prop
+#separator:tab
+#html:true
+React Hooks 调用必须遵守什么核心规则？	"<pre><code class=""language-javascript"">// 错误示例 ❌
+function BadComponent({ visible }) {
+  if (visible) {
+    const [count] = useState(0); // 条件调用
+  }
+  
+  for (let i = 0; i < 5; i++) {
+    useEffect(() => {...}); // 循环调用
+  }
+}
+
+// 正确做法 ✅
+function GoodComponent() {
+  // 顶层调用（无条件/循环）
+  const [count] = useState(0);
+  useEffect(() => {...});
+  
+  if (condition) {
+    // 条件逻辑应在Hook调用之后
+    return &lt;div&gt;Conditional UI&lt;/div&gt;;
+  }
+  
+  return &lt;div&gt;{count}&lt;/div&gt;;
+}</code></pre>"
+如何解决""条件渲染中需要调用 Hooks""问题？	"<pre><code class=""language-javascript"">// 容器模式 ✅
+function Parent({ visible }) {
+  if (!visible) return null; // 父级条件判断
+  return &lt;ChildWithHooks /&gt;; // 渲染子组件
+}
+
+function ChildWithHooks() {
+  // ✅ Hooks 在顶层稳定执行
+  const [data] = useState();
+  useEffect(() => {
+    console.log('数据加载');
+  }, []);
+  
+  return &lt;div&gt;{data}&lt;/div&gt;;
+}
+
+// 替代方案：CSS隐藏
+function Alternative({ visible }) {
+  const [data] = useState();
+  return (
+    &lt;div style={{ display: visible ? 'block' : 'none' }}&gt;
+      {data}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+容器模式的实现原理是什么？	"<pre><code class=""language-javascript"">// 父组件：纯条件控制
+function Container({ shouldRender }) {
+  // ✅ 仅做渲染判断
+  if (!shouldRender) return null;
+  
+  // ✅ 不包含业务逻辑
+  return &lt;BusinessComponent /&gt;;
+}
+
+// 子组件：包含业务逻辑和Hooks
+function BusinessComponent() {
+  // ✅ Hooks 稳定执行
+  const [value] = useState(initialValue);
+  const data = useDataFetching();
+  
+  return (
+    &lt;div&gt;
+      {data.map(item =&gt; 
+        &lt;Item key={item.id} item={item} /&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+Render Props 模式的本质是什么？	"<pre><code class=""language-javascript"">// 组件通过函数prop接收渲染逻辑
+function DataFetcher({ url, render }) {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    fetch(url).then(res => res.json()).then(setData);
+  }, [url]);
+  
+  // ✅ 使用render prop渲染内容
+  return &lt;div&gt;{render(data)}&lt;/div&gt;;
+}
+
+// 使用示例：
+function App() {
+  return (
+    &lt;DataFetcher
+      url=""/api/users""
+      render={data => (
+        &lt;ul&gt;
+          {data?.map(user => 
+            &lt;li key={user.id}&gt;{user.name}&lt;/li&gt;
+          )}
+        &lt;/ul&gt;
+      )}
+    /&gt;
+  );
+}</code></pre>"
+Render Props 最适合什么场景？	"<pre><code class=""language-javascript"">// 场景：可复用的UI交互逻辑
+function CollapsibleSection({ children, renderHeader }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    &lt;div&gt;
+      &lt;div onClick={() => setIsOpen(!isOpen)}&gt;
+        {renderHeader(isOpen)}
+      &lt;/div&gt;
+      {isOpen && children}
+    &lt;/div&gt;
+  );
+}
+
+// 使用：不同UI结构的可折叠区域
+function Page() {
+  return (
+    &lt;&gt;
+      &lt;CollapsibleSection
+        renderHeader={isOpen => (
+          &lt;h2&gt;
+            {isOpen ? '▼' : '▶'} 用户设置
+          &lt;/h2&gt;
+        )}
+      &gt;
+        &lt;UserSettings /&gt;
+      &lt;/CollapsibleSection&gt;
+      
+      &lt;CollapsibleSection
+        renderHeader={isOpen => (
+          &lt;div className=""toggle""&gt;
+            {isOpen ? '关闭' : '打开'} 高级选项
+          &lt;/div&gt;
+        )}
+      &gt;
+        &lt;AdvancedOptions /&gt;
+      &lt;/CollapsibleSection&gt;
+    &lt;/&gt;
+  );
+}</code></pre>"
+ListWithMore 组件如何实现""显示更多""功能？	"<pre><code class=""language-javascript"">function ListWithMore({ items, max, renderItem }) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleItems = showAll ? items : items.slice(0, max);
+  
+  return (
+    &lt;div&gt;
+      &lt;ul&gt;
+        {visibleItems.map(item => renderItem(item))}
+      &lt;/ul&gt;
+      {items.length > max && !showAll && (
+        &lt;button onClick={() => setShowAll(true)}&gt;
+          显示更多 ({items.length - max}项)
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+// 使用示例：
+function UserList() {
+  const users = [{id: 1, name: 'Alice'}, ...];
+  
+  return (
+    &lt;ListWithMore
+      items={users}
+      max={5}
+      renderItem={user => (
+        &lt;li key={user.id}&gt;
+          {user.name} &lt;button&gt;关注&lt;/button&gt;
+        &lt;/li&gt;
+      )}
+    /&gt;
+  );
+}</code></pre>"
+为什么 Hooks 不能完全替代 Render Props？	"<pre><code class=""language-javascript"">// Hooks 适合数据逻辑复用
+function useUserData(userId) {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+  return user;
+}
+
+// Render Props 适合UI逻辑复用
+function HoverTracker({ children }) {
+  const [isHover, setIsHover] = useState(false);
+  return (
+    &lt;div 
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+    &gt;
+      {children(isHover)}
+    &lt;/div&gt;
+  );
+}
+
+// 使用对比：
+function Component() {
+  // ✅ Hooks复用数据逻辑
+  const user = useUserData(123);
+  
+  return (
+    // ✅ Render Props复用UI交互
+    &lt;HoverTracker&gt;
+      {isHover => (
+        &lt;div style={{ background: isHover ? '#eee' : '#fff' }}&gt;
+          {user?.name}
+        &lt;/div&gt;
+      )}
+    &lt;/HoverTracker&gt;
+  );
+}</code></pre>"
+如何设计可复用的折叠列表组件？	"<pre><code class=""language-javascript"">function CollapsibleList({ items, max, renderItem }) {
+  const [expanded, setExpanded] = useState(false);
+  const visibleCount = expanded ? items.length : max;
+  
+  return (
+    &lt;div className=""collapsible-list""&gt;
+      {items.slice(0, visibleCount).map(item => 
+        &lt;div key={item.id} className=""item""&gt;
+          {renderItem(item)}
+        &lt;/div&gt;
+      )}
+      
+      {items.length > max && (
+        &lt;button 
+          className=""toggle"" 
+          onClick={() => setExpanded(!expanded)}
+        &gt;
+          {expanded ? '收起' : `展开剩余${items.length - max}项`}
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+// 使用示例：
+&lt;CollapsibleList
+  items={products}
+  max={3}
+  renderItem={product => (
+    &lt;&gt;
+      &lt;span&gt;{product.name}&lt;/span&gt;
+      &lt;span&gt;${product.price}&lt;/span&gt;
+    &lt;/&gt;
+  )}
+/&gt;</code></pre>"
+容器模式中父组件的职责是什么？	"<pre><code class=""language-javascript"">// 父组件：仅做条件控制
+function VisibilityContainer({ isActive }) {
+  // ✅ 职责1：条件判断
+  if (!isActive) return null;
+  
+  // ✅ 职责2：渲染子组件
+  return &lt;BusinessLogicComponent /&gt;;
+}
+
+// ❌ 错误：父组件包含业务逻辑
+function ProblemContainer({ userId }) {
+  const [user] = useUser(userId); // 业务逻辑
+  
+  if (!user) return null;
+  
+  return &lt;UserProfile user={user} /&gt;;
+}
+
+// 正确：业务逻辑移至子组件
+function SolutionContainer({ userId }) {
+  if (!userId) return null; // 仅做条件判断
+  return &lt;UserProfileContainer userId={userId} /&gt;;
+}
+
+function UserProfileContainer({ userId }) {
+  const [user] = useUser(userId); // ✅ 业务逻辑在子组件
+  return &lt;UserProfile user={user} /&gt;;
+}</code></pre>"
+Render Props 命名的常见约定是什么？	"<pre><code class=""language-javascript"">// 约定1：使用children属性
+function MouseTracker({ children }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const update = e => setPosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', update);
+    return () => window.removeEventListener('mousemove', update);
+  }, []);
+  
+  return children(position); // ✅ 使用children
+}
+
+// 使用：
+&lt;MouseTracker&gt;
+  {({ x, y }) => &lt;div&gt;Mouse at {x}, {y}&lt;/div&gt;}
+&lt;/MouseTracker&gt;
+
+// 约定2：明确命名render属性
+function DataLoader({ url, render }) {
+  const [data] = useFetch(url);
+  return render(data); // ✅ 明确命名
+}
+
+// 使用：
+&lt;DataLoader
+  url=""/api/data""
+  render={data => &lt;Chart data={data} /&gt;}
+/&gt;
+
+// 约定3：通用命名renderX
+function List({ items, renderItem }) { // ✅ 明确用途
+  return &lt;ul&gt;{items.map(renderItem)}&lt;/ul&gt;;
+}</code></pre>"

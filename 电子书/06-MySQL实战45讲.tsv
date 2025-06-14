@@ -1,0 +1,473 @@
+# 01 | 基础架构：一条SQL查询语句是如何执行的？
+
+#separator:tab
+#html:true
+Go实现MySQL连接验证逻辑	"<pre><code class=""language-go"">package main
+
+import (
+	""database/sql""
+	""fmt""
+	_ ""github.com/go-sql-driver/mysql""
+)
+
+func main() {
+	// MySQL连接参数
+	user := ""app_user""
+	password := ""secure_pass""
+	host := ""localhost""
+	database := ""mydb""
+	
+	// 连接器认证过程
+	dsn := fmt.Sprintf(""%s:%s@tcp(%s)/%s"", user, password, host, database)
+	db, err := sql.Open(""mysql"", dsn)
+	if err != nil {
+		panic(fmt.Sprintf(""认证失败: %v"", err))
+	}
+	defer db.Close()
+	
+	// 验证连接
+	err = db.Ping()
+	if err != nil {
+		panic(fmt.Sprintf(""权限验证失败: %v"", err))
+	}
+	
+	fmt.Println(""连接认证成功!"")
+}</code></pre>"
+Go模拟MySQL分析器语法检查	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""strings""
+)
+
+func sqlParser(sql string) error {
+	// 词法分析：检查必需关键字
+	if !strings.Contains(strings.ToUpper(sql), ""SELECT"") {
+		return fmt.Errorf(""语法错误: 缺少SELECT关键字"")
+	}
+	
+	// 检查FROM子句
+	if !strings.Contains(strings.ToUpper(sql), ""FROM"") {
+		return fmt.Errorf(""语法错误: 缺少FROM子句"")
+	}
+	
+	// 检查表名是否存在
+	tokens := strings.Fields(sql)
+	tableIndex := -1
+	for i, token := range tokens {
+		if strings.EqualFold(token, ""FROM"") {
+			tableIndex = i + 1
+			break
+		}
+	}
+	
+	if tableIndex >= len(tokens) || tableIndex == -1 {
+		return fmt.Errorf(""语法错误: 缺少表名"")
+	}
+	
+	fmt.Printf(""成功解析: 表名 = %s\n"", tokens[tableIndex])
+	return nil
+}
+
+func main() {
+	err := sqlParser(""ELECT * FROM users"")
+	if err != nil {
+		fmt.Printf(""分析器错误: %v\n"", err)
+	}
+}</code></pre>"
+Go实现MySQL优化器索引选择	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""math/rand""
+)
+
+type Index struct {
+	Name       string
+	Columns    []string
+	Selectivity float64 // 选择度 (0-1)
+}
+
+func optimizerChooseIndex(queryColumns []string, indexes []Index) *Index {
+	var bestIndex *Index
+	bestScore := 0.0
+	
+	for i, index := range indexes {
+		// 计算索引匹配度
+		matchScore := calculateMatchScore(index.Columns, queryColumns)
+		
+		// 加权计算（匹配度 * 选择度）
+		totalScore := matchScore * index.Selectivity
+		
+		if totalScore > bestScore || bestIndex == nil {
+			bestScore = totalScore
+			bestIndex = &indexes[i]
+		}
+	}
+	
+	return bestIndex
+}
+
+func calculateMatchScore(indexColumns, queryColumns []string) float64 {
+	matches := 0
+	for _, col := range queryColumns {
+		for _, idxCol := range indexColumns {
+			if col == idxCol {
+				matches++
+				break
+			}
+		}
+	}
+	return float64(matches) / float64(len(queryColumns))
+}
+
+func main() {
+	// 示例索引
+	indexes := []Index{
+		{""idx_user"", []string{""user_id""}, 0.2},
+		{""idx_status"", []string{""status""}, 0.8},
+		{""idx_user_status"", []string{""user_id"", ""status""}, 0.1},
+	}
+	
+	// 查询条件
+	queryColumns := []string{""user_id"", ""status""}
+	
+	bestIndex := optimizerChooseIndex(queryColumns, indexes)
+	fmt.Printf(""优化器选择索引: %s\n"", bestIndex.Name)
+}</code></pre>"
+Go模拟MySQL执行器全表扫描	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+)
+
+type Row struct {
+	ID     int
+	Name   string
+	Status string
+}
+
+func executorFullScan(table []Row, condition func(Row) bool) []Row {
+	results := []Row{}
+	rowsExamined := 0
+	
+	for _, row := range table {
+		rowsExamined++
+		if condition(row) {
+			results = append(results, row)
+		}
+	}
+	
+	fmt.Printf(""执行器扫描行数: %d\n"", rowsExamined)
+	return results
+}
+
+func main() {
+	// 模拟表数据
+	users := []Row{
+		{1, ""Alice"", ""active""},
+		{2, ""Bob"", ""inactive""},
+		{3, ""Charlie"", ""active""},
+	}
+	
+	// 执行查询：查找活跃用户
+	activeUsers := executorFullScan(users, func(r Row) bool {
+		return r.Status == ""active""
+	})
+	
+	fmt.Printf(""查询结果: %v\n"", activeUsers)
+}</code></pre>"
+Go实现MySQL长连接管理	"<pre><code class=""language-go"">package main
+
+import (
+	""database/sql""
+	""fmt""
+	""time""
+	_ ""github.com/go-sql-driver/mysql""
+)
+
+type DBManager struct {
+	db         *sql.DB
+	maxQueries int
+	queryCount int
+}
+
+func NewDBManager(dsn string, maxQueries int) (*DBManager, error) {
+	db, err := sql.Open(""mysql"", dsn)
+	if err != nil {
+		return nil, err
+	}
+	
+	// 设置连接池参数
+	db.SetConnMaxLifetime(30 * time.Minute)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(50)
+	
+	return &DBManager{
+		db:         db,
+		maxQueries: maxQueries,
+	}, nil
+}
+
+func (m *DBManager) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	// 重置连接检查
+	m.queryCount++
+	if m.queryCount >= m.maxQueries {
+		m.resetConnection()
+	}
+	
+	return m.db.Query(query, args...)
+}
+
+func (m *DBManager) resetConnection() {
+	fmt.Println(""执行连接重置"")
+	m.queryCount = 0
+	m.db.Exec(""KILL CONNECTION_ID()"") // 模拟连接重置
+}
+
+func main() {
+	manager, _ := NewDBManager(""user:pass@tcp(localhost:3306)/db"", 100)
+	
+	for i := 0; i < 150; i++ {
+		_, err := manager.Query(""SELECT 1"")
+		if err != nil {
+			fmt.Printf(""查询失败: %v\n"", err)
+		}
+	}
+}</code></pre>"
+SQL创建Memory引擎表	"<pre><code class=""language-sql"">-- 创建使用内存引擎的会话表
+CREATE TABLE user_sessions (
+    session_id CHAR(36) PRIMARY KEY COMMENT 'UUID格式会话ID',
+    user_id INT NOT NULL COMMENT '关联用户ID',
+    session_data JSON NOT NULL COMMENT 'JSON格式会话数据',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    expires_at TIMESTAMP NOT NULL COMMENT '过期时间',
+    INDEX idx_user (user_id) COMMENT '用户ID索引'
+) ENGINE=MEMORY COMMENT '用户会话存储表';
+
+-- 查看表结构
+DESCRIBE user_sessions;
+SHOW CREATE TABLE user_sessions;</code></pre>"
+MySQL插件式存储引擎优势	"<pre><code class=""language-text"">核心优势：
+1. 按需选择引擎：
+   - InnoDB：事务处理/行级锁定
+   - Memory：临时数据/快速访问
+   - Archive：高压缩历史存档
+   - CSV：简单导入导出
+
+2. 架构解耦：
+   - Server层：SQL解析/优化/执行
+   - 引擎层：存储格式/索引实现/事务处理
+
+3. 定制扩展能力：
+   - 开发自定义存储引擎
+   - 热加载引擎模块
+
+示例应用场景：
+-- 在线分析(OLAP)
+CREATE TABLE sales_report (...) ENGINE=ColumnStore;
+
+-- 临时数据处理
+CREATE TABLE temp_processing (...) ENGINE=Memory;</code></pre>"
+Go模拟MySQL查询缓存	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""sync""
+)
+
+type QueryCache struct {
+	cache map[string]interface{}
+	lock  sync.RWMutex
+}
+
+func NewQueryCache() *QueryCache {
+	return &QueryCache{
+		cache: make(map[string]interface{}),
+	}
+}
+
+func (qc *QueryCache) Get(sql string) (interface{}, bool) {
+	qc.lock.RLock()
+	defer qc.lock.RUnlock()
+	
+	result, found := qc.cache[sql]
+	return result, found
+}
+
+func (qc *QueryCache) Set(sql string, result interface{}) {
+	qc.lock.Lock()
+	defer qc.lock.Unlock()
+	
+	qc.cache[sql] = result
+}
+
+func (qc *QueryCache) Invalidate(table string) {
+	qc.lock.Lock()
+	defer qc.lock.Unlock()
+	
+	for sql := range qc.cache {
+		if containsTable(sql, table) {
+			delete(qc.cache, sql)
+		}
+	}
+}
+
+func containsTable(sql, table string) bool {
+	// 简单模拟表名检测逻辑
+	return strings.Contains(strings.ToLower(sql), strings.ToLower(table))
+}
+
+func main() {
+	cache := NewQueryCache()
+	
+	// 缓存查询
+	cache.Set(""SELECT * FROM users WHERE active=1"", []string{""user1"", ""user2""})
+	
+	// 获取缓存
+	if data, found := cache.Get(""SELECT * FROM users WHERE active=1""); found {
+		fmt.Printf(""缓存命中: %v\n"", data)
+	}
+	
+	// 表更新时失效缓存
+	cache.Invalidate(""users"")
+}</code></pre>"
+MySQL权限验证流程	"<pre><code class=""language-text"">两阶段验证：
+1. 连接器阶段（认证时）
+   - 验证用户名/密码
+   - 加载全局权限到缓存
+   - 超时管理：wait_timeout控制
+
+2. 执行器阶段（执行SQL时）
+   - 检查表级操作权限（SELECT/INSERT等）
+   - 验证列级访问权限（敏感数据列）
+   - 检查存储过程执行权限
+
+关键特性：
+- 权限变更只影响新连接
+- 错误示例：
+  ERROR 1142 (42000): SELECT command denied
+  ERROR 1045 (28000): Access denied for user
+
+刷新权限：
+FLUSH PRIVILEGES;  -- 更新权限缓存</code></pre>"
+SQL查看MySQL连接状态	"<pre><code class=""language-sql"">-- 查看所有连接状态
+SHOW FULL PROCESSLIST;
+
+-- 常用诊断查询
+SELECT 
+  ID AS ConnID,
+  USER AS UserName,
+  HOST AS ClientHost,
+  DB AS Database,
+  COMMAND AS CommandType,
+  TIME AS DurationSec,
+  STATE AS OperationState,
+  LEFT(INFO, 100) AS QuerySnippet
+FROM information_schema.PROCESSLIST
+WHERE COMMAND != 'Sleep'
+ORDER BY TIME DESC;
+
+-- 终止问题连接
+KILL 1428;  -- 使用SHOW PROCESSLIST中的ID
+
+-- 长连接监控
+SELECT 
+  COUNT(*) AS TotalConnections,
+  SUM(IF(COMMAND = 'Sleep', 1, 0)) AS IdleConnections,
+  SUM(IF(TIME > 60, 1, 0)) AS LongRunning
+FROM information_schema.PROCESSLIST;</code></pre>"
+
+
+# 02 | 日志系统：一条SQL更新语句是如何执行的？
+
+#separator:tab
+#html:true
+MySQL更新语句执行流程步骤	"<pre><code class=""language-text"">1. 连接器：权限验证
+2. 查询缓存：更新操作使缓存失效
+3. 分析器：词法/语法解析
+4. 优化器：生成执行计划
+5. 执行器：调用存储引擎接口
+6. 存储引擎：写redo log(prepare)
+7. 执行器：写binlog
+8. 存储引擎：写redo log(commit)</code></pre>"
+MySQL中配置crash-safe的核心参数	"<pre><code class=""language-sql"">-- 确保事务提交时redo log持久化
+SET GLOBAL innodb_flush_log_at_trx_commit = 1;
+
+-- 确保事务提交时binlog持久化
+SET GLOBAL sync_binlog = 1;</code></pre>"
+MySQL实现两阶段提交的伪代码	"<pre><code class=""language-python"">def two_phase_commit():
+    # 阶段一：Prepare
+    engine.write_redo_log(data, state=""prepare"")
+    
+    # 阶段二：Commit
+    server.write_binlog(sql_statement)
+    engine.write_redo_log(state=""commit"")
+    
+    # 异常处理
+    if crash_during_commit():
+        # 恢复时检查日志一致性
+        if binlog_exists() and redo_state == ""prepare"":
+            engine.rollback()
+        elif binlog_exists():
+            engine.commit()</code></pre>"
+MySQL数据恢复操作步骤	"<pre><code class=""language-bash""># 1. 恢复最近全量备份
+mysql -uroot -p < full_backup.sql
+
+# 2. 重放binlog到误操作前
+mysqlbinlog \\
+  --start-datetime=""2023-01-01 00:00:00"" \\
+  --stop-datetime=""2023-01-01 12:00:00"" \\
+  mysql-bin.000001 | mysql -uroot -p</code></pre>"
+InnoDB redo log物理结构示例	"<pre><code class=""language-c"">struct redo_log {
+  uint32_t lsn;          // 日志序列号
+  uint64_t page_no;      // 数据页编号
+  uint16_t offset;       // 页内偏移量
+  byte old_value[16];    // 旧值
+  byte new_value[16];    // 新值
+  uint8_t flag;          // 状态标志 (0x01=prepare, 0x02=commit)
+};</code></pre>"
+binlog与redo log核心区别对比	"<pre><code class=""language-text"">| 特性        | binlog             | redo log          |
+|-------------|-------------------|-------------------|
+| 层级        | MySQL Server层    | InnoDB引擎层      |
+| 类型        | 逻辑日志(SQL语句) | 物理日志(数据页)  |
+| 写入方式    | 追加写入          | 循环写入          |
+| 用途        | 主从复制/数据归档 | 崩溃恢复(crash-safe) |</code></pre>"
+WAL技术核心思想伪代码	"<pre><code class=""language-python"">def update_record(data):
+    # 1. 先写日志（内存操作）
+    log_buffer.append(create_log_entry(data))
+    
+    # 2. 返回成功（无需等待磁盘）
+    return ""UPDATE_SUCCESS""
+    
+    # 3. 后台异步刷盘
+    async def flush_to_disk():
+        write(log_buffer)  # 日志持久化
+        apply_to_datafile() # 更新数据文件</code></pre>"
+MySQL备份策略选择考量因素	"<pre><code class=""language-text"">RTO（恢复时间目标）：
+  一天一备：恢复速度快，资源消耗大
+  一周一备：恢复速度慢，资源消耗小
+
+RPO（数据丢失容忍度）：
+  一天一备：最大丢失24小时数据
+  一周一备：最大丢失7天数据</code></pre>"
+InnoDB崩溃恢复流程	"<pre><code class=""language-text"">1. 扫描redo log找到最近checkpoint
+2. 重放checkpoint后的所有redo log
+3. 检查prepare状态的redo log
+4. 查找对应的binlog记录：
+   - 有commit记录⇒提交事务
+   - 无binlog记录⇒回滚事务
+5. 清理未完成事务</code></pre>"
+binlog事件类型示例	"<pre><code class=""language-sql"">/* WRITE_ROWS_EVENT */
+SET TIMESTAMP=1672531200;
+INSERT INTO users 
+VALUES (101, ""John"", ""john@example.com"");
+
+/* UPDATE_ROWS_EVENT */
+SET TIMESTAMP=1672531500;
+UPDATE users 
+SET email=""new@example.com""
+WHERE id = 101;
+
+/* XID_EVENT (事务提交) */
+COMMIT/*!*/;</code></pre>"

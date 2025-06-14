@@ -1,94 +1,875 @@
 # 1 ~ 3
-Go语言的核心优势是什么？	"1. 原生并发支持（goroutine/channel） 2. 编译速度快 3. 部署简单 4. 丰富的标准库"	chap1,语言特性
-GOPATH的作用是什么？	"定义工作区目录结构（src/pkg/bin），存放项目代码、依赖包和可执行文件"	chap2,GOPATH
-GOROOT和GOPATH的区别？	"GOROOT是Go安装目录，GOPATH是工作区目录（可配置多个）"	chap2,环境变量
-命令源码文件的特征？	"1. 属于main包 2. 包含main函数 3. 可直接编译执行"	chap3,源码文件
-如何声明库源码文件？	"使用非main包声明（如package mylib），提供可复用函数/类型"	chap3,源码文件
-init函数的执行时机？	"1. 在main函数前自动执行 2. 每个包可包含多个init函数 3. 按导入顺序执行"	chap3,init函数
-Go程序的初始化顺序？	"1. 初始化导入的包 2. 执行包级变量声明 3. 执行init函数 4. 执行main函数"	chap3,初始化
-如何访问外部包的程序实体？	"1. 首字母大写的公开实体 2. 通过包名.实体名访问（如mylib.Func）"	chap3,访问控制
-多工作区时包的查找顺序？	"按GOPATH配置顺序查找（第一个匹配的包会被使用）"	chap2,GOPATH
-go install命令的作用？	"1. 编译库源码文件到pkg目录 2. 编译命令源码文件到bin目录"	chap2,命令工具
+#separator:tab
+#html:true
+Go语言：核心优势是什么？	"<pre><code class=""language-text"">1. 原生并发支持（goroutine/channel） 2. 编译速度快 3. 部署简单 4. 丰富的标准库</code></pre>"
+Go语言中：GOPATH的作用？	"<pre><code class=""language-text"">定义工作区目录结构（src/pkg/bin），存放项目代码、依赖包和可执行文件</code></pre>"
+Go语言：GOROOT和GOPATH区别？	"<pre><code class=""language-text"">GOROOT是Go安装目录，GOPATH是工作区目录（可配置多个）</code></pre>"
+Go语言中：命令源码文件特征？	"<pre><code class=""language-go"">package main  // 必须属于main包
 
-如何自定义命令参数？	"使用flag包：flag.StringVar(&name, "name", "default", "description")	chap3,flag包
-库源码文件如何被引用？	"通过import导入路径（如import "github.com/user/lib"）"	chap3,包导入
-工作区中src目录的作用？	"存储所有源码（.go文件），按包路径组织"	chap2,目录结构
+func main() {  // 必须包含main函数
+    // 直接编译执行
+}</code></pre>"
+Go语言中：声明库源码文件	"<pre><code class=""language-go"">// mylib.go
+package mylib  // 非main包声明
 
-main函数的特殊要求？	"1. 无参数 2. 无返回值 3. 必须作为程序入口"	chap3,main函数,!核心
-跨包调用规则？	"只有首字母大写的程序实体（变量/函数/类型）可被外部访问"	chap3,访问控制,!核心
-GOPATH下的bin目录作用？	"存放go install生成的可执行文件（命令源码文件编译结果）"	chap2,目录结构,!核心
+func Helper() {  // 可复用函数
+    // 功能实现
+}</code></pre>"
+Go语言中：init函数执行时机	"<pre><code class=""language-go"">package main
 
-同一个目录下能否有多个main包？	不能（所有文件必须同属一个包）
-init函数能否被显式调用？	不能（自动执行）
-小写字母开头的函数能否跨包调用？	不能（仅包内可见）
+import ""fmt""
+
+func init() { fmt.Println(""init1"") }
+func init() { fmt.Println(""init2"") }  // 每个包多个init函数
+
+func main() {
+    // 自动在main前执行
+}</code></pre>"
+Go语言：程序初始化顺序	"<pre><code class=""language-go"">package main
+
+import ""pkg1""  // 1.初始化导入包
+
+var count = 1  // 2.包级变量声明
+
+func init() { /* 3.init函数 */ }  // 4.main函数</code></pre>"
+Go语言中：访问外部包程序实体	"<pre><code class=""language-go"">// 外部包定义
+package external
+
+// 首字母大写的公开实体
+func PublicFunc() {}
+
+// 外部调用
+import ""external""
+
+func main() {
+    external.PublicFunc()  // 包名.实体名
+}</code></pre>"
+Go语言中：多工作区包查找顺序	"<pre><code class=""language-text"">按GOPATH配置顺序查找（第一个匹配的包会被使用）</code></pre>"
+Go语言中：go install命令作用	"<pre><code class=""language-bash""># 编译库源码文件
+go install mylib  → pkg/.../mylib.a
+
+# 编译命令源码文件
+go install cmd   → bin/cmd</code></pre>"
+Go语言中：自定义命令参数	"<pre><code class=""language-go"">package main
+
+import (
+    ""flag""
+    ""fmt""
+)
+
+func main() {
+    var name string
+    // 绑定命令行参数
+    flag.StringVar(&name, ""name"", ""guest"", ""用户名"")
+    flag.Parse()
+    fmt.Println(""Hello"", name)
+}</code></pre>"
+Go语言中：引用库源码文件	"<pre><code class=""language-go"">// 通过import导入路径
+import (
+    ""mylib""             // 本地包
+    ""github.com/user/lib""  // 远程包
+)
+
+func main() {
+    mylib.Function()
+}</code></pre>"
+Go语言中：工作区src目录作用	"<pre><code class=""language-text"">存储所有源码（.go文件），按包路径组织</code></pre>"
+Go语言中：main函数特殊要求	"<pre><code class=""language-go"">package main
+
+// 1. 无参数 2. 无返回值
+func main() {  // 3. 必须作为程序入口
+    // 程序逻辑
+}</code></pre>"
+Go语言中：跨包调用规则	"<pre><code class=""language-go"">// 包A
+package A
+
+var PublicVar int   // 可导出
+var privateVar int  // 不可导出
+
+// 包B调用
+import ""A""
+
+func main() {
+    A.PublicVar = 10  // 正确
+    // A.privateVar = 5  // 编译错误
+}</code></pre>"
+Go语言中：GOPATH的bin目录作用	"<pre><code class=""language-text"">存放go install生成的可执行文件（命令源码文件编译结果）</code></pre>"
+Go语言中：同目录多main包限制	"<pre><code class=""language-go"">// 错误示例：
+// file1.go
+package main  // ❌ 与file2冲突
+
+// file2.go
+package main  // ❌ 所有文件必须同属一个包</code></pre>"
+Go语言中：init函数调用限制	"<pre><code class=""language-go"">func init() {}  // 自动执行
+
+func main() {
+    init()  // ❌ 编译错误：不能显式调用
+}</code></pre>"
+Go语言中：小写函数跨包调用	"<pre><code class=""language-go"">package util
+
+func helper() {}  // 小写开头私有函数
+
+// 外部调用
+import ""util""
+
+util.helper()  // ❌ 编译错误：仅包内可见</code></pre>"
 
 # 4 ~ 6
-Go语言变量声明有哪几种方式？	"1. var name string  2. name := value  3. var name = value  4. 类型推断声明"	chap4,变量声明
-短变量声明(:=)的使用限制？	"只能在函数内部使用，支持重声明（需至少一个新变量）"	chap4,短变量声明
-类型推断的优势是什么？	"提升代码灵活性，便于重构（如函数返回类型变更不影响调用方）"	chap4,类型推断
-代码块划分的依据是什么？	"花括号{}显式划分，或隐式划分（如if/for语句的初始化子句）"	chap5,代码块
-变量屏蔽（shadowing）发生的条件？	"内层作用域声明同名变量，覆盖外层变量（不影响外层原始值）"	chap5,作用域
-如何访问被屏蔽的外层变量？	"通过外层代码块标识符访问（如pkg.Var），但无法跨函数访问"	chap5,变量屏蔽
-类型断言的正确写法？	"value, ok := interface{}(x).(T) （需双返回值避免panic）"	chap6,类型断言
-类型转换与类型断言的区别？	"转换：显式改变值类型  断言：判断接口值的动态类型"	chap6,类型系统
-潜在类型（underlying type）的作用？	"决定类型转换是否合法（如type MyInt int可转int）"	chap6,潜在类型
-哪些值是不可寻址的？	"常量、字面量、算术结果、临时表达式结果、部分字面量索引值"	chap6,寻址
+#separator:tab
+#html:true
+Go语言变量声明方式	"<pre><code class=""language-go"">// 1. 标准声明
+var name string = ""go""
 
-函数作为一等公民的体现？	"1. 赋值变量 2. 作为参数 3. 作为返回值"	chap4,函数特性
-类型别名(type A=B)与类型定义(type A B)的区别？	"别名：完全等价原类型  定义：创建新类型（需显式转换）"	chap6,类型定义
-不可寻址值的使用限制？	"1. 无法取址 2. 不能调用指针方法 3. 不能作为赋值左值"	chap6,寻址限制
+// 2. 短变量声明（函数内部）
+func main() {
+    age := 25
+}
 
-变量重声明（redeclaration）的条件？	"1. 同一代码块 2. 短变量声明 3. 至少一个新变量 4. 同类型"	chap4,变量重声明,!核心
-空接口interface{}的作用？	"承载任意类型值（类型断言的基础容器）"	chap6,空接口,!核心
-unsafe.Pointer的核心用途？	"实现任意指针类型与uintptr间的转换（绕过类型系统）"	chap6,指针操作,!核心
+// 3. 类型推断声明
+var isOpen = true
 
-类型断言失败会怎样？	单返回值形式引发panic（需用ok-idiom）
-变量屏蔽是否影响外层变量？	不影响（仅当前作用域生效）
-type MyInt int64能否直接赋值int64？	不能（需显式转换，因是不同的新类型）
+// 4. 多变量声明
+var x, y = 1, 3.14</code></pre>"
+Go语言短变量声明限制	"<pre><code class=""language-go"">package main
+
+// ❌ 错误：不能在函数外使用
+// global := 100
+
+func main() {
+    // ✅ 正确：函数内部使用
+    local := ""hello""
+    
+    // ✅ 重声明（至少一个新变量）
+    v1, err := call()
+    v2, err := call() // err被重新声明
+}</code></pre>"
+Go语言类型推断优势	"<pre><code class=""language-go"">// 重构前
+func oldFunc() float64 { return 3.14 }
+value := oldFunc() // value类型自动推断为float64
+
+// 重构后（返回类型变更）
+func oldFunc() int { return 100 }
+// ✅ 调用方代码无需修改
+// value仍可正常工作</code></pre>"
+Go语言代码块划分依据	"<pre><code class=""language-go"">func main() { // 显式代码块1
+    { // 显式代码块2
+        if x := 10; x > 0 { // 隐式代码块（if初始化）
+            fmt.Println(x)
+        }
+    }
+}</code></pre>"
+Go语言变量屏蔽现象	"<pre><code class=""language-go"">package main
+
+var global = 100 // 外层变量
+
+func main() {
+    global := 200 // 屏蔽外层global
+    fmt.Println(global) // 输出200
+    
+    { // 内层代码块
+        global := 300 // 再次屏蔽
+        fmt.Println(global) // 输出300
+    }
+    
+    // 外层global仍为100
+}</code></pre>"
+Go语言类型断言写法	"<pre><code class=""language-go"">var i interface{} = ""hello""
+
+// ✅ 安全写法（双返回值）
+s, ok := i.(string)
+if ok {
+    fmt.Println(s)
+}
+
+// ❌ 危险写法（单返回值可能panic）
+// s := i.(int) // 引发panic</code></pre>"
+Go语言类型转换与断言区别	"<pre><code class=""language-go"">// 类型转换（静态类型）
+var f float64 = 3.14
+i := int(f) // ✅ 显式转换
+
+// 类型断言（动态类型）
+var val interface{} = 100
+switch v := val.(type) { // 检查接口值实际类型
+case int:
+    fmt.Println(v * 2) // 输出200
+}</code></pre>"
+Go语言潜在类型作用	"<pre><code class=""language-go"">type Celsius float64
+type Fahrenheit float64
+
+var c Celsius = 100
+var f Fahrenheit = 212
+
+// ✅ 相同潜在类型可转换
+c = Celsius(f)
+
+// ❌ 不同类型不能直接运算
+// sum := c + f // 编译错误</code></pre>"
+Go语言不可寻址值示例	"<pre><code class=""language-go"">func getValue() int { return 100 }
+
+func main() {
+    // 常量
+    const PI = 3.14
+    // &PI // ❌ 不可取址
+    
+    // 算术结果
+    result := 10 + 20
+    // &(10+20) // ❌ 临时表达式
+    
+    // 函数返回值
+    // &getValue() // ❌ 临时结果
+}</code></pre>"
+Go语言函数一等公民体现	"<pre><code class=""language-go"">// 1. 赋值变量
+add := func(a, b int) int { return a+b }
+
+// 2. 作为参数
+calculate(10, 20, add)
+
+// 3. 作为返回值
+func makeMultiplier(n int) func(int) int {
+    return func(x int) int { return x*n }
+}</code></pre>"
+Go语言类型别名与定义区别	"<pre><code class=""language-go"">// 类型别名
+type Alias = int
+var a Alias = 10
+var b int = a // ✅ 无需转换
+
+// 类型定义
+type NewType int
+var c NewType = 20
+// var d int = c // ❌ 需要显式转换
+var d int = int(c) // ✅</code></pre>"
+Go语言不可寻址值限制	"<pre><code class=""language-go"">type Counter struct{ count int }
+func (c *Counter) Inc() { c.count++ }
+
+func main() {
+    // 1. 无法取址
+    // addr := &(10)
+    
+    // 2. 不能调用指针方法
+    Counter{}.Inc() // ❌ 编译错误
+    
+    // 3. 不能作为左值
+    // getValue() = 200 // ❌
+}</code></pre>"
+Go语言变量重声明条件	"<pre><code class=""language-go"">func main() {
+    // ✅ 合法重声明
+    v, err := open()
+    v, err := open() // ❌ 缺少新变量
+    
+    // ✅ 至少一个新变量
+    v1, err := open()
+    v2, err := open() // ✅
+    
+    // ❌ 不同类型
+    s := ""text""
+    s, n := open() // 编译错误
+}</code></pre>"
+Go语言空接口作用	"<pre><code class=""language-go"">func printAny(val interface{}) {
+    // 承载任意类型值
+    switch v := val.(type) {
+    case int: fmt.Println(v*2)
+    case string: fmt.Println(v)
+    }
+}
+
+printAny(100)    // 输出200
+printAny(""go"")  // 输出go</code></pre>"
+Go语言unsafe.Pointer用途	"<pre><code class=""language-go"">import ""unsafe""
+
+func main() {
+    var i int64 = 255
+    
+    // 任意指针转换
+    p := unsafe.Pointer(&i)
+    b := (*byte)(p)
+    
+    // 绕过类型系统
+    *b = 1 // 修改内存
+}</code></pre>"
+Go语言类型断言失败处理	"<pre><code class=""language-go"">var val interface{} = ""text""
+
+// ❌ 单返回值形式
+// num := val.(int) // panic!
+
+// ✅ 安全模式
+if num, ok := val.(int); ok {
+    fmt.Println(num)
+} else {
+    fmt.Println(""类型错误"")
+}</code></pre>"
+Go语言type MyInt转换规则	"<pre><code class=""language-go"">type MyInt int64
+
+func main() {
+    var mi MyInt = 100
+    var i int64 = 200
+    
+    // ❌ 不能直接赋值（新类型）
+    // i = mi
+    
+    // ✅ 显式转换
+    i = int64(mi)
+    mi = MyInt(i)
+}</code></pre>"
 
 # 7 ~ 9
-数组与切片的本质区别是什么？	"数组：固定长度、值类型；切片：可变长度、引用类型（含指针/长度/容量）"	chap7,数组切片
-切片扩容规则是什么？	"1. 容量<1024：双倍扩容 2. 容量≥1024：1.25倍扩容 3. 超过原容量2倍时按需扩容"	chap7,切片扩容
-切片表达式s[2:5]的长度和容量如何计算？	"长度=3 (5-2) 容量=原容量-2（从索引2到底层数组末尾）"	chap7,切片操作
-container/list包中List的零值是否可用？	可用（延迟初始化机制），零值是长度为0的空链表	chap8,链表
-循环链表(ring)与双向链表(list)的核心区别？	"1. ring长度固定，list长度可变 2. ring无头尾概念 3. ring.Len()复杂度O(n)"	chap8,链表对比
-字典键类型的约束条件是什么？	必须支持判等操作（==和!=），因此函数/字典/切片不能作为键	chap9,字典约束
-值为nil的字典能进行哪些操作？	"读操作：安全返回零值 写操作：引发panic 删除操作：安全无操作"	chap9,字典nil
-字典扩容的触发条件？	负载因子（元素数量/桶数量）超过阈值（通常为6.5）	chap9,字典扩容
+#separator:tab
+#html:true
+Go数组与切片的本质区别	"<pre><code class=""language-go"">// 数组：固定长度值类型
+var arr = [3]int{1, 2, 3} // 长度固定不可修改
+arrCopy := arr             // 值拷贝（独立内存）
+arrCopy[0] = 9             // 不影响原数组
 
-如何正确估算切片容量？	"容量 = 原底层数组长度 - 切片起始索引（对数组切片时）"	chap7,切片容量
-list.Element值能否直接插入链表？	不能，必须通过list的方法插入（防止破坏内部关联）	chap8,链表安全
-字典访问不存在的键会怎样？	返回值类型零值（需用comma-ok模式区分是否存在）	chap9,字典访问
+// 切片：动态长度引用类型
+slice := []int{1, 2, 3}    // 底层数组指针+长度+容量
+sliceCopy := slice         // 共享底层数组
+sliceCopy[0] = 9           // 修改影响原切片</code></pre>"
+Go切片扩容规则	"<pre><code class=""language-go"">func main() {
+    s := make([]int, 0, 3) // 初始容量3
+    fmt.Printf(""扩容前: len=%d cap=%d\n"", len(s), cap(s))
+    
+    // 容量<1024时双倍扩容
+    for i := 0; i < 4; i++ {
+        s = append(s, i)
+    }
+    fmt.Printf(""首次扩容: len=%d cap=%d\n"", len(s), cap(s)) // cap=6
+    
+    // 容量≥1024时1.25倍扩容
+    s = make([]int, 1024)
+    s = append(s, 1)
+    fmt.Printf(""大切片扩容: len=%d cap=%d"", len(s), cap(s)) // cap=1280
+}</code></pre>"
+Go切片表达式s[2:5]的长度容量计算	"<pre><code class=""language-go"">func main() {
+    arr := [10]int{0,1,2,3,4,5,6,7,8,9}
+    s := arr[:]              // 容量10
+    sub := s[2:5]           // 从索引2到5（不包含5）
+    
+    // 长度 = 结束索引 - 起始索引
+    fmt.Printf(""长度: %d\n"", len(sub)) // 5-2=3
+    
+    // 容量 = 原容量 - 起始索引 
+    fmt.Printf(""容量: %d"", cap(sub))   // 10-2=8
+}</code></pre>"
+Go中container/list零值可用性	"<pre><code class=""language-go"">func main() {
+    var lst list.List // 零值链表
+    
+    // 直接操作零值（延迟初始化）
+    lst.PushBack(""A"") 
+    lst.PushFront(1)
+    
+    // 遍历打印
+    for e := lst.Front(); e != nil; e = e.Next() {
+        fmt.Print(e.Value, "" "")
+    }
+    // 输出: 1 A
+}</code></pre>"
+Go中循环链表(ring)与双向链表(list)区别	"<pre><code class=""language-go"">// 双向链表示例
+func listDemo() {
+    l := list.New()
+    l.PushBack(10)
+    l.PushFront(20)
+    fmt.Print(l.Len()) // O(1)返回长度
+}
 
-切片共享底层数组会导致什么问题？	"多个切片修改数据相互影响（需用copy或完整切片表达式避免）"	chap7,切片陷阱,!核心
-list开箱即用的实现原理？	延迟初始化（首次操作时初始化内部结构）	chap8,链表原理,!核心
-字典并发读写会引发什么问题？	"fatal error: concurrent map read and map write"	chap9,并发安全,!核心
+// 循环链表示例
+func ringDemo() {
+    r := ring.New(3) // 固定长度
+    for i := 0; i < 10; i++ {
+        r.Value = i
+        r = r.Next()
+    }
+    // 无头尾概念，遍历需记录起点
+    start := r
+    for {
+        fmt.Print(r.Value)
+        if r.Next() == start { break }
+    }
+}</code></pre>"
+Go字典键类型约束	"<pre><code class=""language-go"">func main() {
+    valid := make(map[string]int)   // 字符串可作键
+    valid[[2]int{1,2}] = 10         // 数组可作键
+    
+    // 以下类型禁止作为键：
+    // invalid := make(map[[]int]int)   // 切片❌
+    // invalid := make(map[map[int]int]int) // 字典❌
+    // invalid := make(map[func()]int) // 函数❌
+}</code></pre>"
+Go中nil字典操作安全性	"<pre><code class=""language-go"">func main() {
+    var nilMap map[string]int
+    
+    // 读操作安全
+    v := nilMap[""key""] // 返回零值0
+    
+    // 写操作引发panic
+    // nilMap[""key""] = 1 // 触发panic
+    
+    // 删除操作安全
+    delete(nilMap, ""key"") // 无操作
+    
+    fmt.Print(v) // 输出: 0
+}</code></pre>"
+Go字典扩容触发条件	"<pre><code class=""language-go"">func main() {
+    m := make(map[int]int, 8)
+    // 负载因子 = 元素数/桶数
+    
+    // 添加元素直到触发扩容
+    for i := 0; i < 10; i++ {
+        // 当 len(m)/bucket_count > 6.5 时扩容
+        m[i] = i*10
+    }
+    fmt.Printf(""当前元素数: %d"", len(m))
+}</code></pre>"
+Go切片容量估算方法	"<pre><code class=""language-go"">func main() {
+    arr := [10]int{}      // 底层数组长度10
+    
+    // 对数组切片时的容量计算：
+    s1 := arr[2:5]        // 容量=10-2=8
+    s2 := arr[5:]         // 容量=10-5=5
+    
+    // 完整切片表达式显式控制容量
+    s3 := arr[2:5:8]      // 容量=8-2=6
+    fmt.Print(cap(s1), cap(s2), cap(s3))
+}</code></pre>"
+Go中list.Element安全插入	"<pre><code class=""language-go"">func main() {
+    l := list.New()
+    elem := &list.Element{Value: ""test""}
+    
+    // 错误：直接插入破坏链表关联
+    // l.PushFront(elem) ❌
+    
+    // 正确：通过List方法插入
+    validElem := l.PushFront(""valid"")
+    l.InsertAfter(""new"", validElem)
+}</code></pre>"
+Go字典访问不存在的键	"<pre><code class=""language-go"">func main() {
+    m := map[string]int{""a"": 1}
+    
+    // 直接访问返回零值
+    v1 := m[""b""] // v1=0
+    
+    // comma-ok模式检测存在性
+    v2, ok := m[""b""] 
+    fmt.Printf(""值:%d 存在:%v"", v2, ok) // 值:0 存在:false
+}</code></pre>"
+Go切片共享底层数组问题	"<pre><code class=""language-go"">func main() {
+    s1 := []int{1, 2, 3, 4}
+    s2 := s1[1:3] // 共享底层数组
+    
+    s2[0] = 99    // 修改s2
+    fmt.Print(s1) // s1变为[1 99 3 4]
+    
+    // 解决方案：复制数据
+    s3 := make([]int, len(s2))
+    copy(s3, s2)  // 独立内存
+    s3[0] = 100   // 不影响s1
+}</code></pre>"
+Go中list延迟初始化原理	"<pre><code class=""language-go"">// 链表定义（简化）
+type List struct {
+    root Element // 哨兵节点
+    len  int     // 惰性初始化
+}
+
+// 首次操作时初始化
+func (l *List) lazyInit() {
+    if l.root.next == nil {
+        l.root.next = &l.root
+        l.root.prev = &l.root
+    }
+}
+
+// PushBack方法实现
+func (l *List) PushBack(v any) {
+    l.lazyInit() // 确保已初始化
+    // 插入逻辑...
+}</code></pre>"
+Go字典并发读写安全问题	"<pre><code class=""language-go"">func main() {
+    m := make(map[int]int)
+    
+    // 写goroutine
+    go func() {
+        for i := 0; i < 1000; i++ {
+            m[i] = i   // 写操作
+        }
+    }()
+    
+    // 读goroutine
+    go func() {
+        for i := 0; i < 1000; i++ {
+            _ = m[i]   // 读操作
+        }
+    }()
+    
+    // 等待触发并发错误
+    time.Sleep(time.Second)
+    // 输出: fatal error: concurrent map read and map write
+}</code></pre>"
 
 
 # 10 ~ 12 
-通道的基本特性有哪些？	"1. 并发安全 2. 先进先出（FIFO） 3. 可作为参数传递 4. 有缓冲/无缓冲两种类型"	chap10,通道
-发送操作在什么情况下会阻塞？	"1. 缓冲通道已满 2. 无缓冲通道无接收方 3. 通道为nil"	chap10,阻塞
-接收操作在什么情况下会阻塞？	"1. 通道为空 2. 无缓冲通道无发送方 3. 通道为nil"	chap10,阻塞
-关闭通道的原则是什么？	"1. 仅发送方关闭 2. 不可重复关闭 3. 关闭后发送会panic"	chap10,关闭通道
-如何安全判断通道是否关闭？	"使用双返回值模式：v, ok := <-ch （ok=false表示关闭）"	chap10,通道关闭
-单向通道的作用是什么？	约束函数行为（只允许发送或只允许接收）	chap11,单向通道
-select语句的执行规则？	"1. 随机执行就绪的case 2. 无case时阻塞 3. 有default立即执行"	chap11,select
-select语句中的case表达式求值顺序？	按代码顺序从上到下依次求值	chap11,select
-带range的for语句处理通道时有何特性？	"1. 持续接收直到通道关闭 2. 通道为nil会永久阻塞"	chap11,range
-函数作为一等公民的体现？	"1. 可赋值给变量 2. 可作为参数传递 3. 可作为返回值"	chap12,函数特性
-高阶函数的定义？	"1. 接收函数作为参数 2. 返回函数作为结果"	chap12,高阶函数
-闭包的本质是什么？	捕获外部变量的函数（绑定自由变量）	chap12,闭包
-函数参数传递的规则？	"值类型传副本，引用类型传指针副本（浅拷贝）"	chap12,传参
+#separator:tab
+#html:true
+Go通道基本特性	"<pre><code class=""language-go"">func main() {
+    // 1. 并发安全
+    ch := make(chan int)
+    go func() { ch <- 1 }() // 并发写入
+    fmt.Print(<-ch)         // 并发读取
+    
+    // 2. FIFO特性
+    ch <- 2; ch <- 3
+    fmt.Print(<-ch, <-ch) // 输出 2 3
+    
+    // 3. 作为参数传递
+    processChannel(ch)
+    
+    // 4. 有缓冲/无缓冲通道
+    unbuffered := make(chan int)    // 无缓冲
+    buffered := make(chan int, 10)  // 缓冲容量10
+}</code></pre>"
+Go发送操作阻塞条件	"<pre><code class=""language-go"">func main() {
+    // 1. 缓冲通道已满
+    fullCh := make(chan int, 1)
+    fullCh <- 1
+    // fullCh <- 2 // 阻塞（需另开goroutine）
+    
+    // 2. 无缓冲通道无接收方
+    unbuffered := make(chan int)
+    // unbuffered <- 1 // 阻塞（无接收者）
+    
+    // 3. 向nil通道发送
+    var nilCh chan int
+    // nilCh <- 1 // 永久阻塞
+}</code></pre>"
+Go接收操作阻塞条件	"<pre><code class=""language-go"">func main() {
+    // 1. 空通道阻塞
+    emptyCh := make(chan int, 1)
+    // <-emptyCh // 阻塞（无数据）
+    
+    // 2. 无缓冲通道无发送方
+    unbuffered := make(chan int)
+    // <-unbuffered // 阻塞（无发送者）
+    
+    // 3. 从nil通道接收
+    var nilCh chan int
+    // <-nilCh // 永久阻塞
+}</code></pre>"
+Go关闭通道原则	"<pre><code class=""language-go"">func producer(ch chan int) {
+    // 1. 仅发送方关闭
+    for i := 0; i < 3; i++ {
+        ch <- i
+    }
+    close(ch) // 正确关闭位置
+    
+    // 3. 关闭后发送会panic
+    // ch <- 4 // panic: send on closed channel
+}
 
-带缓冲通道与无缓冲通道的本质区别？	"带缓冲通道异步操作（可暂存元素），无缓冲通道同步操作（直接传递）"	chap10,通道类型
-如何触发通道操作的panic？	"1. 关闭nil通道 2. 重复关闭通道 3. 向已关闭通道发送数据"	chap10,panic
-select语句中default的作用？	避免阻塞，当所有case未就绪时立即执行	chap11,select
-闭包捕获外部变量的时机？	定义时捕获变量引用（非值拷贝）	chap12,闭包
-函数类型如何声明？	"type FuncType func(int) string"	chap12,函数类型
+func main() {
+    ch := make(chan int, 3)
+    go producer(ch)
+    
+    // 2. 不可重复关闭
+    // close(ch) // 错误：接收方不应关闭
+}</code></pre>"
+Go安全判断通道关闭	"<pre><code class=""language-go"">func main() {
+    ch := make(chan int, 2)
+    ch <- 1; close(ch)
+    
+    // 双返回值模式
+    v, ok := <-ch
+    fmt.Printf(""值:%v 开启:%v\n"", v, ok) // 值:1 开启:true
+    
+    v, ok = <-ch
+    fmt.Printf(""值:%v 开启:%v"", v, ok) // 值:0 开启:false
+}</code></pre>"
+Go单向通道作用	"<pre><code class=""language-go"">// 约束函数行为：只允许发送
+func sendOnly(ch chan<- int) {
+    ch <- 10
+    // <-ch // 编译错误
+}
 
-如何避免通道操作导致的goroutine泄露？	"确保通道最终被关闭或通过select+超时机制"	chap10,goroutine泄露,!核心
-单向通道的典型应用场景？	"函数参数约束（如只允许发送的chan<- int）"	chap11,单向通道,!核心
-闭包为何能实现状态封装？	通过捕获并修改外部变量（如计数器）	chap12,闭包,!核心
+// 约束函数行为：只允许接收
+func receiveOnly(ch <-chan int) {
+    fmt.Print(<-ch)
+    // ch <- 1 // 编译错误
+}
+
+func main() {
+    ch := make(chan int)
+    go sendOnly(ch)   // 传入双向通道自动转换
+    receiveOnly(ch)
+}</code></pre>"
+Goselect执行规则	"<pre><code class=""language-go"">func main() {
+    ch1, ch2 := make(chan int), make(chan int)
+    
+    go func() { ch1 <- 1 }()
+    go func() { ch2 <- 2 }()
+    
+    select {
+    case v := <-ch1: // 随机执行就绪case
+        fmt.Print(""ch1:"", v)
+    case v := <-ch2:
+        fmt.Print(""ch2:"", v)
+    }
+    
+    // 2. 无case永久阻塞
+    // select {}
+    
+    // 3. default立即执行
+    select {
+    case v := <-ch1: 
+        fmt.Print(v)
+    default:
+        fmt.Print(""无就绪通道"")
+    }
+}</code></pre>"
+Goselect中case表达式求值	"<pre><code class=""language-go"">func main() {
+    ch := make(chan int, 2)
+    ch <- 1; ch <- 2
+    
+    // 按代码顺序求值
+    select {
+    case v := <-ch: // 最先求值
+        fmt.Print(""case1:"", v)
+    case v := <-ch: // 第二个求值
+        fmt.Print(""case2:"", v)
+    case v := <-expensiveFunc(): // 最后求值
+        fmt.Print(""case3:"", v)
+    }
+}
+
+func expensiveFunc() chan int {
+    fmt.Print(""【函数求值】"")
+    return make(chan int)
+}</code></pre>"
+Gofor-range通道特性	"<pre><code class=""language-go"">func main() {
+    // 1. 持续接收直到关闭
+    ch := make(chan int, 3)
+    ch <- 1; ch <- 2; close(ch)
+    for v := range ch {
+        fmt.Print(v, "" "") // 输出 1 2
+    }
+    
+    // 2. nil通道永久阻塞
+    var nilCh chan int
+    // for range nilCh { // 阻塞
+    //    fmt.Print(""never"")
+    // }
+}</code></pre>"
+Go函数一等公民体现	"<pre><code class=""language-go"">// 1. 赋值给变量
+var fn = func(s string) { fmt.Print(s) }
+
+// 2. 作为参数传递
+func wrapper(f func()) { f() }
+
+// 3. 作为返回值
+func getPrinter() func(string) {
+    return func(s string) { fmt.Print(s) }
+}
+
+func main() {
+    fn(""变量调用"")      // 体现1
+    wrapper(func() {     // 体现2
+        fmt.Print(""参数传递"")
+    })
+    getPrinter()(""返回值"") // 体现3
+}</code></pre>"
+Go高阶函数定义	"<pre><code class=""language-go"">// 1. 接收函数参数
+func apply(nums []int, f func(int) int) {
+    for i, n := range nums {
+        nums[i] = f(n)
+    }
+}
+
+// 2. 返回函数
+func multiplier(factor int) func(int) int {
+    return func(x int) int { return x * factor }
+}
+
+func main() {
+    // 高阶函数用法
+    nums := []int{1, 2, 3}
+    apply(nums, func(x int) int { return x*2 }) // 传入函数
+    fmt.Print(nums) // [2 4 6]
+    
+    double := multiplier(2) // 返回函数
+    fmt.Print(double(5))    // 10
+}</code></pre>"
+Go闭包本质	"<pre><code class=""language-go"">func counter() func() int {
+    count := 0 // 捕获的外部变量
+    return func() int {
+        count++ // 绑定自由变量
+        return count
+    }
+}
+
+func main() {
+    c1 := counter()
+    fmt.Print(c1(), c1()) // 输出 1 2
+    
+    c2 := counter()
+    fmt.Print(c2()) // 输出 1（新闭包实例）
+}</code></pre>"
+Go函数参数传递规则	"<pre><code class=""language-go"">func modifyValue(val int) {
+    val = 100 // 值类型副本
+}
+
+func modifySlice(s []int) {
+    s[0] = 99 // 引用类型浅拷贝
+}
+
+func main() {
+    // 1. 值类型传副本
+    num := 1
+    modifyValue(num)
+    fmt.Print(num) // 1（未修改）
+    
+    // 2. 引用类型传指针副本
+    slice := []int{1, 2}
+    modifySlice(slice)
+    fmt.Print(slice) // [99 2]（已修改）
+}</code></pre>"
+Go带缓冲与无缓冲通道区别	"<pre><code class=""language-go"">func main() {
+    // 无缓冲通道（同步）
+    unbuf := make(chan int)
+    go func() {
+        time.Sleep(time.Second)
+        fmt.Print(<-unbuf) // 阻塞等待发送
+    }()
+    unbuf <- 1 // 同步点
+    
+    // 带缓冲通道（异步）
+    buf := make(chan int, 1)
+    buf <- 2 // 立即返回（不阻塞）
+    fmt.Print(<-buf)
+}</code></pre>"
+Go通道操作panic触发条件	"<pre><code class=""language-go"">func main() {
+    var ch chan int
+    
+    // 1. 关闭nil通道
+    // close(ch) // panic: close of nil channel
+    
+    ch = make(chan int)
+    close(ch)
+    
+    // 2. 重复关闭
+    // close(ch) // panic: close of closed channel
+    
+    // 3. 向已关闭通道发送
+    // ch <- 1 // panic: send on closed channel
+}</code></pre>"
+Goselect中default作用	"<pre><code class=""language-go"">func main() {
+    ch := make(chan int) // 无缓冲空通道
+    
+    select {
+    case v := <-ch: // 阻塞case
+        fmt.Print(v)
+    default:        // 避免阻塞
+        fmt.Print(""立即执行"")
+    }
+    
+    // 无default将阻塞
+    // select {
+    // case v := <-ch
+    // }
+}</code></pre>"
+Go闭包捕获变量时机	"<pre><code class=""language-go"">func main() {
+    a := 1
+    closure := func() { fmt.Print(a) }
+    
+    a = 2  // 修改捕获的变量
+    closure() // 输出2（捕获引用）
+    
+    // 循环陷阱示例
+    for i := 0; i < 3; i++ {
+        defer func() { fmt.Print(i) }() // 捕获循环变量
+    }
+    // 输出 3 3 3（非0,1,2）
+}</code></pre>"
+Go函数类型声明	"<pre><code class=""language-go"">// 声明函数类型
+type Formatter func(int) string
+type Callback func(string)
+
+func formatNumber(n int) string {
+    return fmt.Sprintf(""%03d"", n)
+}
+
+func process(f Formatter, c Callback) {
+    c(f(5))
+}
+
+func main() {
+    // 使用函数类型
+    var f Formatter = formatNumber
+    fmt.Print(f(1)) // 001
+    
+    // 作为参数传递
+    process(formatNumber, func(s string) {
+        fmt.Print(""回调:"", s) // 回调:005
+    })
+}</code></pre>"
+Go避免通道导致的goroutine泄露	"<pre><code class=""language-go"">func worker(done chan bool) {
+    time.Sleep(time.Second)
+    done <- true
+}
+
+func main() {
+    done := make(chan bool)
+    go worker(done)
+    
+    // 1. 确保通道关闭
+    // defer close(done)
+    
+    // 2. select+超时机制
+    select {
+    case <-done:
+        fmt.Print(""完成"")
+    case <-time.After(2 * time.Second):
+        fmt.Print(""超时"")
+    }
+}</code></pre>"
+Go单向通道应用场景	"<pre><code class=""language-go"">// 数据生产者（只发送）
+func producer(ch chan<- int) {
+    for i := 0; i < 3; i++ {
+        ch <- i
+    }
+    close(ch)
+}
+
+// 数据处理（双向转换）
+func pipeline(in <-chan int, out chan<- int) {
+    for n := range in {
+        out <- n * 2
+    }
+    close(out)
+}
+
+func main() {
+    ch1 := make(chan int)
+    ch2 := make(chan int)
+    
+    go producer(ch1)
+    go pipeline(ch1, ch2)
+    
+    for n := range ch2 {
+        fmt.Print(n, "" "")
+    }
+    // 输出: 0 2 4
+}</code></pre>"
+Go闭包实现状态封装	"<pre><code class=""language-go"">func newCounter() func() int {
+    count := 0 // 封装状态
+    return func() int {
+        count++
+        return count
+    }
+}
+
+func main() {
+    counter := newCounter()
+    fmt.Print(counter(), counter()) // 1 2
+    
+    // 每个闭包独立状态
+    another := newCounter()
+    fmt.Print(another()) // 1
+}</code></pre>"
 
 # 13 ~ 15
 结构体嵌入字段的作用是什么？	"1. 字段和方法提升到外部结构体 2. 实现类型组合（非继承） 3. 可通过外部结构体直接访问嵌入字段成员"	chap13,结构体

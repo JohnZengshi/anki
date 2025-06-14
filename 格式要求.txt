@@ -1,0 +1,67 @@
+# Anki通用代码卡片生成要求
+请按此规范生成TSV格式卡片（支持任意编程语言）：
+
+## 格式规范
+1. 文件必须以这两行开头：
+
+#separator:tab
+#html:true
+
+2. 每行一个问答对：
+- 左列：简洁的问题描述（需包含语言名称）
+- 右列：完整代码块
+- 用制表符(\t)分隔列
+- 代码列必须用双引号包裹
+
+3. 代码块格式：
+```html
+"<pre><code class=""language-{编程语言}"">{代码内容}</code></pre>"
+
+示例：
+#separator:tab
+#html:true
+请编写代码模拟浏览器渲染核心流程的步骤	"<pre><code class=""language-javascript"">function renderPage() {
+  parseHTML(); // 解析
+  buildDOMTree(); // 构建DOM树
+  calculateCSS(); // 计算CSS
+  renderLayout(); // 渲染
+  compositeLayers(); // 合成
+  paintScreen(); // 绘制
+}</code></pre>"
+
+
+其中：
+
+{编程语言}：实际语言名称（小写，如python/java/cpp）
+{代码内容}：保留原始缩进/换行的完整代码
+
+## 特殊符号处理说明
+当代码中包含以下特殊符号时，必须进行转义：
+1. **双引号`"`** → 替换为两个双引号`""`  
+
+# Anki代码卡片生成终极规范
+
+## 重要安全准则 !!!!!!!!
+**严格禁止在代码中使用HTML注释语法 `<!-- 注释内容 -->`**  
+**如果生成的是HTML代码时，需要：对代码进行转义 **
+
+示例：
+Vue组件安全示例	"<pre><code class=""language-html"">&lt;template&gt;
+  &lt;div class=""card""&gt;
+    &lt;!-- 使用插值代替注释 --&gt;
+    &lt;div v-if=""false""&gt;卡片头部说明&lt;/div&gt;
+    
+    &lt;h3&gt;{{ title }}&lt;/h3&gt;
+    &lt;slot&gt;&lt;/slot&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  props: [""title""],
+  // 组件逻辑说明
+}
+&lt;/script&gt;</code></pre>"
+
+
+根据格式要求，参考知识点内容生成一一对应相关代码编程题（尽可能的用代码，如果是伪代码或者示例代码只用golang！，代码中多加注释）或者 概念题（无法用代码来举例的题）

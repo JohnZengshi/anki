@@ -1,27 +1,309 @@
-什么是JavaScript规范中的"引用"类型？	引用是表达式求值的结果，用于属性存取（如obj.x）和函数调用，存储目标对象和属性名，支持动态解析。
-delete 0 的行为是什么？	delete 0 返回true（无错误），但实际无效，因为delete只能删除对象属性；值不能被删除。
-var x = y = 100; 的问题是什么？	y未声明，导致泄漏为全局变量；正确做法是分别声明，如var x = 100, y = 100;避免隐式全局污染。
-表达式和语句的核心区别？	表达式求值返回结果值（如1+2=3），语句执行返回完成记录（如throw）；表达式可嵌套，语句控制执行流。
-解释a.x = a = {n:2}; 的执行顺序。	先计算左侧a.x（引用原始a），再计算右侧a = {n:2}（覆盖a），最后将新对象赋给原始a的x属性，可能导致属性丢失。
-箭头函数x => x 的本质是什么？	是单参数匿名函数表达式，省略大括号时直接返回值；无自身this，继承外层作用域，用于函数式编程。
-for (let x of [1,2,3]) 的开销为何大？	每次迭代创建新作用域实例（iterationEnv），存储迭代变量；开销类似函数递归，因引擎需管理多个环境。
-yield 关键字如何工作？	在生成器函数中暂停执行，返回{value, done}；function* 生成迭代器，.next()恢复执行，用于异步流控制。
-throw 1; 为什么被称为"最简单语句"？	只返回throw类型完成记录，无复杂求值；ECMAScript规范中仅3行实现：求值表达式、取GetValue、返回ThrowCompletion。
-对象和数组的本质区别？	对象是关联数组（键值对），数组是索引数组（有序序列）；两者可互转，如[...obj]需Symbol.iterator迭代器。
-super.xxx() 如何绑定this？	通过当前方法的[[HomeObject]]找到父类，super.xxx触发函数调用，this值从环境复制（非super自身），依赖执行上下文。
-export default function() {} 的问题？	无法导出匿名函数表达式，因export default需绑定标识符；规范中处理为"default"名字的引用。
-new X 的执行过程？	调用构造函数：1. 创建this对象（原型为X.prototype）；2. 执行构造函数代码；3. 若有return对象则覆盖this。
-Object.create(new.target.prototype) 的作用？	在类构造器中创建实例，new.target指向子类，用于自定义根类（如extends null时手动设置原型）。
-解构赋值[a, b] = {a, b} 如何工作？	右侧对象需实现Symbol.iterator（如Object.values(this)），左侧数组模板绑定变量；本质是数据结构转换。
+#separator:tab
+#html:true
+JavaScript中引用类型是什么？请用代码说明	"<pre><code class=""language-javascript"">// 引用类型由base和name组成
+const obj = { x: 10 };
+const ref = { base: obj, name: ""x"" };  // 引用类型表示obj.x
 
+// 属性访问时创建引用
+console.log(ref.base[ref.name]); // 10</code></pre>"
+JavaScript中delete 0的行为是什么？	"<pre><code class=""language-javascript"">// delete操作符只能删除对象属性
+console.log(delete 0); // true (语法正确但无效操作)
 
-JavaScript 中对象和数组的本质是什么？	对象是关联数组（键值对集合），数组是索引数组（有序序列）。数组是对象的特例，索引即属性名（如 arr[0] 等价于 arr["0"]）。
-解构赋值 [a, b] = {a, b} 如何使其可执行？	需为 Object.prototype 添加 Symbol.iterator 方法（如 yield* Object.values(this)），使对象可迭代转换为值序列。
-展开语法 ...obj 会处理原型链属性吗？	不会。展开语法仅处理对象自身的可枚举属性，忽略原型链属性和不可枚举属性（如 Object.create() 添加的属性）。
-迭代器协议要求对象实现什么方法？	[Symbol.iterator]() 方法，返回含 next() 方法的对象。next() 返回 {value, done}，支持 return()/throw() 处理中断。
-生成器函数中 yield 如何实现双向通信？	yield 暂停执行返回 {value, done}；下次 next(arg) 恢复时，arg 作为 yield 表达式的值传入（如 function* gen() { const x = yield 10 }）。
-执行上下文包含哪些核心组件？	变量环境（VariableEnvironment）、词法环境（LexicalEnvironment）、this 绑定（ThisBinding）。函数上下文还有闭包存储。
-new.target 在构造函数中的作用是什么？	指向 new 调用的类或函数。用于检测是否通过 new 调用（如 if (!new.target) throw error），或在派生类中访问父类构造器。
-派生类（有 extends）的实例如何创建？	this 由父类构造器创建，子类需先调用 super() 初始化父类，才能访问 this 和添加子类属性（否则 ReferenceError）。
-ES6 模块在导入导出阶段会执行代码吗？	不会。模块装配阶段只处理静态的 import/export 绑定，代码执行推迟到模块求值阶段（顶层代码执行时）。
-引用类型（Reference）由哪三部分组成？	基对象（base）、属性名（name）、严格模式标志（strict）。用于描述 obj.x 等表达式，存储对象和属性信息。
+const obj = { prop: ""value"" };
+console.log(delete obj.prop); // true (实际删除属性)
+console.log(obj.prop); // undefined</code></pre>"
+如何修复var x = y = 100;的变量泄漏问题？	"<pre><code class=""language-javascript"">// 错误写法：y泄漏为全局变量
+function leakExample() {
+  var x = y = 100;
+}
+leakExample();
+console.log(y); // 100 (全局污染)
+
+// 正确写法：同时声明变量
+function correctExample() {
+  var x = 100, y = x; // 使用逗号分隔声明
+}</code></pre>"
+JavaScript中表达式和语句的区别？	"<pre><code class=""language-javascript"">// 表达式示例：产生值
+const sum = 1 + 2; // 表达式求值为3
+console.log(sum * 2); // 表达式可嵌套
+
+// 语句示例：控制执行流
+if (sum > 2) { // if语句
+  throw new Error(""示例""); // throw语句
+}</code></pre>"
+解释a.x = a = {n:2};的执行顺序？	"<pre><code class=""language-javascript"">let a = { n: 1 };
+const originalA = a;
+
+// 执行步骤：
+// 1. 计算左侧a.x → 引用原始a的x属性
+// 2. 计算右侧a = {n:2} → 变量a指向新对象
+// 3. 将新对象赋值给原始a.x
+a.x = a = { n: 2 };
+
+console.log(originalA.x); // {n:2} (原始对象的属性)
+console.log(a.x); // undefined (新对象无x属性)</code></pre>"
+箭头函数x => x的本质是什么？	"<pre><code class=""language-javascript"">// 等价于普通函数
+const arrow = x => x;
+const func = function(x) { return x; };
+
+// 关键区别：this绑定
+const obj = {
+  value: 10,
+  arrow: () => this.value, // 继承外层this
+  regular: function() { return this.value; }
+};
+console.log(obj.arrow()); // undefined (非对象this)</code></pre>"
+为什么for...of循环开销较大？	"<pre><code class=""language-javascript"">// 每次迭代创建新作用域
+const iterable = [1, 2, 3];
+for (let x of iterable) {
+  // 引擎行为：
+  // 1. 创建新环境记录(iterationEnv)
+  // 2. 绑定当前迭代值
+  // 3. 执行循环体代码
+  console.log(x);
+}
+
+// 等价于手动创建作用域链
+{
+  let x = 1;
+  console.log(x);
+}
+{
+  let x = 2;
+  console.log(x);
+}</code></pre>"
+yield关键字如何工作？	"<pre><code class=""language-javascript"">function* generator() {
+  yield 1; // 暂停点1
+  yield 2; // 暂停点2
+}
+
+const gen = generator();
+console.log(gen.next()); // {value:1, done:false}
+console.log(gen.next()); // {value:2, done:false}
+console.log(gen.next()); // {value:undefined, done:true}</code></pre>"
+throw 1为什么是最简单语句？	"<pre><code class=""language-javascript"">try {
+  // 规范实现：
+  // 1. 求值表达式 → 1
+  // 2. GetValue(1) → 1
+  // 3. 返回ThrowCompletion(1)
+  throw 1; 
+} catch (e) {
+  console.log(e); // 1
+}</code></pre>"
+JavaScript中对象和数组的区别？	"<pre><code class=""language-javascript"">// 对象：键值对集合
+const obj = { a: 1, b: 2 };
+console.log(Object.keys(obj)); // [""a"",""b""]
+
+// 数组：有序索引集合
+const arr = [1, 2];
+console.log(arr[0]); // 1 (顺序访问)
+
+// 转换要求
+obj[Symbol.iterator] = function*() {
+  for (let key in this) yield this[key];
+};
+console.log([...obj]); // [1,2] (转为数组)</code></pre>"
+super.xxx()如何绑定this？	"<pre><code class=""language-javascript"">class Parent {
+  method() { return this; }
+}
+
+class Child extends Parent {
+  callSuper() {
+    // super绑定过程：
+    // 1. 通过[[HomeObject]]找到Parent.prototype
+    // 2. 调用Parent.prototype.method
+    // 3. this从当前执行环境复制
+    return super.method(); 
+  }
+}
+
+const child = new Child();
+console.log(child.callSuper() === child); // true</code></pre>"
+export default function() {}的问题？	"<pre><code class=""language-javascript"">// 错误：匿名函数无法直接绑定
+// export default function() {} 
+
+// 正确写法1：具名导出
+export default function myFunc() {}
+
+// 正确写法2：先声明后导出
+function myFunc() {}
+export default myFunc;</code></pre>"
+new X的执行过程？	"<pre><code class=""language-javascript"">function simulateNew() {
+  // 1. 创建空对象(原型指向X.prototype)
+  const obj = Object.create(X.prototype);
+  
+  // 2. 执行构造函数绑定this
+  const result = X.call(obj, arguments);
+  
+  // 3. 处理返回值
+  return (typeof result === ""object"") ? result : obj;
+}
+
+function X() { this.value = 10; }
+const instance = simulateNew();
+console.log(instance.value); // 10</code></pre>"
+Object.create(new.target.prototype)的作用？	"<pre><code class=""language-javascript"">class NullClass extends null {
+  constructor() {
+    // 当继承null时需要手动设置原型
+    const instance = Object.create(new.target.prototype);
+    return Object.assign(instance, { value: 10 });
+  }
+}
+
+const obj = new NullClass();
+console.log(obj.value); // 10</code></pre>"
+解构赋值[a,b]={a,b}如何工作？	"<pre><code class=""language-javascript"">// 右侧对象需实现迭代器
+const obj = { 
+  a: 1, 
+  b: 2,
+  [Symbol.iterator]: function*() {
+    yield this.a;
+    yield this.b;
+  }
+};
+
+// 解构过程：
+// 1. 调用obj[Symbol.iterator]()
+// 2. 按顺序赋值给左侧变量
+const [a, b] = obj;
+console.log(a, b); // 1 2</code></pre>"
+
+#separator:tab
+#html:true
+JavaScript中对象和数组的本质区别？	"<pre><code class=""language-javascript"">// 对象：关联数组（键值对）
+const obj = { a: 1, b: 2 };
+console.log(obj[""a""]); // 1 (字符串索引)
+
+// 数组：特殊对象（有序索引）
+const arr = [10, 20];
+console.log(arr[0]); // 10 (数字索引)
+console.log(arr[""0""]); // 10 (等效字符串索引)</code></pre>"
+如何使解构赋值[a,b]={a,b}可执行？	"<pre><code class=""language-javascript"">// 为Object添加迭代器
+Object.prototype[Symbol.iterator] = function*() {
+  yield* Object.values(this);
+};
+
+// 现在对象可被解构
+const {a, b} = {a:1, b:2};
+const [x, y] = {a, b}; // 转换为数组解构
+console.log(x, y); // 1 2</code></pre>"
+展开语法...obj会处理原型链属性吗？	"<pre><code class=""language-javascript"">const parent = { inherited: ""value"" };
+const obj = Object.create(parent);
+obj.ownProp = ""data"";
+
+// 展开语法仅处理自身属性
+console.log({...obj}); // { ownProp: ""data"" }
+
+// 对比：Object.assign会忽略原型链属性
+console.log(Object.assign({}, obj)); // { ownProp: ""data"" }</code></pre>"
+迭代器协议要求实现什么方法？	"<pre><code class=""language-javascript"">// 自定义迭代器实现
+const customIterator = {
+  data: [10, 20, 30],
+  [Symbol.iterator]() {
+    let index = 0;
+    return {
+      next: () => {
+        return index < this.data.length ? 
+          { value: this.data[index++], done: false } : 
+          { done: true };
+      }
+    };
+  }
+};
+
+for (let num of customIterator) {
+  console.log(num); // 10, 20, 30
+}</code></pre>"
+生成器函数中yield如何实现双向通信？	"<pre><code class=""language-javascript"">function* twoWayGen() {
+  const name = yield ""请输入名字"";
+  const age = yield `你好${name}, 请输入年龄`;
+  return `${name}:${age}岁`;
+}
+
+const gen = twoWayGen();
+console.log(gen.next().value); // ""请输入名字""
+console.log(gen.next(""张三"").value); // ""你好张三, 请输入年龄""
+console.log(gen.next(30).value); // ""张三:30岁""</code></pre>"
+执行上下文包含哪些核心组件？	"<pre><code class=""language-javascript"">function demoContext() {
+  // 变量环境(var)
+  var varVariable = ""hoisted"";
+  
+  // 词法环境(let/const)
+  let lexicalVar = ""scoped"";
+  
+  // this绑定
+  console.log(this); // 取决于调用方式
+}
+
+// 模拟执行上下文结构
+const executionContext = {
+  VariableEnvironment: { varVariable: undefined },
+  LexicalEnvironment: { lexicalVar: ""<uninitialized>"" },
+  ThisBinding: globalThis
+};</code></pre>"
+new.target在构造函数中的作用？	"<pre><code class=""language-javascript"">class Parent {
+  constructor() {
+    // 检测调用方式
+    if (!new.target) throw ""必须使用new调用"";
+    
+    // 访问当前构造器
+    console.log(new.target.name); // ""Child""
+  }
+}
+
+class Child extends Parent {
+  constructor() {
+    super();
+    // 访问父类构造器
+    console.log(new.target.super); // Parent
+  }
+}
+
+const child = new Child();</code></pre>"
+如何正确创建派生类实例？	"<pre><code class=""language-javascript"">class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name); // 必须先调用super!
+    this.breed = breed;
+  }
+}
+
+// 错误示例（未调用super）：
+// class Cat extends Animal {
+//   constructor() {
+//     this.paws = 4; // ReferenceError
+//   }
+// }
+
+const myDog = new Dog(""Max"", ""Labrador"");
+console.log(myDog.name); // ""Max""</code></pre>"
+ES6模块在导入阶段会执行代码吗？	"<pre><code class=""language-javascript"">// moduleA.js
+console.log(""模块A执行"");
+export const value = ""data"";
+
+// moduleB.js
+import { value } from './moduleA.js';
+console.log(""模块B执行"", value);
+
+// 输出顺序：
+// 1. 模块A执行
+// 2. 模块B执行 data
+// 说明：导入时执行被导入模块</code></pre>"
+JavaScript引用类型的三个组成部分？	"<pre><code class=""language-javascript"">// 模拟引用类型
+const reference = {
+  base: window,       // 基对象
+  name: ""location"",   // 属性名
+  strict: false       // 严格模式标志
+};
+
+// 属性访问过程
+function resolveReference(ref) {
+  return ref.base[ref.name];
+}
+
+console.log(resolveReference(reference)); // window.location</code></pre>"

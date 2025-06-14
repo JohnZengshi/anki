@@ -1,405 +1,1562 @@
-# 知识体系
-浏览器渲染核心流程	解析 → 构建DOM树 → 计算CSS → 渲染 → 合成 → 绘制
+#separator:tab
+#html:true
+JavaScript的7种语言类型	"<pre><code class=""language-javascript"">// JavaScript的7种语言类型：
+console.log(typeof undefined);  // ""undefined""
+console.log(typeof null);       // ""object"" (历史遗留)
+console.log(typeof true);       // ""boolean""
+console.log(typeof 'text');     // ""string""
+console.log(typeof 42);         // ""number""
+console.log(typeof Symbol());   // ""symbol""
+console.log(typeof {});         // ""object""</code></pre>"
+用void 0代替undefined的原因	"<pre><code class=""language-javascript"">// 用void 0代替undefined的原因：
+let undefined = 'hacked';      // 篡改undefined变量
+console.log(undefined);         // 输出'hacked'
 
-# JavaScript类型系统
-JavaScript的7种语言类型	Undefined、Null、Boolean、String、Number、Symbol、Object
-用void 0代替undefined的原因	undefined是变量可被篡改，void 0可确保获取真正的未定义值
-0.1+0.2≠0.3的根本原因	浮点数精度问题（IEEE 754双精度标准），应使用Math.abs(a+b-c)<=Number.EPSILON比较
-Symbol的核心特性	唯一性（描述相同也不相等）、不可枚举、可作为对象非字符串key
-类型转换的装箱操作原理	"."运算符自动创建临时对象（如"abc".charAt(0)实际创建String包装对象）
+// 安全获取undefined值的方法：
+const safeUndefined = void 0;
+console.log(safeUndefined);     // 输出undefined</code></pre>"
+浮点数精度问题解决方案	"<pre><code class=""language-javascript"">// 浮点数比较的正确方法：
+function floatEqual(a, b) {
+  return Math.abs(a - b) <= Number.EPSILON;
+}
 
-# 对象系统
-对象的三个本质特征	唯一标识性（内存地址）、有状态、有行为
-JavaScript对象的两类属性	数据属性（value/writable/enumerable/configurable）、访问器属性（getter/setter）
-Object.defineProperty的作用	精确控制属性特征（如设置writable:false创建不可写属性）
-原型系统的核心规则	1. 对象通过[[prototype]]链继承 2. 属性查找沿原型链回溯直至找到或为null
-new运算符的三步操作	1. 以构造器prototype为原型创建对象 2. 执行构造器绑定this 3. 返回对象（或构造器返回值）
-ES6 class的实质	语法糖（底层仍基于原型继承），通过extends实现更规范的继承
+console.log(0.1 + 0.2 === 0.3);  // false
+console.log(floatEqual(0.1+0.2, 0.3)); // true</code></pre>"
+Symbol的唯一性演示	"<pre><code class=""language-javascript"">// Symbol的唯一性：
+const sym1 = Symbol('key');
+const sym2 = Symbol('key');
+console.log(sym1 === sym2); // false
 
-# 浏览器API
-BOM与DOM的核心区别	BOM操作浏览器窗口（如window），DOM操作文档结构（如document）
-CSSOM的作用	以对象形式操作CSS规则（如document.styleSheets）
-事件传播的三个阶段	捕获 → 目标 → 冒泡
+// 作为对象key：
+const obj = {
+  [sym1]: 'private'
+};
+console.log(obj[sym1]); // 'private'</code></pre>"
+装箱操作原理演示	"<pre><code class=""language-javascript"">// 装箱操作原理：
+const str = 'abc';
+console.log(str.charAt(0)); // 'a' (实际创建临时String对象)
 
-# 工程实践
-前端性能优化的核心目标	更快的加载速度（FMP/FCP）、更流畅的交互（FPS）
-工具链的关键组成	脚手架、本地服务器、代码检查、构建工具（如Webpack）
+// 等同于：
+const temp = new String(str);
+console.log(temp.charAt(0)); // 'a'</code></pre>"
+数据属性与访问器属性	"<pre><code class=""language-javascript"">// 数据属性 vs 访问器属性：
+const dataObj = {
+  prop: 'value' // 数据属性
+};
 
-# 浮点数精度问题
-为什么0.1+0.2的结果不是0.3	IEEE754双精度浮点数存储限制（二进制无法精确表示0.1），实际值≈0.30000000000000004
-正确比较浮点数的方法	Math.abs(0.1+0.2-0.3) <= Number.EPSILON（艾普西隆）
+const accessorObj = {
+  get prop() { return this._value; },
+  set prop(v) { this._value = v; }
+};</code></pre>"
+Object.defineProperty使用	"<pre><code class=""language-javascript"">// 使用Object.defineProperty：
+const obj = {};
+Object.defineProperty(obj, 'readOnly', {
+  value: 42,
+  writable: false,
+  configurable: false
+});
 
-# 原型链
-实现tiger继承cat的原型链代码	var tiger = Object.create(cat, {say:{value:()=>console.log("roar!")}})
-Object.create(null)创建的对象特点	无原型链（无法调用toString等方法），纯净数据容器
+obj.readOnly = 100; // 严格模式下报错
+console.log(obj.readOnly); // 42</code></pre>"
+原型链继承示例	"<pre><code class=""language-javascript"">// 原型链继承：
+function Animal() {}
+Animal.prototype.eat = function() {};
 
-# 属性描述符
-使对象属性不可删除的配置	Object.defineProperty(obj,'prop',{configurable:false})
-检测属性可枚举性的方法	Object.getOwnPropertyDescriptor(obj,'prop').enumerable
+function Cat() {}
+Cat.prototype = Object.create(Animal.prototype);
+
+const kitty = new Cat();
+console.log(kitty instanceof Animal); // true</code></pre>"
+new运算符实现原理	"<pre><code class=""language-javascript"">// 模拟new操作符：
+function mockNew(Constructor, ...args) {
+  // 1. 创建空对象并设置原型
+  const obj = Object.create(Constructor.prototype);
+  
+  // 2. 执行构造函数绑定this
+  const result = Constructor.apply(obj, args);
+  
+  // 3. 返回对象
+  return result instanceof Object ? result : obj;
+}</code></pre>"
+ES6 class实质演示	"<pre><code class=""language-javascript"">// ES6 class实质：
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  distance() { /*...*/ }
+}
+
+console.log(typeof Point); // 'function'
+console.log(Point.prototype.distance); // 方法存在原型上</code></pre>"
+事件传播阶段演示	"<pre><code class=""language-javascript"">// 事件传播三个阶段：
+document.getElementById('btn').addEventListener('click', e => {
+  console.log('目标阶段');
+}, false);
+
+document.body.addEventListener('click', e => {
+  console.log('冒泡阶段');
+}, false);
+
+document.body.addEventListener('click', e => {
+  console.log('捕获阶段');
+}, true);</code></pre>"
+浮点数正确比较方法	"<pre><code class=""language-javascript"">// 浮点数正确比较：
+const a = 0.1 + 0.2;
+const b = 0.3;
+
+// 错误方式：
+console.log(a === b); // false
+
+// 正确方式：
+console.log(Math.abs(a - b) <= Number.EPSILON); // true</code></pre>"
+原型链继承实现	"<pre><code class=""language-javascript"">// tiger继承cat的原型链：
+const cat = {
+  say: () => console.log('meow!')
+};
+
+const tiger = Object.create(cat, {
+  say: {
+    value: () => console.log('roar!')
+  }
+});
+
+tiger.say(); // 'roar!'</code></pre>"
+Object.create(null)特点	"<pre><code class=""language-javascript"">// Object.create(null)特点：
+const bareObj = Object.create(null);
+
+console.log('toString' in bareObj); // false
+console.log(bareObj.__proto__);     // undefined</code></pre>"
+配置不可删除属性	"<pre><code class=""language-javascript"">// 配置不可删除属性：
+const obj = {};
+Object.defineProperty(obj, 'immutable', {
+  value: 'cannot delete',
+  configurable: false
+});
+
+delete obj.immutable; // 严格模式下报错
+console.log(obj.immutable); // 'cannot delete'</code></pre>"
+检测属性可枚举性	"<pre><code class=""language-javascript"">// 检测属性可枚举性：
+const obj = {
+  visible: 'enumerable'
+};
+Object.defineProperty(obj, 'hidden', {
+  value: 'non-enumerable',
+  enumerable: false
+});
+
+console.log(Object.getOwnPropertyDescriptor(obj, 'visible').enumerable); // true
+console.log(Object.getOwnPropertyDescriptor(obj, 'hidden').enumerable);  // false</code></pre>"
+宿主对象示例	"<pre><code class=""language-javascript"">// 浏览器宿主对象示例：
+console.log(window);     // BOM对象
+console.log(document);   // DOM对象
+new Image();             // 宿主构造器</code></pre>"
+固有对象示例	"<pre><code class=""language-javascript"">// JavaScript固有对象：
+console.log(Array);      // Array构造器
+console.log(Date.now()); // Date对象方法
+console.log(/regex/);    // 正则对象</code></pre>"
+原生对象创建	"<pre><code class=""language-javascript"">// 原生对象创建：
+const arr = new Array(1, 2, 3); // 通过构造器
+const regex = /abc/;            // 字面量语法</code></pre>"
+普通对象创建	"<pre><code class=""language-javascript"">// 普通对象创建：
+const obj1 = {};                // 字面量
+const obj2 = new Object();       // 构造器
+class Foo {}                    // ES6 class
+const obj3 = new Foo();</code></pre>"
+
+#separator:tab
+#html:true
+JavaScript函数对象的[[call]]特性	"<pre><code class=""language-javascript"">// 函数调用触发[[call]]
+function greet() { return 'Hello!' }
+console.log(greet()); // 输出'Hello!'</code></pre>"
+JavaScript构造器对象的[[construct]]特性	"<pre><code class=""language-javascript"">// new操作触发[[construct]]
+class Person {
+  constructor(name) { this.name = name }
+}
+const john = new Person('John');</code></pre>"
+Date作为函数调用返回字符串	"<pre><code class=""language-javascript"">// Date作为函数调用
+console.log(typeof Date()); // string
+console.log(Date().includes('GMT')); // true</code></pre>"
+Date作为构造器调用返回对象	"<pre><code class=""language-javascript"">// Date作为构造器调用
+const now = new Date();
+console.log(now instanceof Date); // true
+console.log(now.getFullYear()); // 当前年份</code></pre>"
+Image构造器不能作为函数调用	"<pre><code class=""language-javascript"">// Image构造器必须用new调用
+try {
+  Image(); // 尝试作为函数调用
+} catch(e) {
+  console.error('Error:', e.message); 
+  // 输出错误信息
+}</code></pre>"
+箭头函数不能作为构造器	"<pre><code class=""language-javascript"">// 箭头函数不支持new操作
+const arrow = () => {};
+try {
+  new arrow();
+} catch(e) {
+  console.log('Error:', e.message); // 报错
+}</code></pre>"
+Array对象的length自动更新	"<pre><code class=""language-javascript"">// Array的length自动更新
+const arr = [1, 2];
+arr[5] = 6;
+console.log(arr.length); // 6
+arr.length = 2;
+console.log(arr); // [1, 2]</code></pre>"
+Object.prototype原型不可变	"<pre><code class=""language-javascript"">// Object.prototype原型固定
+try {
+  Object.setPrototypeOf(Object.prototype, {});
+} catch(e) {
+  console.error('Cannot change prototype:', e.message);
+}</code></pre>"
+String对象属性访问特性	"<pre><code class=""language-javascript"">// String索引访问
+const str = 'abc';
+console.log(str[1]); // 'b'
+str[1] = 'x'; // 无变化（字符串不可变）
+console.log(str); // 'abc'</code></pre>"
+Arguments对象参数联动	"<pre><code class=""language-javascript"">// Arguments参数联动
+function test(a, b) {
+  arguments[0] = 100; // 修改arguments
+  console.log(a);     // 输出100（非严格模式）
+}
+test(1, 2);</code></pre>"
+bind函数上下文绑定	"<pre><code class=""language-javascript"">// bind绑定上下文
+const obj = { value: 42 };
+function getValue() { return this.value; }
+const boundFn = getValue.bind(obj);
+console.log(boundFn()); // 42</code></pre>"
+宏任务与微任务执行顺序	"<pre><code class=""language-javascript"">// 宏任务 vs 微任务
+setTimeout(() => console.log('Macrotask'), 0);
+Promise.resolve().then(() => console.log('Microtask'));
+// 输出顺序: Microtask → Macrotask</code></pre>"
+Promise.resolve产生微任务	"<pre><code class=""language-javascript"">// Promise.resolve产生微任务
+console.log('Start');
+Promise.resolve().then(() => console.log('Microtask'));
+console.log('End');
+// 输出顺序: Start → End → Microtask</code></pre>"
+闭包携带定义环境	"<pre><code class=""language-javascript"">// 闭包携带环境
+function outer() {
+  const secret = 'closure';
+  return () => secret;
+}
+const getSecret = outer();
+console.log(getSecret()); // 'closure'</code></pre>"
+var声明的函数作用域	"<pre><code class=""language-javascript"">// var的函数作用域
+function test() {
+  if(true) {
+    var x = 10;
+  }
+  console.log(x); // 10（穿透块级作用域）
+}</code></pre>"
+let声明的块级作用域	"<pre><code class=""language-javascript"">// let的块级作用域
+function test() {
+  if(true) {
+    let y = 20;
+  }
+  console.log(typeof y); // 'undefined'
+}</code></pre>"
+Realm的独立内置对象集	"<pre><code class=""language-javascript"">// Realm独立内置对象
+const iframe = document.createElement('iframe');
+document.body.appendChild(iframe);
+const iframeArray = iframe.contentWindow.Array;
+console.log([] instanceof iframeArray); // false</code></pre>"
+普通函数this绑定规则	"<pre><code class=""language-javascript"">// 普通函数this绑定
+const obj = {
+  method() { 
+    console.log(this === obj); 
+  }
+};
+obj.method(); // true
+const fn = obj.method;
+fn();        // false（严格模式undefined）</code></pre>"
+箭头函数this继承规则	"<pre><code class=""language-javascript"">// 箭头函数this继承
+const obj = {
+  value: 'obj',
+  arrow: () => console.log(this.value),
+  regular() {
+    const arrow = () => console.log(this.value);
+    arrow();
+  }
+};
+obj.arrow();      // undefined（继承全局this）
+obj.regular();    // 'obj'（继承外层函数this）</code></pre>"
+类方法this严格模式特性	"<pre><code class=""language-javascript"">// 类方法this特性
+class StrictClass {
+  method() {
+    'use strict';
+    console.log(this);
+  }
+}
+const instance = new StrictClass();
+const method = instance.method;
+method(); // undefined（未绑定调用）</code></pre>"
+call/apply无法改变箭头函数this	"<pre><code class=""language-javascript"">// call无法改变箭头函数this
+const arrow = () => console.log(this);
+const obj = {};
+arrow.call(obj); // 仍然指向全局this</code></pre>"
+支持new操作的函数类型	"<pre><code class=""language-javascript"">// 支持new操作的函数
+function NormalFn() {}
+class MyClass {}
+
+const normalInstance = new NormalFn();
+const classInstance = new MyClass();
+
+// 其他函数类型不支持new
+const arrow = () => {};
+new arrow(); // TypeError</code></pre>"
+生成器函数定义与使用	"<pre><code class=""language-javascript"">// 生成器函数
+function* gen() {
+  yield 1;
+  yield 2;
+}
+const g = gen();
+console.log(g.next().value); // 1</code></pre>"
+异步函数处理	"<pre><code class=""language-javascript"">// 异步普通函数
+async function fetchData() {
+  return await fetch('/api');
+}
+
+// 异步箭头函数
+const asyncArrow = async () => {
+  await new Promise(resolve => setTimeout(resolve, 100));
+};
+
+// 异步生成器
+async function* asyncGen() {
+  yield await Promise.resolve(1);
+}</code></pre>"
+
+#separator:tab
+#html:true
+JavaScript中Completion Record的三个字段	"<pre><code class=""language-javascript"">// Completion Record的三个字段：
+try {
+  // [[type]]: 'return'
+  // [[value]]: 42
+  // [[target]]: 空
+  return 42;
+} finally {
+  console.log('执行finally');
+}</code></pre>"
+JavaScript中finally覆盖返回值演示	"<pre><code class=""language-javascript"">// finally覆盖返回值：
+function test() {
+  try {
+    return 'try';
+  } finally {
+    return 'finally'; // 覆盖try的返回值
+  }
+}
+console.log(test()); // 输出'finally'</code></pre>"
+JavaScript带标签语句跳出多层循环	"<pre><code class=""language-javascript"">// 带标签语句跳出多层循环：
+outer: for(let i=0; i<3; i++) {
+  for(let j=0; j<3; j++) {
+    if(i===1 && j===1) break outer;
+    console.log(i, j);
+  }
+}
+// 输出: 0 0, 0 1, 0 2, 1 0</code></pre>"
+JavaScript中语句块非normal类型影响	"<pre><code class=""language-javascript"">// 非normal类型中断执行：
+function demo() {
+  console.log('A');
+  return; // 类型为return
+  console.log('B'); // 不会执行
+}
+demo(); // 只输出'A'</code></pre>"
+JavaScript数字属性访问的正确方式	"<pre><code class=""language-javascript"">// 正确访问数字属性：
+console.log(12 .toString()); // '12'
+console.log((12).toString()); // '12'
+console.log(0.5.toString()); // '0.5'</code></pre>"
+JavaScript数字直接量支持的进制	"<pre><code class=""language-javascript"">// 数字直接量进制表示：
+console.log(0b1010); // 二进制 10
+console.log(0o12);   // 八进制 10
+console.log(0xA);    // 十六进制 10
+console.log(12);     // 十进制 12</code></pre>"
+JavaScript类方法严格模式this特性	"<pre><code class=""language-javascript"">// 类方法this特性：
+class C {
+  showThis() {
+    'use strict';
+    console.log(this);
+  }
+}
+const o = new C();
+const fn = o.showThis;
+fn(); // 输出undefined（严格模式未绑定）</code></pre>"
+JavaScript微任务优先于宏任务执行	"<pre><code class=""language-javascript"">// 微任务优先于宏任务：
+setTimeout(() => console.log('宏任务'), 0);
+Promise.resolve().then(() => console.log('微任务'));
+// 输出顺序: 微任务 → 宏任务</code></pre>"
+JavaScript四则运算解释器词法分析	"<pre><code class=""language-javascript"">// 词法分析示例：
+function tokenize(code) {
+  return code.match(/\d+|[+\-*/()]/g);
+}
+console.log(tokenize('12+34 * 56')); 
+// ['12', '+', '34', '*', '56']</code></pre>"
+JavaScript四则运算语法分析(LL算法)	"<pre><code class=""language-javascript"">// LL算法语法分析：
+function parse(tokens) {
+  let index = 0;
+  function parseExpression() {
+    let left = parseTerm();
+    while (tokens[index] === '+' || tokens[index] === '-') {
+      const op = tokens[index++];
+      const right = parseTerm();
+      left = { type: 'Binary', op, left, right };
+    }
+    return left;
+  }
+  // parseTerm实现类似...
+}</code></pre>"
+JavaScript解释器构建AST示例	"<pre><code class=""language-javascript"">// AST表示：3+4 * 5
+const ast = {
+  type: 'AdditiveExpression',
+  operator: '+',
+  children: [
+    { type: 'Number', value: 3 },
+    '*',
+    {
+      type: 'MultiplicativeExpression',
+      operator: '*',
+      children: [
+        { type: 'Number', value: 4 },
+        { type: 'Number', value: 5 }
+      ]
+    }
+  ]
+};</code></pre>"
+JavaScript解释器后序遍历计算	"<pre><code class=""language-javascript"">// 后序遍历计算AST：
+function evaluate(node) {
+  if (node.type === 'Number') return node.value;
+  const left = evaluate(node.left);
+  const right = evaluate(node.right);
+  switch(node.op) {
+    case '+': return left + right;
+    case '-': return left - right;
+    case '*': return left * right;
+    case '/': return left / right;
+  }
+}</code></pre>"
+JavaScript解释器支持括号扩展	"<pre><code class=""language-javascript"">// 支持括号的语法规则：
+// PrimaryExpression ::= Number | ""("" AdditiveExpression "")""
+function parsePrimary() {
+  if (tokens[index] === '(') {
+    index++; // 跳过'('
+    const exp = parseExpression();
+    index++; // 跳过')'
+    return exp;
+  }
+  return { type: 'Number', value: tokens[index++] };
+}</code></pre>"
+JavaScript自动分号插入问题演示	"<pre><code class=""language-javascript"">// 自动分号插入问题：
+const a = 1
+(function() { console.log('IIFE') })()
+// 解释为: const a = 1(function(){...})() → 报错</code></pre>"
+JavaScript避免IIFE分号问题方案	"<pre><code class=""language-javascript"">// 避免IIFE分号问题：
+;(function() { 
+  console.log('安全IIFE') 
+})()
+// 或
+!function() { 
+  console.log('安全IIFE') 
+}()</code></pre>"
+JavaScript模块与脚本核心区别	"<pre><code class=""language-javascript"">// 模块与脚本区别：
+// 模块代码（需type=""module""）
+import { util } from './utils.js';
+export const data = [1, 2, 3];</code></pre>"
+JavaScript模块动态绑定特性	"<pre><code class=""language-javascript"">// 模块动态绑定：
+// modA.js
+export let count = 0;
+export function increment() { count++; }
+
+// modB.js
+import { count, increment } from './modA.js';
+console.log(count); // 0
+increment();
+console.log(count); // 1（动态更新）</code></pre>"
+JavaScript预处理var声明提升	"<pre><code class=""language-javascript"">// var声明提升：
+console.log(x); // undefined（不会报错）
+var x = 5;
+console.log(x); // 5</code></pre>"
+JavaScript预处理function提升	"<pre><code class=""language-javascript"">// function整体提升：
+foo(); // 'OK'（函数已提升）
+function foo() {
+  console.log('OK');
+}</code></pre>"
+JavaScript预处理class暂时性死区	"<pre><code class=""language-javascript"">// class暂时性死区：
+try {
+  new MyClass(); // 报错（TDZ）
+} catch(e) {
+  console.error(e.message);
+}
+class MyClass {}</code></pre>"
+JavaScript中no LineTerminator规则	"<pre><code class=""language-javascript"">// no LineTerminator规则：
+const obj = {
+  a: 1
+  , b: 2 // 逗号前不能换行
+};
+
+return // 自动插入分号
+  { result: 'value' };</code></pre>"
+
+#separator:tab
+#html:true
+JavaScript中普通语句与声明型语句区别	"<pre><code class=""language-javascript"">// 普通语句
+let a = 1 + 2;  // 执行时计算
+
+// 声明型语句（预处理）
+function test() {
+  console.log(b); // undefined（var提升）
+  var b = 10;
+}</code></pre>"
+JavaScript的for...in遍历对象属性	"<pre><code class=""language-javascript"">// for...in遍历可枚举属性
+const obj = {a:1, b:2};
+Object.defineProperty(obj, 'c', {
+  value: 3,
+  enumerable: false
+});
+
+for(let key in obj) {
+  console.log(key); // 'a', 'b'（不含'c'）
+}</code></pre>"
+JavaScript中实现可迭代对象	"<pre><code class=""language-javascript"">// 使普通对象可用于for...of
+const iterableObj = {
+  [Symbol.iterator]() {
+    let count = 0;
+    return {
+      next() {
+        return count < 3 
+          ? {value: count++, done: false}
+          : {done: true};
+      }
+    };
+  }
+};
+
+for(let num of iterableObj) {
+  console.log(num); // 0,1,2
+}</code></pre>"
+JavaScript中finally块始终执行	"<pre><code class=""language-javascript"">// finally块在return后仍执行
+function test() {
+  try {
+    console.log('try');
+    return 'exit';
+  } finally {
+    console.log('finally'); // 始终执行
+  }
+}
+console.log(test()); 
+// 输出: try → finally → exit</code></pre>"
+JavaScript左值表达式示例	"<pre><code class=""language-javascript"">// 左值表达式可放在赋值左侧
+const obj = {};
+obj.property = 'value'; // 属性访问
+const arr = [0];
+arr[0] = 10;           // 索引访问
+let x;
+x = 42;                // 变量名</code></pre>"
+JavaScript乘方运算符右结合性	"<pre><code class=""language-javascript"">// **运算符右结合
+console.log(2 ** 3 ** 2); // 2^(3^2)=512
+console.log((2 ** 3) ** 2); // (2^3)^2=64</code></pre>"
+JavaScript逗号运算符返回值	"<pre><code class=""language-javascript"">// 逗号运算符返回最后值
+const a = (1, 2, 3);
+console.log(a); // 3
+
+function test() {
+  return console.log('A'), 'B';
+}
+console.log(test()); // 'A' → 'B'</code></pre>"
+JavaScript分号陷阱案例演示	"<pre><code class=""language-javascript"">// 分号缺失导致错误：
+[1,2,3].forEach(console.log)
+[4,5,6].forEach(console.log) 
+// 解释为: [1,2,3].forEach(console.log)[4,5,6].forEach(console.log)
+// 解决方案: 行首加分号或使用IIFE封装</code></pre>"
+JavaScript模块绑定动态引用	"<pre><code class=""language-javascript"">// 模块a.js:
+export let count = 1;
+export function inc() { count++; }
+
+// 模块b.js:
+import { count, inc } from './a.js';
+console.log(count); // 1
+inc();
+console.log(count); // 2（动态更新）</code></pre>"
+JavaScript暂时性死区示例	"<pre><code class=""language-javascript"">// 块级作用域TDZ:
+let x = 'outer';
+{
+  console.log(x); // 报错（访问前已声明x）
+  let x = 'inner';
+}</code></pre>"
+HTML语义标签em与strong用法	"<pre><code class=""language-html"">&lt;!-- em表示重音强调 --&gt;
+&lt;p&gt;你&lt;em&gt;必须&lt;/em&gt;立即行动!&lt;/p&gt;
+
+&lt;!-- strong表示重要性 --&gt;
+&lt;p&gt;&lt;strong&gt;警告:&lt;/strong&gt;高压危险!&lt;/p&gt;</code></pre>"
+HTML中ruby标签注音示例	"<pre><code class=""language-html"">&lt;!-- 文字注音 --&gt;
+&lt;ruby&gt;
+  漢 &lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;han&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;
+  字 &lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;zi&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;
+&lt;/ruby&gt;</code></pre>"
+HTML中figure和figcaption用法	"<pre><code class=""language-html"">&lt;!-- 图文组合 --&gt;
+&lt;figure&gt;
+  &lt;img src=""diagram.png"" alt=""架构图""&gt;
+  &lt;figcaption&gt;图1: 系统架构图&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>"
+HTML中dfn标签术语定义	"<pre><code class=""language-html"">&lt;!-- 术语定义 --&gt;
+&lt;p&gt;&lt;dfn&gt;HTML&lt;/dfn&gt;是超文本标记语言&lt;/p&gt;</code></pre>"
+HTML中abbr标签使用示例	"<pre><code class=""language-html"">&lt;!-- 缩写词 --&gt;
+&lt;abbr title=""World Wide Web""&gt;WWW&lt;/abbr&gt;</code></pre>"
+HTML中time标签机器可读格式	"<pre><code class=""language-html"">&lt;!-- 机器可读时间 --&gt;
+&lt;time datetime=""2023-06-15T14:00:00Z""&gt;
+  下周四下午2点
+&lt;/time&gt;</code></pre>"
+HTML中article与body结构相似性	"<pre><code class=""language-html"">&lt;!-- article包含完整内容结构 --&gt;
+&lt;article&gt;
+  &lt;header&gt;
+    &lt;h1&gt;文章标题&lt;/h1&gt;
+    &lt;p&gt;发布日期&lt;/p&gt;
+  &lt;/header&gt;
+  &lt;section&gt;
+    &lt;h2&gt;章节标题&lt;/h2&gt;
+    &lt;p&gt;内容...&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;footer&gt;版权信息&lt;/footer&gt;
+&lt;/article&gt;</code></pre>"
+HTML中base标签危险替代方案	"<pre><code class=""language-html"">&lt;!-- 避免使用base标签 --&gt;
+&lt;script&gt;
+  document.querySelectorAll('a').forEach(a =&gt; {
+    a.href = new URL(a.href, 'https://base.example/').href;
+  });
+&lt;/script&gt;</code></pre>"
+HTML中charset元标签位置	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset=""UTF-8""&gt; &lt;!-- 必须首位 --&gt;
+  &lt;title&gt;页面标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;/html&gt;</code></pre>"
+HTML中viewport禁用缩放问题	"<pre><code class=""language-html"">&lt;!-- 避免禁用缩放 --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0""&gt;
+&lt;!-- 不要添加 user-scalable=no --&gt;</code></pre>"
+HTML中theme-color元标签应用	"<pre><code class=""language-html"">&lt;!-- 设置浏览器主题色 --&gt;
+&lt;meta name=""theme-color"" content=""#4285f4""&gt;</code></pre>"
+
+#separator:tab
+#html:true
+CSS顶层样式表组成规则	"<pre><code class=""language-css"">/* @规则示例 */
+@charset ""UTF-8"";      /* 必须首行 */
+@import url(""theme.css"");
+@media print { /* 打印样式 */ }
+
+/* 普通规则示例 */
+h1 { color: blue; }</code></pre>"
+CSS@charset声明规则	"<pre><code class=""language-css"">/* 必须在样式表开头 */
+@charset ""UTF-8"";
+
+/* 后续内容 */
+body { font-family: sans-serif; }</code></pre>"
+CSS@media媒体查询应用	"<pre><code class=""language-css"">/* 响应式布局 */
+@media (max-width: 600px) {
+  .sidebar { display: none; }
+}
+
+/* 打印样式 */
+@media print {
+  .noprint { display: none; }
+}</code></pre>"
+CSS@font-face自定义字体	"<pre><code class=""language-css"">/* 图标字体 */
+@font-face {
+  font-family: 'Icons';
+  src: url('icons.woff') format('woff');
+}
+
+.icon { 
+  font-family: 'Icons';
+}</code></pre>"
+CSS普通规则结构	"<pre><code class=""language-css"">/* 选择器 + 声明块 */
+header > nav li.active { /* 选择器 */
+  color: red;     /* 声明块 */
+  font-weight: bold;
+}</code></pre>"
+CSS选择器双竖线||用法	"<pre><code class=""language-css"">/* 选中表格列 */
+table || td.selected {
+  background-color: yellow;
+}</code></pre>"
+CSS calc()混合单位运算	"<pre><code class=""language-css"">/* 响应式宽度 */
+.container {
+  width: calc(100% - 40px); /* 减除边距 */
+}
+
+/* 动态高度 */
+.card {
+  height: calc(100vh - 120px);
+}</code></pre>"
+CSS attr()函数用法	"<pre><code class=""language-css"">/* 显示tooltip */
+.tooltip::after {
+  content: attr(data-tooltip);
+}</code></pre>"
+CSS clamp()响应式字体	"<pre><code class=""language-css"">/* 字体大小范围限制 */
+h1 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+}</code></pre>"
+CSS var()自定义属性	"<pre><code class=""language-css"">/* 定义变量 */
+:root {
+  --primary-color: #4285f4;
+}
+
+/* 使用变量 */
+button {
+  background-color: var(--primary-color);
+}</code></pre>"
+CSS cubic-bezier()动画曲线	"<pre><code class=""language-css"">/* 自定义缓动 */
+.animation {
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}</code></pre>"
+HTML语义标签误用案例修正	"<pre><code class=""language-html"">&lt;!-- 错误用法 --&gt;
+&lt;ul&gt;
+  &lt;li&gt;苹果&lt;/li&gt;
+  &lt;li&gt;香蕉&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- 正确用法（简单并列） --&gt;
+&lt;p&gt;苹果、香蕉、橘子&lt;/p&gt;</code></pre>"
+CSS选择器基本结构	"<pre><code class=""language-css"">/* 简单选择器 */
+div        /* 类型选择器 */
+.class     /* 类选择器 */
+#id        /* ID选择器 */
+
+/* 复合选择器 */
+div.class  /* 组合 */
+
+/* 复杂选择器 */
+div > p    /* 关系组合 */
+
+/* 选择器列表 */
+h1, h2, h3 { /* 分组 */ }</code></pre>"
+CSS命名空间选择器	"<pre><code class=""language-css"">/* SVG中的链接样式 */
+@namespace svg url(http://www.w3.org/2000/svg);
+svg|a { 
+  fill: blue; 
+}</code></pre>"
+CSS属性选择器包含值匹配	"<pre><code class=""language-css"">/* 匹配部分属性值 */
+a[href~=""example.com""] {
+  color: red; /* 匹配href包含""example.com""的链接 */
+}</code></pre>"
+CSS :root伪类应用	"<pre><code class=""language-css"">/* 在scoped CSS中使用 */
+:root {
+  --theme-color: #4285f4;
+}
+
+.local :root {
+  --theme-color: #db4437; /* 局部覆盖 */
+}</code></pre>"
+CSS :empty伪类忽略空白	"<pre><code class=""language-css"">/* 匹配真正空元素 */
+div:empty {
+  display: none; /* 忽略空白文本节点 */
+}</code></pre>"
+CSS :nth-child奇数选择	"<pre><code class=""language-css"">/* 斑马纹表格 */
+tr:nth-child(2n+1) {
+  background-color: #f8f9fa;
+}</code></pre>"
+CSS :focus-within表单样式	"<pre><code class=""language-css"">/* 表单组获得焦点时 */
+.form-group:focus-within {
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
+}</code></pre>"
+CSS选择器优先级计算	"<pre><code class=""language-css"">/* 优先级示例 */
+#header .nav li.active a { /* a=1, b=2, c=2 */ }
+#header li > a:hover     { /* a=1, b=1, c=2 */ }</code></pre>"
+CSS ::first-letter首字样式	"<pre><code class=""language-css"">/* 首字下沉 */
+p::first-letter {
+  font-size: 2.5em;
+  float: left;
+  margin-right: 5px;
+  color: #db4437;
+}</code></pre>"
+CSS伪元素content属性	"<pre><code class=""language-css"">/* 必须指定content */
+.tooltip::before {
+  content: ""⚠️""; /* 使用表情符号 */
+}</code></pre>"
+HTML link标签rel类型	"<pre><code class=""language-html"">&lt;!-- 超链接型 --&gt;
+&lt;link rel=""canonical"" href=""https://example.com/page""&gt;
+
+&lt;!-- 外部资源型 --&gt;
+&lt;link rel=""stylesheet"" href=""theme.css""&gt;</code></pre>"
+HTML rel=canonical用法	"<pre><code class=""language-html"">&lt;!-- 指定规范URL --&gt;
+&lt;link rel=""canonical"" href=""https://example.com/main-page""&gt;</code></pre>"
+HTML RSS订阅引入	"<pre><code class=""language-html"">&lt;!-- 添加RSS订阅 --&gt;
+&lt;link rel=""alternate"" type=""application/rss+xml"" 
+      href=""/rss.xml"" title=""最新内容""></code></pre>"
+HTML preload预加载	"<pre><code class=""language-html"">&lt;!-- 预加载关键资源 --&gt;
+&lt;link rel=""preload"" href=""hero-image.jpg"" as=""image""&gt;</code></pre>"
+HTML noopener安全链接	"<pre><code class=""language-html"">&lt;!-- 安全打开外部链接 --&gt;
+&lt;a href=""https://external.com"" target=""_blank"" rel=""noopener""&gt;
+  安全链接
+&lt;/a&gt;</code></pre>"
+HTML area热区定义	"<pre><code class=""language-html"">&lt;!-- 图像热区 --&gt;
+&lt;img src=""planets.jpg"" usemap=""#planetmap""&gt;
+
+&lt;map name=""planetmap""&gt;
+  &lt;area shape=""rect"" coords=""0,0,82,126"" href=""sun.html""&gt;
+  &lt;area shape=""circle"" coords=""124,58,8"" href=""mercury.html""&gt;
+  &lt;area shape=""poly"" coords=""124,58,100,40,140,30"" href=""custom.html""&gt;
+&lt;/map&gt;</code></pre>"
+CSS正常流排版规则	"<pre><code class=""language-css"">/* 默认文档流 */
+.container {
+  width: 600px; /* 固定宽度 */
+}
+
+.item {
+  display: inline-block;
+  width: 150px; /* 自动换行 */
+}</code></pre>"
+CSS float文字环绕效果	"<pre><code class=""language-css"">/* 图片文字环绕 */
+img {
+  float: left;
+  margin-right: 15px;
+}</code></pre>"
+CSS margin折叠现象	"<pre><code class=""language-css"">/* 垂直外边距折叠 */
+.section {
+  margin: 20px 0; /* 相邻元素间距20px而非40px */
+}</code></pre>"
+CSS块级格式化上下文	"<pre><code class=""language-css"">/* 创建BFC */
+.container {
+  overflow: hidden; /* 创建新BFC */
+}</code></pre>"
+CSS行内格式化上下文	"<pre><code class=""language-css"">/* 行内元素水平排列 */
+.menu {
+  font-size: 0; /* 消除间隙 */
+}
+
+.menu-item {
+  display: inline-block;
+  font-size: 16px;
+}</code></pre>"
+CSS等分布局负边距技巧	"<pre><code class=""language-css"">/* 三栏等分布局 */
+.container {
+  margin: 0 -10px; /* 抵消padding */
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 0 10px; /* 内容间距 */
+  box-sizing: border-box;
+}</code></pre>"
+CSS自适应布局padding技巧	"<pre><code class=""language-css"">/* 左侧固定右侧自适应 */
+.sidebar {
+  float: left;
+  width: 200px;
+}
+
+.content {
+  margin-left: 200px;
+  padding-left: 20px; /* 避免内容重叠 */
+}</code></pre>"
+
+#separator:tab
+#html:true
+替换型元素的定义？	"<pre><code class=""language-html"">&lt;!-- 引入外部资源替换自身位置的元素 --&gt;
+&lt;img src=""image.jpg"">   &lt;!-- 图片元素 --&gt;
+&lt;script src=""app.js"">&lt;/script>  &lt;!-- 脚本元素 --&gt;</code></pre>"
+为什么引入CSS用href而JS用src？	"<pre><code class=""language-html"">&lt;link rel=""stylesheet"" href=""style.css""> &lt;!-- 非替换元素用href --&gt;
+&lt;script src=""app.js"">&lt;/script>  &lt;!-- 替换元素用src --&gt;</code></pre>"
+data URI的格式示例？	"<pre><code class=""language-html"">&lt;img src=""data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg'>&lt;circle r='50'/>&lt;/svg>""> &lt;!-- 内嵌SVG图片 --&gt;</code></pre>"
+为什么建议给img指定宽高？	"<pre><code class=""language-css"">/* 避免布局偏移(Layout Shift) */
+img {
+  width: 300px;  /* 明确宽度 */
+  height: 200px; /* 明确高度 */
+  object-fit: cover; /* 保持比例 */
+}</code></pre>"
+img的alt属性为什么重要？	"<pre><code class=""language-html"">&lt;img src=""logo.jpg"" alt=""公司商标""> 
+&lt;!-- 为屏幕阅读器提供文字描述 --&gt;
+&lt;!-- 提升可访问性(accessibility) --&gt;</code></pre>"
+srcset和sizes属性的作用？	"<pre><code class=""language-html"">&lt;img src=""small.jpg""
+     srcset=""large.jpg 1024w, medium.jpg 640w""
+     sizes=""(max-width: 768px) 100vw, 50vw""
+     alt=""响应式图片""> 
+&lt;!-- 根据设备分辨率自动选择最佳图片源 --&gt;</code></pre>"
+picture和srcset的区别？	"<pre><code class=""language-html"">&lt;picture>
+  &lt;source media=""(min-width: 1200px)"" srcset=""large.jpg""> 
+  &lt;source media=""(min-width: 768px)"" srcset=""medium.jpg"">
+  &lt;img src=""small.jpg"" alt=""自适应图片""> 
+&lt;/picture>
+&lt;!-- 支持更复杂的媒体查询条件 --&gt;</code></pre>"
+video为什么推荐用source而非src？	"<pre><code class=""language-html"">&lt;video controls>
+  &lt;source src=""movie.mp4"" type=""video/mp4"">
+  &lt;source src=""movie.webm"" type=""video/webm"">
+  浏览器不支持视频
+&lt;/video>
+&lt;!-- 解决浏览器格式兼容问题 --&gt;</code></pre>"
+track标签的kind=""captions""作用？	"<pre><code class=""language-html"">&lt;video>
+  &lt;track src=""captions.vtt"" kind=""captions"" srclang=""en"" label=""English"">
+&lt;/video>
+&lt;!-- 为听障用户提供字幕支持 --&gt;</code></pre>"
+audio与video的主要区别？	"<pre><code class=""language-html"">&lt;audio controls> &lt;!-- 无视频轨道 --&gt;
+  &lt;source src=""audio.mp3"" type=""audio/mpeg"">
+&lt;/audio></code></pre>"
+iframe的sandbox模式解决了什么问题？	"<pre><code class=""language-html"">&lt;iframe 
+  sandbox=""allow-scripts"" 
+  src=""widget.html"">
+&lt;/iframe>
+&lt;!-- 限制跨域脚本执行，提升安全性 --&gt;</code></pre>"
+srcdoc属性的作用？	"<pre><code class=""language-html"">&lt;iframe 
+  srcdoc=""&lt;h1>嵌入式HTML&lt;/h1>&lt;p>直接渲染内容&lt;/p>"">
+&lt;/iframe>
+&lt;!-- 避免额外HTTP请求 --&gt;</code></pre>"
+HTML标准中描述元素的6个部分是什么？	"<pre><code class=""language-text"">1. Categories - 元素分类
+2. Contexts - 允许的父元素
+3. Content model - 允许的子元素
+4. Tag omission - 标签省略规则
+5. Content attributes - 支持的属性
+6. DOM interface - DOM接口类型</code></pre>"
+如何用JavaScript获取HTML标准中所有元素定义？	"<pre><code class=""language-javascript"">// 查询标准文档中的元素定义
+const elements = Array.from(
+  document.querySelectorAll("".element"")
+).map(el => el.id);</code></pre>"
+Flex布局主要解决传统CSS的哪三大问题？	"<pre><code class=""language-css"">/* 1. 垂直居中 */
+.container { justify-content: center; align-items: center; }
+
+/* 2. 两列等高 */
+.container { display: flex; }
+.column { flex: 1; }
+
+/* 3. 自适应宽 */
+.item { flex: 1 0 auto; }</code></pre>"
+Flex排版的核心属性是什么？	"<pre><code class=""language-css"">.container {
+  display: flex; /* 容器属性 */
+}
+.item {
+  flex: 1; /* 项目属性：grow/shrink/basis */
+}</code></pre>"
+Flex容器和Flex项分别指什么？	"<pre><code class=""language-html"">&lt;style>
+  .container { display: flex; } /* Flex容器 */
+  .item { flex: 1; }           /* Flex项目 */
+&lt;/style>
+&lt;div class=""container"">  &lt;!-- 容器 --&gt;
+  &lt;div class=""item"">A&lt;/div> &lt;!-- 项目 --&gt;
+  &lt;div class=""item"">B&lt;/div> &lt;!-- 项目 --&gt;
+&lt;/div></code></pre>"
+Flex布局中主轴和交叉轴如何定义？	"<pre><code class=""language-css"">.container {
+  flex-direction: row; /* 主轴方向(水平) */
+  align-items: center; /* 交叉轴对齐方式(垂直) */
+}</code></pre>"
+Flex分行算法的第一步是什么？	"<pre><code class=""language-css"">/* 步骤1: 收集所有flex项 */
+.container {
+  flex-wrap: wrap; /* 启用分行 */
+}
+
+/* flex属性项在计算时:
+   - flex-grow值视为0
+   - flex-shrink值视为0
+   - 使用flex-basis值 */</code></pre>"
+Flex布局实现垂直居中的关键属性？	"<pre><code class=""language-css"">.container {
+  display: flex;
+  justify-content: center; /* 主轴居中 */
+  align-items: center;     /* 交叉轴居中 */
+}</code></pre>"
+两列等高布局的关键属性？	"<pre><code class=""language-css"">.container {
+  display: flex;
+  align-items: stretch; /* 默认值，项目拉伸等高 */
+}
+
+.column {
+  flex: 1; /* 等宽分配 */
+}</code></pre>"
+自适应宽布局的关键实现？	"<pre><code class=""language-css"">.sidebar {
+  flex: 0 0 200px; /* 固定宽度 */
+}
+.main {
+  flex: 1;        /* 自动填充剩余空间 */
+}</code></pre>"
+HSL颜色模型的三个维度？	"<pre><code class=""language-css"">.color {
+  /* Hue(色相): 0-360度 */
+  /* Saturation(纯度): 0%-100% */
+  /* Lightness(明度): 0%-100% */
+  background: hsl(120, 100%, 50%); /* 纯绿色 */
+}</code></pre>"
+RGBA中的A代表什么？	"<pre><code class=""language-css"">.transparent {
+  /* Alpha通道: 0(全透明) ~ 1(不透明) */
+  background: rgba(255, 0, 0, 0.5); /* 半透明红色 */
+}</code></pre>"
+CSS渐变有哪两种主要类型？	"<pre><code class=""language-css"">/* 线性渐变 */
+.linear { background: linear-gradient(red, blue); }
+
+/* 放射性渐变 */
+.radial { background: radial-gradient(red, blue); }</code></pre>"
+线性渐变的方向参数有哪些写法？	"<pre><code class=""language-css"">.example {
+  background: linear-gradient(to bottom, red, blue);
+  background: linear-gradient(45deg, red, blue);
+  background: linear-gradient(1.57rad, red, blue);
+}</code></pre>"
+DTD的全称是什么？	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;!-- Document Type Definition (文档类型定义) --&gt;
+&lt;!-- 指定HTML版本规范 --&gt;</code></pre>"
+HTML4.01的三种DTD类型？	"<pre><code class=""language-html"">&lt;!-- 严格模式 --&gt;
+&lt;!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01//EN"">
+
+&lt;!-- 过渡模式 --&gt;
+&lt;!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"">
+
+&lt;!-- Frameset模式 --&gt;
+&lt;!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Frameset//EN""></code></pre>"
+HTML5的DTD写法？	"<pre><code class=""language-html"">&lt;!DOCTYPE html> &lt;!-- 简化写法 --&gt;</code></pre>"
+SGML规定的HTML基本语法节点类型？	"<pre><code class=""language-text"">1. 标签节点: &lt;div>
+2. 文本节点: Hello
+3. 注释节点: &lt;!-- comment -->
+4. DTD节点: &lt;!DOCTYPE>
+5. 处理信息节点: &lt;?xml...></code></pre>"
+文本实体转义的基本格式？	"<pre><code class=""language-html"">&amp;lt;   &lt;!-- 小于号 &lt; --&gt;
+&amp;gt;   &lt;!-- 大于号 > --&gt;
+&amp;amp;  &lt;!-- and符号 & --&gt;</code></pre>"
+HTML中必须转义的字符有哪些？	"<pre><code class=""language-html"">&lt;div&gt; 
+  &amp;lt; &amp;amp; &amp;gt; &lt;!-- 文本节点中必须转义 --&gt;
+&lt;/div&gt;</code></pre>"
+如何获取浏览器已实现的CSS属性？	"<pre><code class=""language-javascript"">// 过滤浏览器私有属性
+const standardProps = Object.keys(document.body.style)
+  .filter(prop => !prop.startsWith('webkit'));</code></pre>"
+从W3C标准提取CSS属性的选择器？	"<pre><code class=""language-javascript"">// 使用CSS选择器获取标准属性
+const cssProps = document.querySelectorAll(
+  "".propdef [data-dfn-type=property]""
+);</code></pre>"
+Flex布局中如何计算flex项位置？	"<pre><code class=""language-text"">计算步骤：
+1. 分行：根据容器尺寸将flex项分行
+2. 计算主轴：确定每行项目的主轴尺寸和位置
+3. 计算交叉轴：确定项目在交叉轴的对齐位置</code></pre>"
+Flex主轴尺寸计算的特殊情况？	"<pre><code class=""language-css"">/* 当容器未设置width时 */
+.container {
+  display: flex;
+  /* 所有flex-grow值被视为0 */
+  /* 所有flex-shrink值被视为0 */
+  /* 使用flex-basis值计算 */
+}</code></pre>"
+Flex如何分配主轴剩余空间？	"<pre><code class=""language-css"">.item1 { flex: 2; } /* 获得2份剩余空间 */
+.item2 { flex: 1; } /* 获得1份剩余空间 */
+
+/* 无flex项时使用justify-content分配 */
+.container { justify-content: space-between; }</code></pre>"
+align-content和align-items区别？	"<pre><code class=""language-css"">/* align-content: 控制行间对齐 (多行布局) */
+.container { align-content: space-around; }
+
+/* align-items: 控制行内项目对齐 (单行布局) */
+.container { align-items: center; }</code></pre>"
+HSL相比RGB的优势？	"<pre><code class=""language-css"">/* 更直观的颜色控制 */
+.color {
+  /* 调整色相 */   hsl(120, 100%, 50%)
+  /* 降低纯度 */   hsl(120, 50%, 50%)
+  /* 提高明度 */   hsl(120, 100%, 70%)
+}</code></pre>"
+为什么金色(gold)的CSS表现不佳？	"<pre><code class=""language-css"">.gold {
+  color: gold; /* 单一RGB值 */
+  /* 无法表现金属反光特性 */
+  /* 实际效果为暗黄色 */
+  /* 需使用渐变模拟金属光泽 */
+  background: linear-gradient(145deg, #ffd700, #daa520);
+}</code></pre>"
+线性渐变的color-stop支持哪些单位？	"<pre><code class=""language-css"">.gradient {
+  background: linear-gradient(
+    to right,
+    red 0%,       /* 百分比 */
+    green 120px,   /* 固定像素值 */
+    blue           /* 无单位(自动计算) */
+  );
+}</code></pre>"
+放射性渐变的参数结构？	"<pre><code class=""language-css"">.example {
+  background: radial-gradient(
+    circle at center, /* 形状 位置 */
+    red 0%, 
+    blue 100%
+  );
+}</code></pre>"
+CSS中产生形状的关键属性？	"<pre><code class=""language-css"">/* 基础形状 */
+.circle {
+  border-radius: 50%;  /* 圆形 */
+  box-shadow: 0 0 10px; /* 阴影 */
+  border: 2px solid;
+}
+
+/* 三角形 */
+.triangle {
+  border: 50px solid transparent;
+  border-bottom-color: red;
+}</code></pre>"
+替代CSS形状的高级方案？	"<pre><code class=""language-html"">&lt;div style=""
+  background: url('data:image/svg+xml,&lt;svg ...>&lt;/svg>')
+"">&lt;/div>
+&lt;!-- 使用SVG实现复杂形状 --&gt;</code></pre>"
+RGB颜色中数值范围？	"<pre><code class=""language-css"">.rgb {
+  /* 每个通道0-255 (8位) */
+  color: rgb(255, 0, 0); /* 红色 */
+}</code></pre>"
+CMYK中K代表什么？	"<pre><code class=""language-text"">C: 青色(Cyan)
+M: 品红(Magenta)
+Y: 黄色(Yellow)
+K: 黑色(Key) - 单独设置提高印刷质量</code></pre>"
+CSS颜色系统中真彩色指？	"<pre><code class=""language-css"">/* 每个RGB通道8位(256级) */
+/* 共24位色深(1677万色) */
+.true-color {
+  color: #FF0000; /* 真彩色红色 */
+}</code></pre>"
+文本实体&amp;表示什么字符？	"<pre><code class=""language-html"">&amp;amp;  &lt;!-- 表示 & 符号 --&gt;</code></pre>"
+HTML注释中如何包含-->？	"<pre><code class=""language-html"">&lt;!-- 正常注释 --&gt;
+&lt;!-- 拆分注释1 --&gt; - &lt;!-- 拆分注释2 --&gt;</code></pre>"
+CDATA节点的核心作用？	"<pre><code class=""language-xml"">&lt;
+
+#separator:tab
+#html:true
+用Flex实现垂直居中的代码要点？	"<pre><code class=""language-css"">.parent {
+  display: flex;                 /* 启用Flex布局 */
+  justify-content: center;       /* 水平居中 */
+  align-items: center;           /* 垂直居中 */
+  height: 100vh;                /* 需要指定容器高度 */
+}
+
+.child {
+  width: 200px;                 /* 子元素尺寸 */
+  height: 100px;
+}</code></pre>"
+两列等高布局的关键代码？	"<pre><code class=""language-css"">.container {
+  display: flex;                /* Flex布局使子列等高 */
+  align-items: stretch;          /* 关键属性：拉伸子元素高度 */
+}
+
+.column {
+  flex: 1;                      /* 等分宽度 */
+  padding: 20px;
+}</code></pre>"
+自适应宽布局中flex:1的作用？	"<pre><code class=""language-css"">.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;                 /* 固定宽度 */
+}
+
+.main {
+  flex: 1;                      /* 自动填充剩余空间 */
+  /* 等效于：flex-grow:1 + flex-shrink:1 + flex-basis:0% */
+}</code></pre>"
+用HSL实现动态变色按钮的原理？	"<pre><code class=""language-javascript"">function changeColor() {
+  const hue = (Date.now() / 50) % 360;  // 随时间变化色相值(0-360)
+  btn.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
+}
+setInterval(changeColor, 100);  // 每0.1秒更新颜色</code></pre>"
+从W3C标准爬取CSS属性的步骤？	"<pre><code class=""language-javascript"">// 1. 获取标准文档列表
+const specs = await fetch(""https://api.w3.org/specifications"");
+
+// 2. 创建iframe加载规范
+const iframe = document.createElement(""iframe"");
+iframe.src = specURL;
+document.body.append(iframe);
+
+// 3. 内容加载后提取属性
+iframe.onload = () => {
+  const props = iframe.contentDocument.querySelectorAll(""dfn[data-dfn-type=prop]"");
+};</code></pre>"
+处理iframe加载事件的技巧？	"<pre><code class=""language-javascript"">// Promise封装加载事件
+function loadIframe(url) {
+  return new Promise((resolve) => {
+    const iframe = document.createElement(""iframe"");
+    iframe.onload = () => resolve(iframe);
+    iframe.src = url;
+  });
+}
+
+// 使用示例
+loadIframe(""https://example.com"")
+  .then(iframe => console.log(""Loaded!"", iframe));</code></pre>"
+HTML标准中Categories如何解析？	"<pre><code class=""language-javascript"">// 从规范文本提取分类
+const text = ""... Flow content: always ..."";
+const regex = /(\w+) content: (.+?)(?=\n\w|$)/gs;
+
+let match;
+while ((match = regex.exec(text)) !== null) {
+  const category = match[1];    // 如 ""Flow""
+  const rules = match[2];       // 如 ""always"" 或具体元素列表
+}</code></pre>"
+Content Model解析的难点？	"<pre><code class=""language-javascript"">function parseContentModel(desc) {
+  // 处理条件语句
+  if (desc.includes(""if the element has a src attribute"")) {
+    return ""conditional"";
+  }
+  
+  // 处理多重嵌套规则
+  return desc.split("" or "").map(rule => 
+    rule.replace(/$.*?$/g, """")  // 移除括号说明
+  );
+}</code></pre>"
+用position:absolute模拟Flex的思路？	"<pre><code class=""language-css"">.container {
+  position: relative;           /* 定位基准 */
+  height: 300px;                /* 需固定高度 */
+}
+
+.child {
+  position: absolute;
+  top: 50%;                    /* 垂直居中 */
+  transform: translateY(-50%); 
+  /* 水平排列需手动计算left值 */
+}</code></pre>"
+CSS渐变创建金属质感的技巧？	"<pre><code class=""language-css"">.metal {
+  background: linear-gradient(
+    145deg,
+    #e6cda9 0%,    /* 浅金 */
+    #d4af37 25%,   /* 主金色 */
+    #f9e076 50%,   /* 高光 */
+    #d4af37 75%,   /* 阴影 */
+    #a67c00 100%   /* 深棕 */
+  );
+}</code></pre>"
+CSS颜色名称的缺点？	"<pre><code class=""language-css"">/* 实际显示效果与名称不符 */
+.gold { color: gold; }       /* RGB(255,215,0) 偏黄 */
+.silver { color: silver; }    /* RGB(192,192,192) 偏灰 */
+
+/* 建议使用具体值 */
+.real-gold { color: #d4af37; }</code></pre>"
+CSS属性挖掘实验的价值？	"<pre><code class=""language-javascript"">/* 建立属性-标准映射 */
+const cssKnowledgeBase = {
+  flex: ""CSS Flexible Box Layout"",
+  grid: ""CSS Grid Layout"",
+  clipPath: ""CSS Masking Module""
+};
+
+/* 系统学习函数 */
+function learnCSS(prop) {
+  openSpec(cssKnowledgeBase[prop]); // 打开对应标准
+}</code></pre>"
 
 
+#separator:tab
+#html:true
+Web可访问性：ARIA的全称	"<pre><code class=""language-text"">Accessible Rich Internet Applications</code></pre>"
+Web可访问性：ARIA的主要作用	"<pre><code class=""language-text"">提供一组属性增强网页可访问性，帮助辅助技术理解界面</code></pre>"
+Web可访问性：可访问性服务对象	"<pre><code class=""language-text"">不是，它服务于各种设备、环境和人群的访问需求</code></pre>"
+HTML：ARIA checkbox角色实现	"<pre><code class=""language-html"">&lt;div role=""checkbox"" 
+     aria-checked=""false""
+     aria-labelledby=""chk-label""
+     tabindex=""0""&gt;
+&lt;/div&gt;
+&lt;span id=""chk-label""&gt;接收新闻邮件&lt;/span&gt;
 
-# JavaScript对象分类
-JavaScript对象分为哪几大类？	宿主对象、内置对象（含固有/原生对象）、普通对象
-宿主对象的行为由什么决定？	由JavaScript宿主环境（如浏览器）决定
-举例说明浏览器提供的宿主对象	window、document、Image构造器
-什么是固有对象(Intrinsic Objects)？	标准规定随JS运行时自动创建的对象实例（如全局对象属性）
-列举三个固有对象例子	Array、Date、RegExp（标准规定自动创建）
-原生对象(Native Objects)如何创建？	用户通过内置构造器（如new Array()）或特殊语法创建
-为什么原生对象无法用class继承？	内部使用私有字段（如[[DateValue]]），破坏原型继承
-普通对象(Ordinary Objects)的特征？	由{}、Object构造器或class创建，支持原型继承
+&lt;!-- 
+role=""checkbox"": 声明元素为复选框
+aria-checked: 表示选中状态(true/false/mixed)
+aria-labelledby: 关联描述文本
+--&gt;</code></pre>"
+HTML：ARIA button角色实现	"<pre><code class=""language-html"">&lt;div role=""button""
+     aria-pressed=""false""
+     aria-expanded=""false"" 
+     tabindex=""0""&gt;
+   &lt;span&gt;菜单&lt;/span&gt;
+&lt;/div&gt;
 
-# 函数与构造器
-函数对象的核心特征是什么？	具有[[call]]私有字段
-构造器对象的核心特征是什么？	具有[[construct]]私有字段
-Date作为函数调用时返回什么？	当前日期字符串（如"Wed Jun 09 2021..."）
-Date作为构造器调用时返回什么？	Date对象实例
-Image构造器能否作为函数调用？	否，会抛出错误（DOM 对象的创建规范要求，避免意外创建全局对象）
-箭头函数能否作为构造器？	不能，new (a=>0)会报错
-用户定义函数的[[call]]和[[construct]]关系？	执行相同代码，但调用方式不同（每个函数都具有两个重要的内部方法：[[Call]] 和 [[Construct]]）
+&lt;!-- 
+aria-pressed: 表示切换按钮状态(true/false)
+aria-expanded: 表示折叠状态(true/false)
+--&gt;</code></pre>"
+HTML：Landmark角色实现	"<pre><code class=""language-html"">&lt;nav role=""navigation"" aria-label=""主菜单""&gt;
+  &lt;!-- 导航链接 --&gt;
+&lt;/nav&gt;
 
-# 特殊对象行为
-Array对象的特殊行为是什么？	length属性自动随下标变化
-Object.prototype的特殊限制？	不能重新设置原型（Object.prototype的原型必须固定为 null，不可变）
-String对象的属性访问特性？	正整数索引返回对应字符（如'abc'[1]='b'）
-Arguments对象的特性？	非负整数属性与函数参数变量联动 `function test(a, b) {arguments[0] = 100; console.log(a); // 输出 100 (非严格模式)}test(1, 2);`
-bind后的函数有何特殊？	与原函数关联，保留绑定上下文
+&lt;main role=""main""&gt;
+  &lt;!-- 主要内容 --&gt;
+&lt;/main&gt;
 
-# 执行机制
-宏观任务(Macrotask)由谁发起？	宿主环境（如setTimeout）
-微观任务(Microtask)由谁发起？	JS引擎（如Promise.then）
-任务执行顺序规则？	微观任务优先于宏观任务
-如何分析异步代码执行顺序？	1.划分宏任务 2.分析微任务 3.确定执行次序
-Promise.resolve()产生的任务类型？	微观任务
-setTimeout(fn,0)产生的任务类型？	宏观任务
+&lt;aside role=""complementary""&gt;
+  &lt;!-- 相关内容 --&gt;
+&lt;/aside&gt;
 
-# 闭包与上下文
-闭包的本质是什么？	携带定义时环境的函数（环境+标识符列表+函数体）
-执行上下文在ES2018包含哪些部分？	词法环境、变量环境、代码位置、函数引用等
-var声明的核心特征？	函数作用域，穿透块级作用域
-let声明的核心改进？	块级作用域（for/if/try等语句内有效）
-Realm的核心作用？	提供独立内置对象集（如iframe环境，包含：Object, Array, String, Date, Promise, Error, Math, JSON 等）
+&lt;footer role=""contentinfo""&gt;
+  &lt;!-- 页脚信息 --&gt;
+&lt;/footer&gt;</code></pre>"
+JavaScript：dialog角色焦点管理	"<pre><code class=""language-javascript"">// 打开对话框时
+function openDialog() {
+  const dialog = document.getElementById('myDialog');
+  dialog.style.display = 'block';
+  
+  // 创建焦点陷阱
+  dialog.addEventListener('keydown', trapFocus);
+  dialog.focus();
+}
 
-# 函数类型
-ES2018定义的8种函数类型？	普通函数、箭头函数、类方法、生成器函数、类、异步普通函数、异步箭头函数、异步生成器函数
-普通函数中this如何确定？	由调用时的引用决定（如obj.fn()的this为obj）
-箭头函数中this如何确定？	继承定义时外层this（与调用方式无关）
-类方法中this的特性？	默认严格模式，未绑定调用时为undefined
-call/apply能否改变箭头函数的this？	不能，但可传参
-哪些函数类型支持new操作？	仅普通函数和类
+// 焦点陷阱实现
+function trapFocus(e) {
+  if (e.key === 'Tab') {
+    const focusable = dialog.querySelectorAll('button, [href], input');
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    
+    if (!e.shiftKey && document.activeElement === last) {
+      first.focus();
+      e.preventDefault();
+    } 
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus();
+      e.preventDefault();
+    }
+  }
+}</code></pre>"
+浏览器工作原理：六个阶段	"<pre><code class=""language-text"">请求页面→构建DOM树→计算CSS→排版→渲染→绘制</code></pre>"
+HTTP协议：TCP基础	"<pre><code class=""language-text"">TCP协议，使用Request-Response模式</code></pre>"
+HTTP协议：请求结构	"<pre><code class=""language-text"">request line，包含方法、路径和协议版本</code></pre>"
+HTTP协议：状态码200含义	"<pre><code class=""language-text"">请求成功</code></pre>"
+HTTP协议：状态码304含义	"<pre><code class=""language-text"">资源未修改，使用客户端缓存</code></pre>"
+HTTPS核心功能	"<pre><code class=""language-text"">确认服务端身份，防止数据被窃听或篡改</code></pre>"
+HTTP/2核心改进	"<pre><code class=""language-text"">服务端推送和TCP连接复用</code></pre>"
+JavaScript：模拟浏览器渲染流程	"<pre><code class=""language-javascript"">function simulateRendering() {
+  // 1. 请求资源
+  fetchPageResources();
+  
+  // 2. 构建DOM树
+  const domTree = buildDOMTree(htmlContent);
+  
+  // 3. 计算CSS样式
+  const cssTree = computeCSS(domTree, cssRules);
+  
+  // 4. 排版布局
+  const layout = calculateLayout(cssTree);
+  
+  // 5. 渲染合成
+  const layers = compositeLayers(layout);
+  
+  // 6. 绘制到屏幕
+  paintScreen(layers);
+}
 
-# 语句执行
-Completion Record的三个字段？	[[type]]（break/return等）、[[value]]、[[target]]
-try中包含return时finally是否执行？	是，finally始终执行
-finally中包含return时会发生什么？	覆盖try/catch中的返回值
-带标签语句的核心用途？	配合break/continue跳出多层循环（如break outer）
-语句块中非normal类型的影响？	中断后续语句执行（如return后的代码不执行）
+// 辅助函数定义
+function buildDOMTree(html) {
+  /* 解析HTML构建节点树 */
+}</code></pre>"
 
-# 词法分析
-为什么12.toString()会报错？	12.被解析为数字直接量，点号成为小数部分
-正确访问数字属性方法？	12 .toString() 或 (12).toString()
-数字直接量支持的进制表示？	十进制、二进制(0b)、八进制(0o)、十六进制(0x)
-字符串模板的词法处理特点？	被拆分为模板头、中段、尾（如`a${b}c`拆为三部分）
-正则表达式直接量的限制？	第一个字符不能是*（避免与注释冲突）
+#separator:tab
+#html:true
+HTML解析的核心技术实现	"<pre><code class=""language-javascript"">// 状态机实现示例 (80种状态)
+function parseHTML(html) {
+  let state = dataState; // 初始状态
+  
+  while (html) {
+    state = state(html); // 状态转换
+  }
+  
+  function tagOpenState(char) {
+    if (char === '/') return endTagOpenState;
+    if (char.match(/[a-zA-Z]/)) return tagNameState;
+    // ...其他状态转换
+  }
+  // 其他79个状态函数...
+}</code></pre>"
+DOM树构建使用的数据结构	"<pre><code class=""language-javascript"">// 使用栈结构构建DOM树
+const stack = []; // DOM节点栈
+let currentParent = null; // 当前父节点
 
-# 函数类型与this
-以下代码输出为什么是undefined？ 
-class C{showThis(){console.log(this)}}
-let o=new C(); let fn=o.showThis; fn()	类方法默认严格模式，未绑定调用时this为undefined
+function handleStartTag(tagName) {
+  const element = createElement(tagName);
+  if (currentParent) {
+    currentParent.appendChild(element);
+  }
+  stack.push(element); // 入栈新节点
+  currentParent = element; // 设为当前节点
+}</code></pre>"
+遇到开始标签时栈的变化	"<pre><code class=""language-javascript"">function handleStartTag(tagName) {
+  const element = document.createElement(tagName);
+  
+  // 栈操作：
+  stack.push(element); // 新节点入栈
+  currentParent = element; // 设为当前操作节点
+  
+  if (stack.length > 1) {
+    const parent = stack[stack.length - 2]; // 获取父节点
+    parent.appendChild(element);
+  }
+}</code></pre>"
+遇到结束标签时栈的变化	"<pre><code class=""language-javascript"">function handleEndTag(tagName) {
+  if (stack.length === 0) return; // 空栈处理
+  
+  const lastTag = stack[stack.length - 1].tagName;
+  if (lastTag !== tagName) {
+    // 标签不匹配的容错处理 (依据W3C tree-construction规则)
+    handleMismatch(tagName);
+    return;
+  }
+  
+  stack.pop(); // 正确匹配，出栈节点
+  currentParent = stack.length > 0 ? stack[stack.length - 1] : null;
+}</code></pre>"
+HTML解析中文本节点处理	"<pre><code class=""language-javascript"">let textBuffer = ''; // 文本内容缓冲区
 
-# 任务系统
-为什么Promise.then在setTimeout前执行？	Promise产生微任务，setTimeout产生宏任务，微任务优先
+function handleCharacter(char) {
+  textBuffer += char; // 缓冲文本内容
+}
 
-
-# 四则运算解释器
-解释器实现的四个主要步骤？	词法分析、语法分析、构建AST、解释执行
-词法分析的作用？	将字符串流转换为token流
-在四则运算词法分析中，如何处理数字？	连续数字字符组合成Number token
-语法分析阶段使用的分析方法是？	LL算法（递归下降）
-四则运算语法中，AdditiveExpression的产生式是什么？	AdditiveExpression ::= MultiplicativeExpression | AdditiveExpression '+' MultiplicativeExpression | AdditiveExpression '-' MultiplicativeExpression
-构建AST时，加法节点如何表示？	{type:"AdditiveExpression", operator:"+", children:[左操作数,运算符,右操作数]}
-解释执行阶段如何计算表达式？	后序遍历AST，递归计算子节点
-如何扩展解释器支持括号？	在语法规则中加入带括号的PrimaryExpression产生式
-
-# 分号规则
-JavaScript自动插入分号的三条规则？	1.换行符+下个符号不合法时插入 2.换行符+语法禁止换行处插入 3.源代码结束处不完整时插入
-什么情况下会触发"no LineTerminator here"规则？	当语法结构明确禁止换行符的位置（如return后）
-哪些语法结构有"no LineTerminator here"限制？	return/break/continue/throw/后自增减/async/箭头函数/yield
-不写分号时，以什么字符开头会导致问题？	括号(()、数组([])、正则(//)、模板字符串(`)
-如何避免IIFE因分号缺失导致的错误？	在IIFE前加分号或在行首加!
-以下代码为何报错？a = b\n(function(){})()	换行后函数调用被解释为b的参数
-
-# 模块与脚本
-脚本(script)与模块(module)的核心区别？	模块支持import/export，脚本不支持
-在HTML中如何引入模块？	<script type="module" src="...">
-import声明有哪两种基本形式？	import "mod"（执行模块）和 import v from "mod"（导入默认导出）
-export声明有哪两种主要形式？	独立export声明（export {x}）和在声明前加export关键字
-export default的特殊行为？	导出一个匿名值，导入时可任意命名
-以下代码输出什么？模块a: export var a=1; export function modify(){a=2} 模块b: import {a,modify} from "./a"; console.log(a); modify(); console.log(a)	1和2（导入绑定是动态引用）
-
-# 预处理机制
-JavaScript预处理阶段处理哪些声明？	var/function/class/const/let
-var声明的预处理特点？	声明提升到作用域顶部，初始化为undefined
-function声明的预处理特点？	声明+赋值整体提升
-class声明的预处理特点？	声明提升但形成暂时性死区（TDZ），提前访问报错
-以下代码输出？console.log(foo); function foo(){}	foo函数体（函数声明整体提升）
-以下代码输出？console.log(c); class c{}	报错（class声明前不可访问）
-
-# 语句类型
-普通语句与声明型语句的关键区别？	声明型语句响应预处理，普通语句只有执行过程
-哪些语句属于声明型语句？	var/let/const/function/class
-for...in循环的特点？	遍历对象可枚举属性（含原型链），顺序不确定
-for...of循环的机制？	基于迭代器协议(Iterator)遍历
-如何使普通对象可用于for...of？	实现[Symbol.iterator]方法
-try...catch...finally中，finally何时执行？	无论是否异常都会执行（即使try/catch中有return）
-
-# 表达式
-什么是表达式语句？	能产生值的语法结构（函数调用/赋值/自增减等）
-PrimaryExpression包含哪些？	直接量/this/变量/括号表达式
-MemberExpression有哪些形式？	属性访问(a.b/a["b"])/模板调用(f`x`)/带参数new(new Cls())
-左值表达式(LeftHandSideExpression)指什么？	可放在赋值运算符左边的表达式（变量/属性访问等）
-乘方运算符(**)的特点？	右结合（如2**3**2=2**(3**2)=512）
-逗号运算符的作用？	连接表达式，返回最后一个表达式的值
-
-# 分号陷阱案例
-为何这段代码报错？[1,2,3].forEach()\n[4,5,6].forEach()	数组直接量换行被解释为下标访问：1[4,5,6].forEach
-
-# 模块绑定
-模块a中: export let a=1; export function inc(){a++} 模块b中: import {a,inc} from './a'; inc(); console.log(a)	输出2（模块绑定是动态引用）
-
-# 暂时性死区
-以下代码输出？ let x=1; { console.log(x); let x=2 }	报错（块内let声明导致暂时性死区）
-
-
-# HTML语义标签
-语义类标签的主要作用是什么？	增强可读性、利于SEO、支持读屏软件、便于团队维护
-div和span在什么场景下使用是合理的？	软件界面（非富文本）场景
-ul/ol误用的常见错误是什么？	所有并列关系都用ul/ol，造成冗余标签
-em标签和strong标签的本质区别？	em表示重音（强调发音），strong表示重要性
-ruby标签的作用是什么？	用于文字注音或注解（如日文中的注音）
-figure和figcaption的典型用法？	包裹图片/代码/表格等独立内容，figcaption为其标题
-dfn标签的使用场景？	包裹被定义的术语（通常在定义句中出现）
-abbr标签必须配合什么属性使用？	title属性（填写完整形式）
-time标签的datetime属性作用？	提供机器可读的时间格式（如"2015-07-09"）
-article和body的结构相似性体现在？	都可以包含header/section/footer等结构
-
-# HTML元信息标签
-head标签必须包含什么子标签？	至少一个title标签
-title和h1标签的核心区别？	title用于无上下文场景（收藏夹/分享卡片），需完整概括；h1用于页面内有上下文场景
-base标签为什么被认为危险？	改变全局链接基准地址，易与JavaScript冲突
-推荐用什么代替base标签？	JavaScript动态设置链接基准
-charset型meta标签应放在head的什么位置？	第一个子元素位置（避免乱码）
-http-equiv="content-type"的作用等价于？	HTTP头中的Content-Type字段
-viewport meta的user-scalable=no可能带来什么问题？	移动端视力障碍用户无法缩放页面
-哪些meta的name值是预定义的标准？	application-name/author/description/generator/keywords/referrer/theme-color
-theme-color meta影响什么？	浏览器窗口边框或Tab的颜色（不影响页面内容）
-
-# CSS语法结构
-CSS顶层样式表由哪两种规则组成？	at-rule（@规则）和qualified rule（普通规则）
-@charset的作用和限制？	声明CSS文件字符编码，必须出现在样式表最开头
-@import可以引入什么？	另一个CSS文件的全部内容（除@charset）
-@media的典型应用场景？	根据设备类型应用不同样式（如print媒体类型）
-@page用于什么输出场景？	分页媒体（如打印页面时）
-@counter-style的作用？	自定义列表项标记样式
-@keyframes的核心产出？	定义动画关键帧序列
-@font-face的经典应用？	自定义字体（如图标字体技术）
-普通规则由哪两部分构成？	选择器和声明区块
-CSS选择器语法中双竖线||的作用？	选中特定列（如表格中选列）
-
-# CSS函数
-calc()函数的最大优势？	支持混合单位运算（如100% - 20px）
-attr()函数的作用？	使CSS属性值可读取HTML属性值
-toggle()函数的典型场景？	在多个值之间循环切换（如列表项交替样式）
-clamp()函数的参数意义？	clamp(最小值, 基准值, 最大值)
-var()函数通常配合什么使用？	CSS自定义属性（以--开头的属性）
-哪些CSS属性会接受函数值？	transform/easing-function/content等
-cubic-bezier()属于哪类函数？	缓动函数（定义动画速度曲线）
-url()函数可以用于哪些属性？	background-image/cursor/list-style-image等
-
-# 语义标签误用案例
-以下代码问题在哪？<ul><li>苹果</li><li>香蕉</li><li>橘子</li></ul>	若仅为并列词语展示（非列表项），应使用纯文本+逗号而非ul
-
-
-# CSS选择器
-CSS选择器分为哪四种结构？	简单选择器、复合选择器、复杂选择器、选择器列表
-如何选中SVG中的a元素？	使用带命名空间的类型选择器：svg|a { ... }
-全体选择器用什么符号表示？	*（星号）
-属性选择器[att~=val]的作用？	检查元素属性值是否包含用空格分隔的val
-:root伪类的作用是什么？	表示文档树的根元素（在scoped CSS中特别有用）
-:empty伪类会忽略什么类型的子节点？	空白文本节点
-:nth-child(2n+1)匹配哪些元素？	奇数位置的子元素
-:any-link和:link的区别？	:any-link匹配所有链接元素，:link只匹配未访问链接
-:focus-within伪类的作用？	匹配包含获得焦点子元素的父元素
-选择器优先级的三元组(a,b,c)分别代表？	a=ID选择器数, b=类/伪类数, c=标签/伪元素数
-计算选择器优先级时为什么用大进制数？	避免出现256个class等于1个ID的历史问题
-选择器列表(逗号分隔)如何计算优先级？	每个选择器独立计算，不合并计算优先级
-为什么建议避免复杂选择器？	影响代码可读性和维护性，可能造成性能问题
-::first-letter可以设置哪些CSS属性？	字体/颜色/背景/内外边距/边框/文本装饰等文本相关属性
-::before必须指定什么属性才生效？	content属性
-伪元素content属性支持什么特殊值？	counter()函数（用于生成计数器）
-
-# HTML链接
-link标签的两种主要类型？	超链接型（被动）和外部资源型（主动下载）
-rel="canonical"的作用？	提示搜索引擎保留哪个URL作为主URL
-如何引入页面RSS订阅？	<link rel="alternate" type="application/rss+xml" href="...">
-rel="preload"的作用？	提前加载href指定的资源（不执行）
-rel="modulepreload"的作用？	预加载JS模块（下载不执行）
-为什么建议页面必须有icon型link？	避免浏览器自动请求不存在的/favicon.ico
-a标签的rel="nofollow"作用？	告诉搜索引擎不要追踪此链接
-a标签的rel="noopener"作用？	阻止新页面通过window.opener访问原页面
-area标签必须配合哪些标签使用？	和<map>标签
-area的热区形状有哪三种？	圆形(circle)、矩形(rect)、多边形(poly)
-如何定义多边形热区坐标？	coords属性提供至少6个值表示各顶点坐标
-
-# CSS排版
-正常流排版的基本规则？	"依次排列，排不下了换行"
-float在正常流中的行为可比喻为？	文字环绕效果
-margin折叠的本质原因？	元素规定了自身周围至少需要的空间
-格式化上下文(formatting context)是什么？	CSS排版过程中的当前状态
-块级格式化上下文如何排列元素？	垂直方向顺次排列
-行内级格式化上下文如何排列元素？	水平方向顺次排列
-哪些元素会创建新块级格式化上下文？	浮动/绝对定位元素/inline-blocks/table-cells/overflow非visible
-等分布局中inline-block出现间隙的原因？	HTML中的换行和空格被当作文本节点
-解决inline-block间隙的方法？	父容器font-size:0 或 移除HTML空格换行
-自适应宽布局中为什么用负margin？	抵消固定宽度元素占用的空间
-为什么自适应宽布局要加padding-left？	将内容从重叠区域"挤"出来显示
-
-# 替换型元素
-替换型元素的定义？	引入外部文件替换自身位置的标签
-为什么引入CSS用href而JS用src？	link非替换型元素用href，script作为替换型元素用src
-data URI的格式示例？	data:image/svg+xml,<svg>...</svg>
-为什么建议给img指定宽高？	避免加载后重排（reflow）
-img的alt属性为什么重要？	对视障用户关键，提升可访问性
-srcset和sizes属性的作用？	根据屏幕条件选择不同图片源
-picture和srcset的区别？	picture使用source元素，支持更复杂的媒体查询
-video为什么推荐用source而非src？	解决不同浏览器视频格式兼容问题
-track标签的kind="captions"作用？	提供音频内容的文字描述（适合听障人士）
-audio与video的主要区别？	audio没有严重的格式兼容问题
-iframe的sandbox模式解决了什么问题？	提供安全隔离，避免跨域问题
-srcdoc属性的作用？	直接在iframe中嵌入HTML内容
-
-
-# HTML标准分析
-HTML标准中描述元素的6个部分是什么？	Categories, Contexts, Content model, Tag omission, Content attributes, DOM interface
-如何用JavaScript获取HTML标准中所有元素定义？	document.querySelectorAll(".element")
-Flex布局主要解决传统CSS的哪三大问题？	垂直居中、两列等高、自适应宽
-Flex排版的核心属性是什么？	display:flex 和 flex属性
-Flex容器和Flex项分别指什么？	display:flex的元素是容器，子元素是flex项
-Flex布局中主轴和交叉轴如何定义？	延伸方向是主轴，垂直方向是交叉轴
-Flex分行算法的第一步是什么？	把flex项分行，flex属性项主轴尺寸视为0
-Flex布局实现垂直居中的关键属性？	justify-content:center; align-content:center; align-items:center;
-两列等高布局的关键属性？	align-items:stretch
-自适应宽布局的关键实现？	给元素添加flex属性
-HSL颜色模型的三个维度？	色相(H)、纯度(S)、明度(L)
-RGBA中的A代表什么？	Alpha通道（透明度）
-CSS渐变有哪两种主要类型？	线性渐变(linear-gradient)和放射性渐变(radial-gradient)
-线性渐变的方向参数有哪些写法？	to bottom/top/left/right, 角度(120deg), 弧度(3.14rad)
-DTD的全称是什么？	Document Type Definition（文档类型定义）
-HTML4.01的三种DTD类型？	严格模式、过渡模式、frameset模式
-HTML5的DTD写法？	<!DOCTYPE html>
-SGML规定的HTML基本语法节点类型？	标签、文本、注释、DTD、处理信息
-文本实体转义的基本格式？	&开头;结尾（如&lt;代表<）
-HTML中必须转义的字符有哪些？	< 和 &（文本节点中）
-如何获取浏览器已实现的CSS属性？	Object.keys(document.body.style).filter(e => !e.match(/^webkit/))
-从W3C标准提取CSS属性的选择器？	.propdef [data-dfn-type=property]
-
-# CSS排版与渲染
-Flex布局中如何计算flex项位置？	三步：分行 → 计算主轴尺寸位置 → 计算交叉轴尺寸位置
-Flex主轴尺寸计算的特殊情况？	容器未指定主轴尺寸时，所有flex尺寸视为0
-Flex如何分配主轴剩余空间？	按flex项比例分配，无flex项时用justify-content
-align-content和align-items区别？	align-content分配行间空间，align-items控制行内对齐
-HSL相比RGB的优势？	更符合人类颜色认知（语义化颜色）
-为什么金色(gold)的CSS表现不佳？	金属色需要反光效果，单一色值无法表现
-线性渐变的color-stop支持哪些单位？	百分比(10%)、固定值(28px)、无单位
-放射性渐变的参数结构？	radial-gradient(形状 尺寸 at 位置, 颜色...)
-CSS中产生形状的关键属性？	border, box-shadow, border-radius
-替代CSS形状的高级方案？	datauri+svg
-RGB颜色中数值范围？	0-255（每个通道1字节）
-CMYK中K代表什么？	黑色(Key)，因印刷经济性单独设置
-CSS颜色系统中真彩色指？	RGB每个通道8位(256级)
-文本实体&amp;表示什么字符？	&
-HTML注释中如何包含-->？	拆分成多个注释节点
-CDATA节点的核心作用？	避免转义，可直接包含<和&字符
-
-# 实验与技巧
-用Flex实现垂直居中的代码要点？	父容器flex+三个center对齐属性
-两列等高布局的关键代码？	父容器align-items:stretch
-自适应宽布局中flex:1的作用？	自动填充剩余空间
-用HSL实现动态变色按钮的原理？	周期性改变hue值生成新颜色
-从W3C标准爬取CSS属性的步骤？	1.获取标准列表 2.iframe加载 3.选择器提取
-处理iframe加载事件的技巧？	用Promise封装load事件
-HTML标准中Categories如何解析？	正则匹配分类内容（如Flow content）
-Content Model解析的难点？	条件语句（if element has src attribute）
-用position:absolute模拟Flex的思路？	计算位置并绝对定位（简化版可单行固定高度）
-CSS渐变创建金属质感的技巧？	多色阶渐变（如gold-yellow-gold）
-CSS颜色名称的缺点？	部分名称（金银）与实际视觉效果不符
-CSS属性挖掘实验的价值？	建立属性-标准映射关系，系统学习CSS
+function flushText() {
+  if (textBuffer.trim() === '') return;
+  
+  // 合并相邻文本节点
+  const textNode = document.createTextNode(textBuffer);
+  currentParent.appendChild(textNode);
+  textBuffer = ''; // 清空缓冲区
+}</code></pre>"
+CSS计算与DOM构建的同步过程	"<pre><code class=""language-javascript"">function handleStartTag(tagName) {
+  const element = createElement(tagName);
+  currentParent.appendChild(element);
+  stack.push(element);
+  
+  // 同步计算CSS样式
+  computeCSS(element); // 边构建DOM边计算样式
+}</code></pre>"
+后代选择器的实现原理	"<pre><code class=""language-javascript"">function matchSelector(element, selector) {
+  // ""div p"" 选择器实现
+  if (selector.includes(' ')) {
+    const parts = selector.split(' ');
+    let current = element;
+    
+    // 从右向左匹配：先匹配p，再向上查找div
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (!current || !matchSimpleSelector(current, parts[i])) {
+        return false;
+      }
+      current = current.parentElement;
+    }
+    return true;
+  }
+  // ...其他选择器类型
+}</code></pre>"
+直接后继选择器"+"的实现	"<pre><code class=""language-javascript"">function matchAdjacentSibling(element, selector) {
+  // ""div + p"" 选择器实现
+  if (!element.previousElementSibling) return false;
+  
+  // 检查前一个兄弟节点
+  const prev = element.previousElementSibling;
+  return matchSelector(prev, selector.split('+')[0].trim());
+}</code></pre>"
+正常流排版的基本原理	"<pre><code class=""language-javascript"">function layoutNormalFlow(elements) {
+  let currentX = 0;
+  let currentY = 0;
+  let lineHeight = 0;
+  
+  elements.forEach(element => {
+    // 检查是否超出容器宽度
+    if (currentX + element.width > containerWidth) {
+      currentY += lineHeight; // 折行
+      currentX = 0;
+      lineHeight = 0;
+    }
+    
+    // 定位元素
+    element.x = currentX;
+    element.y = currentY;
+    
+    // 更新位置
+    currentX += element.width;
+    lineHeight = Math.max(lineHeight, element.height);
+  });
+}</code></pre>"
+绝对定位元素的排版处理	"<pre><code class=""language-javascript"">function layoutAbsolute(element) {
+  // 脱离文档流
+  const parent = element.offsetParent;
+  
+  // 根据top/left定位
+  element.x = parent.x + parseValue(element.style.left, parent.width);
+  element.y = parent.y + parseValue(element.style.top, parent.height);
+  
+  // 不影响其他元素布局
+}</code></pre>"
+浮动元素的排版过程	"<pre><code class=""language-javascript"">function layoutFloat(element) {
+  // 1. 先按正常流排布
+  const initialPosition = computeNormalFlowPosition(element);
+  
+  // 2. 移动到边界
+  if (element.style.float === 'left') {
+    element.x = currentLineLeft;
+    currentLineLeft += element.width;
+  } else {
+    element.x = containerWidth - currentLineRight - element.width;
+    currentLineRight += element.width;
+  }
+  
+  // 3. 后续内容环绕
+  updateContentWrapAround(element);
+}</code></pre>"
 
 
-# ARIA可访问性
-ARIA的全称是什么？	Accessible Rich Internet Applications
-ARIA的主要作用是什么？	提供一组属性增强网页可访问性，帮助辅助技术理解界面
-可访问性仅服务于视觉障碍用户吗？	不是，它服务于各种设备、环境和人群的访问需求
-ARIA的核心属性是什么？	role属性，用于定义元素的交互角色
-checkbox角色对应的关键属性是什么？	aria-checked和aria-labelledby
-button角色对应的关键属性是什么？	aria-pressed和aria-expanded
-Landmark角色包含哪些常见类型？	navigation, search, banner, main, complementary, contentinfo
-dialog角色有什么特殊行为？	可能产生"焦点陷阱"，阻止焦点离开对话框区域
+#separator:tab
+#html:true
+图形学：渲染(render)的定义	"<pre><code class=""language-text"">将模型转换为位图的过程</code></pre>"
+浏览器渲染：基本单位	"<pre><code class=""language-text"">每个元素对应的盒（box）</code></pre>"
+浏览器渲染：两类内容处理	"<pre><code class=""language-text"">图形（背景/边框等）和文字</code></pre>"
+字体渲染：关键库实现	"<pre><code class=""language-c"">#include &lt;ft2build.h&gt;
+#include FT_FREETYPE_H
 
+void render_char(char c) {
+  FT_Library library;
+  FT_Face face;
+  
+  // 初始化FreeType库
+  FT_Init_FreeType(&library);
+  
+  // 加载字体文件
+  FT_New_Face(library, ""arial.ttf"", 0, &face);
+  
+  // 设置像素大小
+  FT_Set_Pixel_Sizes(face, 0, 16);
+  
+  // 加载字符字形
+  FT_Load_Char(face, c, FT_LOAD_RENDER);
+  
+  // 获取位图数据
+  FT_Bitmap bitmap = face->glyph->bitmap;
+  
+  // 渲染到屏幕缓冲区...
+}</code></pre>"
+浏览器合成：核心目的	"<pre><code class=""language-text"">减少绘制次数，提升性能</code></pre>"
+浏览器合成：策略确定逻辑	"<pre><code class=""language-javascript"">function determineCompositing(element) {
+  // 检查CSS属性确定合成策略
+  if (element.style.position === 'fixed' || 
+      element.style.transform !== 'none' ||
+      element.style.opacity < 1) {
+    return true; // 需要独立合成层
+  }
+  
+  // 使用will-change提示
+  if (element.style.willChange === 'transform' || 
+      element.style.willChange === 'opacity') {
+    return true; // 提前优化
+  }
+  
+  return false;
+}</code></pre>"
+CSS：will-change属性用法	"<pre><code class=""language-css"">.animated-element {
+  will-change: transform, opacity; /* 提示浏览器优化 */
+  transition: transform 0.3s, opacity 0.3s;
+}
 
-# 浏览器工作原理
-浏览器工作的六个阶段是什么？	请求页面→构建DOM树→计算CSS→排版→渲染→绘制
-HTTP协议基于什么协议？	TCP协议，使用Request-Response模式
-HTTP请求的第一行叫什么？	request line，包含方法、路径和协议版本
-HTTP响应状态码200表示什么？	请求成功
-HTTP响应状态码304表示什么？	资源未修改，使用客户端缓存
-HTTPS的两个主要作用是什么？	确认服务端身份，防止数据被窃听或篡改
-HTTP/2的两大改进是什么？	服务端推送和TCP连接复用
+.optimized-composite {
+  /* 实际变化时提升为合成层 */
+  transform: translateZ(0);
+}</code></pre>"
+图形渲染：脏矩形算法实现	"<pre><code class=""language-cpp"">void updateScreen() {
+  // 定义脏矩形区域
+  std::vector<Rect> dirtyRects = getChangedAreas();
+  
+  for (Rect rect : dirtyRects) {
+    // 只重绘受影响区域
+    renderer->redrawArea(rect.x, rect.y, rect.width, rect.height);
+  }
+  
+  // 合并到屏幕缓冲区
+  composeBuffer();
+}</code></pre>"
+HTTP：GET与POST方法区别	"<pre><code class=""language-text"">GET用于获取资源，POST用于提交数据</code></pre>"
+HTTP：301与302状态码区别	"<pre><code class=""language-text"">301永久重定向，302临时重定向</code></pre>"
+CSS：排版模式对比	"<pre><code class=""language-text"">正常流：顺序布局；绝对定位：脱离流；浮动：先流后移</code></pre>"
+渲染流程：三阶段关系	"<pre><code class=""language-text"">渲染生成位图→合成优化位图→绘制到屏幕</code></pre>"
+图形学：颜色模型对比	"<pre><code class=""language-text"">RGB：光三原色；CMYK：印刷四色；HSL：色相饱和度明度</code></pre>"
+DOM：节点统一接口	"<pre><code class=""language-text"">Node</code></pre>"
+DOM：主要节点类型	"<pre><code class=""language-text"">Document, Element, Text, Comment, DocumentType, DocumentFragment</code></pre>"
+JavaScript：DocumentFragment使用	"<pre><code class=""language-javascript"">// 创建文档片段
+const fragment = document.createDocumentFragment();
 
+// 批量添加节点（不会触发重排）
+for (let i = 0; i < 1000; i++) {
+  const li = document.createElement('li');
+  li.textContent = `项目 ${i}`;
+  fragment.appendChild(li);
+}
 
-# HTML解析与DOM构建
-HTML解析使用的核心技术是什么？	状态机（80种状态）
-状态机实现的关键代码特征？	每个状态是函数，返回下一个状态函数
-DOM树构建使用的数据结构？	栈（stack）
-遇到开始标签时栈如何变化？	入栈新节点，设为当前节点
-遇到结束标签时栈如何变化？	出栈节点，检查是否匹配
-文本节点如何处理？	合并相邻文本节点
-HTML解析的容错处理依据？	W3C的tree-construction规则
-
-
-# CSS计算与排版
-CSS计算发生在DOM构建前还是后？	同步进行，边构建DOM边计算样式
-后代选择器"空格"如何实现？	满足前段条件后检查所有子代
-后继选择器"~"如何实现？	检查父元素相同的后续节点
-子代选择器">"如何实现？	检查直接子节点
-直接后继选择器"+"如何实现？	作为特殊flag匹配一次后失效
-正常流排版的基本原理？	顺次排布+折行，类似文字书写
-绝对定位元素排版特点？	脱离正常流，由top/left定位
-浮动元素排版特点？	先排入正常流再移动到边界
-
-
-# 渲染与绘制
-渲染(render)在图形学的定义？	将模型转换为位图的过程
-浏览器渲染的基本单位？	每个元素对应的盒（box）
-哪两类内容需要不同渲染方式？	图形（背景/边框等）和文字
-字体渲染的关键库？	Freetype（处理像素/矢量字形）
-合成(compositing)的目的是什么？	减少绘制次数，提升性能
-合成策略如何确定？	根据position/transform等属性猜测变化元素
-will-change属性的作用？	提示浏览器合成策略优化
-脏矩形算法是什么？	将屏幕分矩形区域，只重绘受影响区域
-
-# 关键概念对比
-HTTP方法GET和POST的区别？	GET用于获取资源，POST用于提交数据
-HTTP状态码301和302的区别？	301永久重定向，302临时重定向
-正常流/绝对定位/浮动排版区别？	正常流：顺序布局；绝对定位：脱离流；浮动：先流后移
-渲染/合成/绘制的关系？	渲染生成位图→合成优化位图→绘制到屏幕
-RGB/CMYK/HSL颜色模型区别？	RGB：光三原色；CMYK：印刷四色；HSL：色相饱和度明度
-
-# DOM节点类型
-DOM树形结构中所有节点的统一接口是什么？	Node
-列举6种主要的DOM节点类型。	Document, Element, Text, Comment, DocumentType, DocumentFragment
-DocumentFragment节点的主要用途是什么？	高性能地批量添加节点
-哪些节点没有对应的HTML写法？	Document 和 DocumentFragment
+// 一次性添加到DOM
+document.getElementById('list').appendChild(fragment);</code></pre>"
+DOM：无HTML写法的节点类型	"<pre><code class=""language-text"">Document 和 DocumentFragment</code></pre>"
 
 # Node接口
 Node接口中表示父节点的属性是什么？	parentNode
@@ -775,3 +1932,4 @@ class关键字的本质是什么？	构造函数的语法糖，必须用new调�
 箭头函数类字段为何能绑定`this`？	箭头函数无自身`this`，自动捕获定义时的词法作用域（实例创建时的`this`）。
 手动绑定方法时，应该在类的什么生命周期操作？	在构造函数（constructor）中进行绑定操作。
 独立调用类方法导致`this=undefined`的好处是什么？	防止意外污染全局作用域，使错误更易暴露（避免隐式绑定）。
+
