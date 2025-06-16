@@ -1,0 +1,209 @@
+# 03 | 复杂度分析（上）：如何分析、统计算法的执行效率和资源消耗？
+
+#separator:tab
+#html:true
+Golang演示时间复杂度加法法则	"<pre><code class=""language-go"">// 时间复杂度：O(max(f(n), g(n)))
+func exampleAddRule(n int) {
+    // O(1)操作
+    fmt.Println(""固定操作"")  
+
+    // O(n)操作
+    for i := 0; i < n; i++ { 
+        fmt.Println(i)  
+    }
+
+    // O(n²)操作（最高阶）
+    for i := 0; i < n; i++ {
+        for j := 0; j < n; j++ {
+            fmt.Printf(""%d-%d "", i, j)
+        }
+    }
+}</code></pre>"
+Golang演示时间复杂度乘法法则	"<pre><code class=""language-go"">// 时间复杂度：O(n²)
+func exampleMultRule(n int) {
+    // 外层循环O(n)
+    for i := 0; i < n; i++ {  
+        // 内层函数O(n)
+        processRow(i, n)  
+    }
+}
+
+// 内层函数：O(n)
+func processRow(row int, n int) {
+    for col := 0; col < n; col++ {
+        fmt.Printf(""%d-%d "", row, col)
+    }
+}</code></pre>"
+Golang双数据规模复杂度示例	"<pre><code class=""language-go"">// 时间复杂度O(m+n)
+func dualScale1(m, n int) {
+    // O(m)操作
+    for i := 0; i < m; i++ {
+        fmt.Print(""A"")
+    }
+    
+    // O(n)操作
+    for j := 0; j < n; j++ {
+        fmt.Print(""B"")
+    }
+}
+
+// 时间复杂度O(m*n)
+func dualScale2(m, n int) {
+    // 嵌套循环O(m*n)
+    for i := 0; i < m; i++ {
+        for j := 0; j < n; j++ {
+            fmt.Printf(""%d-%d "", i, j)
+        }
+    }
+}</code></pre>"
+Golang空间复杂度示例	"<pre><code class=""language-go"">// 空间复杂度O(1)
+func spaceO1(n int) {
+    // 固定空间占用
+    a, b := 0, 1  
+    for i := 0; i < n; i++ {
+        c := a + b  // 循环内变量每次销毁
+        a, b = b, c
+    }
+}
+
+// 空间复杂度O(n)
+func spaceOn(n int) {
+    // 动态分配n长度的切片
+    data := make([]int, n)  
+    for i := range data {
+        data[i] = i * i  // 占用空间与n成正比
+    }
+}</code></pre>"
+Golang二分查找时间复杂度	"<pre><code class=""language-go"">// 时间复杂度O(logn)
+func binarySearch(arr []int, target int) int {
+    low, high := 0, len(arr)-1
+    
+    for low <= high {
+        mid := low + (high-low)/2  // 每次范围减半
+        
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] < target {
+            low = mid + 1  // 搜索右半部
+        } else {
+            high = mid - 1  // 搜索左半部
+        }
+    }
+    return -1
+}</code></pre>"
+复杂度分析的核心目的	"<pre><code class=""language-text"">核心目标：
+1. 评估算法效率随数据规模n的增长趋势
+2. 提前预判性能瓶颈（无需实际运行）
+3. 为大规模数据场景选择最优算法
+
+核心指标：
+- 时间复杂度：时间增长趋势
+- 空间复杂度：空间增长趋势</code></pre>"
+常见时间复杂度对比	"<pre><code class=""language-text"">效率排序：
+O(1) > O(logn) > O(n) > O(nlogn) > O(n²) > O(2ⁿ) > O(n
+
+关键特征：
+O(1)   : 哈希查找
+O(logn): 二分查找（每次减半）
+O(n)   : 数组遍历
+O(n²)  : 冒泡排序（嵌套循环）
+O(2ⁿ)  : 斐波那契递归（指数爆炸）</code></pre>"
+
+
+# 04 | 复杂度分析（下）：浅析最好、最坏、平均、均摊时间复杂度
+
+#separator:tab
+#html:true
+Golang实现最好情况时间复杂度示例（无序数组查找元素在首位）	"<pre><code class=""language-go"">// 无序数组查找元素在首位时的时间复杂度为O(1)
+func find(arr []int, target int) int {
+    for i, v := range arr {
+        if v == target {  // 目标元素在首位立即返回
+            return i
+        }
+    }
+    return -1
+}</code></pre>"
+Golang实现最坏情况时间复杂度示例（无序数组查找元素不存在）	"<pre><code class=""language-go"">// 无序数组查找元素不存在时的时间复杂度为O(n)
+func find(arr []int, target int) int {
+    for i, v := range arr {
+        if v == target {
+            return i
+        }
+    }
+    return -1  // 遍历完整个数组后返回-1
+}</code></pre>"
+Golang实现平均情况时间复杂度计算（无序数组查找）	"<pre><code class=""language-go"">// 平均情况时间复杂度计算公式：∑(i=1→n)(i/(2n)) + n/2
+// 简化后为(3n+1)/4 → O(n)
+func avgComplexity(n int) float64 {
+    sum := 0.0
+    for i := 1; i <= n; i++ {
+        sum += float64(i) / float64(2*n)  // 元素在位置i的概率
+    }
+    return sum + float64(n)/2  // 加上元素不存在的概率
+}</code></pre>"
+Golang实现均摊时间复杂度示例（动态数组插入）	"<pre><code class=""language-go"">type DynamicArray struct {
+    array []int
+    count int
+}
+
+// 插入操作的均摊时间复杂度为O(1)
+func (da *DynamicArray) Insert(element int) {
+    if da.count == len(da.array) {  // 数组已满
+        sum := 0
+        for _, v := range da.array {  // O(n)操作
+            sum += v
+        }
+        da.array = []int{sum}  // 重置数组
+        da.count = 1
+    } else {
+        da.array[da.count] = element  // O(1)操作
+        da.count++
+    }
+}</code></pre>"
+Golang动态数组扩容的均摊时间复杂度分析	"<pre><code class=""language-go"">type Vector struct {
+    array []int
+    len   int
+    cap   int
+}
+
+// 均摊时间复杂度O(1)
+func (v *Vector) Add(element int) {
+    if v.len >= v.cap {  // 触发扩容
+        newCap := v.cap * 2
+        newArray := make([]int, newCap)
+        copy(newArray, v.array)  // O(n)复制
+        v.array = newArray
+        v.cap = newCap
+    }
+    v.array[v.len] = element  // O(1)插入
+    v.len++
+}</code></pre>"
+均摊时间复杂度与平均时间复杂度的核心区别	"<pre><code class=""language-go"">/*
+关键区别：
+1. 均摊分析：操作间存在时序关联（高低耗时操作交替出现）
+   - 示例：动态数组扩容（n次O(1)插入后1次O(n)扩容）
+
+2. 平均分析：操作间相互独立（基于概率分布）
+   - 示例：无序数组查找（每个位置等概率）
+
+数学本质：
+均摊：∑(操作成本)/操作次数
+平均：∑(概率×成本)
+*/</code></pre>"
+时间复杂度分析四大类型对比	"<pre><code class=""language-go"">/*
+| 类型               | 场景                          | 示例                  |
+|--------------------|-------------------------------|-----------------------|
+| 最好情况(Best)     | 最理想输入                    | 数组查找元素在首位    |
+| 最坏情况(Worst)    | 最差输入                      | 数组查找元素不存在    |
+| 平均情况(Average)  | 所有可能输入的加权平均        | 随机查找位置期望值    |
+| 均摊(Amortized)    | 连续操作的成本分摊            | 动态数组扩容操作     |
+*/</code></pre>"
+动态数组扩容的均摊成本计算公式	"<pre><code class=""language-go"">// 扩容操作的均摊成本公式：
+// (1次O(n)操作 + (n-1)次O(1)操作) / n = O(1)
+func amortizedCost(n int) float64 {
+    // 单次扩容成本：O(n)
+    expansionCost := float64(n)
+    // n-1次插入成本：每次O(1)
+    insertCost := float64(n - 1)
+    return (expansionCost + insertCost) / float64(n)
+}</code></pre>"

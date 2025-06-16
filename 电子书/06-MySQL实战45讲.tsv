@@ -471,3 +471,140 @@ WHERE id = 101;
 
 /* XID_EVENT (事务提交) */
 COMMIT/*!*/;</code></pre>"
+
+
+# 03 | 事务隔离：为什么你改了我还看不见？
+
+#separator:tab
+#html:true
+MySQL事务开启的三种方式	"<pre><code class=""language-sql"">/* 1.显式开启（推荐） */
+BEGIN;
+START TRANSACTION;
+
+/* 2.关闭自动提交（危险！） */
+SET autocommit = 0;
+
+/* 3.链式提交（连续事务） */
+COMMIT WORK AND CHAIN;</code></pre>"
+MySQL设置读提交隔离级别	"<pre><code class=""language-sql"">/* 会话级设置 */
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+/* 全局设置 */
+SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+/* Oracle兼容配置 */
+SET tx_isolation = 'READ-COMMITTED';</code></pre>"
+Golang实现MySQL事务操作	"<pre><code class=""language-go"">func TransferFunds(db *sql.DB, from, to int, amount float64) error {
+    tx, err := db.Begin()  // 开启事务
+    if err != nil { return err }
+    defer tx.Rollback()    // 失败时自动回滚
+
+    // 扣款操作
+    if _, err := tx.Exec(""UPDATE accounts SET balance=balance-? WHERE id=?"", amount, from); err != nil {
+        return err
+    }
+    
+    // 存款操作
+    if _, err := tx.Exec(""UPDATE accounts SET balance=balance+? WHERE id=?"", amount, to); err != nil {
+        return err
+    }
+    
+    return tx.Commit()  // 提交事务
+}</code></pre>"
+MySQL长事务监控查询	"<pre><code class=""language-sql"">/* 查询运行超过60秒的事务 */
+SELECT 
+  trx_id,
+  TIMEDIFF(NOW(), trx_started) AS duration,
+  trx_query 
+FROM information_schema.innodb_trx 
+WHERE TIME_TO_SEC(TIMEDIFF(NOW(), trx_started)) > 60;
+
+/* 查看未提交事务 */
+SELECT * FROM information_schema.innodb_trx 
+WHERE trx_state = 'RUNNING';</code></pre>"
+MVCC多版本控制伪代码	"<pre><code class=""language-go"">// 伪代码：MVCC版本链实现
+type Record struct {
+    Value     int
+    Version   int64       // 事务版本号
+    Rollback  *Record     // 指向上个版本
+}
+
+// 查询时获取可见版本
+func GetVisibleVersion(record *Record, txVersion int64) *Record {
+    for r := record; r != nil; r = r.Rollback {
+        if r.Version <= txVersion { 
+            return r  // 返回事务启动时的最新版本
+        }
+    }
+    return nil
+}</code></pre>"
+MySQL回滚日志清理机制	"<pre><code class=""language-sql"">/* 查看回滚段信息 */
+SHOW ENGINE INNODB STATUS;
+
+/* 清理历史回滚日志（由系统自动执行） */
+-- 当没有事务需要读取旧版本时
+-- InnoDB自动清理对应undo log
+
+/* 危险操作：强制清理（仅测试环境） */
+PURGE MASTER LOGS BEFORE NOW();</code></pre>"
+MySQL事务状态验证实验	"<pre><code class=""language-sql"">/* 实验准备 */
+CREATE TABLE t(id INT PRIMARY KEY, val INT) ENGINE=InnoDB;
+INSERT INTO t VALUES(1,1);
+
+/* 事务A（可重复读） */
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN;
+SELECT val FROM t WHERE id=1;  -- V1=1
+SELECT SLEEP(5);               -- 等待事务B提交
+SELECT val FROM t WHERE id=1;  -- V2=1（视图冻结）
+COMMIT;
+
+/* 事务B（立即执行） */
+BEGIN;
+UPDATE t SET val=2 WHERE id=1;
+COMMIT;</code></pre>"
+MySQL备份恢复策略伪代码	"<pre><code class=""language-go"">// 伪代码：备份恢复流程
+func BackupRecovery() {
+    // 1. 每日全量备份
+    BackupFull(""/backups/full_""+time.Now().Format(""20060102""))
+    
+    // 2. 持续备份binlog
+    go BackupBinlog(""/backups/binlog"")
+    
+    // 3. 故障恢复流程
+    if needRecovery {
+        RestoreFull(""/backups/full_20240501"")  // 恢复最近全备
+        RestoreBinlog(""/backups/binlog"", ""2024-05-01 12:00:00"") // 重放binlog
+    }
+}</code></pre>"
+ACID特性验证测试用例	"<pre><code class=""language-go"">// Golang测试原子性
+func TestTransactionAtomicity(t *testing.T) {
+    db.Exec(""CREATE TABLE test(id INT PRIMARY KEY)"")
+
+    // 模拟失败事务
+    tx, _ := db.Begin()
+    tx.Exec(""INSERT INTO test VALUES(1)"")
+    tx.Exec(""INSERT INTO test VALUES(1)"")  // 主键冲突
+    err := tx.Commit()
+    
+    // 验证原子性（无数据插入）
+    var count int
+    db.QueryRow(""SELECT COUNT(*) FROM test"").Scan(&count)
+    if count != 0 {
+        t.Error(""原子性失败：部分操作被提交"")
+    }
+}</code></pre>"
+MySQL死锁检测与处理	"<pre><code class=""language-sql"">/* 死锁日志分析 */
+SHOW ENGINE INNODB STATUS; 
+-- 查看LATEST DETECTED DEADLOCK部分
+
+/* 死锁处理策略 */
+SET GLOBAL innodb_deadlock_detect = ON;  -- 开启检测（默认）
+SET GLOBAL innodb_lock_wait_timeout = 50; -- 等待超时(秒)
+
+/* 重试机制伪代码 */
+FOR retry := 0; retry < 3; retry++ {
+    EXEC transaction
+    IF no deadlock ERROR BREAK
+    SLEEP(random_ms)
+}</code></pre>"
