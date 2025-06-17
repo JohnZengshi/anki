@@ -1,0 +1,285 @@
+# 01 | 架构到底是指什么？
+
+#separator:tab
+#html:true
+Go语言如何定义系统与子系统的关系？	"<pre><code class=""language-go"">// 系统定义
+type System struct {
+    Subsystems []Subsystem // 子系统集合
+    Rules      string      // 协作规则
+}
+
+// 子系统定义 (本身也是独立系统)
+type Subsystem struct {
+    Components []Component // 组件集合
+    Rules      string      // 内部协作规则
+}
+
+// 示例：电商系统包含支付子系统
+func main() {
+    paymentSubsystem := Subsystem{
+        Components: []Component{
+            {Name: ""支付网关""},
+            {Name: ""交易记录""},
+        },
+        Rules: ""支付成功后更新订单状态"",
+    }
+    
+    ecommerceSystem := System{
+        Subsystems: []Subsystem{paymentSubsystem},
+        Rules:      ""用户下单后调用支付子系统"",
+    }
+}</code></pre>"
+Go语言如何区分模块和组件？	"<pre><code class=""language-go"">// 模块：逻辑拆分 (包内组织)
+package user
+
+// 用户模块 - 逻辑功能集合
+func Login() {} // 登录功能
+func Register() {} // 注册功能
+
+// 组件：物理可部署单元 (main.go)
+package main
+
+import (
+    ""database/sql""
+    ""user"" // 导入逻辑模块
+)
+
+func main() {
+    // 物理组件
+    db, _ := sql.Open(""mysql"", ""user:pwd@/dbname"") // 数据库组件
+    cache := NewRedisCache() // 缓存组件
+    
+    // 使用逻辑模块
+    user.Login()
+}</code></pre>"
+架构设计中的多视角如何用Go实现？	"<pre><code class=""language-go"">// 业务视角架构 (MVC模式)
+package controller
+func OrderController() { /* 处理订单请求 */ }
+
+package service
+func CreateOrder() { /* 订单业务逻辑 */ }
+
+package repository
+func SaveOrder() { /* 订单存储逻辑 */ }
+
+// -------------------------------------------
+// 部署视角架构 (物理组件)
+package main
+
+import (
+    ""net/http""
+    ""controller""
+)
+
+func main() {
+    // 定义HTTP服务组件
+    http.HandleFunc(""/orders"", controller.OrderController)
+    http.ListenAndServe("":8080"", nil)
+    
+    // 数据库组件
+    db := NewDatabaseCluster()
+    
+    // 消息队列组件
+    mq := NewMessageQueue()
+}</code></pre>"
+框架规范在Go中的实现示例	"<pre><code class=""language-go"">// HTTP框架规范 (类似Gin)
+type Router interface {
+    GET(path string, handler HandlerFunc)
+    POST(path string, handler HandlerFunc)
+}
+
+// 框架实现
+type GinRouter struct{}
+
+func (r *GinRouter) GET(path string, handler HandlerFunc) {
+    // 实现GET路由绑定
+    fmt.Println(""注册GET路由: "", path)
+}
+
+// 开发者遵循框架规范
+func main() {
+    router := &GinRouter{}
+    router.GET(""/api/users"", getUserHandler) // 按规范使用
+}
+
+func getUserHandler(c Context) {
+    // 业务处理逻辑
+}</code></pre>"
+系统涌现特性在Go中的示例	"<pre><code class=""language-go"">// 单独组件无法完成的功能
+type Engine struct{}
+func (e Engine) Start() { /* 启动引擎 */ }
+
+type Wheel struct{}
+func (w Wheel) Rotate() { /* 轮子转动 */ }
+
+// 系统组合产生新能力
+type CarSystem struct {
+    Engine
+    Wheels [4]Wheel
+}
+
+func (c CarSystem) Drive() { // 涌现的新能力
+    c.Engine.Start()
+    for _, wheel := range c.Wheels {
+        wheel.Rotate() // 协调运作产生移动能力
+    }
+    fmt.Println(""汽车行驶中..."") // 单个组件无法实现的功能
+}</code></pre>"
+
+# 02 | 架构设计的历史背景    03 | 架构设计的目的
+
+#separator:tab
+#html:true
+机器语言编程示例	"<pre><code class=""language-text"">00110001 00000000 00000000   # 将寄存器A清零
+00110001 00000000 00000001   # 将值1加载到寄存器B
+00110010 00000000 00000000   # 将寄存器A和B相加</code></pre>"
+汇编语言实现加法运算	"<pre><code class=""language-assembly"">; 8086汇编实现s=768+12288-1280
+mov ax, 768      ; 加载768到AX寄存器
+mov bx, 12288    ; 加载12288到BX寄存器
+add ax, bx       ; AX = AX + BX
+sub ax, 1280     ; AX = AX - 1280
+mov [s], ax      ; 将结果存入内存地址s</code></pre>"
+Go语言实现高级语言抽象	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+// 高级语言隐藏底层细节
+func main() {
+    // 直接进行数学运算
+    s := 768 + 12288 - 1280
+    fmt.Println(s) // 输出结果：13776
+    
+    // 面向对象示例
+    student := Student{Name: ""张三"", Age: 20}
+    student.Introduce()
+}
+
+type Student struct {
+    Name string
+    Age  int
+}
+
+func (s Student) Introduce() {
+    fmt.Printf(""我叫%s，今年%d岁\n"", s.Name, s.Age)
+}</code></pre>"
+结构化编程避免goto示例	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+// 使用函数代替goto实现控制流
+func main() {
+    total := calculateTotal(100, 0.2)
+    fmt.Println(""总金额:"", total)
+}
+
+// 模块化函数计算总价
+func calculateTotal(price float64, taxRate float64) float64 {
+    subtotal := price
+    taxes := subtotal * taxRate
+    
+    // 避免使用goto
+    if price > 50 {
+        discount := price * 0.1
+        subtotal -= discount
+    }
+    
+    return subtotal + taxes
+}</code></pre>"
+学生管理系统主从同步实现	"<pre><code class=""language-go"">package main
+
+import (
+    ""database/sql""
+    ""fmt""
+    _ ""github.com/go-sql-driver/mysql""
+)
+
+func main() {
+    // 主数据库连接
+    masterDB, err := sql.Open(""mysql"", ""user:pass@tcp(master-host:3306)/db"")
+    if err != nil {
+        panic(err)
+    }
+    defer masterDB.Close()
+
+    // 从数据库连接（备份机房）
+    slaveDB, err := sql.Open(""mysql"", ""user:pass@tcp(slave-host:3306)/db"")
+    if err != nil {
+        panic(err)
+    }
+    defer slaveDB.Close()
+
+    // 写入主库
+    _, err = masterDB.Exec(""INSERT INTO students (name, age) VALUES (?, ?)"", ""李四"", 22)
+    if err != nil {
+        panic(err)
+    }
+
+    // 读操作可以从从库执行
+    var name string
+    err = slaveDB.QueryRow(""SELECT name FROM students WHERE id = 1"").Scan(&name)
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(""学生姓名:"", name)
+}</code></pre>"
+架构设计复杂度判断准则	"<pre><code class=""language-text"">/*
+架构设计决策树：
+1. 是否需要处理高并发？ → 是：考虑缓存/队列
+2. 数据是否不可丢失？ → 是：实现主从复制
+3. 系统是否需要7×24小时可用？ → 是：部署集群
+4. 是否有频繁功能变更？ → 是：采用微服务
+5. 是否资源受限？ → 是：优化资源分配
+
+核心原则：仅针对实际存在的复杂度设计
+*/</code></pre>"
+软件架构演进历史阶段	"<pre><code class=""language-text"">/* 软件架构发展里程碑：
+1. 1940s：机器语言编程
+2. 1950s：汇编语言抽象
+3. 1960s：高级语言诞生(FORTRAN/COBOL)
+4. 1970s：结构化编程解决软件危机
+5. 1980s：面向对象成为主流(C++/Java)
+6. 1990s：软件架构正式成为学科
+7. 2000s：服务导向架构(SOA)
+8. 2010s：微服务架构兴起
+9. 2020s：云原生架构普及
+*/</code></pre>"
+过度设计反模式示例	"<pre><code class=""language-go"">package main
+
+// 不合理的过度设计
+func main() {
+    // 问题：学生系统不需要分布式事务
+    useDistributedTransaction() 
+    
+    // 问题：低流量系统不需要Redis缓存
+    setupRedisCache()
+}
+
+// 不必要的复杂实现
+func useDistributedTransaction() {
+    // 分布式事务协调器（实际只需单数据库事务）
+    // ...
+}
+
+func setupRedisCache() {
+    // 配置Redis集群（实际MySQL可处理负载）
+    // ...
+}
+
+/* 正确做法：根据实际需求选择方案
+if needsHighAvailability {
+    // 部署集群
+} else {
+    // 单节点即可
+}
+*/</code></pre>"
+软件架构核心定义	"<pre><code class=""language-text"">/*
+Mary Shaw & David Garlan定义：
+软件架构 = 组件(Components) + 
+         连接器(Connectors) + 
+         约束(Constraints)
+
+关键转变：
+1. 从算法为中心 → 组件交互为中心
+2. 从代码细节 → 系统结构
+3. 从局部优化 → 全局约束
+*/</code></pre>"

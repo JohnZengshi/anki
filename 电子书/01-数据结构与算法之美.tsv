@@ -207,3 +207,213 @@ func amortizedCost(n int) float64 {
     insertCost := float64(n - 1)
     return (expansionCost + insertCost) / float64(n)
 }</code></pre>"
+
+# 05 | 数组：为什么很多编程语言中数组都从0开始编号？
+
+#separator:tab
+#html:true
+数组在内存中的存储方式（Golang）	"<pre><code class=""language-go"">// 数组内存连续分配示例
+package main
+
+import (
+	""fmt""
+	""unsafe""
+)
+
+func main() {
+	arr := [3]int32{10, 20, 30}
+	
+	// 打印数组地址和每个元素地址
+	fmt.Printf(""数组首地址: %p\n"", &arr)
+	fmt.Printf(""arr[0]地址: %p, 大小:%d字节\n"", &arr[0], unsafe.Sizeof(arr[0]))
+	fmt.Printf(""arr[1]地址: %p, 大小:%d字节\n"", &arr[1], unsafe.Sizeof(arr[1]))
+	fmt.Printf(""arr[2]地址: %p, 大小:%d字节\n"", &arr[2], unsafe.Sizeof(arr[2]))
+	
+	// 验证内存连续性
+	addr0 := uintptr(unsafe.Pointer(&arr[0]))
+	addr1 := uintptr(unsafe.Pointer(&arr[1]))
+	addr2 := uintptr(unsafe.Pointer(&arr[2]))
+	fmt.Printf(""地址差: %d字节\n"", addr1-addr0) // 应为4字节(int32大小)
+}</code></pre>"
+Golang数组随机访问实现原理	"<pre><code class=""language-go"">// 随机访问底层实现模拟
+package main
+
+import (
+	""fmt""
+	""unsafe""
+)
+
+func getElement(arr *[5]int, index int) int {
+	// 计算元素地址 = 首地址 + 索引 * 元素大小
+	basePtr := unsafe.Pointer(arr)
+	elementPtr := unsafe.Add(basePtr, index*int(unsafe.Sizeof(arr[0])))
+	return *(*int)(elementPtr) // 直接访问内存位置
+}
+
+func main() {
+	nums := [5]int{10, 20, 30, 40, 50}
+	fmt.Println(""直接访问:"", nums[2])       // 30
+	fmt.Println(""计算访问:"", getElement(&nums, 2)) // 30
+}</code></pre>"
+Golang数组插入操作优化策略（无序数组）	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func insert(arr []int, index int, value int) {
+    // 优化策略：将目标位置元素移到末尾
+    if index < len(arr)-1 {
+        arr[len(arr)-1] = arr[index] // 原位置元素移到末尾
+    }
+    arr[index] = value // 新元素放入目标位置
+}
+
+func main() {
+    // 初始化数组（使用切片模拟动态数组）
+    arr := make([]int, 5)
+    arr[0], arr[1], arr[2] = 10, 20, 40
+    
+    fmt.Println(""插入前:"", arr) // [10 20 40 0 0]
+    insert(arr, 1, 30) // 在索引1处插入30
+    fmt.Println(""插入后:"", arr) // [10 30 40 20 0]
+}</code></pre>"
+Golang数组批量删除优化（标记删除法）	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func main() {
+    // 初始化数组和删除标记
+    arr := []int{10, 20, 30, 40, 50}
+    deleted := make([]bool, len(arr))
+    
+    // 标记要删除的元素（索引1和3）
+    deleted[1] = true
+    deleted[3] = true
+    
+    // 创建新数组（实际应用中可等到空间不足时执行）
+    newArr := make([]int, 0, len(arr))
+    for i, v := range arr {
+        if !deleted[i] {
+            newArr = append(newArr, v)
+        }
+    }
+    
+    fmt.Println(""原数组:"", arr)
+    fmt.Println(""删除后:"", newArr) // [10 30 50]
+}</code></pre>"
+Golang二维数组内存布局及访问	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""unsafe""
+)
+
+func main() {
+	// 创建3x2二维数组
+	matrix := [3][2]int{
+		{1, 2},
+		{3, 4},
+		{5, 6},
+	}
+	
+	// 打印内存地址
+	fmt.Printf(""首元素地址: %p\n"", &matrix[0][0])
+	fmt.Printf(""matrix[0][1]地址: %p\n"", &matrix[0][1])
+	fmt.Printf(""matrix[1][0]地址: %p\n"", &matrix[1][0])
+	
+	// 计算地址差验证连续性
+	addr00 := uintptr(unsafe.Pointer(&matrix[0][0]))
+	addr10 := uintptr(unsafe.Pointer(&matrix[1][0]))
+	fmt.Printf(""行间距: %d字节\n"", addr10-addr00) // 应为8字节(2个int)
+}</code></pre>"
+Golang数组越界访问的后果	"<pre><code class=""language-go"">package main
+
+func main() {
+    // 创建长度为3的数组
+    arr := [3]int{10, 20, 30}
+    
+    // 尝试越界访问
+    // 在Golang中会引发panic:
+    // ""runtime error: index out of range [4] with length 3""
+    println(arr[4]) 
+    
+    // 注意：在C语言中类似操作会导致未定义行为
+    // 可能破坏其他内存数据
+}</code></pre>"
+Golang数组与切片的性能对比	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""time""
+)
+
+func testArray() {
+	var arr [1000]int
+	for i := 0; i < len(arr); i++ {
+		arr[i] = i // 直接访问
+	}
+}
+
+func testSlice() {
+	sl := make([]int, 1000)
+	for i := 0; i < len(sl); i++ {
+		sl[i] = i // 切片访问(有额外指针开销)
+	}
+}
+
+func main() {
+	start := time.Now()
+	testArray()
+	fmt.Printf(""数组耗时: %v\n"", time.Since(start))
+	
+	start = time.Now()
+	testSlice()
+	fmt.Printf(""切片耗时: %v\n"", time.Since(start))
+	
+	// 结果：数组操作通常快5-10%
+}</code></pre>"
+数组下标从0开始的设计原因	"<pre><code class=""language-text""># 内存偏移计算原理
+地址计算: a[k]_address = base_address + k * type_size
+
+# 从1开始的额外开销
+若下标从1开始: a[k]_address = base_address + (k-1)*type_size
+→ 需要额外的减法指令
+→ CPU执行效率降低
+
+# 历史原因
+C语言初始设计影响 → Java/Python/Go等继承</code></pre>"
+数组插入操作时间复杂度分析	"<pre><code class=""language-text"">| 插入位置 | 时间复杂度 | 原因                  |
+|----------|------------|-----------------------|
+| 末尾     | O(1)       | 无数据搬移            |
+| 开头     | O(n)       | 搬移全部n个元素       |
+| 中间     | O(n)       | 平均搬移n/2个元素     |
+| 平均情况 | O(n)       | 各位置概率均等        |
+
+# 优化策略（无序数组）：
+1. 将目标位置元素移至末尾 → O(1)
+2. 新元素放入目标位置 → O(1)
+3. 总时间复杂度降为O(1)</code></pre>"
+动态数组扩容机制（Golang切片）	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func main() {
+    // 创建初始切片
+    s := make([]int, 0, 2) // 长度0, 容量2
+    
+    fmt.Printf(""初始: len=%d cap=%d %p\n"", len(s), cap(s), s)
+    
+    // 添加元素触发扩容
+    s = append(s, 1)
+    fmt.Printf(""添加1: len=%d cap=%d %p\n"", len(s), cap(s), s)
+    
+    s = append(s, 2)
+    fmt.Printf(""添加2: len=%d cap=%d %p\n"", len(s), cap(s), s)
+    
+    s = append(s, 3) // 触发扩容(容量翻倍)
+    fmt.Printf(""添加3: len=%d cap=%d %p\n"", len(s), cap(s), s)
+    
+    // 扩容过程:
+    // 1. 申请新内存(容量翻倍)
+    // 2. 复制原数据
+    // 3. 更新指针和容量
+}</code></pre>"
