@@ -1,92 +1,387 @@
-什么是网络协议？	网络协议是计算机网络中进行数据交换的规则、标准或约定的集合。
-为什么要学习网络协议？	理解网络通信原理、开发网络应用、排查网络故障、保障网络安全。
-常见的网络协议有哪些？（至少5个）	TCP, IP, HTTP, HTTPS, DNS, SMTP, FTP, UDP, ARP, OSPF, BGP。
-TCP和UDP的主要区别是什么？	TCP是面向连接、可靠的协议（如支付）；UDP是无连接、不可靠但传输速度快的协议（如视频流）。
-IP协议的核心作用是什么？	负责在网络层处理数据包的寻址和路由（源IP和目标IP）。
-HTTP协议的主要应用场景是什么？	Web网页请求与响应，客户端和服务器间的数据传输（如浏览器显示页面）。
-什么是DNS？它的功能是什么？	DNS是域名系统，用于将域名（如www.kaola.com）解析为对应的IP地址。
-网络协议的分层结构是什么？	常用TCP/IP四层模型（应用层、传输层、网络层、链路层）或OSI七层模型。
-协议的三要素是什么？分别解释。	语法（规则格式，如HTTP头状态码）、语义（含义，如状态码200表示成功）、顺序（操作时序，如请求→响应）。
-HTTPS和HTTP有什么区别？	HTTPS是HTTP的安全版本，对传输内容加密（用于购物等需保密场景）。
-浏览器如何找到电商服务器的IP地址？	通过DNS或HTTPDNS协议将输入的域名解析为IP地址（如www.kaola.com → 106.114.138.24）。
-ARP协议的作用是什么？	在本地网络中通过IP地址获取对应的MAC地址（如操作系统"大吼"192.168.1.1的MAC）。
-在购物下单时，传输层为何常用TCP？	TCP通过建立连接、确认机制和重试，保证数据包可靠到达（如支付请求）。
-网络包到达服务器后，TCP层如何处理？	收到包后发送ACK确认回复；若超时未收到，自动重发包，确保数据完整。
-操作系统如何判断目标IP地址是本地还是外地？	根据IP地址范围（如192.168.x.x为本地），若不属于本地网络则转发到网关。
-网关在路由中的作用是什么？	根据路由表决定网络包的下一步转发路径（如OSPF/BGP协议）。
-路由协议OSPF和BGP的区别是什么？	OSPF用于内部网络路由（如企业网），BGP用于跨网络路由（如互联网骨干）。
-什么是RPC？它在服务器内部通信中的作用？	RPC（远程过程调用）是进程间通信的框架（如Tomcat调用订单服务），封装网络细节。
-编译语言（如Java）的过程有哪些步骤？	源文件 → 词法分析 → 语法分析 → 语义分析 → 代码生成 → 目标文件。
-"双十一下单"涉及哪些网络协议？	DNS解析IP → HTTPS打包请求 → TCP传输 → IP路由 → ARP获取MAC → 后端RPC协调服务。
+#separator:tab
+#html:true
+什么是网络协议？	"网络协议是计算机网络中进行数据交换的规则、标准或约定的集合。"
+为什么要学习网络协议？	"理解网络通信原理、开发网络应用、排查网络故障、保障网络安全。"
+常见的网络协议有哪些？（至少5个）	"TCP, IP, HTTP, HTTPS, DNS, SMTP, FTP, UDP, ARP, OSPF, BGP。"
+TCP和UDP的主要区别是什么？	"TCP是面向连接、可靠的协议（如支付）；UDP是无连接、不可靠但传输速度快的协议（如视频流）。"
+IP协议的核心作用是什么？	"负责在网络层处理数据包的寻址和路由（源IP和目标IP）。"
+HTTP协议的主要应用场景是什么？	"Web网页请求与响应，客户端和服务器间的数据传输（如浏览器显示页面）。"
+什么是DNS？它的功能是什么？	"DNS是域名系统，用于将域名（如www.kaola.com）解析为对应的IP地址。"
+网络协议的分层结构是什么？	"常用TCP/IP四层模型（应用层、传输层、网络层、链路层）或OSI七层模型。"
+协议的三要素是什么？分别解释。	"语法（规则格式，如HTTP头状态码）、语义（含义，如状态码200表示成功）、顺序（操作时序，如请求→响应）。"
+HTTPS和HTTP有什么区别？	"HTTPS是HTTP的安全版本，对传输内容加密（用于购物等需保密场景）。"
+浏览器如何找到电商服务器的IP地址？	"通过DNS或HTTPDNS协议将输入的域名解析为IP地址（如www.kaola.com → 106.114.138.24）。"
+ARP协议的作用是什么？	"在本地网络中通过IP地址获取对应的MAC地址（如操作系统""大吼""192.168.1.1的MAC）。"
+在购物下单时，传输层为何常用TCP？	"TCP通过建立连接、确认机制和重试，保证数据包可靠到达（如支付请求）。"
+网络包到达服务器后，TCP层如何处理？	"收到包后发送ACK确认回复；若超时未收到，自动重发包，确保数据完整。"
+操作系统如何判断目标IP地址是本地还是外地？	"根据IP地址范围（如192.168.x.x为本地），若不属于本地网络则转发到网关。"
+网关在路由中的作用是什么？	"根据路由表决定网络包的下一步转发路径（如OSPF/BGP协议）。"
+路由协议OSPF和BGP的区别是什么？	"OSPF用于内部网络路由（如企业网），BGP用于跨网络路由（如互联网骨干）。"
+什么是RPC？它在服务器内部通信中的作用？	"RPC（远程过程调用）是进程间通信的框架（如Tomcat调用订单服务），封装网络细节。"
+编译语言（如Java）的过程有哪些步骤？	"<pre><code class=""language-golang"">// 编译过程伪代码示例
+func compile(source string) {
+    lexer := NewLexer(source) // 1.词法分析
+    tokens := lexer.Tokenize()
+    
+    parser := NewParser(tokens) // 2.语法分析
+    ast := parser.Parse()
+    
+    analyzer := NewSemanticAnalyzer() // 3.语义分析
+    analyzer.Check(ast)
+    
+    generator := NewCodeGenerator() // 4.代码生成
+    targetCode := generator.Generate(ast)
+    
+    SaveToFile(targetCode) // 5.生成目标文件
+}</code></pre>"
+"双十一下单"涉及哪些网络协议？	"<pre><code class=""language-golang"">// 网络请求流程示例
+func placeOrder() {
+    // 1.DNS解析
+    ip := DNSLookup(""www.kaola.com"")
+    
+    // 2.HTTPS加密请求
+    req := HTTPSRequest{
+        URL:  ""https://"" + ip + ""/order"",
+        Body: `{""product_id"":123}`
+    }
+    
+    // 3.TCP传输
+    conn := TCPConnect(ip, 443)
+    conn.Send(req.Serialize())
+    
+    // 4.IP路由
+    pkt := IPPacket{
+        Source: localIP,
+        Dest:   ip,
+        Data:   req.ToBytes()
+    }
+    routePacket(pkt) // 经过网关/路由器
+    
+    // 5.ARP获取MAC地址
+    if isLocalNetwork(ip) {
+        mac := ARPLookup(ip)
+        sendEthernetFrame(mac, pkt)
+    }
+    
+    // 6.后端RPC调用
+    orderService := RPCClient(""order.service"")
+    orderService.Call(""CreateOrder"", req.Body)
+}</code></pre>"
+
+#separator:tab
+#html:true
+为什么网络必须分层设计？	"<pre><code class=""language-text"">因为复杂程序都需要分层，每层专注特定功能（如网络协议栈/电商系统分层）</code></pre>"
+网络分层最恰当的比喻是什么？	"<pre><code class=""language-text"">套娃模型（上层数据被下层封装），而非独立沟通模型</code></pre>"
+TCP三次握手时IP层在做什么？	"<pre><code class=""language-golang"">func processIPLayer(tcpData []byte) {
+    // 添加IP头（源IP/目标IP）
+    ipHeader := createIPHeader()
+    // 处理路由寻址
+    nextHop := findRoute(ipHeader.DstIP)
+    return append(ipHeader, tcpData...)
+}</code></pre>"
+TCP三次握手时MAC层在做什么？	"<pre><code class=""language-golang"">func processMACLayer(ipPacket []byte) {
+    // 添加MAC头（源MAC/目标MAC）
+    macHeader := createMACHeader()
+    return append(macHeader, ipPacket...)
+}</code></pre>"
+网络包接收时首先调用什么函数？	"<pre><code class=""language-golang"">func main() {
+    buffer := receivePacket()
+    process_layer2(buffer) // 首先调用MAC层处理
+}</code></pre>"
+process_layer2函数主要做什么？	"<pre><code class=""language-golang"">func process_layer2(buffer []byte) {
+    // 检查MAC地址是否匹配
+    if buffer.dstMAC != localMAC {
+        return // 丢弃不匹配的包
+    }
+    // 交给上层处理
+    process_layer3(buffer.payload)
+}</code></pre>"
+process_layer3函数主要做什么？	"<pre><code class=""language-golang"">func process_layer3(buffer []byte) {
+    // 检查IP地址是否匹配
+    if buffer.dstIP != localIP {
+        forward(buffer) // 转发到其他设备
+        return
+    }
+    // 继续处理
+    process_layer4(buffer.payload)
+}</code></pre>"
+send_tcp函数主要做什么？	"<pre><code class=""language-golang"">func send_tcp(data []byte) {
+    // 添加TCP头（含源/目的端口）
+    tcpHeader := createTCPHeader(srcPort, dstPort)
+    return append(tcpHeader, data)
+}</code></pre>"
+send_layer3函数主要做什么？	"<pre><code class=""language-golang"">func send_layer3(tcpData []byte) {
+    // 添加IP头（含源/目的IP）
+    ipHeader := createIPHeader(srcIP, dstIP)
+    return append(ipHeader, tcpData)
+}</code></pre>"
+send_layer2函数主要做什么？	"<pre><code class=""language-golang"">func send_layer2(ipPacket []byte) {
+    // 添加MAC头（含源/目的MAC）
+    macHeader := createMACHeader(srcMAC, dstMAC)
+    return append(macHeader, ipPacket)
+}</code></pre>"
+为什么没有MAC地址无法发送消息？	"<pre><code class=""language-text"">因为数据包在链路层传输必须封装MAC头，否则无法在物理网络中定位设备</code></pre>"
+二层设备如何处理HTTP数据包？	"<pre><code class=""language-text"">去掉MAC头检查目标地址，根据MAC表转发，不处理HTTP内容</code></pre>"
+三层设备如何处理HTTP数据包？	"<pre><code class=""language-text"">去掉MAC头和IP头，检查目标IP地址，根据路由表转发，不处理HTTP内容</code></pre>"
+网络包完整性的核心原则是什么？	"<pre><code class=""language-text"">可以有下层没上层，绝对不可能有上层没下层</code></pre>"
+浏览器发送HTTP请求时如何构建数据包？	"<pre><code class=""language-golang"">func buildPacket() {
+    // 应用层：HTTP头
+    httpHeader := ""GET / HTTP/1.1\r\nHost: example.com""
+    // 传输层：加TCP头
+    tcpPacket := send_tcp([]byte(httpHeader))
+    // 网络层：加IP头
+    ipPacket := send_layer3(tcpPacket)
+    // 链路层：加MAC头
+    macFrame := send_layer2(ipPacket)
+}</code></pre>"
+如何查看Windows系统的IP地址？	"<pre><code class=""language-text"">在命令提示符输入：ipconfig</code></pre>"
+网络协议栈处理程序的核心思想是什么？	"<pre><code class=""language-text"">想象自己是处理网络包的程序，有多个网口进出数据包</code></pre>"
+为什么TCP握手需要底层协议支持？	"<pre><code class=""language-text"">每个TCP消息都要经过完整封装流程（IP头/MAC头）才能发送</code></pre>"
+当目标MAC地址未知时如何处理？	"<pre><code class=""language-text"">通过ARP协议广播查询目标IP对应的MAC地址</code></pre>"
+传输层如何识别目标应用程序？	"<pre><code class=""language-text"">通过TCP/UDP头中的端口号标识具体应用</code></pre>"
+分层设计中"员工"层对应网络哪一层？	"<pre><code class=""language-text"">MAC层（最底层处理物理寻址）</code></pre>"
 
 
-为什么网络必须分层设计？	因为复杂程序都需要分层，每层专注特定功能（如网络协议栈/电商系统分层）
-网络分层最恰当的比喻是什么？	套娃模型（上层数据被下层封装），而非独立沟通模型
-TCP三次握手时IP层在做什么？	为每个TCP消息添加IP头，处理路由寻址
-TCP三次握手时MAC层在做什么？	为每个TCP消息添加MAC头，处理物理寻址
-网络包接收时首先调用什么函数？	process_layer2(buffer) 处理MAC层
-process_layer2函数主要做什么？	检查MAC地址是否匹配，决定是否继续处理
-process_layer3函数主要做什么？	检查IP地址是否匹配，决定转发还是继续处理
-send_tcp函数主要做什么？	在数据上添加TCP头（含源/目的端口号）
-send_layer3函数主要做什么？	在TCP数据上添加IP头（含源/目的IP）
-send_layer2函数主要做什么？	在IP数据上添加MAC头（含源/目的MAC）
-为什么没有MAC地址无法发送消息？	因为数据包在链路层传输必须封装MAC头
-二层设备如何处理HTTP数据包？	去掉MAC头检查目标地址，不处理HTTP内容
-三层设备如何处理HTTP数据包？	去掉MAC头和IP头检查目标IP，不处理HTTP内容
-网络包完整性的核心原则是什么？	"可以有下层没上层，绝对不可能有上层没下层"
-浏览器发送HTTP请求时如何构建数据包？	HTTP头→TCP头（加端口）→IP头（加IP）→MAC头（加MAC）
-如何查看Windows系统的IP地址？	在命令提示符输入 ipconfig
-网络协议栈处理程序的核心思想是什么？	想象自己是处理网络包的程序，有多个网口进出
-为什么TCP握手需要底层协议支持？	每个TCP消息都要经过完整封装流程才能发送
-当目标MAC地址未知时如何处理？	通过ARP协议广播查询获取目标MAC地址
-传输层如何识别目标应用程序？	通过TCP/UDP头中的端口号标识具体应用
-分层设计中"员工"层对应网络哪一层？	MAC层（最底层处理物理寻址）
+#separator:tab
+#html:true
+Windows查看IP地址用什么命令？	"<pre><code class=""language-bash"">ipconfig</code></pre>"
+Linux查看IP地址的两个主要命令是什么？	"<pre><code class=""language-bash""># 传统工具
+ifconfig
+
+# 现代工具
+ip addr</code></pre>"
+ifconfig和ip addr的根本区别是什么？	"<pre><code class=""language-plaintext"">ifconfig属于net-tools，ip addr属于更现代的iproute2工具集</code></pre>"
+IP地址的格式是怎样的？	"<pre><code class=""language-plaintext"">32位分4组十进制(IPv4)，或128位(IPv6)</code></pre>"
+IP地址分为哪几类？	"<pre><code class=""language-plaintext"">A类(0-127)，B类(128-191)，C类(192-223)，D类(多播)，E类(保留)</code></pre>"
+A类IP地址的主机号有多少位？	"<pre><code class=""language-plaintext"">24位(最大主机数16777214)</code></pre>"
+C类IP地址的最大主机数是多少？	"<pre><code class=""language-plaintext"">254</code></pre>"
+私有IP地址的A类范围？	"<pre><code class=""language-plaintext"">10.0.0.0 - 10.255.255.255</code></pre>"
+最常用的私有IP地址段是什么？	"<pre><code class=""language-plaintext"">192.168.x.x</code></pre>"
+什么是CIDR？	"<pre><code class=""language-plaintext"">无类域间选路，打破IP分类的地址表示法(如192.168.1.1/24)</code></pre>"
+如何计算网络号？	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""net""
+)
+
+func main() {
+	// IP地址与子网掩码进行按位与运算
+	ip := net.ParseIP(""192.168.1.100"")
+	mask := net.IPv4Mask(255, 255, 255, 0)
+	network := ip.Mask(mask)
+	fmt.Println(""网络号:"", network) // 192.168.1.0
+}</code></pre>"
+什么是公有IP地址？	"<pre><code class=""language-plaintext"">全球唯一，需购买，用于互联网服务</code></pre>"
+CIDR地址16.158.165.91/22的网络号是多少？	"<pre><code class=""language-plaintext"">16.158.164.0</code></pre>"
+CIDR地址16.158.165.91/22的广播地址是多少？	"<pre><code class=""language-plaintext"">16.158.167.255</code></pre>"
+MAC地址是什么？	"<pre><code class=""language-plaintext"">网卡物理地址(6字节十六进制)</code></pre>"
+MAC地址的两个关键特性？	"<pre><code class=""language-plaintext"">出厂固化，全局唯一</code></pre>"
+为什么互联网不能只用MAC地址通信？	"<pre><code class=""language-plaintext"">MAC无定位功能，不能跨子网通信</code></pre>"
+MAC地址的通信范围？	"<pre><code class=""language-plaintext"">限于同一个子网内</code></pre>"
+环回地址(lo)的作用？	"<pre><code class=""language-plaintext"">本机内部通信(127.0.0.1)</code></pre>"
+网络设备状态UP表示什么？	"<pre><code class=""language-plaintext"">网卡已启动</code></pre>"
+BROADCAST标志表示什么？	"<pre><code class=""language-plaintext"">支持发送广播包</code></pre>"
+LOWER_UP标志表示什么？	"<pre><code class=""language-plaintext"">物理层连接正常(网线插着)</code></pre>"
+MTU是什么？	"<pre><code class=""language-plaintext"">最大传输单元(以太网默认1500字节)</code></pre>"
+pfifo_fast是什么？	"<pre><code class=""language-plaintext"">分三个优先级波段(band0最高)的排队机制</code></pre>"
+qdisc如何分配数据包优先级？	"<pre><code class=""language-go"">package main
+
+// IP头中的TOS字段结构
+type IPHeader struct {
+	Version  uint8 // 版本
+	TOS      uint8 // 服务类型字段
+	TotalLen uint16
+	// ...其他字段
+}
+
+func setPriority(pkt IPHeader) {
+	// 提取TOS字段的前3位作为优先级
+	priority := (pkt.TOS >> 5) & 0x07
+	switch priority {
+	case 0:
+		fmt.Println(""分配到band0(最高优先级)"")
+	case 1:
+		fmt.Println(""分配到band1"")
+	default:
+		fmt.Println(""分配到band2(最低优先级)"")
+	}
+}</code></pre>"
 
 
-Windows查看IP地址用什么命令？	ipconfig
-Linux查看IP地址的两个主要命令是什么？	ifconfig和ip addr
-ifconfig和ip addr的根本区别是什么？	ifconfig属于net-tools，ip addr属于更现代的iproute2工具集
-IP地址的格式是怎样的？	32位分4组十进制(IPv4)，或128位(IPv6)
-IP地址分为哪几类？	A类(0-127)，B类(128-191)，C类(192-223)，D类(多播)，E类(保留)
-A类IP地址的主机号有多少位？	24位(最大主机数16777214)
-C类IP地址的最大主机数是多少？	254
-私有IP地址的A类范围？	10.0.0.0 - 10.255.255.255
-最常用的私有IP地址段是什么？	192.168.x.x
-什么是CIDR？	无类域间选路，打破IP分类的地址表示法(如192.168.1.1/24)
-如何计算网络号？	IP地址 AND 子网掩码
-什么是公有IP地址？	全球唯一，需购买，用于互联网服务
-CIDR地址16.158.165.91/22的网络号是多少？	16.158.164.0
-CIDR地址16.158.165.91/22的广播地址是多少？	16.158.167.255
-MAC地址是什么？	网卡物理地址(6字节十六进制)
-MAC地址的两个关键特性？	出厂固化，全局唯一
-为什么互联网不能只用MAC地址通信？	MAC无定位功能，不能跨子网通信
-MAC地址的通信范围？	限于同一个子网内
-环回地址(lo)的作用？	本机内部通信(127.0.0.1)
-网络设备状态UP表示什么？	网卡已启动
-BROADCAST标志表示什么？	支持发送广播包
-LOWER_UP标志表示什么？	物理层连接正常(网线插着)
-MTU是什么？	最大传输单元(以太网默认1500字节)
-pfifo_fast是什么？	分三个优先级波段(band0最高)的排队机制
-qdisc如何分配数据包优先级？	根据IP头中的TOS字段
+#separator:tab
+#html:true
+如何用net-tools配置IP地址？	"<pre><code class=""language-bash""># 配置eth1网卡IP地址并启用网卡
+sudo ifconfig eth1 10.0.0.1/24 && sudo ifconfig eth1 up
 
+# 验证配置
+ifconfig eth1</code></pre>"
+iproute2中哪个命令用于配置IP？	"<pre><code class=""language-bash""># 使用iproute2配置IP地址
+sudo ip addr add 10.0.0.1/24 dev eth1
 
-如何用net-tools配置IP地址？	sudo ifconfig eth1 10.0.0.1/24 && sudo ifconfig eth1 up
-iproute2中哪个命令用于配置IP？	sudo ip addr add 10.0.0.1/24 dev eth1
-配置孤立IP地址会导致什么后果？	数据包无法发出（目标MAC地址无法获取）
-Linux如何判断是否跨网段通信？	检查目标IP是否与任何网卡在同一网段
-跨网段时Linux默认如何发送数据包？	自动尝试发送到网关
-网关配置的限制条件是什么？	必须和当前网络至少一个网卡同网段
-DHCP协议的核心作用是什么？	自动为客户端动态分配IP地址配置
-DHCP Discover包的源IP是什么？	0.0.0.0
-DHCP广播包的目标MAC地址是什么？	ff:ff:ff:ff:ff:ff
-DHCP服务器端口是多少？	UDP 67
-客户端选择多个Offer时如何操作？	广播DHCP Request告知选择的服务器
-DHCP租期续约发生在何时？	租期达到50%时自动续约
-PXE协议主要解决什么问题？	为空白设备自动安装操作系统
-PXE客户端存放在哪里？	计算机的BIOS中
-PXE流程中下载启动文件使用什么协议？	TFTP协议
-DHCP Server需额外配置哪两个PXE参数？	next-server（PXE地址）和filename（启动文件）
-pxelinux.0文件的作用是什么？	初始化启动环境并获取配置
-如何避免PXE每次重启都重装系统？	首次安装后将系统写入本地存储
-DHCP ACK包包含哪些关键信息？	确认IP租约、子网掩码、网关、租期
-"网络封装"的核心原则是什么？	可以只有下层无上层，不可只有上层无下层
+# 启用网卡
+sudo ip link set eth1 up</code></pre>"
+配置孤立IP地址会导致什么后果？	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""net""
+)
+
+func main() {
+	// 配置孤立IP地址（无网关、无DNS）
+	ip := net.ParseIP(""192.168.1.100"")
+	
+	// 尝试访问外部网络
+	target := net.ParseIP(""8.8.8.8"")
+	
+	// 由于没有配置网关，ARP请求无法获取目标MAC地址
+	fmt.Println(""数据包无法发出: 目标MAC地址不可达"")
+	
+	// 实际网络通信需要完整的网络配置
+	fmt.Printf(""孤立IP %v 无法访问 %v\n"", ip, target)
+}</code></pre>"
+Linux如何判断是否跨网段通信？	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""net""
+)
+
+func isSameSubnet(sourceIP, destIP net.IP, mask net.IPMask) bool {
+	// 获取源IP的网络地址
+	srcNet := sourceIP.Mask(mask)
+	
+	// 获取目标IP的网络地址
+	destNet := destIP.Mask(mask)
+	
+	// 比较网络地址是否相同
+	return srcNet.Equal(destNet)
+}
+
+func main() {
+	// 示例：192.168.1.100/24 访问 192.168.1.200
+	ip1 := net.ParseIP(""192.168.1.100"")
+	ip2 := net.ParseIP(""192.168.1.200"")
+	mask := net.IPv4Mask(255, 255, 255, 0)
+	
+	if isSameSubnet(ip1, ip2, mask) {
+		fmt.Println(""同子网通信: 直接ARP请求目标MAC"")
+	} else {
+		fmt.Println(""跨子网通信: 需要发送到网关"")
+	}
+}</code></pre>"
+跨网段时Linux默认如何发送数据包？	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func main() {
+	// 当检测到目标IP在不同子网时
+	targetIP := ""10.1.2.3""
+	
+	// 查询路由表找到默认网关
+	gateway := ""192.168.1.1""
+	
+	// 将数据包发送到网关而不是直接目标
+	fmt.Printf(""跨网段通信: 将目标 %s 的数据包发送到网关 %s\n"", targetIP, gateway)
+	
+	// 网关负责将数据包路由到目标网络
+	fmt.Println(""网关执行NAT转发到目标网络"")
+}</code></pre>"
+网关配置的限制条件是什么？	"<pre><code class=""language-plaintext"">网关IP必须与当前主机至少一个网卡在同一子网内</code></pre>"
+DHCP协议的核心作用是什么？	"<pre><code class=""language-plaintext"">自动为客户端动态分配IP地址及相关网络配置</code></pre>"
+DHCP Discover包的源IP是什么？	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""net""
+)
+
+func main() {
+	// DHCP Discover包结构
+	type DHCPPacket struct {
+		SourceIP    net.IP
+		DestinationIP net.IP
+		SourcePort  int
+		MessageType string
+	}
+	
+	discover := DHCPPacket{
+		SourceIP:     net.IPv4(0, 0, 0, 0), // 0.0.0.0
+		DestinationIP: net.IPv4(255, 255, 255, 255), // 255.255.255.255
+		SourcePort:   68,
+		MessageType:  ""Discover"",
+	}
+	
+	fmt.Printf(""DHCP发现包源IP: %s\n"", discover.SourceIP)
+}</code></pre>"
+DHCP广播包的目标MAC地址是什么？	"<pre><code class=""language-plaintext"">ff:ff:ff:ff:ff:ff (全F广播地址)</code></pre>"
+DHCP服务器端口是多少？	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func main() {
+	// DHCP标准端口
+	const (
+		ServerPort = 67
+		ClientPort = 68
+	)
+	
+	fmt.Printf(""DHCP服务器监听端口: UDP %d\n"", ServerPort)
+	fmt.Printf(""客户端使用端口: UDP %d\n"", ClientPort)
+}</code></pre>"
+客户端选择多个Offer时如何操作？	"<pre><code class=""language-plaintext"">广播DHCP Request包，包含选中的服务器标识符</code></pre>"
+DHCP租期续约发生在何时？	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+func main() {
+	// 租期示例：24小时(86400秒)
+	leaseTime := 86400
+	
+	// 租期达到50%时开始续约
+	renewTime := leaseTime / 2
+	
+	// 租期达到87.5%时进入重绑定状态
+	rebindTime := leaseTime * 7 / 8
+	
+	fmt.Printf(""租期续约时间点: 在 %d 秒后 (50%%)\n"", renewTime)
+	fmt.Printf(""租期重绑定时间点: 在 %d 秒后 (87.5%%)\n"", rebindTime)
+}</code></pre>"
+PXE协议主要解决什么问题？	"<pre><code class=""language-plaintext"">为空白设备自动安装操作系统</code></pre>"
+PXE客户端存放在哪里？	"<pre><code class=""language-plaintext"">计算机主板BIOS/UEFI固件中</code></pre>"
+PXE流程中下载启动文件使用什么协议？	"<pre><code class=""language-plaintext"">TFTP (Trivial File Transfer Protocol)</code></pre>"
+DHCP Server需额外配置哪两个PXE参数？	"<pre><code class=""language-plaintext"">next-server (TFTP服务器地址) 和 filename (启动文件路径)</code></pre>"
+pxelinux.0文件的作用是什么？	"<pre><code class=""language-plaintext"">初始化启动环境并加载操作系统安装配置</code></pre>"
+如何避免PXE每次重启都重装系统？	"<pre><code class=""language-plaintext"">首次安装后将系统写入本地存储，禁用PXE启动</code></pre>"
+DHCP ACK包包含哪些关键信息？	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+type DHCPAck struct {
+	ClientIP     string
+	SubnetMask   string
+	Router       string
+	DNSServers   []string
+	LeaseTime    int
+	ServerID     string
+}
+
+func main() {
+	ack := DHCPAck{
+		ClientIP:   ""192.168.1.100"",
+		SubnetMask: ""255.255.255.0"",
+		Router:     ""192.168.1.1"",
+		DNSServers: []string{""8.8.8.8"", ""8.8.4.4""},
+		LeaseTime:  86400, // 24小时
+		ServerID:   ""192.168.1.1"",
+	}
+	
+	fmt.Println(""DHCP ACK包含:"")
+	fmt.Printf(""- 分配的IP: %s\n"", ack.ClientIP)
+	fmt.Printf(""- 子网掩码: %s\n"", ack.SubnetMask)
+	fmt.Printf(""- 网关地址: %s\n"", ack.Router)
+	fmt.Printf(""- DNS服务器: %v\n"", ack.DNSServers)
+	fmt.Printf(""- 租期时间: %d秒\n"", ack.LeaseTime)
+}</code></pre>"
+"网络封装"的核心原则是什么？	"<pre><code class=""language-plaintext"">可以只有下层无上层，不可只有上层无下层</code></pre>"

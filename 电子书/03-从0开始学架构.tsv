@@ -283,3 +283,159 @@ Mary Shaw & David Garlan定义：
 2. 从代码细节 → 系统结构
 3. 从局部优化 → 全局约束
 */</code></pre>"
+
+# 04 | 复杂度来源：高性能
+
+#separator:tab
+#html:true
+Golang实现进程间通信IPC机制	"<pre><code class=""language-go"">package main
+
+import (
+    ""os""
+    ""os/exec""
+    ""time""
+)
+
+func main() {
+    // 创建管道（匿名管道示例）
+    r, w, _ := os.Pipe()
+    
+    // 父进程写数据
+    go func() {
+        w.Write([]byte(""IPC message from parent""))
+        w.Close()
+    }()
+    
+    // 子进程读数据
+    cmd := exec.Command(""go"", ""run"", ""child.go"")
+    cmd.ExtraFiles = []*os.File{r}  // 将读端传递给子进程
+    cmd.Start()
+    
+    time.Sleep(1 * time.Second) // 等待通信完成
+}</code></pre>"
+Golang多线程共享资源与互斥锁	"<pre><code class=""language-go"">package main
+
+import (
+    ""fmt""
+    ""sync""
+)
+
+var counter int
+var mutex sync.Mutex
+
+func main() {
+    var wg sync.WaitGroup
+    for i := 0; i < 10; i++ {
+        wg.Add(1)
+        go increment(&wg) // 启动10个goroutine
+    }
+    wg.Wait()
+    fmt.Println(""Final counter:"", counter)
+}
+
+func increment(wg *sync.WaitGroup) {
+    mutex.Lock()         // 加锁保护临界区
+    defer mutex.Unlock() // 确保解锁
+    counter++            // 共享资源修改
+    wg.Done()
+}</code></pre>"
+Golang实现轮询负载均衡算法	"<pre><code class=""language-go"">package main
+
+import ""fmt""
+
+type Server struct {
+    Name string
+    Load int
+}
+
+func main() {
+    servers := []Server{
+        {""ServerA"", 0},
+        {""ServerB"", 0},
+        {""ServerC"", 0},
+    }
+    
+    // 模拟10个请求
+    for i := 0; i < 10; i++ {
+        target := &servers[i%len(servers)] // 轮询选择服务器
+        target.Load++                      // 增加目标服务器负载
+        fmt.Printf(""Request %d → %s (Load:%d)\n"", i+1, target.Name, target.Load)
+    }
+}</code></pre>"
+任务分解过细的性能问题伪代码	"<pre><code class=""language-go"">package main
+
+import (
+    ""fmt""
+    ""time""
+)
+
+// 微服务调用模拟（100个子系统）
+func callMicroservice(id int) {
+    time.Sleep(1 * time.Millisecond) // 网络延迟
+    // 业务处理...
+}
+
+func main() {
+    start := time.Now()
+    
+    // 需要99次跨服务调用
+    for i := 0; i < 99; i++ {
+        go callMicroservice(i) // 并行调用
+    }
+    
+    time.Sleep(100 * time.Millisecond) // 等待调用完成
+    fmt.Printf(""总耗时: %v\n"", time.Since(start))
+}</code></pre>"
+微信后台系统拆分架构伪代码	"<pre><code class=""language-go"">package main
+
+// 微信后台子系统定义
+type Subsystem interface {
+    ProcessRequest()
+}
+
+// 实现子系统
+type AuthSystem struct{}
+func (a *AuthSystem) ProcessRequest() { /* 认证逻辑 */ }
+
+type MessageSystem struct{}
+func (m *MessageSystem) ProcessRequest() { /* 消息处理 */ }
+
+type LBSSystem struct{}
+func (l *LBSSystem) ProcessRequest() { /* 位置服务 */ }
+
+func main() {
+    // 初始化7个子系统（微信实际拆分）
+    subsystems := []Subsystem{
+        &AuthSystem{},
+        &MessageSystem{},
+        &LBSSystem{},
+        // ...其他4个子系统
+    }
+    
+    // 请求处理流程
+    for _, sys := range subsystems {
+        sys.ProcessRequest() // 依次处理各子系统任务
+    }
+}</code></pre>"
+高性能复杂度两大来源概念	"<pre><code class=""language-text"">软件系统高性能复杂度主要来源：
+1. 单机内部复杂度
+   - CPU架构演进（SMP/NUMA/MPP）
+   - OS机制（进程/线程/IPC）
+   - 并发控制（锁/原子操作）
+
+2. 集群复杂度
+   - 任务分配策略（负载均衡算法）
+   - 系统扩展瓶颈（分配器成为单点）
+   - 网络通信开销（延迟/丢包）</code></pre>"
+任务分解性能优化原则	"<pre><code class=""language-text"">任务分解性能优化黄金法则：
+1. 拆分粒度平衡原则
+   - 过粗 → 优化困难
+   - 过细 → 调用爆炸
+
+2. 性能收益递减规律
+   - 系统1→10台：性能↑8倍
+   - 系统10→100台：性能↑仅5倍
+
+3. 网络延迟敏感度
+   - 1ms网络延迟 + 50ms处理
+   - 增加99次调用 → 总时延增加99ms</code></pre>"
