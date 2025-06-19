@@ -1,0 +1,139 @@
+# 01 | 基本架构：一个键值数据库包含什么？
+
+#separator:tab
+#html:true
+Golang实现键值数据库PUT操作示例	"<pre><code class=""language-go"">func (db *KVStore) Put(key string, value []byte) error {
+    // 1. 获取写锁保证线程安全
+    db.mu.Lock()
+    defer db.mu.Unlock()
+    
+    // 2. 更新内存索引（哈希表实现O(1)复杂度）
+    db.index[key] = len(db.data)
+    
+    // 3. 追加写入数据文件（持久化策略）
+    entry := encodeEntry(key, value)
+    if _, err := db.dataFile.Write(entry); err != nil {
+        return fmt.Errorf(""持久化失败: %v"", err)
+    }
+    
+    // 4. 更新内存缓存（LRU策略）
+    db.cache.Add(key, value)
+    return nil
+}</code></pre>"
+哈希表索引在Golang中的实现原理	"<pre><code class=""language-go"">// 内存索引结构
+type Index map[string]int64  // key映射数据文件偏移量
+
+// 索引查询核心逻辑
+func (idx Index) GetLocation(key string) (int64, bool) {
+    offset, exists := idx[key]
+    // 哈希碰撞处理：链地址法
+    if !exists {
+        return -1, false
+    }
+    return offset, true
+}
+
+// 索引更新（PUT/DELETE时调用）
+func (idx Index) Update(key string, offset int64) {
+    idx[key] = offset  // O(1)时间复杂度更新
+}</code></pre>"
+Golang实现AOF持久化伪代码	"<pre><code class=""language-go"">func startAOFWriter(dataChan <-chan []byte) {
+    // 1. 创建追加日志文件
+    file, _ := os.OpenFile(""kvstore.aof"", os.O_APPEND|os.O_CREATE, 0600)
+    defer file.Close()
+    
+    // 2. 后台协程处理写入队列
+    go func() {
+        for cmd := range dataChan {
+            // 写入命令日志（格式: [操作类型]键值数据）
+            if _, err := file.Write(cmd); err != nil {
+                log.Printf(""AOF写入失败: %v"", err)
+            }
+            // 可配置的fsync策略
+            if config.AOFSyncEvery > 0 {
+                file.Sync()  // 立即刷盘保证可靠性
+            }
+        }
+    }()
+}</code></pre>"
+键值数据库SCAN操作Golang实现	"<pre><code class=""language-go"">func (db *KVStore) Scan(prefix string) map[string][]byte {
+    results := make(map[string][]byte)
+    
+    // 遍历哈希表索引（实际生产环境用B+树更高效）
+    for key, offset := range db.index {
+        // 前缀匹配筛选
+        if strings.HasPrefix(key, prefix) {
+            // 从数据文件读取值
+            value, _ := db.readFromDisk(offset)
+            results[key] = value
+        }
+    }
+    return results
+}
+
+// 优化：使用跳表实现范围查询
+type SkipList struct {
+    // ... 跳表层级实现
+}</code></pre>"
+Redis的SORTED SET在Golang中的数据结构实现	"<pre><code class=""language-go"">// 跳表+哈希表组合结构
+type SortedSet struct {
+    skiplist *SkipListNode  // 跳表按分数排序
+    dict     map[string]*Node  // 哈希表快速定位
+}
+
+// 添加元素 O(logN)
+func (ss *SortedSet) Add(member string, score float64) {
+    // 1. 哈希表检查是否存在
+    if node, exists := ss.dict[member]; exists {
+        // 更新跳表节点位置
+        ss.skiplist.Update(node, score)
+    } else {
+        // 2. 创建跳表新节点
+        newNode := ss.skiplist.Insert(score, member)
+        ss.dict[member] = newNode
+    }
+}</code></pre>"
+Golang模拟键值数据库网络层核心	"<pre><code class=""language-go"">func startServer() {
+    ln, _ := net.Listen(""tcp"", "":6379"")
+    for {
+        conn, _ := ln.Accept()
+        go handleConnection(conn)  // 每连接独立协程
+    }
+}
+
+func handleConnection(conn net.Conn) {
+    // 1. 解析Redis协议请求
+    cmd, args := parseCommand(conn)
+    
+    // 2. 路由到对应操作
+    switch cmd {
+    case ""GET"":
+        value := store.Get(args[0])
+        conn.Write(value)
+    case ""PUT"":
+        store.Put(args[0], args[1])
+        conn.Write([]byte(""OK""))
+    // ... 其他命令处理
+    }
+}</code></pre>"
+内存分配器碎片问题解决方案	"<pre><code class=""language-go"">// 自定义内存池减少碎片
+type MemoryPool struct {
+    blocks [][]byte
+    pageSize int
+}
+
+func (p *MemoryPool) Alloc(size int) []byte {
+    // 1. 尝试重用现有内存块
+    for i, block := range p.blocks {
+        if len(block) >= size {
+            // 切割并返回可用内存
+            p.blocks = append(p.blocks[:i], p.blocks[i+1:]...)
+            return block[:size]
+        }
+    }
+    
+    // 2. 申请新内存页（按页对齐减少碎片）
+    newBlock := make([]byte, p.pageSize)
+    p.blocks = append(p.blocks, newBlock[size:])
+    return newBlock[:size]
+}</code></pre>"
