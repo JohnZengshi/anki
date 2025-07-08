@@ -1032,6 +1032,11 @@ align-content和align-items区别？	"<pre><code class=""language-css"">/* align
 
 /* align-items: 控制行内项目对齐 (单行布局) */
 .container { align-items: center; }</code></pre>"
+
+
+# =============================================================================================
+
+
 HSL相比RGB的优势？	"<pre><code class=""language-css"">/* 更直观的颜色控制 */
 .color {
   /* 调整色相 */   hsl(120, 100%, 50%)
@@ -1092,7 +1097,6 @@ CSS颜色系统中真彩色指？	"<pre><code class=""language-css"">/* 每个RG
 文本实体&amp;表示什么字符？	"<pre><code class=""language-html"">&amp;amp;  &lt;!-- 表示 & 符号 --&gt;</code></pre>"
 HTML注释中如何包含-->？	"<pre><code class=""language-html"">&lt;!-- 正常注释 --&gt;
 &lt;!-- 拆分注释1 --&gt; - &lt;!-- 拆分注释2 --&gt;</code></pre>"
-CDATA节点的核心作用？	"<pre><code class=""language-xml"">&lt;
 
 #separator:tab
 #html:true
@@ -1537,6 +1541,9 @@ CSS：will-change属性用法	"<pre><code class=""language-css"">.animated-eleme
   // 合并到屏幕缓冲区
   composeBuffer();
 }</code></pre>"
+
+
+
 HTTP：GET与POST方法区别	"<pre><code class=""language-text"">GET用于获取资源，POST用于提交数据</code></pre>"
 HTTP：301与302状态码区别	"<pre><code class=""language-text"">301永久重定向，302临时重定向</code></pre>"
 CSS：排版模式对比	"<pre><code class=""language-text"">正常流：顺序布局；绝对定位：脱离流；浮动：先流后移</code></pre>"
@@ -1558,378 +1565,1727 @@ for (let i = 0; i < 1000; i++) {
 document.getElementById('list').appendChild(fragment);</code></pre>"
 DOM：无HTML写法的节点类型	"<pre><code class=""language-text"">Document 和 DocumentFragment</code></pre>"
 
-# Node接口
-Node接口中表示父节点的属性是什么？	parentNode
-Node接口中表示子节点列表的属性是什么？	childNodes
-Node接口中用于在父节点的子节点列表末尾添加节点的API是什么？	appendChild
-Node接口中用于在父节点的指定子节点前插入新节点的API是什么？	insertBefore
-Node接口中用于替换一个子节点的API是什么？	replaceChild
-Node接口中用于比较两个节点关系的API是什么？	compareDocumentPosition
-Node接口中用于检查一个节点是否包含另一个节点的API是什么？	contains
-Node接口中用于复制节点的API是什么？	cloneNode
-
-# 创建节点
-创建元素节点的方法是什么？	document.createElement
-创建文本节点的方法是什么？	document.createTextNode
-创建注释节点的方法是什么？	document.createComment
-创建文档片段的方法是什么？	document.createDocumentFragment
-
-# Element与Attribute
-Element接口中获取元素属性的方法是什么？	getAttribute
-Element接口中设置元素属性的方法是什么？	setAttribute
-Element接口中删除元素属性的方法是什么？	removeAttribute
-Element接口中检查元素是否有某个属性的方法是什么？	hasAttribute
-Element接口中获取属性节点的方法是什么？	getAttributeNode
-Element接口中设置属性节点的方法是什么？	setAttributeNode
-
-# 查找元素
-document对象中通过CSS选择器查找单个元素的方法是什么？	querySelector
-document对象中通过CSS选择器查找多个元素的方法是什么？	querySelectorAll
-document对象中通过id查找元素的方法是什么？	getElementById
-document对象中通过name属性查找元素的方法是什么？	getElementsByName
-document对象中通过标签名查找元素的方法是什么？	getElementsByTagName
-document对象中通过类名查找元素的方法是什么？	getElementsByClassName
-为什么建议使用getElement系列API而不是querySelector？	性能更高，且返回的集合是动态更新的
-
-# 遍历DOM
-DOM标准中用于遍历节点的两个主要API是什么？	NodeIterator 和 TreeWalker
-创建NodeIterator的方法是什么？	document.createNodeIterator
-NodeIterator的nextNode方法返回什么？	下一个节点，如果没有则返回null
-TreeWalker相比NodeIterator多出的能力是什么？	可以在DOM树上自由移动当前节点（如parentNode, firstChild等）
-
-# Range API
-Range对象表示什么？	HTML文档中的一个连续范围
-创建Range对象的方法是什么？	new Range()
-设置Range起点的方法是什么？	setStart
-设置Range终点的方法是什么？	setEnd
-从用户选中区域创建Range的方法是什么？	document.getSelection().getRangeAt(0)
-提取Range内容的方法是什么？	extractContents
-在Range位置插入节点的方法是什么？	insertNode
-
-
-# CSSOM
-CSSOM包含哪两个部分？	描述样式表和规则等CSS的模型部分（CSSOM）和跟元素视图相关的View部分（CSSOM View）
-获取文档中所有样式表的方法是什么？	document.styleSheets
-向样式表中插入新规则的方法是什么？	document.styleSheets[0].insertRule
-从样式表中删除规则的方法是什么？	document.styleSheets[0].deleteRule
-获取元素最终计算样式的方法是什么？	window.getComputedStyle
-
-
-# CSSOM View
-CSSOM View主要包含哪三个部分？	窗口API、滚动API、布局API
-改变浏览器窗口大小的API是什么？	resizeTo 和 resizeBy
-获取视口横向滚动距离的属性是什么？	scrollX 或 pageXOffset
-获取视口纵向滚动距离的属性是什么？	scrollY 或 pageYOffset
-使页面滚动到特定位置的API是什么？	scroll 或 scrollTo
-使页面滚动特定距离的API是什么？	scrollBy
-获取元素在交叉轴方向的高度的属性是什么？	scrollHeight
-使元素滚动到可见区域的API是什么？	scrollIntoView
-
-
-# 布局API
-获取视口高度的属性是什么？	window.innerHeight
-获取设备物理像素与CSS像素比率的属性是什么？	window.devicePixelRatio
-获取元素所有盒占据的客户端矩形区域的API是什么？	getClientRects
-获取元素包裹所有盒的矩形区域的API是什么？	getBoundingClientRect
-
-
-# 浏览器事件
-浏览器事件的三个主要来源是什么？	键盘、鼠标、触摸屏
-事件传播的捕获过程是怎样的？	从外向内（从根节点到目标节点）
-事件传播的冒泡过程是怎样的？	从内向外（从目标节点到根节点）
-addEventListener的第三个参数可以是什么？	布尔值（true表示捕获，false表示冒泡）或对象（包含capture、once、passive等选项）
-
-
-# 焦点系统
-焦点系统的作用是什么？	处理键盘事件，确定键盘事件的目标元素
-使元素获得焦点的方法是什么？	focus()
-使元素失去焦点的方法是什么？	blur()
-
-# 自定义事件
-创建自定义事件的方法是什么？	new Event(type, options)
-触发自定义事件的方法是什么？	dispatchEvent
-
-
-# 性能优化
-性能优化体系的四个步骤是什么？	现状评估和建立指标、技术方案、执行、结果评估和监控
-前端性能的三个重要方面是什么？	页面加载性能、动画与操作性能、内存和电量消耗
-为什么使用"秒开率"作为性能指标？	1秒内打开的用户体验较好，且避免超长加载用户对平均值的影响
-
-
-# 工具链
-工具链设计需要满足的两个基本要求是什么？	版本一致、避免冲突
-工具链一般覆盖前端开发的哪些任务？	初始化项目、运行和调试、测试、发布
-
-# 持续集成
-前端持续集成的两个主要措施是什么？	预览环境、规则校验
-规则校验的三种方法是什么？	页面结构扫描、运行时数据采集、代码扫描
-
-
-# 搭建系统
-搭建系统的目标是什么？	解决大量简单页面的生产问题
-搭建系统的三种设计思路是什么？	模板化搭建、模块化搭建、数据驱动界面
-搭建系统中的数据按用途分为哪两类？	界面配置数据、内容数据
-搭建系统中的模板由谁生产？	前端工程师
-
-
-# 前端架构
-前端架构解决的三个核心问题是什么？	组件化、适配性、单页应用
-适配性主要适配屏幕的哪三个要素？	单位英寸像素数（PPI）、设备像素比率（DPR）、分辨率
-单页应用（SPA）的主要技术难点是什么？	逻辑页面解耦、独立开发和发布、保持前进后退历史
-
-
-# 组件化方案
-列举5种主流的组件化方案。	Web Component、Vue、React、Angular、自研
-Web Component的主要优势是什么？	无需额外运行时支持，与现代浏览器兼容
-Vue框架的两个主要特点是什么？	符合传统HTML/CSS/JS书写习惯、MVVM模式
-React框架的特点是什么？	JSX语法、可配合React Native开发客户端应用
-
-# 兼容性与适配性
-适配分辨率的主要CSS单位是什么？	vw
-适配DPR的主要CSS规则是什么？	viewport
-适配PPI的主要CSS规则是什么？	media
-
-# 实际应用
-如何高效添加多个DOM节点？	使用DocumentFragment批量操作
-如何获取元素最终渲染尺寸？	使用getBoundingClientRect()
-如何实现事件委托？	在父元素监听事件，利用冒泡机制处理子元素事件
-为什么移动端开发需要viewport配置？	适配不同设备的DPR（设备像素比）
-SPA应用如何保持前进后退历史？	使用URL的Hash部分并监听onhashchange事件
-
-# 前端图形学基础
-前端引入图形学的主要动机是什么？	解决传统前端无法实现的先进交互效果（如光影效果）
-浏览器图形学的技术栈依赖关系是什么？	OpenGL → 浏览器渲染引擎 → 前端应用
-Photoshop中实现图形效果的核心技术是什么？	滤镜（Filter）
-设计稿中的图形可分为哪三类？	图案（Pattern）、图片（Photo）、形状（Shape）
-
-# 图形渲染技术
-如何用代码实现云雾效果？	叠加多张不同比例的噪声图（Noise）
-分形图形的特点是什么？	局部与整体相似，可无限延伸
-Julia Set分形图的特点是什么？	不同常数产生完全不同的图形
-如何实现色相变化效果？	将RGB转HSV修改色相后转回RGB
-绿幕技术的原理是什么？	通过颜色阈值分离前景和背景
-前端实现3D图形的常用库有哪些？	ThreeJS和BabylonJS
-
-# 图形学基础设施
-为什么需要GCanvas？	解决Weex/React Native等原生方案中缺失Canvas的问题
-GCanvas的主要作用是什么？	在原生应用环境中提供Canvas绘制能力
-G3D与ThreeJS的主要区别是什么？	更强调底层管理能力和交互支持（点选/拖拽/顶点变形）
-
-# 交互基础设施演进
-MVC架构提出的时间？	1979年左右
-MVP模式的提出者和时间？	Mike于1995年提出
-MVVM模式的提出背景？	2005年微软架构师为WPF设计
-FLUX模式的出现时间和背景？	2014年Facebook为React设计
-REDUX的出现时间？	2015年
-
-# 现代交互体系
-交互的本质是什么？	操作（输入）和看（输出）
-Binding模式解决的核心问题是什么？	减少JS与Native通讯次数提升性能
-手势识别中pan事件的触发条件？	手指移动超过10px
-手势识别中tap事件的触发条件？	手指快速离开屏幕
-手势识别中press事件的触发条件？	按压超过1.5秒
-陀螺仪数据的核心问题是什么？	0-360度跳变导致计算困难
-现代视图层的核心职责变化？	从被动展示变为同时处理输入输出
-
-# 前端趋势预测
-2019年图形学的发展方向？	2D/3D应用普及，替代PS滤镜效果
-前端包管理的主要问题？	安全问题和依赖过多导致的性能问题
-AI与前端的结合点？	视觉识别和智能研发（如自动切图）
-三大框架(Vue/React/Angular)的预测？	稳定发展，生态持续成熟
-
-# 实际应用
-如何实现设计师的云雾效果需求？	叠加多张不同比例的噪声图(noise)
-如何动态改变图片主色调？	RGB转HSV修改色相后转回RGB
-在Weex环境中如何解决Canvas缺失问题？	使用GCanvas
-如何优化手势事件的性能？	采用Binding模式减少JS-Native通讯
-
-# JavaScript基础
-对象方法中name(){}与name:function(){}的主要区别是什么？	函数的name属性不同，后者可命名用于递归
-const声明数组时push操作是否允许？	允许，const仅禁止重新赋值而非修改内容
-如何冻结对象防止篡改？	使用Object.freeze()
-创建自定义事件的方法是什么？	new Event(type, options)
-触发自定义事件的方法是什么？	dispatchEvent
-
-# 异步与事件循环
-Promise.then中setTimeout的执行顺序特点？	微任务发起的宏任务最后入队执行
-同步请求为什么不被推荐？	会阻塞JavaScript执行线程
-new Promise中setTimeout(resolve)与setTimeout(()=>resolve())的区别？	传参需求不同，无参时可简写
-事件传播的捕获过程是怎样的？	从外向内（根节点到目标节点）
-事件传播的冒泡过程是怎样的？	从内向外（目标节点到根节点）
-
-# CSS与渲染
-为什么推荐使用flex布局替代float？	避免margin兼容问题，更符合现代布局需求
-CSSOM包含哪两个主要部分？	描述样式表的模型部分(CSSOM)和视图相关部分(CSSOM View)
-适配不同屏幕的三个核心要素是什么？	PPI(像素密度)、DPR(设备像素比)、分辨率
-分辨率适配推荐使用什么CSS单位？	vw单位
-CSS规则匹配为什么从右向左？	对复杂选择器更高效，可快速过滤不匹配元素
-
-# 浏览器原理
-DOM树构建与CSSOM构建的先后关系？	CSSOM规则部分先构建，视图部分与DOM同步构建
-浏览器如何检测鼠标事件目标？	从外向内逐级分配，事件捕获确定目标
-修改DOM元素位置会触发什么渲染过程？	重排影响相关元素，重绘影响视觉变化
-位图缓存如何优化渲染性能？	父子元素分别缓存位图，位置变化只需合成
-
-# 工程实践
-前端性能监控主要收集哪些数据？	window.onerror错误和window.performance指标
-搭建系统如何实现逻辑页面独立发布？	发布JavaScript渲染文件+公共HTML载体
-为什么活动页面适合模板化开发？	通过参数化解决多变性需求
-单元测试在什么场景最有效？	框架和基础库开发中效果显著
-
-# HTML与语义化
-footer标签必须明确什么关联关系？	需指明所属内容区域（如文章/章节）
-为什么alt属性不能被figureCaption替代？	alt描述图片内容，figureCaption可能是编号
-style标签为什么不支持src属性？	已有link标签满足外部样式需求
-iframe的使用场景建议是什么？	PC端历史包袱外避免使用，移动端禁用
-
-# 架构与学习
-前端架构解决的三个核心问题？	组件化、适配性、单页应用(SPA)
-2019年前端三大框架发展趋势？	Vue/React/Angular稳定发展，生态持续成熟
-图形学在前端的应用方向？	替代PS滤镜效果，实现2D/3D渲染
-如何建立有效的前端知识体系？	通过写作梳理知识，形成可检索的架构
-
-# 综合问题
-为什么术语中保留英文原词？	避免翻译失真，便于查阅标准文档
-如何阅读Web标准文档？	配合代码实现理解，MDN是更友好选择
-项目技术选型的关键因素？	团队现状、业务需求、基础设施支持
-前端如何拓展职业边界？	学习Node/Electron，但需深入领域知识
-
-
-# 补充
-JavaScript中基本类型(如字符串)为什么能调用方法?	引擎自动装箱创建临时包装对象
-当使用'abc'.charAt(0)时，底层发生了什么?	1) 创建String临时对象 2) 调用charAt方法 3) 销毁对象
-JavaScript装箱操作产生的对象是永久的吗?为什么?	不是永久的，方法调用后立即销毁
-以下代码输出什么？"abc".prop = 123; console.log("abc".prop);	undefined（临时对象已销毁）
-显式装箱与隐式装箱的区别是什么?	显式: new String()创建持久对象，隐式: .运算符自动创建临时对象
-为什么123.toString()会报错而(123).toString()不会?	.被解析为小数点，括号强制识别为对象访问
-typeof new String('abc')的返回值是什么?	"object"（包装对象）
-typeof 'abc'的返回值是什么?	"string"（原始类型）
-布尔值true调用方法时会创建什么包装对象?	new Boolean(true)
-包装对象被销毁后，能否访问为其添加的属性?	不能，属性随临时对象一起销毁
-
-
-Object.defineProperty()的主要作用是什么？	精确控制对象属性的特征（可写性、可枚举性、可配置性）
-属性描述符中writable: false的作用是什么？	创建只读属性，阻止属性值被修改
-enumerable: false属性在枚举对象属性时会如何表现？	隐藏属性（不会出现在for...in循环或Object.keys()中）
-configurable: false的作用是什么？	阻止属性被删除或属性特征被修改
-默认使用Object.defineProperty()创建的属性特征是什么？	writable:false, enumerable:false, configurable:false
-在严格模式下尝试修改writable:false的属性会发生什么？	抛出TypeError错误
-如何用Object.defineProperty()实现属性值的验证？	通过定义setter函数添加验证逻辑
-getter/setter和普通属性描述符的区别是什么？	getter/setter允许自定义属性访问逻辑而不是直接存储值
-为什么在框架（如Vue.js）中会用到Object.defineProperty？	实现响应式数据追踪变化
-Object.defineProperty()和普通属性赋值的核心区别是什么？	defineProperty可以精确控制属性特征，普通赋值默认所有特征均为true
-能否同时定义value和getter/setter？为什么？	不能，会抛出错误（无法同时定义访问器和值/可写描述符）
-
-
-JavaScript中Symbol的主要作用是什么？	创建唯一标识符，避免属性名冲突
-为什么Symbol('desc') === Symbol('desc')返回false？	每个Symbol都是唯一的，即使描述相同也不相等
-如何获取对象的所有Symbol属性键？	使用Object.getOwnPropertySymbols()
-Symbol属性在for-in循环和Object.keys()中可见吗？	不可见，Symbol属性默认不可枚举
-如何使用Symbol创建"类私有"属性？	将Symbol作为属性键，利用不可枚举特性隐藏内部状态
-Symbol.for()和Symbol()的区别是什么？	Symbol.for()在全局注册表中创建共享Symbol，Symbol()创建唯一Symbol
-Symbol.keyFor()方法的作用是什么？	返回全局Symbol的描述文本
-哪个内置Symbol用于自定义对象的迭代行为？	Symbol.iterator
-Symbol如何避免多个第三方库的属性名冲突？	使用Symbol作为属性键，确保唯一性不受命名影响
-在JSON.stringify()中Symbol属性会被序列化吗？	不会，Symbol属性默认被忽略
-Symbol属性可以通过Object.assign()复制吗？	可以，Symbol属性会被复制到新对象中
-
-
-ES6 class的本质是什么？	基于原型继承的语法糖
-class中的方法实际定义在哪里？	在构造函数的原型对象上
-class的静态方法定义在哪里？	在构造函数本身上，而不是在prototype上
-ES6的extends关键字实现了什么？	更规范的继承机制
-使用extends时，如何设置原型链？	Object.setPrototypeOf(子类.prototype, 父类.prototype)
-super()在构造函数中的作用是什么？	调用父类的构造函数
-为什么在子类构造函数中必须先调用super()才能使用this？	ES6规范要求初始化this实例必须由父类完成
-class表达式和函数声明的关键区别是什么？	类声明不会提升，存在暂时性死区
-ES6类中的非方法变量定义会如何处理？	会创建全局变量（没有类级作用域）
-如何证明ES6 class本质是函数？	typeof 类名 返回 "function"
-ES6类和ES5原型继承的核心区别是什么？	语法更清晰，但底层机制相同
-class能实现真正的私有字段吗？	不能（ES2022前），但ES2022引入了#前缀的私有字段
-class支持多重继承吗？	不支持，只能单一继承
-class中的静态方法如何访问？	通过类名直接访问，而不是实例
-class创建实例是否必须使用new？	必须使用new，否则会报错
-子类如何继承父类的静态方法？	Object.setPrototypeOf(子类, 父类)
-class是否改变了JavaScript的核心继承模型？	没有，仍然是基于原型的继承
-
-
-为什么JavaScript中无法用class继承Date等原生对象？	原生对象依赖引擎内部私有字段（如[[DateValue]]），这些字段无法通过原型链继承
-Image构造器能否作为普通函数调用？为什么？	否，必须使用new调用。DOM规范要求其作为构造函数使用，否则抛出TypeError
-函数调用和new调用时内部方法有何不同？	[[Call]]用于普通调用(f())，[[Construct]]用于构造函数调用(new f())
-new调用时如何处理返回值？	返回非对象则忽略并返回新建对象；返回对象则作为结果
-普通函数调用时如何绑定this？	非严格模式：绑定全局对象；严格模式：undefined
-new调用时如何建立原型链？	自动设置新对象的__proto__指向构造函数的prototype属性
-如何检测函数是否作为构造函数被调用？	使用new.target属性：new调用时为函数本身，普通调用时为undefined
-箭头函数能否用new调用？为什么？	不能，箭头函数只有[[Call]]内部方法，没有[[Construct]]方法
-内置构造函数Symbol/BigInt能否用new调用？	不能，它们只有[[Call]]方法，没有[[Construct]]方法
-构造函数返回原始值时如何处理？	new调用时忽略原始值返回值，直接返回创建的新对象
-
-
-arguments 对象是什么？	类数组对象，包含函数调用时传入的所有参数。
-arguments 对象是数组吗？	不是，没有数组方法，可通过 Array.from(arguments) 或 [...arguments] 转成真数组。
-非严格模式下修改 arguments[0] 会怎样？	会同步改变对应的形参变量（两者双向绑定）。
-严格模式下 arguments 和形参的关系？	彼此独立，互不影响（需 "use strict"）。
-arguments.length 表示什么？	函数调用时实际传入的参数数量。
-形参数量少于实参时如何访问额外参数？	通过 arguments[索引] 访问（例如 arguments[2] 表示第三个参数）。
-箭头函数有 arguments 对象吗？	没有自身 arguments 对象，会继承外层函数的 arguments。
-ES6 中替代 arguments 的最佳方案？	剩余参数：function test(...args) {...}（args 是真正的数组）。
-如何获取未传递的形参在 arguments 中的值？	对应索引位置值为 undefined（形参变量也是 undefined）。
-非严格模式下修改形参变量会怎样影响 arguments？	会同步改变 arguments 对象对应位置的值。
-arguments.callee 的作用？	引用当前正在执行的函数（严格模式禁用）。
-arguments[Symbol.iterator] 的作用？	使 arguments 可迭代，支持 for...of 循环（类似数组）。
-
-
-bind() 创建的函数与原函数是同一个函数吗？	不是，bind() 返回全新的函数对象，但执行时会调用原函数
-bind() 绑定的 this 能否被 call/apply 覆盖？	不能，绑定函数的 this 永久固定，无法被 call/apply 修改
-bind() 如何处理预设参数？	预设参数自动拼接在调用参数之前（顺序：bind预设参数 + 调用时参数）
-用 new 调用绑定函数时，绑定的 this 是否生效？	不生效，new 会忽略绑定的 this，但预设参数仍然有效
-bind() 后的函数是否有 prototype 属性？	没有，但 instanceof 可关联原函数的原型链
-bind() 的主要应用场景有哪些？	解决回调函数 this 丢失问题（如事件处理）、创建偏函数（预设部分参数）
-bind() 和箭头函数在 this 处理上的核心区别？	bind() 显式绑定 this，箭头函数隐式绑定（定义时确定且不可改）
-
-
-谁负责发起JavaScript中的宏观任务(Macrotask)?	宿主环境（如浏览器或Node.js）
-请列出3个由宿主环境发起的宏观任务API。	setTimeout、setInterval、I/O操作回调、DOM事件回调、requestAnimationFrame（任选3项）
-当调用setTimeout时，哪个部分负责计时操作?	宿主环境（浏览器/Node.js使用系统级计时器）
-宏观任务回调函数会被放入哪个队列?	宏任务队列(Macrotask Queue)
-在事件循环中，宏观任务何时被执行?	1. 调用栈清空 2. 微任务队列全部执行完成后
-为什么宏观任务需要宿主环境发起?	因为JS引擎无法直接操作外部系统（如定时器/网络），需要宿主环境充当桥梁
-Node.js中哪些API会产生宏观任务?	setImmediate、I/O回调、定时器回调
-浏览器渲染UI属于什么类型的任务?	宏观任务
-setTimeout(fn, 0)何时执行?	在所有微任务执行完毕后，下一个宏任务周期执行
-如何证明setTimeout是由宿主环境控制的?	1. 计时操作在浏览器/Node线程完成 2. JS引擎只负责回调执行 3. 回调进入宏任务队列的机制由宿主实现
-
-
-var声明的变量作用域是什么？	函数作用域（非块级作用域），作用域在声明它的整个函数内有效。
-var声明的变量是否会穿透if/for等块级作用域？	是，在{}块内var声明的变量会泄漏到外层函数/全局作用域。
-什么是变量提升？	var声明会被提升到作用域顶部（赋值不提升），初始值为undefined。
-console.log(x); var x=5; 输出什么？	undefined（声明提升，但赋值在原地执行）。
-var是否允许重复声明？	允许，且不会报错（let/const不允许）。
-for(var i=0;i<3;i++){setTimeout(()=>console.log(i))}输出？	3,3,3（i被整个函数共享，穿透块作用域）。
-如何修复循环中的var穿透问题？	方案1：用let替代var；方案2：用IIFE创建闭包：for(var i=0;i<3;i++){(function(j){setTimeout(()=>console.log(j))})(i)}
-var声明的全局变量和let有何区别？	var在全局作用域声明会成为window属性（var y=1; window.y //1），而let不会（let z=2; window.z //undefined）。
-function test(){ if(true){var x=5;} return x;} 调用test()返回？	5（var穿透if块作用域，属于整个函数作用域）。
-如何防止var的变量污染作用域？	1) 始终在函数顶部声明var；2) 优先使用let/const；3) 用IIFE隔离作用域。
-
-普通函数的特点是什么？	通过function关键字定义，有独立this值，可作为构造函数使用，支持arguments对象
-箭头函数与普通函数的主要区别？	箭头函数没有独立this（继承外层作用域），不能作为构造函数，不支持arguments对象
-类方法如何定义和使用？	在class内部定义，通过实例调用，this绑定到实例，支持静态方法（static）
-生成器函数的核心特征是什么？	使用function*语法，通过yield控制执行流程，返回可迭代的生成器对象
-class关键字的本质是什么？	构造函数的语法糖，必须用new调用，本质是函数（typeof Class === 'function'）
-异步普通函数有什么特殊行为？	用async function定义，隐式返回Promise，内部可用await暂停执行等待异步操作
-异步箭头函数的特点是什么？	结合async和箭头函数语法，继承外层this，返回Promise，无独立this绑定
-异步生成器函数的作用是什么？	使用async function*语法，支持yield和await，用于异步数据流处理
-普通函数和箭头函数的this绑定有何不同？	普通函数的this由调用方式决定，箭头函数的this由定义时的词法作用域决定
-如何区分异步函数和异步生成器函数？	异步函数用async定义返回Promise，异步生成器用async function*定义返回异步迭代器
-
-在JavaScript类中，当通过实例调用方法时，`this`指向什么？	指向当前实例对象。
-若将类方法解构后直接调用（未绑定），`this`会是什么值？为什么？	`undefined`。类默认运行在严格模式，独立函数调用时`this`为`undefined`。
-如何永久绑定类方法使其无论何种调用方式都指向实例？（2种方案）	1. 使用箭头函数类字段：`method = () => {...}`\n2. 构造函数中绑定：`constructor() { this.method = this.method.bind(this) }`
-类方法中的严格模式是可选的吗？	不是。ES6规范强制类声明和类表达式默认运行在严格模式。
-非严格模式下独立函数调用的`this`是什么？	全局对象（如浏览器中的`window`），但类方法不受此影响（默认严格模式）。
-为什么类方法要求严格模式？	避免意外修改全局对象，提高代码安全性，强制规范的`this`行为。
-如何临时解决解构后调用的`this`丢失问题？	调用时显式绑定：`const fn = obj.method.bind(obj); fn();`
-箭头函数类字段为何能绑定`this`？	箭头函数无自身`this`，自动捕获定义时的词法作用域（实例创建时的`this`）。
-手动绑定方法时，应该在类的什么生命周期操作？	在构造函数（constructor）中进行绑定操作。
-独立调用类方法导致`this=undefined`的好处是什么？	防止意外污染全局作用域，使错误更易暴露（避免隐式绑定）。
-
+#separator:tab
+#html:true
+Node接口中表示父节点的属性是什么？	"<pre><code class=""language-javascript"">const parent = node.parentNode;  // 获取父节点</code></pre>"
+Node接口中表示子节点列表的属性是什么？	"<pre><code class=""language-javascript"">const children = node.childNodes;  // 获取所有子节点（NodeList）</code></pre>"
+Node接口中用于在父节点的子节点列表末尾添加节点的API是什么？	"<pre><code class=""language-javascript"">parent.appendChild(newNode);  // 将新节点添加到子节点列表末尾</code></pre>"
+Node接口中用于在父节点的指定子节点前插入新节点的API是什么？	"<pre><code class=""language-javascript"">parent.insertBefore(newNode, referenceNode);  // 在参考节点前插入新节点</code></pre>"
+Node接口中用于替换一个子节点的API是什么？	"<pre><code class=""language-javascript"">parent.replaceChild(newNode, oldNode);  // 用新节点替换旧节点</code></pre>"
+Node接口中用于比较两个节点关系的API是什么？	"<pre><code class=""language-javascript"">const relationship = nodeA.compareDocumentPosition(nodeB);  // 返回节点关系掩码值</code></pre>"
+Node接口中用于检查一个节点是否包含另一个节点的API是什么？	"<pre><code class=""language-javascript"">const isContained = parent.contains(child);  // 检查是否包含子节点</code></pre>"
+Node接口中用于复制节点的API是什么？	"<pre><code class=""language-javascript"">const copy = node.cloneNode(true);  // 深度复制节点及其子节点</code></pre>"
+创建元素节点的方法是什么？	"<pre><code class=""language-javascript"">const div = document.createElement(""div"");  // 创建div元素</code></pre>"
+创建文本节点的方法是什么？	"<pre><code class=""language-javascript"">const text = document.createTextNode(""Hello"");  // 创建文本节点</code></pre>"
+创建注释节点的方法是什么？	"<pre><code class=""language-javascript"">const comment = document.createComment(""注释内容"");  // 创建注释节点</code></pre>"
+创建文档片段的方法是什么？	"<pre><code class=""language-javascript"">const fragment = document.createDocumentFragment();  // 创建文档片段</code></pre>"
+Element接口中获取元素属性的方法是什么？	"<pre><code class=""language-javascript"">const value = element.getAttribute(""id"");  // 获取id属性值</code></pre>"
+Element接口中设置元素属性的方法是什么？	"<pre><code class=""language-javascript"">element.setAttribute(""class"", ""active"");  // 设置class属性</code></pre>"
+Element接口中删除元素属性的方法是什么？	"<pre><code class=""language-javascript"">element.removeAttribute(""disabled"");  // 删除disabled属性</code></pre>"
+Element接口中检查元素是否有某个属性的方法是什么？	"<pre><code class=""language-javascript"">const hasAttr = element.hasAttribute(""href"");  // 检查是否有href属性</code></pre>"
+Element接口中获取属性节点的方法是什么？	"<pre><code class=""language-javascript"">const attrNode = element.getAttributeNode(""src"");  // 获取src属性节点</code></pre>"
+Element接口中设置属性节点的方法是什么？	"<pre><code class=""language-javascript"">const newAttr = document.createAttribute(""data-id"");
+newAttr.value = ""123"";
+element.setAttributeNode(newAttr);  // 设置新的属性节点</code></pre>"
+document对象中通过CSS选择器查找单个元素的方法是什么？	"<pre><code class=""language-javascript"">const el = document.querySelector("".btn"");  // 查找第一个.btn元素</code></pre>"
+document对象中通过CSS选择器查找多个元素的方法是什么？	"<pre><code class=""language-javascript"">const elements = document.querySelectorAll(""p.warning"");  // 查找所有p.warning元素</code></pre>"
+document对象中通过id查找元素的方法是什么？	"<pre><code class=""language-javascript"">const header = document.getElementById(""header"");  // 通过id查找元素</code></pre>"
+document对象中通过name属性查找元素的方法是什么？	"<pre><code class=""language-javascript"">const inputs = document.getElementsByName(""email"");  // 通过name查找元素</code></pre>"
+document对象中通过标签名查找元素的方法是什么？	"<pre><code class=""language-javascript"">const divs = document.getElementsByTagName(""div"");  // 查找所有div元素</code></pre>"
+document对象中通过类名查找元素的方法是什么？	"<pre><code class=""language-javascript"">const items = document.getElementsByClassName(""item"");  // 查找所有.item类元素</code></pre>"
+为什么建议使用getElement系列API而不是querySelector？	"<pre><code class=""language-javascript"">// 原因：
+// 1. 性能更高：getElementById 比 querySelector 快 10-100 倍
+// 2. 返回动态集合：当DOM变化时自动更新
+// 3. 更好的浏览器兼容性</code></pre>"
+
+
+
+#separator:tab
+#html:true
+DOM标准中用于遍历节点的两个主要API是什么？	"<pre><code class=""language-javascript"">// 主要API:
+// 1. NodeIterator - 用于线性遍历节点
+// 2. TreeWalker - 提供更复杂的树遍历能力
+const iterator = document.createNodeIterator(root);
+const walker = document.createTreeWalker(root);</code></pre>"
+创建NodeIterator的方法是什么？	"<pre><code class=""language-javascript"">const iterator = document.createNodeIterator(
+  document.body, // 根节点
+  NodeFilter.SHOW_ELEMENT, // 节点过滤类型
+  { acceptNode: node => node.tagName === 'DIV' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP } // 过滤函数
+);</code></pre>"
+NodeIterator的nextNode方法返回什么？	"<pre><code class=""language-javascript"">const node = iterator.nextNode(); // 返回下一个节点对象，没有更多节点时返回null
+if (node) {
+  console.log('Found node:', node.tagName);
+}</code></pre>"
+TreeWalker相比NodeIterator多出的能力是什么？	"<pre><code class=""language-javascript"">// TreeWalker额外支持：
+// - parentNode() 移动到父节点
+// - firstChild() 移动到第一个子节点
+// - nextSibling() 移动到下一个兄弟节点
+// 示例：
+const node = walker.parentNode(); // 移动到当前节点的父节点
+const child = walker.firstChild(); // 移动到第一个子节点</code></pre>"
+Range对象表示什么？	"<pre><code class=""language-javascript"">// 表示文档中连续内容范围的对象
+const range = new Range(); // 创建新的Range对象</code></pre>"
+创建Range对象的方法是什么？	"<pre><code class=""language-javascript"">// 两种方式：
+// 1. 构造函数
+const range1 = new Range();
+
+// 2. document.createRange()
+const range2 = document.createRange();</code></pre>"
+设置Range起点的方法是什么？	"<pre><code class=""language-javascript"">range.setStart(startNode, startOffset);
+// 示例：设置起点在第一个段落的第5个字符
+const p = document.querySelector('p');
+range.setStart(p.firstChild, 5);</code></pre>"
+设置Range终点的方法是什么？	"<pre><code class=""language-javascript"">range.setEnd(endNode, endOffset);
+// 示例：设置终点在第二个段落的第10个字符
+const p2 = document.querySelectorAll('p')[1];
+range.setEnd(p2.firstChild, 10);</code></pre>"
+从用户选中区域创建Range的方法是什么？	"<pre><code class=""language-javascript"">const selection = window.getSelection();
+if (selection.rangeCount > 0) {
+  const range = selection.getRangeAt(0); // 获取第一个选中区域
+}</code></pre>"
+提取Range内容的方法是什么？	"<pre><code class=""language-javascript"">const fragment = range.extractContents();
+// 示例：提取选中内容并插入到其他位置
+document.getElementById('target').appendChild(fragment);</code></pre>"
+在Range位置插入节点的方法是什么？	"<pre><code class=""language-javascript"">// 在Range起始位置插入节点
+range.insertNode(newNode);
+
+// 示例：插入新的文本节点
+const text = document.createTextNode('插入的内容');
+range.insertNode(text);</code></pre>"
+CSSOM包含哪两个部分？	"<pre><code class=""language-javascript"">// CSSOM包含：
+// 1. CSSOM - CSS对象模型（样式表和规则）
+// 2. CSSOM View - 视图相关API（滚动、布局等）</code></pre>"
+获取文档中所有样式表的方法是什么？	"<pre><code class=""language-javascript"">const styleSheets = document.styleSheets;
+// 遍历所有样式表
+for (let sheet of styleSheets) {
+  console.log(sheet.href);
+}</code></pre>"
+向样式表中插入新规则的方法是什么？	"<pre><code class=""language-javascript"">const sheet = document.styleSheets[0];
+sheet.insertRule('body { background: red; }', sheet.cssRules.length);</code></pre>"
+从样式表中删除规则的方法是什么？	"<pre><code class=""language-javascript"">const sheet = document.styleSheets[0];
+sheet.deleteRule(0); // 删除第一条规则</code></pre>"
+获取元素最终计算样式的方法是什么？	"<pre><code class=""language-javascript"">const computedStyle = window.getComputedStyle(element);
+const color = computedStyle.getPropertyValue('color'); // 获取计算后的颜色值</code></pre>"
+CSSOM View主要包含哪三个部分？	"<pre><code class=""language-javascript"">// CSSOM View包含：
+// 1. 窗口API (resizeTo, resizeBy)
+// 2. 滚动API (scroll, scrollTo, scrollBy)
+// 3. 布局API (getBoundingClientRect, getClientRects)</code></pre>"
+改变浏览器窗口大小的API是什么？	"<pre><code class=""language-javascript"">// 改变窗口大小：
+window.resizeTo(800, 600); // 设置绝对尺寸
+window.resizeBy(100, 50);   // 增加/减少尺寸</code></pre>"
+获取视口横向滚动距离的属性是什么？	"<pre><code class=""language-javascript"">const scrollX = window.scrollX; // 或 window.pageXOffset
+console.log('横向滚动距离:', scrollX);</code></pre>"
+获取视口纵向滚动距离的属性是什么？	"<pre><code class=""language-javascript"">const scrollY = window.scrollY; // 或 window.pageYOffset
+console.log('纵向滚动距离:', scrollY);</code></pre>"
+使页面滚动到特定位置的API是什么？	"<pre><code class=""language-javascript"">// 滚动到绝对位置：
+window.scroll(100, 200); 
+// 或
+window.scrollTo(100, 200);</code></pre>"
+使页面滚动特定距离的API是什么？	"<pre><code class=""language-javascript"">// 滚动相对距离：
+window.scrollBy(0, 100); // 向下滚动100px</code></pre>"
+获取元素在交叉轴方向的高度的属性是什么？	"<pre><code class=""language-javascript"">// 垂直方向总高度（包括隐藏内容）：
+const height = element.scrollHeight;
+console.log('元素总高度:', height);</code></pre>"
+使元素滚动到可见区域的API是什么？	"<pre><code class=""language-javascript"">element.scrollIntoView();
+// 可带参数：
+element.scrollIntoView({ behavior: 'smooth', block: 'center' });</code></pre>"
+
+
+#separator:tab
+#html:true
+获取视口高度的属性是什么？	"<pre><code class=""language-javascript"">const viewportHeight = window.innerHeight; // 获取视口高度（包括滚动条）</code></pre>"
+获取设备物理像素与CSS像素比率的属性是什么？	"<pre><code class=""language-javascript"">const pixelRatio = window.devicePixelRatio; // 物理像素/CSS像素的比率（如Retina屏为2）</code></pre>"
+获取元素所有盒占据的客户端矩形区域的API是什么？	"<pre><code class=""language-javascript"">const rects = element.getClientRects(); // 获取元素所有盒模型的矩形区域</code></pre>"
+获取元素包裹所有盒的矩形区域的API是什么？	"<pre><code class=""language-javascript"">const boundingRect = element.getBoundingClientRect(); // 获取元素整体的边界矩形</code></pre>"
+浏览器事件的三个主要来源是什么？	"<pre><code class=""language-javascript"">// 事件三大来源：
+// 1. 键盘事件（键盘交互）
+// 2. 鼠标事件（鼠标交互）
+// 3. 触摸事件（触摸屏交互）</code></pre>"
+事件传播的捕获过程是怎样的？	"<pre><code class=""language-javascript"">// 事件捕获过程：
+// 1. 从window对象开始
+// 2. 沿DOM树向下传播到目标元素
+// 3. 依次触发父级元素的捕获事件处理程序</code></pre>"
+事件传播的冒泡过程是怎样的？	"<pre><code class=""language-javascript"">// 事件冒泡过程：
+// 1. 从目标元素开始
+// 2. 沿DOM树向上传播到window对象
+// 3. 依次触发父级元素的冒泡事件处理程序</code></pre>"
+addEventListener的第三个参数可以是什么？	"<pre><code class=""language-javascript"">// 两种形式：
+// 1. 布尔值：true表示捕获阶段，false表示冒泡阶段（默认）
+element.addEventListener('click', handler, true);
+
+// 2. 对象：配置选项
+element.addEventListener('click', handler, {
+  capture: true, // 捕获阶段
+  once: true,    // 仅触发一次
+  passive: true // 不会调用preventDefault()
+});</code></pre>"
+焦点系统的作用是什么？	"<pre><code class=""language-javascript"">// 焦点系统功能：
+// 1. 确定键盘事件的目标元素
+// 2. 管理用户键盘操作的焦点顺序
+// 3. 提供无障碍访问支持</code></pre>"
+使元素获得焦点的方法是什么？	"<pre><code class=""language-javascript"">element.focus(); // 使元素获得焦点</code></pre>"
+使元素失去焦点的方法是什么？	"<pre><code class=""language-javascript"">element.blur(); // 使元素失去焦点</code></pre>"
+创建自定义事件的方法是什么？	"<pre><code class=""language-javascript"">// 两种方式：
+// 1. 通用事件
+const event = new Event('custom-event');
+
+// 2. 带自定义数据的事件
+const customEvent = new CustomEvent('custom-data', {
+  detail: { message: 'Hello' }, // 自定义数据
+  bubbles: true, // 是否冒泡
+  cancelable: true // 是否可取消
+});</code></pre>"
+触发自定义事件的方法是什么？	"<pre><code class=""language-javascript"">element.dispatchEvent(event); // 在元素上触发自定义事件</code></pre>"
+性能优化体系的四个步骤是什么？	"<pre><code class=""language-javascript"">// 性能优化四步法：
+// 1. 现状评估和建立指标（量化性能）
+// 2. 技术方案（确定优化策略）
+// 3. 执行（实施优化）
+// 4. 结果评估和监控（验证效果并持续监测）</code></pre>"
+前端性能的三个重要方面是什么？	"<pre><code class=""language-javascript"">// 前端性能三方面：
+// 1. 页面加载性能（首次加载速度）
+// 2. 动画与操作性能（交互流畅度）
+// 3. 内存和电量消耗（资源使用效率）</code></pre>"
+为什么使用"秒开率"作为性能指标？	"<pre><code class=""language-javascript"">// 秒开率优势：
+// 1. 1秒内打开提供良好用户体验
+// 2. 避免超长加载时间扭曲平均值
+// 3. 更符合用户感知的性能标准</code></pre>"
+工具链设计需要满足的两个基本要求是什么？	"<pre><code class=""language-javascript"">// 工具链基本要求：
+// 1. 版本一致（保证环境统一）
+// 2. 避免冲突（不同项目间依赖隔离）</code></pre>"
+工具链一般覆盖前端开发的哪些任务？	"<pre><code class=""language-javascript"">// 工具链覆盖任务：
+// 1. 初始化项目（创建脚手架）
+// 2. 运行和调试（开发服务器）
+// 3. 测试（单元/集成测试）
+// 4. 发布（构建和部署）</code></pre>"
+前端持续集成的两个主要措施是什么？	"<pre><code class=""language-javascript"">// 持续集成措施：
+// 1. 预览环境（代码提交后自动部署预览）
+// 2. 规则校验（代码质量和规范检查）</code></pre>"
+规则校验的三种方法是什么？	"<pre><code class=""language-javascript"">// 规则校验方法：
+// 1. 页面结构扫描（HTML/CSS验证）
+// 2. 运行时数据采集（性能监控）
+// 3. 代码扫描（静态分析和lint检查）</code></pre>"
+
+
+#separator:tab
+#html:true
+搭建系统的目标是什么？	"<pre><code class=""language-javascript"">// 搭建系统的核心目标：
+// 解决大量简单页面的生产效率问题
+// 降低重复开发成本
+// 实现非技术人员也能构建页面</code></pre>"
+搭建系统的三种设计思路是什么？	"<pre><code class=""language-javascript"">// 三种设计思路：
+// 1. 模板化搭建：预定义布局模板
+// 2. 模块化搭建：可组合的组件库
+// 3. 数据驱动界面：通过配置数据生成UI</code></pre>"
+搭建系统中的数据按用途分为哪两类？	"<pre><code class=""language-javascript"">// 数据分类：
+// 1. 界面配置数据：控制组件展示和布局
+// 2. 内容数据：显示在组件中的实际内容</code></pre>"
+搭建系统中的模板由谁生产？	"<pre><code class=""language-javascript"">// 模板生产者：
+// 由前端工程师设计和开发
+// 提供非技术人员使用的构建基础</code></pre>"
+前端架构解决的三个核心问题是什么？	"<pre><code class=""language-javascript"">// 三大核心问题：
+// 1. 组件化：实现代码复用和模块化开发
+// 2. 适配性：确保多设备兼容性
+// 3. 单页应用：优化用户体验和应用性能</code></pre>"
+适配性主要适配屏幕的哪三个要素？	"<pre><code class=""language-javascript"">// 屏幕适配三要素：
+// 1. PPI（单位英寸像素数）
+// 2. DPR（设备像素比率）
+// 3. 分辨率</code></pre>"
+单页应用（SPA）的主要技术难点是什么？	"<pre><code class=""language-javascript"">// SPA技术难点：
+// 1. 逻辑页面解耦（模块化路由）
+// 2. 独立开发和发布（微前端）
+// 3. 保持前进后退历史（路由状态管理）</code></pre>"
+列举5种主流的组件化方案。	"<pre><code class=""language-javascript"">// 主流组件化方案：
+// 1. Web Component（原生）
+// 2. Vue（渐进式框架）
+// 3. React（UI库）
+// 4. Angular（完整框架）
+// 5. 自研方案（公司内部）</code></pre>"
+Web Component的主要优势是什么？	"<pre><code class=""language-javascript"">// Web Component优势：
+// 1. 无需额外运行时（原生支持）
+// 2. 与现代浏览器兼容
+// 3. 真正的组件封装（Shadow DOM）</code></pre>"
+Vue框架的两个主要特点是什么？	"<pre><code class=""language-javascript"">// Vue主要特点：
+// 1. 符合传统HTML/CSS/JS书写习惯
+// 2. MVVM模式（数据驱动视图）</code></pre>"
+React框架的特点是什么？	"<pre><code class=""language-javascript"">// React特点：
+// 1. JSX语法（JS和HTML混合）
+// 2. 虚拟DOM（高性能渲染）
+// 3. 配合React Native开发客户端应用</code></pre>"
+适配分辨率的主要CSS单位是什么？	"<pre><code class=""language-css"">/* 使用视口单位适配分辨率 */
+.container {
+  width: 100vw; /* 100%视口宽度 */
+  padding: 2vw; /* 视口比例间距 */
+}</code></pre>"
+适配DPR的主要CSS规则是什么？	"<pre><code class=""language-html"">&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0""&gt;
+&lt;style&gt;
+@media (-webkit-min-device-pixel-ratio: 2) {
+  .retina-image {
+    background-image: url('image@2x.png');
+  }
+}
+&lt;/style&gt;</code></pre>"
+适配PPI的主要CSS规则是什么？	"<pre><code class=""language-css"">/* 使用媒体查询适配PPI */
+@media (min-resolution: 192dpi) {
+  body {
+    font-size: 18px; /* 高PPI设备使用更大字体 */
+  }
+}</code></pre>"
+如何高效添加多个DOM节点？	"<pre><code class=""language-javascript"">// 使用DocumentFragment批量操作
+const fragment = document.createDocumentFragment();
+for (let i = 0; i &lt; 100; i++) {
+  const div = document.createElement('div');
+  div.textContent = `Item ${i}`;
+  fragment.appendChild(div);
+}
+document.body.appendChild(fragment); // 一次插入</code></pre>"
+如何获取元素最终渲染尺寸？	"<pre><code class=""language-javascript"">// 使用getBoundingClientRect()
+const rect = element.getBoundingClientRect();
+console.log('尺寸:', rect.width, rect.height);
+console.log('位置:', rect.left, rect.top);</code></pre>"
+如何实现事件委托？	"<pre><code class=""language-javascript"">// 父元素监听 + 目标判断
+document.querySelector('#list').addEventListener('click', e => {
+  if (e.target.matches('.item')) {
+    console.log('点击了项目:', e.target.textContent);
+  }
+});</code></pre>"
+为什么移动端开发需要viewport配置？	"<pre><code class=""language-html"">&lt;!-- 适配设备像素比 --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0, maximum-scale=1.0""&gt;
+&lt;script&gt;
+// 没有viewport配置：
+// 高DPR设备会缩放页面导致模糊
+&lt;/script&gt;</code></pre>"
+SPA应用如何保持前进后退历史？	"<pre><code class=""language-javascript"">// 使用History API
+history.pushState({page: 1}, 'Page 1', '/page1');
+
+// 监听URL变化
+window.addEventListener('popstate', e => {
+  loadPage(e.state.page);
+});</code></pre>"
+前端引入图形学的主要动机是什么？	"<pre><code class=""language-javascript"">// 主要动机：
+// 1. 实现传统CSS无法完成的视觉效果
+// 2. 创建更沉浸式的交互体验
+// 3. 提升数据可视化表现力</code></pre>"
+浏览器图形学的技术栈依赖关系是什么？	"<pre><code class=""language-javascript"">// 技术栈依赖：
+// OpenGL → WebGL → 浏览器渲染引擎 → 前端应用
+// 示例：ThreeJS基于WebGL，WebGL基于OpenGL ES</code></pre>"
+Photoshop中实现图形效果的核心技术是什么？	"<pre><code class=""language-javascript"">// 核心技术：
+// 滤镜(Filter)算法：
+// 模糊(Blur)、锐化(Sharpen)、扭曲(Distort)等
+// 在CSS中对应filter属性</code></pre>"
+设计稿中的图形可分为哪三类？	"<pre><code class=""language-javascript"">// 图形分类：
+// 1. 图案(Pattern)：重复背景纹理
+// 2. 图片(Photo)：位图图像
+// 3. 形状(Shape)：几何矢量图形</code></pre>"
+如何用代码实现云雾效果？	"<pre><code class=""language-glsl"">// GLSL着色器实现云雾
+float noise = 0.0;
+for (float i = 1.0; i &lt; 8.0; i++) {
+  noise += texture2D(noiseTexture, uv * i).r / i;
+}
+vec4 color = mix(fogColor, baseColor, noise);</code></pre>"
+分形图形的特点是什么？	"<pre><code class=""language-javascript"">// 分形特点：
+// 1. 局部与整体相似（自相似性）
+// 2. 可无限放大延伸
+// 3. 通过迭代函数生成（如Mandelbrot集）</code></pre>"
+Julia Set分形图的特点是什么？	"<pre><code class=""language-javascript"">// Julia Set特点：
+// 1. 不同常数产生完全不同的图形
+// 2. 与Mandelbrot集有数学关联
+// 3. 生成公式：z_{n+1} = z_n^2 + c（c为常数）</code></pre>"
+如何实现色相变化效果？	"<pre><code class=""language-javascript"">// RGB转HSV修改色相
+function rgbToHsv(r, g, b) { /* ... */ }
+function hsvToRgb(h, s, v) { /* ... */ }
+
+// 修改色相
+let [h, s, v] = rgbToHsv(r, g, b);
+h = (h + 0.3) % 1.0; // 增加30度色相
+const [newR, newG, newB] = hsvToRgb(h, s, v);</code></pre>"
+绿幕技术的原理是什么？	"<pre><code class=""language-glsl"">// GLSL绿幕抠像
+vec4 color = texture2D(videoTexture, uv);
+float green = color.g;
+float mask = smoothstep(0.4, 0.5, green);
+gl_FragColor = mix(background, color, mask);</code></pre>"
+前端实现3D图形的常用库有哪些？	"<pre><code class=""language-javascript"">// 3D图形库：
+// 1. ThreeJS：最流行的WebGL库
+// 2. BabylonJS：功能丰富的游戏引擎
+// 3. PlayCanvas：基于WebGL的游戏引擎
+// 4. A-Frame：WebVR框架
+// 5. TensorFlow.js：机器学习可视化</code></pre>"
+
+
+#separator:tab
+#html:true
+为什么需要GCanvas？	"<pre><code class=""language-javascript"">// 解决原生环境Canvas缺失问题：
+// 1. Weex/React Native等框架缺乏Canvas支持
+// 2. 需要WebGL和2D绘图能力
+// 3. GCanvas提供跨平台Canvas实现</code></pre>"
+GCanvas的主要作用是什么？	"<pre><code class=""language-javascript"">// 主要作用：
+// 1. 在原生应用中实现Canvas绘图
+// 2. 支持WebGL和2D上下文
+// 3. 提供高性能图形渲染能力</code></pre>"
+G3D与ThreeJS的主要区别是什么？	"<pre><code class=""language-javascript"">// 核心区别：
+// 1. G3D更强调底层管理能力
+// 2. 提供高级交互支持（点选/拖拽/顶点变形）
+// 3. 优化性能监控和资源管理</code></pre>"
+MVC架构提出的时间？	"<pre><code class=""language-javascript"">// 历史背景：
+// 1979年左右由Trygve Reenskaug在Smalltalk-80提出</code></pre>"
+MVP模式的提出者和时间？	"<pre><code class=""language-javascript"">// 发展历程：
+// Mike Potel于1995年在Taligent公司提出</code></pre>"
+MVVM模式的提出背景？	"<pre><code class=""language-javascript"">// 背景说明：
+// 2005年微软架构师John Gossman为WPF设计
+// 解决UI与业务逻辑解耦问题</code></pre>"
+FLUX模式的出现时间和背景？	"<pre><code class=""language-javascript"">// 出现背景：
+// 2014年Facebook为React设计
+// 解决复杂应用的数据流管理问题</code></pre>"
+REDUX的出现时间？	"<pre><code class=""language-javascript"">// 发展时间：
+// 2015年由Dan Abramov和Andrew Clark创建
+// 基于FLUX理念的改进实现</code></pre>"
+交互的本质是什么？	"<pre><code class=""language-javascript"">// 交互本质：
+// 1. 操作（用户输入）
+// 2. 看（系统输出反馈）
+// 3. 输入输出闭环</code></pre>"
+Binding模式解决的核心问题是什么？	"<pre><code class=""language-javascript"">// 解决问题：
+// 减少JS与Native通讯次数
+// 提升手势识别性能
+// 避免频繁跨语言调用</code></pre>"
+手势识别中pan事件的触发条件？	"<pre><code class=""language-javascript"">// 触发条件：
+// 1. 手指移动超过10px
+// 2. 移动速度低于特定阈值
+// 3. 非tap/press事件</code></pre>"
+手势识别中tap事件的触发条件？	"<pre><code class=""language-javascript"">// 触发条件：
+// 1. 快速点击（<500ms）
+// 2. 移动距离<5px
+// 3. 无长按行为</code></pre>"
+手势识别中press事件的触发条件？	"<pre><code class=""language-javascript"">// 触发条件：
+// 1. 按压时间>1.5秒
+// 2. 移动距离<5px
+// 3. 非tap事件</code></pre>"
+陀螺仪数据的核心问题是什么？	"<pre><code class=""language-javascript"">// 核心问题：
+// 0-360度跳变导致计算困难
+// 示例：359°→1°实际只移动2°，但差值358°</code></pre>"
+现代视图层的核心职责变化？	"<pre><code class=""language-javascript"">// 职责演变：
+// 从被动展示 → 同时处理输入输出
+// 实现交互闭环管理</code></pre>"
+2019年图形学的发展方向？	"<pre><code class=""language-javascript"">// 发展方向：
+// 1. 2D/3D应用普及
+// 2. WebGL替代传统PS滤镜
+// 3. 实时图形处理技术成熟</code></pre>"
+前端包管理的主要问题？	"<pre><code class=""language-javascript"">// 主要问题：
+// 1. 依赖过多导致性能下降
+// 2. 安全漏洞风险
+// 3. 版本冲突和兼容性问题</code></pre>"
+AI与前端的结合点？	"<pre><code class=""language-javascript"">// 结合点：
+// 1. 视觉识别（图像/视频分析）
+// 2. 智能研发（自动切图/代码生成）
+// 3. 个性化UI推荐</code></pre>"
+三大框架(Vue/React/Angular)的预测？	"<pre><code class=""language-javascript"">// 发展预测：
+// 1. 稳定发展，无重大变革
+// 2. 生态持续成熟完善
+// 3. 差异化定位更明确</code></pre>"
+如何实现设计师的云雾效果需求？	"<pre><code class=""language-glsl"">// GLSL实现：
+float noise = 0.0;
+for (float i = 1.0; i < 8.0; i++) {
+  noise += texture2D(noiseTexture, uv * i).r / i;
+}
+gl_FragColor = mix(fogColor, baseColor, noise);</code></pre>"
+如何动态改变图片主色调？	"<pre><code class=""language-javascript"">// 色相变换算法：
+function changeHue(imageData, hueShift) {
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    let [h, s, v] = rgbToHsv(...imageData.data.slice(i, i+3));
+    const [r, g, b] = hsvToRgb((h + hueShift) % 1, s, v);
+    imageData.data.set([r, g, b], i);
+  }
+}</code></pre>"
+在Weex环境中如何解决Canvas缺失问题？	"<pre><code class=""language-javascript"">// 解决方案：
+import { enable, WeexBridge } from 'gcanvas.js';
+enable(GCanvas, { bridge: WeexBridge }); // 启用GCanvas</code></pre>"
+如何优化手势事件的性能？	"<pre><code class=""language-javascript"">// 优化方案：
+// 1. 使用Binding模式减少JS-Native通讯
+// 2. 批量处理手势数据
+// 3. 使用requestAnimationFrame节流</code></pre>"
+对象方法中name(){}与name:function(){}的主要区别是什么？	"<pre><code class=""language-javascript"">// 区别：
+const obj = {
+  // 1. 简写方法：函数name为""obj.func""
+  func() {}, 
+  
+  // 2. 传统方法：函数name为""namedFunc""
+  namedFunc: function namedFunc() {} 
+};</code></pre>"
+const声明数组时push操作是否允许？	"<pre><code class=""language-javascript"">const arr = [1,2,3];
+arr.push(4); // 允许：修改引用对象内容
+arr = []; // 报错：禁止重新赋值</code></pre>"
+如何冻结对象防止篡改？	"<pre><code class=""language-javascript"">const obj = { key: 'value' };
+Object.freeze(obj); // 冻结对象
+obj.key = 'new'; // 修改无效（严格模式报错）</code></pre>"
+创建自定义事件的方法是什么？	"<pre><code class=""language-javascript"">// 两种方式：
+const event = new Event('custom');
+// 或带自定义数据
+const customEvent = new CustomEvent('data', { 
+  detail: { info: 'payload' } 
+});</code></pre>"
+触发自定义事件的方法是什么？	"<pre><code class=""language-javascript"">element.dispatchEvent(event); 
+// 示例：
+document.dispatchEvent(new Event('app-ready'));</code></pre>"
+Promise.then中setTimeout的执行顺序特点？	"<pre><code class=""language-javascript"">Promise.resolve()
+  .then(() => setTimeout(console.log, 0, 'macro'))
+  .then(() => console.log('micro'));
+// 输出顺序：
+// 1. 'micro' (微任务)
+// 2. 'macro' (宏任务)</code></pre>"
+同步请求为什么不被推荐？	"<pre><code class=""language-javascript"">// 弊端：
+// 1. 阻塞JS执行线程
+// 2. 导致页面卡死无响应
+// 3. 现代API已全部异步化</code></pre>"
+new Promise中setTimeout(resolve)与setTimeout(()=>resolve())的区别？	"<pre><code class=""language-javascript"">// 区别：
+new Promise(res => setTimeout(res)); // 无参数
+new Promise(res => setTimeout(() => res('data'))); // 可传参数</code></pre>"
+事件传播的捕获过程是怎样的？	"<pre><code class=""language-javascript"">// 捕获阶段：
+// 1. 从window开始
+// 2. 沿DOM树向下传播
+// 3. 依次触发捕获监听器
+// 4. 到达目标元素</code></pre>"
+事件传播的冒泡过程是怎样的？	"<pre><code class=""language-javascript"">// 冒泡阶段：
+// 1. 从目标元素开始
+// 2. 沿DOM树向上传播
+// 3. 依次触发冒泡监听器
+// 4. 到达window对象</code></pre>"
+为什么推荐使用flex布局替代float？	"<pre><code class=""language-css"">/* 优势对比 */
+/* float布局问题： */
+/* 1. 需要清除浮动 */
+/* 2. margin兼容问题 */
+/* 3. 垂直居中困难 */
+
+/* flex解决方案： */
+.container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中 */
+}</code></pre>"
+CSSOM包含哪两个主要部分？	"<pre><code class=""language-javascript"">// 两部分组成：
+// 1. CSSOM：样式表和规则模型
+// 2. CSSOM View：滚动/布局/视口API</code></pre>"
+适配不同屏幕的三个核心要素是什么？	"<pre><code class=""language-javascript"">// 核心要素：
+// 1. PPI（像素密度）
+// 2. DPR（设备像素比）
+// 3. 分辨率</code></pre>"
+分辨率适配推荐使用什么CSS单位？	"<pre><code class=""language-css"">/* 推荐单位 */
+.container {
+  width: 100vw;    /* 视口宽度百分比 */
+  padding: 2vmin;  /* 视口最小比例 */
+  font-size: 4vmax; /* 视口最大比例 */
+}</code></pre>"
+
+
+#separator:tab
+#html:true
+JavaScript中基本类型调用方法的原理是什么？	"<pre><code class=""language-javascript"">// 引擎自动装箱创建临时包装对象
+const str = ""abc"";
+console.log(str.charAt(0)); // 底层执行：
+// 1. 创建String临时对象: new String(str)
+// 2. 调用charAt方法
+// 3. 销毁临时对象</code></pre>"
+JavaScript中'abc'.charAt(0)的底层过程？	"<pre><code class=""language-javascript"">// 隐式装箱过程：
+const temp = new String(""abc"");  // 1. 创建临时对象
+const result = temp.charAt(0);   // 2. 执行方法
+temp = null;                     // 3. 销毁对象
+return result;</code></pre>"
+JavaScript装箱操作产生的对象是否永久存在？	"<pre><code class=""language-javascript"">// 临时对象立即销毁示例：
+const str = ""test"";
+str.customProp = 123;          // 为临时对象添加属性
+console.log(str.customProp);   // undefined (临时对象已销毁)</code></pre>"
+JavaScript显式与隐式装箱的区别？	"<pre><code class=""language-javascript"">// 显式装箱 (持久对象)
+const explicit = new String(""abc"");
+explicit.prop = 123;
+console.log(explicit.prop);    // 123
+
+// 隐式装箱 (临时对象)
+const implicit = ""abc"";
+implicit.prop = 123;           // 为临时对象添加属性
+console.log(implicit.prop);    // undefined</code></pre>"
+为什么123.toString()会报错？	"<pre><code class=""language-javascript"">// 解析器将点解释为小数点
+123.toString()   // SyntaxError
+
+// 解决方案：
+(123).toString() // 正确
+123..toString()   // 正确
+123 .toString()   // 正确（空格分隔）</code></pre>"
+Object.defineProperty()的核心作用？	"<pre><code class=""language-javascript"">// 精确控制属性特征
+const obj = {};
+Object.defineProperty(obj, 'readOnly', {
+  value: 42,
+  writable: false,    // 不可修改
+  enumerable: false,  // 不可枚举
+  configurable: false // 不可删除
+});</code></pre>"
+writable:false属性的行为特点？	"<pre><code class=""language-javascript"">const obj = {};
+Object.defineProperty(obj, 'fixed', {
+  value: 100,
+  writable: false
+});
+
+obj.fixed = 200; // 静默失败（非严格模式）
+console.log(obj.fixed); // 100</code></pre>"
+enumerable:false属性的枚举行为？	"<pre><code class=""language-javascript"">const obj = {
+  visible: 1
+};
+
+Object.defineProperty(obj, 'hidden', {
+  value: 2,
+  enumerable: false
+});
+
+console.log(Object.keys(obj)); // ['visible']</code></pre>"
+configurable:false属性的限制效果？	"<pre><code class=""language-javascript"">const obj = {};
+Object.defineProperty(obj, 'locked', {
+  value: 10,
+  configurable: false
+});
+
+delete obj.locked; // 静默失败
+console.log(obj.locked); // 10</code></pre>"
+如何用Object.defineProperty实现数据验证？	"<pre><code class=""language-javascript"">const user = {
+  name: ''
+};
+
+Object.defineProperty(user, 'age', {
+  set(value) {
+    if (value < 0) throw new Error('年龄不能为负');
+    this._age = value;
+  },
+  get() {
+    return this._age;
+  }
+});
+
+user.age = 25; // 正常
+user.age = -5; // 抛出错误</code></pre>"
+getter/setter与普通属性的区别？	"<pre><code class=""language-javascript"">// 普通属性
+obj.value = 42;
+
+// Getter/Setter
+const obj = {
+  get value() {
+    return this._value * 2;
+  },
+  set value(v) {
+    this._value = v;
+  }
+};</code></pre>"
+为什么Vue.js使用Object.defineProperty？	"<pre><code class=""language-javascript"">// 响应式数据实现原理
+function defineReactive(obj, key) {
+  let value = obj[key];
+  
+  Object.defineProperty(obj, key, {
+    get() {
+      console.log('收集依赖');
+      return value;
+    },
+    set(newVal) {
+      console.log('触发更新');
+      value = newVal;
+    }
+  });
+}</code></pre>"
+Object.defineProperty()的默认行为？	"<pre><code class=""language-javascript"">const obj = {};
+Object.defineProperty(obj, 'defaultProp', {
+  value: 42
+});
+
+// 等价于：
+Object.defineProperty(obj, 'defaultProp', {
+  value: 42,
+  writable: false,
+  enumerable: false,
+  configurable: false
+});</code></pre>"
+为什么不能同时定义value和getter？	"<pre><code class=""language-javascript"">// 错误示例：
+Object.defineProperty({}, 'conflict', {
+  value: 10,   // 冲突定义
+  get() { return 20; }
+});
+// 抛出错误：Cannot specify both accessors and a value</code></pre>"
+
+
+#separator:tab
+#html:true
+JavaScript中如何使用Symbol创建唯一标识符？	"<pre><code class=""language-javascript"">// 创建两个不同Symbol
+const id1 = Symbol('id');
+const id2 = Symbol('id');
+
+console.log(id1 === id2); // false - 即使描述相同也永远不相等
+
+// 作为对象属性键使用
+const user = {
+  name: ""John"",
+  [id1]: 123 // Symbol作为键
+};</code></pre>"
+为什么Symbol('desc') === Symbol('desc')返回false？	"<pre><code class=""language-javascript"">// 每次调用Symbol()都创建全新唯一值
+const sym1 = Symbol('unique');
+const sym2 = Symbol('unique');
+
+// 描述相同但值不同
+console.log(sym1 === sym2); // false
+
+// 证明它们是不同实体
+console.log(sym1.toString()); // ""Symbol(unique)""
+console.log(sym2.toString()); // ""Symbol(unique)""
+console.log(sym1 === sym1); // true - 自身比较才成立</code></pre>"
+如何获取对象的所有Symbol属性键？	"<pre><code class=""language-javascript"">const obj = {
+  [Symbol('id')]: 101,
+  name: ""Object"",
+  [Symbol('secret')]: ""confidential""
+};
+
+// 获取所有Symbol键
+const symbolKeys = Object.getOwnPropertySymbols(obj);
+
+console.log(symbolKeys); // [Symbol(id), Symbol(secret)]
+console.log(symbolKeys.length); // 2
+console.log(obj[symbolKeys[0]]); // 101</code></pre>"
+Symbol属性在for-in循环中可见吗？	"<pre><code class=""language-javascript"">const obj = {
+  name: ""Alice"",
+  age: 30,
+  [Symbol('id')]: 12345
+};
+
+// for-in循环不包含Symbol属性
+console.log(""for-in循环:"");
+for (let key in obj) {
+  console.log(key); // 只输出 'name' 和 'age'
+}
+
+// Object.keys也不包含
+console.log(Object.keys(obj)); // [""name"", ""age""]</code></pre>"
+如何使用Symbol创建""类私有""属性？	"<pre><code class=""language-javascript"">// 在模块作用域中创建Symbol
+const _password = Symbol('password');
+
+class User {
+  constructor(name, pwd) {
+    this.name = name;
+    this[_password] = pwd; // ""私有""属性
+  }
+
+  checkPassword(input) {
+    return this[_password] === input;
+  }
+}
+
+const user = new User('John', 'secret123');
+
+// 外部无法直接访问Symbol属性
+console.log(Object.keys(user)); // [""name""]
+console.log(user._password); // undefined
+console.log(user.checkPassword('secret123')); // true</code></pre>"
+Symbol.for()和Symbol()的区别是什么？	"<pre><code class=""language-javascript"">// Symbol()每次创建新Symbol
+const localSym1 = Symbol('global');
+const localSym2 = Symbol('global');
+console.log(localSym1 === localSym2); // false
+
+// Symbol.for()从全局注册表获取
+const globalSym1 = Symbol.for('shared');
+const globalSym2 = Symbol.for('shared');
+console.log(globalSym1 === globalSym2); // true
+
+// 修改影响所有引用
+globalSym1.description = ""changed"";
+console.log(globalSym2.description); // ""changed""</code></pre>"
+Symbol.keyFor()方法的作用是什么？	"<pre><code class=""language-javascript"">// 创建全局Symbol
+const globalSym = Symbol.for('app.settings');
+
+// 获取全局Symbol的描述
+const key = Symbol.keyFor(globalSym);
+console.log(key); // ""app.settings""
+
+// 非全局Symbol返回undefined
+const localSym = Symbol('local');
+console.log(Symbol.keyFor(localSym)); // undefined</code></pre>"
+哪个内置Symbol用于自定义对象的迭代行为？	"<pre><code class=""language-javascript"">class Countdown {
+  constructor(start) {
+    this.start = start;
+  }
+
+  // 实现迭代器协议
+  [Symbol.iterator]() {
+    let count = this.start;
+    return {
+      next: () => {
+        if (count > 0) {
+          return { value: count--, done: false };
+        }
+        return { done: true };
+      }
+    };
+  }
+}
+
+// 使用for-of迭代
+for (const num of new Countdown(3)) {
+  console.log(num); // 3, 2, 1
+}</code></pre>"
+Symbol如何避免多个第三方库的属性名冲突？	"<pre><code class=""language-javascript"">// 库A使用Symbol
+const LIB_A_PREFIX = Symbol('libA:');
+
+// 库B使用字符串
+const LIB_B_PREFIX = 'libB:';
+
+// 用户对象
+const data = {
+  name: ""data"",
+  [LIB_A_PREFIX + 'cache']: ""A的内部数据"",
+  [LIB_B_PREFIX + 'cache']: ""B的内部数据""
+};
+
+// 两个库互不干扰
+console.log(data[LIB_A_PREFIX + 'cache']); // ""A的内部数据""
+console.log(data[LIB_B_PREFIX + 'cache']); // ""B的内部数据""
+console.log(data['libB:cache']); // 可能被意外访问</code></pre>"
+在JSON.stringify()中Symbol属性会被序列化吗？	"<pre><code class=""language-javascript"">const obj = {
+  name: ""test"",
+  [Symbol('id')]: 123,
+  data: {
+    [Symbol('internal')]: ""secret""
+  }
+};
+
+// 序列化结果
+const jsonStr = JSON.stringify(obj);
+console.log(jsonStr); // ""{""name"":""test"",""data"":{}}"" - Symbol属性被忽略</code></pre>"
+Symbol属性可以通过Object.assign()复制吗？	"<pre><code class=""language-javascript"">const source = {
+  name: ""source"",
+  [Symbol('id')]: 100
+};
+
+// 复制对象
+const clone = Object.assign({}, source);
+
+// Symbol属性被复制
+console.log(clone.name); // ""source""
+console.log(Object.getOwnPropertySymbols(clone)); // [Symbol(id)]</code></pre>"
+ES6 class的本质是什么？	"<pre><code class=""language-javascript"">// class语法
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  greet() {
+    return `Hello, ${this.name}!`;
+  }
+}
+
+// 本质等同构造函数
+function PersonFunc(name) {
+  this.name = name;
+}
+PersonFunc.prototype.greet = function() {
+  return `Hello, ${this.name}!`;
+};
+
+// 证明本质相同
+console.log(typeof Person); // ""function""
+console.log(Person.prototype.greet); // greet方法</code></pre>"
+class中的方法实际定义在哪里？	"<pre><code class=""language-javascript"">class Calculator {
+  // 实例方法定义在原型上
+  add(a, b) {
+    return a + b;
+  }
+}
+
+const calc = new Calculator();
+
+// 验证方法位置
+console.log(calc.add === Calculator.prototype.add); // true
+console.log(Object.hasOwn(calc, 'add')); // false
+console.log(Object.hasOwn(Calculator.prototype, 'add')); // true</code></pre>"
+class的静态方法定义在哪里？	"<pre><code class=""language-javascript"">class MathUtils {
+  // 静态方法直接绑定在类上
+  static square(x) {
+    return x * x;
+  }
+}
+
+// 通过类名访问
+console.log(MathUtils.square(3)); // 9
+
+const util = new MathUtils();
+// 实例无法访问
+console.log(util.square); // undefined
+
+// 验证位置
+console.log(MathUtils.hasOwnProperty('square')); // true</code></pre>"
+ES6的extends关键字实现了什么？	"<pre><code class=""language-javascript"">class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+// 继承父类
+class Dog extends Animal {
+  constructor(name) {
+    super(name); // 必须调用父构造函数
+  }
+  
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+
+const d = new Dog('Rex');
+d.speak(); // ""Rex barks.""</code></pre>"
+使用extends时，如何设置原型链？	"<pre><code class=""language-javascript"">class Parent {}
+class Child extends Parent {}
+
+// 原型链关系
+console.log(Child.prototype instanceof Parent); // true
+console.log(Child.__proto__ === Parent); // true
+console.log(Child.prototype.__proto__ === Parent.prototype); // true</code></pre>"
+super()在构造函数中的作用是什么？	"<pre><code class=""language-javascript"">class Vehicle {
+  constructor(wheels) {
+    this.wheels = wheels;
+  }
+}
+
+class Car extends Vehicle {
+  constructor(wheels, brand) {
+    super(wheels); // 调用父类构造函数
+    this.brand = brand;
+  }
+}
+
+const myCar = new Car(4, 'Toyota');
+console.log(myCar.wheels); // 4</code></pre>"
+为什么在子类构造函数中必须先调用super()？	"<pre><code class=""language-javascript"">class A {}
+class B extends A {
+  constructor() {
+    // 忘记调用super()
+    this.value = 10; // ReferenceError
+  }
+}
+
+// 正确写法
+class C extends A {
+  constructor() {
+    super(); // 必须先调用
+    this.value = 20; // 正常
+  }
+}</code></pre>"
+class表达式和函数声明的关键区别是什么？	"<pre><code class=""language-javascript"">// 函数声明会提升
+const p = new Person(); // 正常
+function Person() {}
+
+// class声明不会提升
+try {
+  const c = new Car(); // ReferenceError
+} catch(e) {
+  console.log(e.message);
+}
+class Car {}</code></pre>"
+ES6类中的非方法变量定义会如何处理？	"<pre><code class=""language-javascript"">class Problem {
+  constructor() {
+    this.value = 1; // 实例属性
+  }
+  
+  // 类中直接声明变量
+  counter = 0; // 语法错误在ES2022前，但实际会泄漏为全局变量
+}
+
+// 证明泄漏
+console.log(typeof counter); // ""number"" (意外全局变量)</code></pre>"
+如何证明ES6 class本质是函数？	"<pre><code class=""language-javascript"">class User {}
+function Fn() {}
+
+// 类型检查
+console.log(typeof User); // ""function""
+
+// 可构造性
+console.log(User.prototype.constructor === User); // true
+
+// 可扩展原型
+User.prototype.greet = () => console.log('Hi');
+new User().greet(); // ""Hi""</code></pre>"
+ES6类和ES5原型继承的核心区别是什么？	"<pre><code class=""language-javascript"">// ES5继承
+function ES5Parent() {}
+function ES5Child() {
+  ES5Parent.call(this);
+}
+ES5Child.prototype = Object.create(ES5Parent.prototype);
+ES5Child.prototype.constructor = ES5Child;
+
+// ES6继承
+class ES6Parent {}
+class ES6Child extends ES6Parent {}
+
+// 核心区别：语法简洁性
+console.log(ES5Child.prototype.__proto__ === ES6Child.prototype.__proto__); // true</code></pre>"
+class能实现真正的私有字段吗？	"<pre><code class=""language-javascript"">class Wallet {
+  // ES2022前无法真正私有
+  constructor() {
+    this._balance = 0; // 约定私有（非真正私有）
+  }
+  
+  deposit(amount) {
+    this._balance += amount;
+  }
+}
+
+const w = new Wallet();
+w._balance = 100; // 仍可外部访问
+
+// ES2022+使用#前缀
+class SecureWallet {
+  #balance = 0; // 真正私有
+  deposit(amount) {
+    this.#balance += amount;
+  }
+}</code></pre>"
+class支持多重继承吗？	"<pre><code class=""language-javascript"">class A { methodA() {} }
+class B { methodB() {} }
+
+// 尝试多重继承
+class C extends A, B {} // 语法错误
+
+// 替代方案：Mixin模式
+const mixin = (base, ...mixins) => {
+  return mixins.reduce((c, mixin) => mixin(c), base);
+};
+
+class C extends mixin(A, B) {}</code></pre>"
+class中的静态方法如何访问？	"<pre><code class=""language-javascript"">class Config {
+  static getSettings() {
+    return { env: ""production"" };
+  }
+}
+
+// 通过类名访问
+console.log(Config.getSettings()); // {env:""production""}
+
+// 实例无法访问
+const config = new Config();
+console.log(config.getSettings); // undefined</code></pre>"
+class创建实例是否必须使用new？	"<pre><code class=""language-javascript"">class RequiredNew {
+  constructor() {
+    console.log('实例化');
+  }
+}
+
+// 正确实例化
+const obj1 = new RequiredNew(); // ""实例化""
+
+// 忘记new报错
+try {
+  const obj2 = RequiredNew(); // TypeError
+} catch(e) {
+  console.log(e.message); // Class constructor cannot be invoked without 'new'
+}</code></pre>"
+子类如何继承父类的静态方法？	"<pre><code class=""language-javascript"">class Parent {
+  static create() {
+    return new this();
+  }
+}
+
+class Child extends Parent {}
+
+// 子类继承静态方法
+const child = Child.create();
+console.log(child instanceof Child); // true</code></pre>"
+class是否改变了JavaScript的核心继承模型？	"<pre><code class=""language-javascript"">class MyClass {}
+const instance = new MyClass();
+
+// 原型链验证
+console.log(instance.__proto__ === MyClass.prototype); // true
+console.log(MyClass.prototype.__proto__ === Object.prototype); // true
+
+// 核心仍是原型继承
+MyClass.prototype.customMethod = function() {};
+console.log('customMethod' in instance); // true</code></pre>"
+
+#separator:tab
+#html:true
+为什么JavaScript中无法用class继承Date等原生对象？	"<pre><code class=""language-javascript"">// 尝试继承Date类型会报错
+class MyDate extends Date {
+  getCustomFormat() {
+    // 引擎内部私有字段[[DateValue]]无法被继承
+    return this.toISOString();
+  }
+}
+const d = new MyDate();
+// TypeError: this is not a Date object</code></pre>"
+Image构造器能否作为普通函数调用？为什么？	"<pre><code class=""language-javascript"">// 直接调用Image()会报错
+try {
+  const img = Image(100, 200); 
+} catch (e) {
+  console.error(e); 
+  // TypeError: Illegal constructor 
+  // DOM规范要求必须通过new调用
+}</code></pre>"
+函数调用和new调用时内部方法有何不同？	"<pre><code class=""language-javascript"">function Test() {
+  // 普通调用: 执行[[Call]]方法
+  // new调用: 执行[[Construct]]方法
+  console.log(new.target ? ""构造函数调用"" : ""普通调用"");
+}
+
+Test();      // 输出""普通调用""
+new Test(); // 输出""构造函数调用""</code></pre>"
+new调用时如何处理返回值？	"<pre><code class=""language-javascript"">function A() { 
+  this.val = 1; 
+  return 123; // 返回原始值
+}
+function B() { 
+  return { val: 2 }; // 返回对象
+}
+
+console.log(new A()); // { val: 1 } ←原始值被忽略
+console.log(new B()); // { val: 2 } ←返回对象被采用</code></pre>"
+普通函数调用时如何绑定this？	"<pre><code class=""language-javascript"">function test() {
+  console.log(this === window);
+}
+
+test(); // 非严格模式: true (绑定全局对象)
+""use strict"";
+test(); // 严格模式: undefined</code></pre>"
+new调用时如何建立原型链？	"<pre><code class=""language-javascript"">function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function() {
+  console.log(`${this.name} makes a sound`);
+};
+
+// new调用时自动设置:
+// obj.__proto__ = Animal.prototype
+const cat = new Animal(""Mittens"");
+cat.speak(); // ""Mittens makes a sound""</code></pre>"
+如何检测函数是否作为构造函数被调用？	"<pre><code class=""language-javascript"">function Check() {
+  if (new.target === Check) {
+    console.log(""构造函数调用"");
+  } else if (new.target === undefined) {
+    console.log(""普通函数调用"");
+  }
+}
+
+Check();      // 输出""普通函数调用""
+new Check(); // 输出""构造函数调用""</code></pre>"
+箭头函数能否用new调用？为什么？	"<pre><code class=""language-javascript"">const Arrow = () => console.log(this);
+
+try {
+  new Arrow(); 
+} catch (e) {
+  console.error(e); 
+  // TypeError: Arrow is not a constructor
+  // 箭头函数缺少[[Construct]]内部方法</code></pre>"
+内置构造函数Symbol/BigInt能否用new调用？	"<pre><code class=""language-javascript"">try {
+  new Symbol(""desc"");
+} catch (e) {
+  console.log(e); // TypeError
+}
+
+try {
+  new BigInt(123); 
+} catch (e) {
+  console.log(e); // TypeError
+}
+// 它们只有[[Call]]方法</code></pre>"
+构造函数返回原始值时如何处理？	"<pre><code class=""language-javascript"">function Test() {
+  this.value = 42;
+  return ""ignored""; // 返回原始值
+}
+
+const obj = new Test();
+console.log(obj); // { value: 42 } ←原始值被丢弃</code></pre>"
+arguments 对象是什么？	"<pre><code class=""language-javascript"">function demo(a, b) {
+  console.log(arguments); 
+  // 类数组对象: 
+  // { 
+  //   0: 1, 
+  //   1: 2, 
+  //   length: 2 
+  // }
+}
+demo(1, 2);</code></pre>"
+arguments 对象是数组吗？	"<pre><code class=""language-javascript"">function checkType() {
+  console.log(Array.isArray(arguments)); // false
+  console.log(arguments.map);             // undefined
+  
+  // 转真数组方法:
+  const arr1 = Array.from(arguments);
+  const arr2 = [...arguments];
+}
+checkType(1, 2);</code></pre>"
+非严格模式下修改 arguments[0] 会怎样？	"<pre><code class=""language-javascript"">function updateArg(a) {
+  arguments[0] = 100;  // 修改arguments
+  console.log(a);      // 100 → 形参同步变化
+}
+updateArg(1);</code></pre>"
+严格模式下 arguments 和形参的关系？	"<pre><code class=""language-javascript"">""use strict"";
+function strictUpdate(a) {
+  arguments[0] = 100;
+  console.log(a); // 1 → 形参未变化
+}
+strictUpdate(1);</code></pre>"
+arguments.length 表示什么？	"<pre><code class=""language-javascript"">function checkLength(a, b) {
+  console.log(arguments.length); // 3 → 实际参数数量
+  console.log(a, b);            // 1 2
+}
+checkLength(1, 2, 3);</code></pre>"
+形参数量少于实参时如何访问额外参数？	"<pre><code class=""language-javascript"">function extraParams(a, b) {
+  console.log(arguments[2]); // 3 → 第三个参数
+  console.log(arguments[3]); // 4 → 第四个参数
+}
+extraParams(1, 2, 3, 4);</code></pre>"
+箭头函数有 arguments 对象吗？	"<pre><code class=""language-javascript"">function outer() {
+  const inner = () => {
+    console.log(arguments); // 继承外层arguments
+  };
+  inner();
+}
+outer(1, 2); // 输出{ 0: 1, 1: 2, length: 2 }</code></pre>"
+ES6 中替代 arguments 的最佳方案？	"<pre><code class=""language-javascript"">function modernApproach(...args) {
+  console.log(Array.isArray(args)); // true
+  args.forEach(arg => console.log(arg));
+}
+modernApproach(1, ""a"", true);</code></pre>"
+如何获取未传递的形参在 arguments 中的值？	"<pre><code class=""language-javascript"">function missingParam(a, b, c) {
+  console.log(arguments[2]); // undefined
+  console.log(c);            // undefined
+}
+missingParam(1, 2);</code></pre>"
+非严格模式下修改形参变量会怎样影响 arguments？	"<pre><code class=""language-javascript"">function dynamicLink(a) {
+  a = 100;                 // 修改形参
+  console.log(arguments[0]); // 100 → 同步变化
+}
+dynamicLink(1);</code></pre>"
+arguments.callee 的作用？	"<pre><code class=""language-javascript"">// 非严格模式下递归示例
+const factorial = function(n) {
+  return n <= 1 
+    ? 1 
+    : n * arguments.callee(n-1);
+};
+console.log(factorial(5)); // 120</code></pre>"
+arguments[Symbol.iterator] 的作用？	"<pre><code class=""language-javascript"">function iterableDemo() {
+  // 启用迭代能力
+  for (const arg of arguments) {
+    console.log(arg);
+  }
+}
+iterableDemo(""a"", ""b"", ""c"");</code></pre>"
+
+
+#separator:tab
+#html:true
+bind() 创建的函数与原函数是同一个函数吗？	"<pre><code class=""language-javascript"">// 验证bind()创建的是新函数
+const obj = { x: 10 };
+function original() { return this.x; }
+
+const bound = original.bind(obj);
+console.log(bound === original); // false
+console.log(bound());            // 10 (行为相同但函数对象不同)</code></pre>"
+bind() 绑定的 this 能否被 call/apply 覆盖？	"<pre><code class=""language-javascript"">const obj1 = { val: ""Apple"" };
+const obj2 = { val: ""Orange"" };
+
+function showVal() { return this.val; }
+
+const bound = showVal.bind(obj1);
+console.log(bound.call(obj2));  // ""Apple"" (绑定this不可覆盖)
+console.log(bound.apply(obj2)); // ""Apple""</code></pre>"
+bind() 如何处理预设参数？	"<pre><code class=""language-javascript"">function sum(a, b, c) {
+  return a + b + c;
+}
+
+const addPartial = sum.bind(null, 10, 20);
+console.log(addPartial(30)); // 50 (10+20+30)
+// 参数顺序: bind预设参数 + 调用时参数</code></pre>"
+用 new 调用绑定函数时，绑定的 this 是否生效？	"<pre><code class=""language-javascript"">function Person(name) {
+  this.name = name;
+}
+
+const BoundPerson = Person.bind({ force: ""no"" });
+const p = new BoundPerson(""Alice"");
+
+console.log(p.name);  // ""Alice"" (new创建的实例)
+console.log(p.force); // undefined (绑定的this被忽略)</code></pre>"
+bind() 后的函数是否有 prototype 属性？	"<pre><code class=""language-javascript"">function Test() {}
+const bound = Test.bind({});
+
+console.log(""prototype"" in bound); // false
+console.log(bound.prototype);       // undefined
+
+const obj = new bound();
+console.log(obj instanceof Test);   // true (仍关联原函数原型链)</code></pre>"
+bind() 的主要应用场景有哪些？	"<pre><code class=""language-javascript"">// 场景1：解决this丢失问题
+const handler = {
+  message: ""Hello!"",
+  handleClick: function() {
+    console.log(this.message);
+  }
+};
+document.addEventListener(""click"", handler.handleClick.bind(handler));
+
+// 场景2：创建偏函数
+const logWithPrefix = console.log.bind(console, ""[App]:"");
+logWithPrefix(""Event occurred""); // [App]: Event occurred</code></pre>"
+bind() 和箭头函数在 this 处理上的核心区别？	"<pre><code class=""language-javascript"">const obj = { val: 100 };
+
+// bind()显式绑定this
+function bindStyle() { return this.val; }
+const boundFn = bindStyle.bind(obj);
+
+// 箭头函数隐式绑定
+const arrowFn = () => this.val;
+
+obj.method = boundFn;
+console.log(obj.method()); // 100 (bind绑定)
+
+obj.arrow = arrowFn;
+console.log(obj.arrow());  // undefined (定义时已确定)</code></pre>"
+谁负责发起JavaScript中的宏观任务(Macrotask)?	"<pre><code class=""language-javascript"">// 宏观任务由宿主环境发起
+// 浏览器中执行:
+setTimeout(() => {
+  console.log(""宏任务由浏览器环境调度"");
+}, 0);
+
+// Node.js中执行:
+setImmediate(() => {
+  console.log(""宏任务由Node.js环境调度"");
+});</code></pre>"
+请列出3个由宿主环境发起的宏观任务API。	"<pre><code class=""language-javascript"">// 浏览器环境API
+setTimeout(() => {}, 0);    // 定时器
+fetch('').then(() => {});   // 网络请求回调
+element.addEventListener('click', handler); // DOM事件
+
+// Node.js环境API
+fs.readFile('', () => {}); // I/O操作
+setImmediate(() => {});    // 立即执行宏任务</code></pre>"
+当调用setTimeout时，哪个部分负责计时操作?	"<pre><code class=""language-javascript"">// 计时由宿主环境实现
+console.log(""调用setTimeout"");
+setTimeout(() => {
+  // 浏览器/Node.js使用系统计时器
+  console.log(""回调执行"");
+}, 1000);
+// JS引擎只负责回调执行，不处理计时</code></pre>"
+宏观任务回调函数会被放入哪个队列?	"<pre><code class=""language-javascript"">// 宿主环境维护的队列
+setTimeout(() => console.log(""宏任务1""));
+setTimeout(() => console.log(""宏任务2""));
+
+// 执行流程:
+// 1. 当前调用栈清空
+// 2. 微任务队列执行完毕
+// 3. 从宏任务队列取出回调执行</code></pre>"
+在事件循环中，宏观任务何时被执行?	"<pre><code class=""language-javascript"">console.log(""同步开始"");
+
+// 微任务
+Promise.resolve().then(() => console.log(""微任务""));
+
+// 宏任务
+setTimeout(() => console.log(""宏任务""));
+
+console.log(""同步结束"");
+
+/* 输出顺序:
+   同步开始
+   同步结束
+   微任务
+   宏任务
+*/</code></pre>"
+为什么宏观任务需要宿主环境发起?	"<pre><code class=""language-javascript"">// JS引擎无法直接操作外部系统
+try {
+  // 以下操作需要宿主环境支持
+  const timerId = externalSystem.setTimer();
+  network.requestExternalResource();
+} catch {
+  console.log(""JS引擎无直接访问能力"");
+}</code></pre>"
+Node.js中哪些API会产生宏观任务?	"<pre><code class=""language-javascript"">// Node.js特有API
+const fs = require('fs');
+
+setImmediate(() => {});          // 立即执行宏任务
+setTimeout(() => {}, 0);         // 定时器
+fs.readFile('file.txt', () => {}); // I/O回调
+process.nextTick(() => {});       // 微任务（非宏任务）</code></pre>"
+浏览器渲染UI属于什么类型的任务?	"<pre><code class=""language-javascript"">// 渲染管线作为宏任务执行
+requestAnimationFrame(() => {
+  console.log(""渲染前回调（宏任务）"");
+});
+
+// 渲染步骤:
+// 1. 样式计算
+// 2. 布局
+// 3. 绘制
+// 4. 合成</code></pre>"
+setTimeout(fn, 0)何时执行?	"<pre><code class=""language-javascript"">console.log(""同步开始"");
+
+setTimeout(() => console.log(""setTimeout(0)""), 0);
+
+Promise.resolve().then(() => console.log(""微任务""));
+
+console.log(""同步结束"");
+
+/* 输出顺序:
+   同步开始
+   同步结束
+   微任务
+   setTimeout(0)
+*/</code></pre>"
+如何证明setTimeout是由宿主环境控制的?	"<pre><code class=""language-javascript"">// 证明1: 计时精度依赖宿主
+console.time(""setTimeout"");
+setTimeout(() => {
+  console.timeEnd(""setTimeout""); // 实际延迟约4ms(浏览器限制)
+}, 0);
+
+// 证明2: 无DOM访问能力时仍可用
+const timerId = setTimeout(() => {}, 0);
+console.log(timerId); // 返回ID(由浏览器/Node管理)</code></pre>"
+var声明的变量作用域是什么？	"<pre><code class=""language-javascript"">function scopeTest() {
+  if (true) {
+    var x = 10; // 函数作用域
+  }
+  console.log(x); // 10 (穿透块作用域)
+}
+scopeTest();</code></pre>"
+var声明的变量是否会穿透if/for等块级作用域？	"<pre><code class=""language-javascript"">for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0); 
+}
+// 输出: 3, 3, 3 (i穿透for块作用域)</code></pre>"
+什么是变量提升？	"<pre><code class=""language-javascript"">console.log(a); // undefined (声明提升)
+var a = 5;      // 赋值保留在原地
+console.log(a); // 5</code></pre>"
+console.log(x); var x=5; 输出什么？	"<pre><code class=""language-javascript"">// 编译阶段提升声明
+var x;
+console.log(x); // undefined
+x = 5;</code></pre>"
+var是否允许重复声明？	"<pre><code class=""language-javascript"">var x = 1;
+var x = 2;      // 无报错
+console.log(x); // 2</code></pre>"
+for(var i=0;i<3;i++){setTimeout(()=>console.log(i))}输出？	"<pre><code class=""language-javascript"">// 因var穿透作用域导致共享变量
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i)); 
+}
+// 输出: 3, 3, 3 (循环结束后执行)</code></pre>"
+如何修复循环中的var穿透问题？	"<pre><code class=""language-javascript"">// 方案1: 使用let
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i)); // 0,1,2
+}
+
+// 方案2: IIFE闭包
+for (var i = 0; i < 3; i++) {
+  (function(j) {
+    setTimeout(() => console.log(j)); 
+  })(i);
+}</code></pre>"
+var声明的全局变量和let有何区别？	"<pre><code class=""language-javascript"">var globalVar = 10;
+let globalLet = 20;
+
+console.log(window.globalVar); // 10 (成为window属性)
+console.log(window.globalLet); // undefined (不污染全局)</code></pre>"
+function test(){ if(true){var x=5;} return x;} 调用test()返回？	"<pre><code class=""language-javascript"">function test() {
+  if (true) {
+    var x = 5; // 穿透块作用域
+  }
+  return x;
+}
+console.log(test()); // 5</code></pre>"
+如何防止var的变量污染作用域？	"<pre><code class=""language-javascript"">// 方法1: 使用IIFE
+(function() {
+  var privateVar = ""内部变量"";
+})();
+
+// 方法2: 使用let/const
+{
+  let blockScoped = ""安全"";
+}
+
+// 方法3: 函数顶部声明变量
+function safe() {
+  var a, b, c; // 顶部声明
+  // ...逻辑
+}</code></pre>"
+
+#separator:tab
+#html:true
+普通函数的特点是什么？	"<pre><code class=""language-javascript"">// 普通函数定义
+function regularFunction(a, b) {
+  // 特点1: 有独立this值
+  console.log(this); 
+  
+  // 特点2: 可作为构造函数
+  if (new.target) {
+    this.value = a + b;
+  }
+  
+  // 特点3: 支持arguments对象
+  console.log(arguments);
+  
+  return a + b;
+}
+
+// 调用方式
+regularFunction(1, 2); // 普通调用
+new regularFunction(1, 2); // 构造函数调用</code></pre>"
+箭头函数与普通函数的主要区别？	"<pre><code class=""language-javascript"">// 箭头函数定义
+const arrowFunc = () => {
+  // 区别1: 没有独立this (继承外层作用域)
+  console.log(this); // 同外层this
+  
+  // 区别2: 不能作为构造函数
+  try {
+    new arrowFunc(); // TypeError
+  } catch (e) {}
+  
+  // 区别3: 不支持arguments对象
+  console.log(arguments); // 引用外层arguments
+};
+
+// 普通函数定义
+function regularFunc() {
+  console.log(this); // 独立this
+  console.log(arguments); // 有arguments对象
+}</code></pre>"
+类方法如何定义和使用？	"<pre><code class=""language-javascript"">class MyClass {
+  // 实例方法
+  instanceMethod() {
+    console.log(""实例方法"", this);
+  }
+  
+  // 静态方法
+  static staticMethod() {
+    console.log(""静态方法"", this === MyClass);
+  }
+}
+
+const obj = new MyClass();
+obj.instanceMethod(); // 通过实例调用
+MyClass.staticMethod(); // 通过类名调用</code></pre>"
+生成器函数的核心特征是什么？	"<pre><code class=""language-javascript"">// 生成器函数定义
+function* generatorFunc() {
+  // 特征1: 通过yield控制执行流程
+  yield ""A"";
+  yield ""B"";
+  return ""C"";
+}
+
+// 返回可迭代的生成器对象
+const gen = generatorFunc();
+console.log(gen.next()); // { value: 'A', done: false }
+console.log(gen.next()); // { value: 'B', done: false }
+console.log(gen.next()); // { value: 'C', done: true }</code></pre>"
+class关键字的本质是什么？	"<pre><code class=""language-javascript"">class Person {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  greet() {
+    return `Hello, ${this.name}`;
+  }
+}
+
+// 本质是函数
+console.log(typeof Person); // ""function""
+
+// 必须用new调用
+try {
+  Person(); // TypeError
+} catch (e) {}</code></pre>"
+异步普通函数有什么特殊行为？	"<pre><code class=""language-javascript"">// 异步普通函数
+async function fetchData() {
+  // 特征1: 隐式返回Promise
+  const response = await fetch('/data');
+  const data = await response.json();
+  
+  // 特征2: 内部可用await
+  return data;
+}
+
+// 使用
+fetchData().then(data => console.log(data));</code></pre>"
+异步箭头函数的特点是什么？	"<pre><code class=""language-javascript"">// 异步箭头函数
+const fetchAsync = async (url) => {
+  // 特点1: 继承外层this
+  console.log(this === window);
+  
+  // 特点2: 返回Promise
+  const res = await fetch(url);
+  return res.json();
+};
+
+// 特点3: 无独立this绑定
+fetchAsync('https://api.example.com/data');</code></pre>"
+异步生成器函数的作用是什么？	"<pre><code class=""language-javascript"">// 异步生成器函数
+async function* asyncGenerator() {
+  // 特点1: 同时支持yield和await
+  const data1 = await fetchData('/data1');
+  yield data1;
+  
+  const data2 = await fetchData('/data2');
+  yield data2;
+}
+
+// 处理异步数据流
+(async () => {
+  const gen = asyncGenerator();
+  for await (const data of gen) {
+    console.log(data);
+  }
+})();</code></pre>"
+普通函数和箭头函数的this绑定有何不同？	"<pre><code class=""language-javascript"">const obj = {
+  regular: function() {
+    // this由调用方式决定
+    console.log(this === obj);
+  },
+  arrow: () => {
+    // this由定义时词法作用域决定
+    console.log(this === window);
+  }
+};
+
+obj.regular(); // true (this=obj)
+obj.arrow();   // true (this=window)</code></pre>"
+如何区分异步函数和异步生成器函数？	"<pre><code class=""language-javascript"">// 异步函数
+async function asyncFunc() {
+  return ""结果"";
+}
+console.log(typeof asyncFunc()); // ""object"" (Promise)
+
+// 异步生成器函数
+async function* asyncGen() {
+  yield ""数据"";
+}
+console.log(typeof asyncGen()); // ""object"" (AsyncGenerator)</code></pre>"
+在JavaScript类中，当通过实例调用方法时，`this`指向什么？	"<pre><code class=""language-javascript"">class User {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  greet() {
+    // this指向当前实例
+    return `Hello, ${this.name}`;
+  }
+}
+
+const user = new User(""Alice"");
+console.log(user.greet()); // ""Hello, Alice""</code></pre>"
+若将类方法解构后直接调用（未绑定），`this`会是什么值？为什么？	"<pre><code class=""language-javascript"">class Counter {
+  value = 0;
+  
+  increment() {
+    this.value++;
+  }
+}
+
+const counter = new Counter();
+const incrementFn = counter.increment;
+
+try {
+  incrementFn(); // TypeError: this未定义
+} catch (e) {
+  // 类默认严格模式，独立调用时this=undefined
+}</code></pre>"
+如何永久绑定类方法使其无论何种调用方式都指向实例？（2种方案）	"<pre><code class=""language-javascript"">class User {
+  name = ""Guest"";
+  
+  // 方案1: 箭头函数类字段
+  greetArrow = () => {
+    console.log(`Hello, ${this.name}`);
+  };
+  
+  // 方案2: 构造函数中绑定
+  constructor() {
+    this.greet = this.greet.bind(this);
+  }
+  
+  greet() {
+    console.log(`Welcome, ${this.name}`);
+  }
+}
+
+const user = new User();
+const { greet, greetArrow } = user;
+
+greet();      // ""Welcome, Guest""
+greetArrow(); // ""Hello, Guest""</code></pre>"
+类方法中的严格模式是可选的吗？	"<pre><code class=""language-javascript"">class StrictTest {
+  method() {
+    // 类默认启用严格模式
+    console.log(this); // 未绑定时为undefined
+    
+    // 尝试访问未声明变量
+    try {
+      undeclaredVar = 1; // ReferenceError
+    } catch (e) {}
+  }
+}
+
+new StrictTest().method();</code></pre>"
+非严格模式下独立函数调用的`this`是什么？	"<pre><code class=""language-javascript"">// 非严格模式的普通函数
+function test() {
+  console.log(this === window); // true
+}
+
+// 但类方法不受影响 (默认严格模式)
+class StrictClass {
+  method() {
+    console.log(this); // undefined (未绑定调用)
+  }
+}</code></pre>"
+为什么类方法要求严格模式？	"<pre><code class=""language-javascript"">class SafeClass {
+  value = 10;
+  
+  updateValue(newVal) {
+    // 严格模式防止意外修改全局对象
+    value = newVal; // ReferenceError (应为this.value)
+  }
+}
+
+const obj = new SafeClass();
+obj.updateValue(20); // 安全报错</code></pre>"
+如何临时解决解构后调用的`this`丢失问题？	"<pre><code class=""language-javascript"">class Button {
+  onClick() {
+    console.log(""Clicked"", this);
+  }
+}
+
+const button = new Button();
+const clickHandler = button.onClick.bind(button); // 显式绑定
+clickHandler(); // 正常执行</code></pre>"
+箭头函数类字段为何能绑定`this`？	"<pre><code class=""language-javascript"">class Timer {
+  seconds = 0;
+  
+  // 箭头函数捕获构造函数中的this
+  start = () => {
+    this.interval = setInterval(() => {
+      this.seconds++; // 始终指向实例
+    }, 1000);
+  };
+}
+
+const timer = new Timer();
+timer.start();</code></pre>"
+手动绑定方法时，应该在类的什么生命周期操作？	"<pre><code class=""language-javascript"">class Component {
+  constructor() {
+    // 在构造函数中绑定
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+  
+  handleEvent() {
+    // 确保this始终指向实例
+    console.log(this);
+  }
+}
+
+const comp = new Component();
+document.addEventListener(""click"", comp.handleEvent);</code></pre>"
+独立调用类方法导致`this=undefined`的好处是什么？	"<pre><code class=""language-javascript"">class Calculator {
+  result = 0;
+  
+  add(num) {
+    // 防止意外修改全局变量
+    this.result += num;
+  }
+}
+
+const calc = new Calculator();
+const add = calc.add;
+
+try {
+  add(5); // TypeError
+} catch (e) {
+  console.error(""安全报错: 未绑定调用"");
+}</code></pre>"
