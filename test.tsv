@@ -1,0 +1,205 @@
+#separator:tab
+#html:true
+Go net.Dial网络参数示例	"<pre><code class=""language-go"">func main() {
+    // 9种网络类型
+    networks := []string{
+        ""tcp"", ""tcp4"", ""tcp6"", 
+        ""udp"", ""udp4"", ""udp6"",
+        ""unix"", ""unixgram"", ""unixpacket""
+    }
+    
+    for _, net := range networks {
+        conn, err := net.Dial(net, ""example.com:80"")
+        if err == nil {
+            fmt.Println(""连接成功:"", net)
+            conn.Close()
+        }
+    }
+}</code></pre>"
+Go net.DialTimeout超时含义	"<pre><code class=""language-go"">func main() {
+    // 总超时时间（含DNS解析）
+    conn, err := net.DialTimeout(""tcp"", ""example.com:80"", 3*time.Second)
+    
+    if err != nil {
+        if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+            fmt.Println(""连接超时（含DNS解析）"")
+        }
+    } else {
+        conn.Close()
+    }
+}</code></pre>"
+Go http.Transport作用	"<pre><code class=""language-go"">func main() {
+    // 自定义Transport复用连接
+    transport := &http.Transport{
+        MaxIdleConns:        100,
+        IdleConnTimeout:     90 * time.Second,
+        TLSHandshakeTimeout: 10 * time.Second,
+    }
+    
+    client := &http.Client{Transport: transport}
+    
+    // 复用相同连接
+    for i := 0; i < 5; i++ {
+        resp, _ := client.Get(""https://example.com"")
+        io.Copy(io.Discard, resp.Body)
+        resp.Body.Close()
+    }
+}</code></pre>"
+Go http.Transport连接池参数	"<pre><code class=""language-go"">func main() {
+    transport := &http.Transport{
+        // 全局最大空闲连接
+        MaxIdleConns: 100,
+        
+        // 单主机最大空闲连接
+        MaxIdleConnsPerHost: 2,
+        
+        // 空闲连接超时时间
+        IdleConnTimeout: 90 * time.Second,
+    }
+    
+    client := &http.Client{Transport: transport}
+    // 使用client执行请求...
+}</code></pre>"
+Go启动CPU采样	"<pre><code class=""language-go"">func main() {
+    f, _ := os.Create(""cpu.pprof"")
+    
+    // 启动CPU采样
+    pprof.StartCPUProfile(f)
+    defer pprof.StopCPUProfile() // 确保停止
+    
+    // 执行需要分析的代码
+    heavyTask()
+}</code></pre>"
+Go内存采样频率设置	"<pre><code class=""language-go"">func main() {
+    // 每分配512KB内存采样一次
+    runtime.MemProfileRate = 512 * 1024
+    
+    // 收集内存分析数据
+    f, _ := os.Create(""mem.pprof"")
+    pprof.WriteHeapProfile(f)
+    f.Close()
+}</code></pre>"
+Go阻塞分析数据获取	"<pre><code class=""language-go"">func main() {
+    // 每发生一次阻塞事件采样一次
+    runtime.SetBlockProfileRate(1)
+    
+    // 模拟阻塞操作
+    doBlockingTasks()
+    
+    // 获取阻塞分析数据
+    p := pprof.Lookup(""block"")
+    f, _ := os.Create(""block.pprof"")
+    p.WriteTo(f, 0)
+}</code></pre>"
+Go添加HTTP性能分析	"<pre><code class=""language-go"">import (
+    _ ""net/http/pprof"" // 自动注册路由
+)
+
+func main() {
+    // 自动添加以下路由:
+    // /debug/pprof/
+    // /debug/pprof/heap
+    // /debug/pprof/profile?seconds=30
+    // /debug/pprof/trace?seconds=5
+    
+    go func() {
+        log.Println(http.ListenAndServe(""localhost:6060"", nil))
+    }()
+    
+    // 主服务逻辑...
+}</code></pre>"
+GoHTTP持久连接原理	"<pre><code class=""language-go"">func main() {
+    transport := &http.Transport{
+        // 启用持久连接
+        DisableKeepAlives: false,
+        
+        // 连接复用参数
+        MaxIdleConnsPerHost: 10,
+    }
+    
+    client := &http.Client{Transport: transport}
+    
+    // 相同主机请求复用连接
+    for i := 0; i < 3; i++ {
+        resp, _ := client.Get(""https://example.com/api"")
+        io.Copy(io.Discard, resp.Body)
+        resp.Body.Close()
+    }
+}</code></pre>"
+Gogo tool pprof交互命令	"<pre><code class=""language-bash""># 启动交互分析
+go tool pprof cpu.pprof
+
+# 常用命令:
+(pprof) top10             # 显示最耗资源函数
+(pprof) list funcName      # 查看函数详细
+(pprof) web               # 生成调用图
+(pprof) traces            # 查看调用栈</code></pre>"
+Goruntime/trace用途	"<pre><code class=""language-go"">func main() {
+    f, _ := os.Create(""trace.out"")
+    trace.Start(f)
+    defer trace.Stop()
+    
+    // 跟踪以下操作:
+    go func() { /* goroutine调度 */ }()
+    runtime.GC()          // GC事件
+    time.Sleep(100 * time.Millisecond) // 阻塞事件
+}</code></pre>"
+Go关键HTTP性能配置	"<pre><code class=""language-go"">func createClient() *http.Client {
+    return &http.Client{
+        Timeout: 30 * time.Second, // 全局超时
+        Transport: &http.Transport{
+            // 关键连接池配置
+            MaxIdleConns:        100,
+            MaxIdleConnsPerHost: 10,  // 避免连接泄露
+            IdleConnTimeout:     90 * time.Second,
+        },
+    }
+}</code></pre>"
+Go生产环境pprof风险	"<pre><code class=""language-go"">func main() {
+    // 危险：公网暴露pprof
+    // http.ListenAndServe("":6060"", nil)
+    
+    // 安全做法：内网绑定或添加认证
+    srv := http.Server{
+        Addr:    ""127.0.0.1:6060"", // 仅本地访问
+        Handler: requireAuth(http.DefaultServeMux),
+    }
+    srv.ListenAndServe()
+}</code></pre>"
+Go采样频率权衡	"<pre><code class=""language-go"">func init() {
+    // 默认内存采样率512KB
+    // 平衡性能与精度
+    
+    // 调优建议：
+    // 1. 生产环境保持默认
+    // 2. 诊断时设为1（每分配采样）
+    runtime.MemProfileRate = 1
+}</code></pre>"
+Go未设置HTTP超时风险	"<pre><code class=""language-go"">func main() {
+    // 危险：未设置超时
+    client := &http.Client{} 
+    
+    // 请求可能永久阻塞
+    resp, err := client.Get(""http://unresponsive-host.com"")
+    // ...
+}</code></pre>"
+GoMaxIdleConnsPerHost过低	"<pre><code class=""language-go"">func main() {
+    transport := &http.Transport{
+        MaxIdleConnsPerHost: 2, // 过低
+    }
+    client := &http.Client{Transport: transport}
+    
+    // 高频请求导致频繁建连
+    for i := 0; i < 100; i++ {
+        go func() {
+            resp, _ := client.Get(""https://api.example.com"")
+            resp.Body.Close()
+        }()
+    }
+}</code></pre>"
+Go生产环境暴露pprof风险	"<pre><code class=""language-bash""># 攻击者利用pprof接口
+curl http://your-server:6060/debug/pprof/heap > heap.dump
+
+# 分析内存敏感信息
+go tool pprof heap.dump
+(pprof) list secretKey</code></pre>"
