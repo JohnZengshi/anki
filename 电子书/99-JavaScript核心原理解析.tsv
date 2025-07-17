@@ -1,309 +1,3752 @@
+# 01 | delete 0：JavaScript中到底有什么是可以销毁的
+
 #separator:tab
 #html:true
-JavaScript中引用类型是什么？请用代码说明	"<pre><code class=""language-javascript"">// 引用类型由base和name组成
-const obj = { x: 10 };
-const ref = { base: obj, name: ""x"" };  // 引用类型表示obj.x
+JavaScript中delete操作值类型的返回值	"<pre><code class=""language-javascript"">console.log(delete 0); // true (操作值类型始终返回true)
+console.log(delete ""hello""); // true
+console.log(delete NaN); // true</code></pre>"
+JavaScript全局变量删除操作	"<pre><code class=""language-javascript"">// 非严格模式
+x = 10; // 隐式全局变量
+console.log(delete x); // true 
 
-// 属性访问时创建引用
-console.log(ref.base[ref.name]); // 10</code></pre>"
-JavaScript中delete 0的行为是什么？	"<pre><code class=""language-javascript"">// delete操作符只能删除对象属性
-console.log(delete 0); // true (语法正确但无效操作)
-
-const obj = { prop: ""value"" };
-console.log(delete obj.prop); // true (实际删除属性)
-console.log(obj.prop); // undefined</code></pre>"
-如何修复var x = y = 100;的变量泄漏问题？	"<pre><code class=""language-javascript"">// 错误写法：y泄漏为全局变量
-function leakExample() {
-  var x = y = 100;
-}
-leakExample();
-console.log(y); // 100 (全局污染)
-
-// 正确写法：同时声明变量
-function correctExample() {
-  var x = 100, y = x; // 使用逗号分隔声明
-}</code></pre>"
-JavaScript中表达式和语句的区别？	"<pre><code class=""language-javascript"">// 表达式示例：产生值
-const sum = 1 + 2; // 表达式求值为3
-console.log(sum * 2); // 表达式可嵌套
-
-// 语句示例：控制执行流
-if (sum > 2) { // if语句
-  throw new Error(""示例""); // throw语句
-}</code></pre>"
-解释a.x = a = {n:2};的执行顺序？	"<pre><code class=""language-javascript"">let a = { n: 1 };
-const originalA = a;
-
-// 执行步骤：
-// 1. 计算左侧a.x → 引用原始a的x属性
-// 2. 计算右侧a = {n:2} → 变量a指向新对象
-// 3. 将新对象赋值给原始a.x
-a.x = a = { n: 2 };
-
-console.log(originalA.x); // {n:2} (原始对象的属性)
-console.log(a.x); // undefined (新对象无x属性)</code></pre>"
-箭头函数x => x的本质是什么？	"<pre><code class=""language-javascript"">// 等价于普通函数
-const arrow = x => x;
-const func = function(x) { return x; };
-
-// 关键区别：this绑定
-const obj = {
-  value: 10,
-  arrow: () => this.value, // 继承外层this
-  regular: function() { return this.value; }
+// 严格模式
+""use strict"";
+y = 20; 
+// delete y; // 抛出ReferenceError</code></pre>"
+JavaScript对象属性删除操作	"<pre><code class=""language-javascript"">const obj = { 
+  prop1: ""可删除"",
+  get readOnly() { return ""只读属性""; } 
 };
-console.log(obj.arrow()); // undefined (非对象this)</code></pre>"
-为什么for...of循环开销较大？	"<pre><code class=""language-javascript"">// 每次迭代创建新作用域
-const iterable = [1, 2, 3];
-for (let x of iterable) {
-  // 引擎行为：
-  // 1. 创建新环境记录(iterationEnv)
-  // 2. 绑定当前迭代值
-  // 3. 执行循环体代码
-  console.log(x);
-}
 
-// 等价于手动创建作用域链
-{
-  let x = 1;
-  console.log(x);
-}
-{
-  let x = 2;
-  console.log(x);
+console.log(delete obj.prop1); // true
+console.log(delete obj.readOnly); // false (只读属性删除失败)</code></pre>"
+JavaScript严格模式下的delete行为	"<pre><code class=""language-javascript"">""use strict"";
+const obj = Object.defineProperty({}, ""x"", {
+  value: 100,
+  writable: false
+});
+
+// delete obj.x; // 抛出TypeError (禁止删除只读属性)
+// delete nonExistent; // 抛出ReferenceError (禁止删除未声明变量)</code></pre>"
+ECMAScript引用类型规范概念	"<pre><code class=""language-text"">引用(Reference) = 基值(Base) + 引用名称(Name) + 严格标志(Strict)
+示例：obj.prop → 
+  Base = obj, Name = ""prop"", Strict = false
+
+delete操作实际删除的是基值对象上的命名属性</code></pre>"
+JavaScript左值(LHS)与右值(RHS)示例	"<pre><code class=""language-javascript"">// LHS (可被赋值的目标)
+const target = ""赋值目标""; // ← 左侧引用
+
+// RHS (提供值的表达式)
+const value = target; // → 右侧值
+
+// delete操作LHS引用
+delete target; // 删除全局对象上的target属性</code></pre>"
+JavaScript表达式结果操作示例	"<pre><code class=""language-javascript"">// 操作表达式结果
+const result = delete {}.toString; // true
+
+// 操作单值表达式
+console.log(delete ({})); // true (操作表达式结果而非对象)</code></pre>"
+JavaScript历史兼容性设计示例	"<pre><code class=""language-javascript"">// 早期JS无try/catch时的设计
+function safeDelete(prop) {
+  if (delete globalThis[prop]) {
+    console.log(""删除成功"");
+  } else {
+    console.log(""删除失败"");
+  }
 }</code></pre>"
-yield关键字如何工作？	"<pre><code class=""language-javascript"">function* generator() {
-  yield 1; // 暂停点1
-  yield 2; // 暂停点2
+
+
+# 02 | var x = y = 100：声明语句与语法改变了JavaScript语言核心性质
+
+
+#separator:tab
+#html:true
+JavaScript六类声明语句示例	"<pre><code class=""language-javascript"">// 1. 变量声明
+let name = ""Alice"";
+const PI = 3.14;
+var count = 0;
+
+// 2. 函数声明
+function sum(a, b) {
+  return a + b;
 }
 
-const gen = generator();
-console.log(gen.next()); // {value:1, done:false}
-console.log(gen.next()); // {value:2, done:false}
-console.log(gen.next()); // {value:undefined, done:true}</code></pre>"
-throw 1为什么是最简单语句？	"<pre><code class=""language-javascript"">try {
-  // 规范实现：
-  // 1. 求值表达式 → 1
-  // 2. GetValue(1) → 1
-  // 3. 返回ThrowCompletion(1)
-  throw 1; 
+// 3. 类声明
+class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+
+// 4. 导入声明
+// import { module } from 'module.js';
+
+// 5. 隐式声明 (for循环/try-catch)
+try {
+  undeclaredFunc(); // 可能触发ReferenceError
 } catch (e) {
-  console.log(e); // 1
+  console.log(e.message); // e是隐式声明的catch变量
 }</code></pre>"
-JavaScript中对象和数组的区别？	"<pre><code class=""language-javascript"">// 对象：键值对集合
-const obj = { a: 1, b: 2 };
-console.log(Object.keys(obj)); // [""a"",""b""]
+JavaScript声明提前现象对比	"<pre><code class=""language-javascript"">// var的变量提升
+console.log(a); // undefined (提升但未初始化)
+var a = 10;
+console.log(a); // 10
 
-// 数组：有序索引集合
-const arr = [1, 2];
-console.log(arr[0]); // 1 (顺序访问)
+// let/const的暂时性死区(TDZ)
+console.log(b); // ReferenceError: Cannot access 'b' before initialization
+let b = 20;</code></pre>"
+JavaScript三种绑定行为示例	"<pre><code class=""language-javascript"">// var/function: 初始化为undefined
+console.log(typeof func); // ""function"" (函数提升)
+function func() {}
+console.log(typeof x); // ""undefined"" (var提升)
+var x = 1;
 
-// 转换要求
-obj[Symbol.iterator] = function*() {
-  for (let key in this) yield this[key];
-};
-console.log([...obj]); // [1,2] (转为数组)</code></pre>"
-super.xxx()如何绑定this？	"<pre><code class=""language-javascript"">class Parent {
-  method() { return this; }
+// let: 未初始化(TDZ)
+{
+  // console.log(y); // 此处访问会抛ReferenceError
+  let y = 2;
 }
 
-class Child extends Parent {
-  callSuper() {
-    // super绑定过程：
-    // 1. 通过[[HomeObject]]找到Parent.prototype
-    // 2. 调用Parent.prototype.method
-    // 3. this从当前执行环境复制
-    return super.method(); 
-  }
+// const/import: 一次性绑定
+const z = 3;
+// z = 4; // TypeError: Assignment to constant variable
+import(""module.js"") // 模块加载也是单次绑定</code></pre>"
+JavaScript赋值操作的本质	"<pre><code class=""language-javascript"">// LHS(左值) = RHS(右值)
+let target; // LHS声明
+target = 100; // RHS赋值
+
+// 链式赋值陷阱
+function testScope() {
+  var x = y = 100; // y成为隐式全局变量
 }
-
-const child = new Child();
-console.log(child.callSuper() === child); // true</code></pre>"
-export default function() {}的问题？	"<pre><code class=""language-javascript"">// 错误：匿名函数无法直接绑定
-// export default function() {} 
-
-// 正确写法1：具名导出
-export default function myFunc() {}
-
-// 正确写法2：先声明后导出
-function myFunc() {}
-export default myFunc;</code></pre>"
-new X的执行过程？	"<pre><code class=""language-javascript"">function simulateNew() {
-  // 1. 创建空对象(原型指向X.prototype)
-  const obj = Object.create(X.prototype);
-  
-  // 2. 执行构造函数绑定this
-  const result = X.call(obj, arguments);
-  
-  // 3. 处理返回值
-  return (typeof result === ""object"") ? result : obj;
+testScope();
+console.log(y); // 100 (全局污染)</code></pre>"
+JavaScript隐式全局变量问题	"<pre><code class=""language-javascript"">// 非严格模式
+function leakVariable() {
+  leaked = ""全局变量""; // 自动创建全局属性
 }
+leakVariable();
+console.log(globalThis.leaked); // ""全局变量""
+console.log(delete leaked); // true (可删除)
 
-function X() { this.value = 10; }
-const instance = simulateNew();
-console.log(instance.value); // 10</code></pre>"
-Object.create(new.target.prototype)的作用？	"<pre><code class=""language-javascript"">class NullClass extends null {
-  constructor() {
-    // 当继承null时需要手动设置原型
-    const instance = Object.create(new.target.prototype);
-    return Object.assign(instance, { value: 10 });
-  }
+// 严格模式修复
+function strictMode() {
+  ""use strict"";
+  // undeclaredVar = 10; // ReferenceError
 }
+strictMode();</code></pre>"
+JavaScript全局环境双体系结构	"<pre><code class=""language-javascript"">// var声明变量
+var declaredVar = ""可删除性测试"";
+console.log(delete declaredVar); // false (不可删除)
+console.log(""declaredVar"" in globalThis); // true
 
-const obj = new NullClass();
-console.log(obj.value); // 10</code></pre>"
-解构赋值[a,b]={a,b}如何工作？	"<pre><code class=""language-javascript"">// 右侧对象需实现迭代器
-const obj = { 
-  a: 1, 
-  b: 2,
-  [Symbol.iterator]: function*() {
-    yield this.a;
-    yield this.b;
+// 隐式全局变量
+implicitGlobal = ""隐式创建"";
+console.log(delete implicitGlobal); // true (可删除)
+
+// eval特例
+eval('var evalVar = ""eval创建""');
+console.log(delete evalVar); // true (可删除)</code></pre>"
+JavaScript声明与赋值的关键差异	"<pre><code class=""language-javascript"">// 声明语句无返回值
+let declarationResult = let x = 10; // SyntaxError
+
+// 赋值表达式返回值
+const obj = {
+  method() {
+    return this === obj;
   }
 };
 
-// 解构过程：
-// 1. 调用obj[Symbol.iterator]()
-// 2. 按顺序赋值给左侧变量
-const [a, b] = obj;
-console.log(a, b); // 1 2</code></pre>"
+const methodRef = obj.method;
+console.log(methodRef()); // false (丢失this绑定)</code></pre>"
+JavaScript环境创建流程伪代码	"<pre><code class=""language-text"">// 编译阶段
+1. 词法分析: 扫描源代码
+2. 注册标识符:
+   - var/function → 初始化为undefined
+   - let/const → 标记为<未初始化>(TDZ)
+
+// 执行阶段
+3. 逐行执行代码:
+   - 遇到赋值 → 处理LHS引用
+   - 遇到表达式 → 计算RHS值
+   - 访问TDZ变量 → 抛出ReferenceError</code></pre>"
+JavaScript引用(Reference)组成解析	"<pre><code class=""language-javascript"">// obj.prop对应的引用结构
+const ref = {
+  base: obj,       // 基值对象
+  name: 'prop',    // 属性名
+  strict: false    // 严格模式标志
+};
+
+// 实际删除操作
+delete ref; // 等效于 delete obj.prop</code></pre>"
+JavaScript严格模式行为修正	"<pre><code class=""language-javascript"">""use strict"";
+
+// 1. 禁止隐式全局变量
+// undeclaredVar = 10; // ReferenceError
+
+// 2. 禁止删除不可配置属性
+const obj = Object.defineProperty({}, 'x', {
+  value: 100,
+  configurable: false
+});
+// delete obj.x; // TypeError
+
+// 3. 禁止访问未初始化变量
+let y;
+// console.log(z); // ReferenceError (z未声明)</code></pre>"
+
+
+# 03 | a.x = a = {n:2}：一道被无数人无数次地解释过的经典面试题
 
 #separator:tab
 #html:true
-JavaScript中对象和数组的本质区别？	"<pre><code class=""language-javascript"">// 对象：关联数组（键值对）
-const obj = { a: 1, b: 2 };
-console.log(obj[""a""]); // 1 (字符串索引)
+JavaScript连续赋值计算顺序示例	"<pre><code class=""language-javascript"">let a = {n: 1};
+let ref = a;  // 保存原始引用
 
-// 数组：特殊对象（有序索引）
-const arr = [10, 20];
-console.log(arr[0]); // 10 (数字索引)
-console.log(arr[""0""]); // 10 (等效字符串索引)</code></pre>"
-如何使解构赋值[a,b]={a,b}可执行？	"<pre><code class=""language-javascript"">// 为Object添加迭代器
-Object.prototype[Symbol.iterator] = function*() {
-  yield* Object.values(this);
+// 关键案例：连续赋值
+a.x = a = {n: 2};
+
+console.log(a.x);    // undefined (新对象没有x属性)
+console.log(ref.x);  // {n: 2} (原始对象被添加了x属性)
+console.log(ref);    // {n: 1, x: {n: 2}}
+console.log(a);      // {n: 2}</code></pre>"
+JavaScript引用保存机制解析	"<pre><code class=""language-javascript"">// 引用 = {基值, 属性名, 严格标志}
+const obj = {value: 10};
+
+function getReference() {
+  return obj.prop; // 返回引用对象（非实际值）
+}
+
+// 引用保存示例
+const ref = {
+  base: obj,
+  name: 'prop',
+  strict: false
 };
 
-// 现在对象可被解构
-const {a, b} = {a:1, b:2};
-const [x, y] = {a, b}; // 转换为数组解构
-console.log(x, y); // 1 2</code></pre>"
-展开语法...obj会处理原型链属性吗？	"<pre><code class=""language-javascript"">const parent = { inherited: ""value"" };
-const obj = Object.create(parent);
-obj.ownProp = ""data"";
+// 后续赋值不受原始对象修改影响
+obj = {value: 20}; // 创建新对象
+ref.base[ref.name] = 100; // 修改原始对象的属性
 
-// 展开语法仅处理自身属性
-console.log({...obj}); // { ownProp: ""data"" }
+console.log(obj);     // {value: 20} (新对象)
+console.log(ref.base); // {value: 10, prop: 100} (原始对象)</code></pre>"
+JavaScript链表构建技巧	"<pre><code class=""language-javascript"">// 使用引用保存机制构建链表
+function createLinkedList(size) {
+  let root = {};
+  let current = root;
+  
+  for(let i = 0; i < size; i++) {
+    // 关键：保存对当前节点next属性的引用
+    current.next = current = {
+      value: i,
+      next: null
+    };
+  }
+  
+  return root.next; // 返回第一个有效节点
+}
 
-// 对比：Object.assign会忽略原型链属性
-console.log(Object.assign({}, obj)); // { ownProp: ""data"" }</code></pre>"
-迭代器协议要求实现什么方法？	"<pre><code class=""language-javascript"">// 自定义迭代器实现
-const customIterator = {
-  data: [10, 20, 30],
+const list = createLinkedList(3);
+console.log(list);        // {value: 0, next: {...}}
+console.log(list.next);   // {value: 1, next: {...}}
+console.log(list.next.next); // {value: 2, next: null}</code></pre>"
+JavaScript对象冻结对赋值的影响	"<pre><code class=""language-javascript"">const original = {n: 1};
+Object.freeze(original); // 冻结对象
+
+try {
+  // 尝试修改冻结对象
+  original.x = original = {n: 2};
+} catch (e) {
+  console.error(""操作失败:"", e.message); 
+  // TypeError: Cannot add property x, object is not extensible
+}
+
+console.log(original); // {n: 1} (未被修改)
+console.log(original.x); // undefined (未添加属性)</code></pre>"
+JavaScript声明与赋值的本质区别	"<pre><code class=""language-javascript"">// 声明语句 vs 赋值表达式
+
+// 声明语句（标识符绑定）
+let x = (y = 100); // 声明x，同时隐式创建全局y
+console.log(x, y); // 100, 100
+
+// 赋值表达式（引用操作）
+const obj = {};
+obj.prop = obj = {value: 200}; // 操作已保存的引用
+
+console.log(obj.prop); // undefined (新对象)
+console.log(obj);      // {value: 200}</code></pre>"
+JavaScript全局变量双体系结构	"<pre><code class=""language-javascript"">// var声明变量（不可删除）
+var declaredVar = ""声明变量"";
+console.log(delete declaredVar); // false
+console.log(""declaredVar"" in globalThis); // true
+
+// 隐式全局变量（可删除）
+implicitGlobal = ""隐式变量"";
+console.log(delete implicitGlobal); // true (非严格模式)
+
+// eval特例：var声明但可删除
+eval('var evalVar = ""eval创建""');
+console.log(delete evalVar); // true</code></pre>"
+JavaScript严格模式行为修正	"<pre><code class=""language-javascript"">""use strict"";
+
+// 1. 禁止隐式全局变量
+function testImplicit() {
+  // implicit = 10; // ReferenceError
+}
+
+// 2. 禁止删除不可配置属性
+const obj = Object.defineProperty({}, 'x', {
+  value: 100,
+  configurable: false
+});
+
+function testDelete() {
+  // delete obj.x; // TypeError
+}
+
+// 3. 禁止访问未声明变量
+function testAccess() {
+  // console.log(undeclared); // ReferenceError
+}
+
+testImplicit();
+testDelete();
+testAccess();</code></pre>"
+JavaScript关键复习题解答	"<pre><code class=""language-javascript"">// 1. with语句中的delete
+with({x: 100}) {
+  console.log(delete x); // true (删除with对象的属性)
+}
+
+// 2. eval作用域差异
+function testEval() {
+  const x = ""local"";
+  
+  // 直接eval使用局部作用域
+  (0, eval)('console.log(x)'); // ""local"" (非严格模式)
+  
+  // 间接eval使用全局作用域
+  (0, eval)('console.log(y)'); // ReferenceError (全局无y)
+}
+
+// 3. 冻结对象的赋值尝试
+const frozen = Object.freeze({});
+try {
+  frozen.prop = 100; // TypeError
+} catch(e) {
+  console.log(""安全失败"");
+}
+
+// 4. with语句中的隐式全局
+with({}) {
+  undeclared = ""test""; // 非严格模式创建全局变量
+}
+console.log(globalThis.undeclared); // ""test""</code></pre>"
+
+# 04 | export default function() {}：你无法导出一个匿名函数表达式
+
+#separator:tab
+#html:true
+ES6模块静态装配特性示例	"<pre><code class=""language-javascript"">// 模块A.js
+export let x = 1; // 编译期登记名字
+export function log() { console.log(x); }
+
+// 模块B.js
+import { x, log } from './A.js';
+console.log(x); // 1 (静态装配已完成名字绑定)
+x = 2; // TypeError: 导入绑定不可修改
+log(); // 2 (但模块内修改有效)</code></pre>"
+ES6模块六种导出语法形式	"<pre><code class=""language-javascript"">// 1. 变量声明导出
+export let count = 0;
+
+// 2. 函数声明导出
+export function increment() { count++; }
+
+// 3. 类声明导出
+export class Counter {
+  constructor() { this.value = 0; }
+}
+
+// 4. 重命名导出
+export { count as total };
+
+// 5. 默认导出
+export default function() { return ""default export""; }
+
+// 6. 转发导出
+export { increment as inc } from './utils.js';</code></pre>"
+export default的实质解析	"<pre><code class=""language-javascript"">// 编译期处理
+export default 42;
+// 等价于：
+var default = 42; // 引擎隐式创建(但模块内不可访问)
+export { default as default };
+
+// 函数导出差异
+export default function demo() {}
+// 具名函数 → 名字为""demo""
+export default function() {}
+// 匿名函数 → 名字为""default""</code></pre>"
+匿名函数导出的特殊性	"<pre><code class=""language-javascript"">// 1. 具名函数导出
+export function namedFn() {}
+console.log(namedFn.name); // ""namedFn""
+
+// 2. 匿名函数默认导出
+export default function() {};
+// 导入后:
+import fn from './module.js';
+console.log(fn.name); // ""default"" (引擎自动命名)
+
+// 3. 真正匿名函数
+console.log((function(){}).name); // """" (空字符串)</code></pre>"
+对象字面量的导出优势	"<pre><code class=""language-javascript"">// 模块内部变量
+const apiVersion = ""1.0"";
+const fetchData = () => ({ data: [] });
+
+// 组合导出方案
+export default {
+  version: apiVersion, // 绑定当前值
+  fetch: fetchData,     // 绑定函数引用
+  constants: {          // 直接导出值
+    MAX_ITEMS: 100
+  }
+};
+
+// 导入方使用
+import api from './api.js';
+console.log(api.version); // ""1.0""
+api.fetch(); // 调用函数</code></pre>"
+模块装配流程伪代码	"<pre><code class=""language-text"">// 阶段1: 编译期静态装配
+1. 解析所有import语句 → 构建依赖树
+2. 登记所有export标识符 → 填充词法名字表(lexicalNames)
+
+// 阶段2: 运行时执行
+3. 按依赖顺序执行模块顶层代码:
+   - 初始化变量(let/const)
+   - 执行函数/类声明提升
+   - 计算默认导出值
+4. 绑定名字与值:
+   - 导出标识符 → 内存地址
+   - 导入标识符 → 只读引用</code></pre>"
+名字空间与绑定特性	"<pre><code class=""language-javascript"">// 模块A: 导出可变状态
+export let state = { value: 0 };
+
+// 模块B: 导入使用
+import { state } from './A.js';
+
+// 导入方特性:
+// state = {}; // TypeError: 禁止直接赋值
+state.value = 1; // 允许: 修改对象属性
+
+// 名字空间导入
+import * as A from './A.js';
+A.state.value = 2; // 允许: 通过名字空间修改
+// A.state = {}; // TypeError: 名字空间只读</code></pre>"
+导出项特性与限制	"<pre><code class=""language-javascript"">// 1. 禁止删除导出项
+export const PI = 3.14;
+// delete PI; // 语法错误
+
+// 2. 禁止重复导出
+export { PI };
+// export { PI as MathPI }; // 允许重命名
+// export const PI = 3.14; // SyntaxError: 重复声明
+
+// 3. 类表达式导出
+export const Calculator = class {
+  add(a, b) { return a + b; }
+};</code></pre>"
+默认导出的边界情况	"<pre><code class=""language-javascript"">// 合法默认导出
+export default 2 + 2; // 表达式结果
+export default class { // 匿名类
+  method() {}
+}
+
+// 非法操作
+// export default const x = 10; // SyntaxError
+// export default let y = 20; // SyntaxError
+
+// 函数表达式导出
+export default (function() {
+  return ""IIFE 结果"";
+})();</code></pre>"
+变量提升现象解析	"<pre><code class=""language-javascript"">// 现象: import似乎""提升""
+console.log(api); // 正常访问 (不会报错)
+import api from './api.js';
+
+// 本质: 编译期处理
+// 实际执行顺序:
+// 1. 编译期登记所有导入名字
+// 2. 运行时按顺序执行代码
+// 效果类似变量提升，但机制不同</code></pre>"
+模块执行入口特性	"<pre><code class=""language-javascript"">// 无传统main函数
+// 顶层代码自动执行
+
+// 依赖顺序决定执行顺序
+// 模块A:
+console.log('A执行');
+import './B.js';
+
+// 模块B:
+console.log('B执行');
+
+// 输出:
+// B执行
+// A执行 (因A依赖B，B先执行)</code></pre>"
+名字绑定异常案例	"<pre><code class=""language-javascript"">// 案例1: 修改导入的let绑定
+import { mutableVar } from './module.js';
+// mutableVar = ""新值""; // TypeError (严格模式)
+
+// 案例2: 修改默认导入
+import defaultExport from './module.js';
+// defaultExport = ""新值""; // TypeError
+
+// 案例3: 访问未导出变量
+import { nonExported } from './module.js';
+// 抛出错误: 未导出标识符</code></pre>"
+
+
+# 05 | for (let x of [1,2,3]) ...：for循环并不比使用函数递归节省开销
+
+
+#separator:tab
+#html:true
+JavaScript switch语句的作用域特性	"<pre><code class=""language-javascript"">// 所有case共享同一作用域
+let condition = 'b';
+switch(condition) {
+  case 'a':
+    let value = 10; // 声明覆盖整个switch块
+    console.log(value);
+    break;
+    
+  case 'b':
+    // console.log(value); // ReferenceError! 变量已声明但未初始化
+    value = 20; // 可以访问前case声明的变量
+    console.log(value); // 20
+    break;
+}</code></pre>"
+for循环的迭代作用域机制	"<pre><code class=""language-javascript"">// 每次迭代创建独立作用域
+let funcs = [];
+for (let i = 0; i < 3; i++) {
+  // 每次迭代创建新的i绑定
+  funcs.push(() => console.log(i));
+}
+
+funcs[0](); // 0
+funcs[1](); // 1
+funcs[2](); // 2
+
+// 对比var声明的行为
+var funcsVar = [];
+for (var j = 0; j < 3; j++) {
+  funcsVar.push(() => console.log(j));
+}
+funcsVar[0](); // 3 (所有闭包共享同一个j)</code></pre>"
+for循环作用域的分层结构	"<pre><code class=""language-javascript"">// 作用域分层示例
+let outer = ""外部"";
+for (let i = 0; i < 2; i++) {
+  let inner = `迭代${i}`;
+  
+  {
+    // 嵌套块作用域
+    let blockScoped = `块${i}`;
+    console.log(outer, inner, blockScoped);
+  }
+  
+  // console.log(blockScoped); // ReferenceError (块作用域外不可访问)
+}
+
+// console.log(i); // ReferenceError (for循环作用域外不可访问)</code></pre>"
+var声明的历史包袱问题	"<pre><code class=""language-javascript"">// var的函数级作用域
+function testVarScope() {
+  for (var i = 0; i < 3; i++) {
+    var inner = i * 2;
+  }
+  console.log(i);      // 3 (泄漏出循环)
+  console.log(inner);  // 4 (泄漏出循环块)
+}
+
+testVarScope();
+
+// 变量提升现象
+console.log(hoisted); // undefined (不会ReferenceError)
+var hoisted = ""已提升"";</code></pre>"
+ES6的双体系作用域示例	"<pre><code class=""language-javascript"">// 变量作用域 vs 词法作用域
+function scopeTest() {
+  // var/函数声明使用变量作用域
+  if (true) {
+    var functionScoped = ""可提升"";
+    function fn() {}
+  }
+  console.log(functionScoped); // ""可提升""
+  
+  // let/const使用词法作用域
+  if (true) {
+    let blockScoped = ""块内"";
+    const PI = 3.14;
+    // console.log(PI); // 正常
+  }
+  // console.log(blockScoped); // ReferenceError
+}
+
+scopeTest();</code></pre>"
+迭代作用域与递归的等价性	"<pre><code class=""language-javascript"">// for循环的迭代作用域
+function loopWithScopes(n) {
+  for (let i = 0; i < n; i++) {
+    let value = i * 10;
+    // 每次迭代创建新的作用域
+  }
+}
+
+// 等价的递归实现
+function recursiveLoop(i, n) {
+  if (i >= n) return;
+  
+  // 创建新作用域
+  (function() {
+    let value = i * 10;
+    // 相当于迭代内的操作
+  })();
+  
+  recursiveLoop(i + 1, n);
+}
+
+// 两种方式都创建N个作用域
+loopWithScopes(5);
+recursiveLoop(0, 5);</code></pre>"
+循环内块语句的性能影响	"<pre><code class=""language-javascript"">// 避免不必要的嵌套块
+console.time(""无嵌套块"");
+for (let i = 0; i < 1000000; i++) {
+  // 直接操作
+  let sum = i + i;
+}
+console.timeEnd(""无嵌套块"");
+
+console.time(""有嵌套块"");
+for (let i = 0; i < 1000000; i++) {
+  { // 额外块作用域
+    let sum = i + i;
+  }
+}
+console.timeEnd(""有嵌套块"");
+
+// 在大型循环中，额外作用域创建会有性能开销</code></pre>"
+词法声明的单语句限制	"<pre><code class=""language-javascript"">// 禁止在单语句位置使用词法声明
+// if (true) let x = 10; // SyntaxError
+
+// 合法方式：使用块语句
+if (true) {
+  let y = 20; // 允许
+}
+
+// 循环头部限制
+// for (let i = 0; i < 3; let j = i); // SyntaxError
+
+// 函数声明在循环头部无效
+// for (function fn() {}; i < 3; i++) {} // 无效</code></pre>"
+闭包捕获迭代状态示例	"<pre><code class=""language-javascript"">// 正确捕获迭代状态
+const timers = [];
+for (let i = 0; i < 3; i++) {
+  timers.push(setTimeout(() => {
+    console.log(`迭代${i}完成`);
+  }, 100 * i));
+}
+
+// 输出:
+// 迭代0完成
+// 迭代1完成
+// 迭代2完成
+
+// 错误示例(var声明)
+const timersError = [];
+for (var j = 0; j < 3; j++) {
+  timersError.push(setTimeout(() => {
+    console.log(`迭代${j}完成`); // 全部输出""迭代3完成""
+  }, 100 * j));
+}</code></pre>"
+for循环头部声明类型限制	"<pre><code class=""language-javascript"">// 允许的声明类型
+for (let i = 0; i < 2; i++) {}    // let允许
+for (const i of [1,2]) {}        // const允许
+
+// 不允许的声明类型
+// for (var i = 0; i < 2; i++) {} // 允许但会泄漏
+// for (function x() {}; i < 2; i++) {} // 无效语法
+
+// 不同for变体
+for (let i in {a:1,b:2}) {}     // for...in
+for (let i of [1,2,3]) {}        // for...of
+for await (let chunk of stream) {} // for await</code></pre>"
+
+# 06 | x: break x; 搞懂如何在循环外使用break，方知语句执行真解
+
+#separator:tab
+#html:true
+JavaScript标签语句基本语法	"<pre><code class=""language-javascript"">// 标签独立于变量命名空间
+let checkpoint = ""变量"";
+checkpoint: { // 标签可与变量同名
+  console.log(checkpoint); // ""变量""
+  break checkpoint; // 中断标签块
+}
+console.log(""块外继续执行"");</code></pre>"
+break在finally中的特殊执行次序	"<pre><code class=""language-javascript"">function testBreakInFinally() {
+  checkpoint: try {
+    console.log(""进入try块"");
+    return 100; // 将被跳过
+  } finally {
+    console.log(""执行finally"");
+    break checkpoint; // 中断并跳转
+  }
+  return 200; // 实际返回
+}
+
+console.log(testBreakInFinally()); 
+// 输出:
+// 进入try块
+// 执行finally
+// 200</code></pre>"
+跨函数作用域的break操作	"<pre><code class=""language-javascript"">outer: {
+  console.log(""外层开始"");
+  
+  function inner() {
+    console.log(""内层函数"");
+    break outer; // 跳出外层标签块
+  }
+  
+  inner();
+  console.log(""不会执行到此""); // 被跳过
+}
+
+console.log(""标签块外继续"");</code></pre>"
+完成记录的组成与状态	"<pre><code class=""language-text"">// 完成记录的结构
+{
+  [[Type]]: ""break"" | ""normal"" | ""continue"" | ""return"" | ""throw"",
+  [[Value]]: Any, // 仅return/throw携带值
+  [[Target]]: label // 仅break/continue携带标签
+}
+
+// 五种完成状态示例:
+1. normal: { type: ""normal"", value: undefined } // 普通语句完成
+2. break: { type: ""break"", target: ""label"" }  // break语句
+3. return: { type: ""return"", value: 100 }      // return语句
+4. throw: { type: ""throw"", value: Error }     // throw语句
+5. continue: { type: ""continue"", target: ""loop"" } // continue语句</code></pre>"
+完成记录传递规则示例	"<pre><code class=""language-javascript"">console.log(eval(`
+  main: {
+    inner: {
+      if (true) {
+        break main; // 类型: break, 目标: main
+      }
+      ""inner块最后语句"" // 不被执行
+    }
+    ""main块最后语句"" // 不被执行
+  }
+  ""外层最后语句"" // 返回此值
+`)); // 输出: ""外层最后语句""</code></pre>"
+最小化break语句实现	"<pre><code class=""language-javascript"">// 最小化break实现
+minimal: break minimal;
+
+// 等价于:
+label: {
+  break label;
+}
+
+// 空值特性验证
+const result = (() => {
+  empty: break empty;
+  return ""返回值"";
+})();
+
+console.log(result); // ""返回值"" (break不覆盖返回值)</code></pre>"
+语句执行与函数执行对比	"<pre><code class=""language-javascript"">// 语句执行特性
+let statementResult;
+main: {
+  statementResult = ""语句值"";
+  break main;
+}
+
+// 函数执行特性
+function funcExecution() {
+  return ""函数值"";
+}
+
+console.log(statementResult); // ""语句值""
+console.log(funcExecution()); // ""函数值""
+
+// 关键差异:
+// 1. 语句立即回收作用域，函数通过闭包保留
+// 2. 语句返回完成记录，函数返回值/引用</code></pre>"
+结构化编程的标签替代方案	"<pre><code class=""language-javascript"">// 替代GOTO的安全跳转
+function processData(data) {
+  validation: {
+    if (!data) break validation;
+    if (typeof data !== 'object') break validation;
+    
+    // 有效数据处理
+    console.log(""数据处理"");
+    return;
+  }
+  
+  // 无效数据分支
+  console.error(""无效数据"");
+}
+
+processData(null); // 无效数据
+processData({});  // 数据处理</code></pre>"
+完成记录状态转换示例	"<pre><code class=""language-javascript"">function testCompletionTypes() {
+  // normal完成
+  let normal = 1 + 1;
+  
+  try {
+    // return完成
+    return ""返回值"";
+  } finally {
+    // break完成 (会覆盖return)
+    breakBlock: break breakBlock;
+  }
+  
+  return ""不会执行"";
+}
+
+console.log(testCompletionTypes()); // undefined (break不携带值)</code></pre>"
+Empty值的传播特性	"<pre><code class=""language-javascript"">// Empty值在多语句中的传播
+const result = (() => {
+  // 空语句
+  ;
+  
+  // break语句
+  empty: break empty;
+  
+  // 返回语句
+  return ""实际返回值"";
+})();
+
+console.log(result); // ""实际返回值"" (Empty不覆盖)</code></pre>"
+跨多层标签的break操作	"<pre><code class=""language-javascript"">outer: {
+  console.log(""外层"");
+  
+  middle: {
+    console.log(""中层"");
+    
+    inner: {
+      console.log(""内层"");
+      break outer; // 直接跳出到最外层
+    }
+    
+    console.log(""中层未执行"");
+  }
+  
+  console.log(""外层未执行"");
+}
+
+console.log(""全局继续"");</code></pre>"
+
+
+# 07 | `${1}`：详解JavaScript中特殊的可执行结构
+
+#separator:tab
+#html:true
+JavaScript参数表动态绑定机制	"<pre><code class=""language-javascript"">// 参数表作为List规范类型
+let counter = 0;
+
+function testParamBinding(a = counter++, b = a * 2) {
+  console.log(`a=${a}, b=${b}`);
+}
+
+testParamBinding(); // a=0, b=0 (counter=1)
+testParamBinding(10); // a=10, b=20 (counter=1)
+testParamBinding(); // a=1, b=2 (counter=2)
+
+// 表达式可访问外部变量
+const multiplier = 3;
+function multiply(x = multiplier) {
+  return x * 2;
+}
+console.log(multiply()); // 6</code></pre>"
+JavaScript参数展开本质	"<pre><code class=""language-javascript"">// 依赖迭代器协议
+function sum(...nums) {
+  return nums.reduce((total, num) => total + num, 0);
+}
+
+// 等效手动实现
+function manualSum() {
+  const nums = [];
+  for (let i = 0; i < arguments.length; i++) {
+    nums.push(arguments[i]);
+  }
+  return nums.reduce((t, n) => t + n, 0);
+}
+
+console.log(sum(1, 2, 3)); // 6
+console.log(manualSum(1, 2, 3)); // 6
+
+// 自定义可迭代对象
+const customIterable = {
+  *[Symbol.iterator]() {
+    yield 10;
+    yield 20;
+    yield 30;
+  }
+};
+console.log(sum(...customIterable)); // 60</code></pre>"
+JavaScript赋值模板应用场景	"<pre><code class=""language-javascript"">// 1. 变量声明解构
+const user = { id: 1, name: ""Alice"" };
+const { id, name } = user;
+console.log(id, name); // 1 ""Alice""
+
+// 2. 函数参数解构
+function render({ title = ""Untitled"", content }) {
+  console.log(`<h1>${title}</h1><p>${content}</p>`);
+}
+render({ content: ""Hello world"" }); // <h1>Untitled</h1><p>Hello world</p>
+
+// 3. 循环解构
+const entries = Object.entries({ a: 1, b: 2 });
+for (const [key, value] of entries) {
+  console.log(`${key}: ${value}`); // a:1, b:2
+}</code></pre>"
+JavaScript普通模板字面体	"<pre><code class=""language-javascript"">// 基本用法
+const name = ""Alice"";
+const age = 30;
+console.log(`Name: ${name}, Age: ${age}`); // Name: Alice, Age: 30
+
+// 多行文本
+const multiLine = `
+  <div>
+    <h2>${name}</h2>
+    <p>Age: ${age}</p>
+  </div>
+`;
+console.log(multiLine);
+
+// 表达式支持
+console.log(`Next year: ${age + 1}`); // Next year: 31
+
+// 缓存机制优化
+const template = `User: ${name}`;
+console.log(template); // 引擎内部缓存解析结果</code></pre>"
+JavaScript标签模板实现原理	"<pre><code class=""language-javascript"">// 自定义标签函数
+function currency(strings, ...values) {
+  let result = strings[0];
+  for (let i = 0; i < values.length; i++) {
+    result += `$${values[i].toFixed(2)}${strings[i+1]}`;
+  }
+  return result;
+}
+
+const item = ""Coffee"";
+const price = 3.5;
+const taxRate = 0.08;
+
+console.log(currency`${item}: ${price} (tax: ${taxRate})`);
+// Coffee: $3.50 (tax: $0.08)
+
+// 原始字符串访问
+function rawTag(strings, ...values) {
+  console.log(strings.raw[0]); // 包含转义字符的原始文本
+}
+rawTag`First line\nSecond line`; // ""First line\\nSecond line""</code></pre>"
+JavaScript引用(Reference)模型	"<pre><code class=""language-javascript"">// 引用组成示例
+const obj = { value: 10 };
+const propRef = {
+  base: obj,
+  referencedName: ""value"",
+  strict: false
+};
+
+// 动态方法调用
+obj.method = function() {
+  console.log(this.value); // this = base
+};
+obj.method(); // 10
+
+// 严格模式指令
+function strictTest() {
+  ""use strict"";
+  // undeclared = 10; // ReferenceError
+}
+strictTest();</code></pre>"
+JavaScript函数实例化过程	"<pre><code class=""language-javascript"">// 伪代码演示实例化
+function createFunction(params, body) {
+  // 1. 创建闭包环境
+  const closureEnv = new Environment();
+  
+  // 2. 绑定参数名
+  for (const param of params) {
+    closureEnv.declare(param, undefined);
+  }
+  
+  // 3. 返回可执行函数
+  return {
+    execute(args) {
+      // 绑定实际参数值
+      for (let i = 0; i < params.length; i++) {
+        closureEnv.set(params[i], args[i]);
+      }
+      // 执行函数体
+      return interpret(body, closureEnv);
+    }
+  };
+}
+
+const myFunc = createFunction([""x"", ""y""], ""return x + y;"");
+console.log(myFunc.execute([10, 20])); // 30</code></pre>"
+JavaScript合法但无效操作示例	"<pre><code class=""language-javascript"">// 语法通过但运行时报错
+try {
+  1 = 2; // Syntax OK, Runtime ReferenceError
+} catch (e) {
+  console.log(e.message); // Invalid left-hand side in assignment
+}
+
+// 解构失败处理
+const obj = { existing: ""value"" };
+const { existing, missing } = obj;
+console.log(existing, missing); // ""value"" undefined
+
+// 函数参数默认值解构
+function draw({ x = 0, y = 0 } = {}) {
+  console.log(`Drawing at (${x}, ${y})`);
+}
+draw(); // Drawing at (0, 0)</code></pre>"
+JavaScript模板字面量内部结构	"<pre><code class=""language-javascript"">// 伪结构表示
+const name = ""Bob"";
+const age = 25;
+
+const template = {
+  raw: [""Name: "", "", Age: "", """"], // 原始文本段
+  cooked: [""Name: "", "", Age: "", """"], // 处理后的文本段
+  expressions: [name, age] // 表达式引用
+};
+
+// 标签模板实际接收的参数
+function debugTag(strings, ...values) {
+  console.log(""原始文本:"", strings);
+  console.log(""原始文本(未转义):"", strings.raw);
+  console.log(""表达式值:"", values);
+  return ""Result"";
+}
+
+debugTag`Name: ${name}, Age: ${age}`;</code></pre>"
+
+# 08 | x => x：函数式语言的核心抽象：函数与表达式的同一性
+
+#separator:tab
+#html:true
+JavaScript函数双重性演示	"<pre><code class=""language-javascript"">// 静态视角：函数对象
+function namedFunction() {}
+console.log(typeof namedFunction); // ""function""
+console.log(namedFunction.name); // ""namedFunction""
+
+// 动态视角：执行结构
+const funcs = [];
+for (let i = 0; i < 3; i++) {
+  // 每次循环创建新的闭包
+  funcs.push(function f() { return i; });
+}
+console.log(funcs[0] === funcs[1]); // false
+console.log(funcs[0]()); // 0
+console.log(funcs[1]()); // 1</code></pre>"
+JavaScript参数传递机制	"<pre><code class=""language-javascript"">// 非惰性求值：参数在调用前计算
+let counter = 0;
+function log(x = counter++) {
+  console.log(x);
+}
+
+log(); // 0 (counter=1)
+log(); // 1 (counter=2)
+
+// 值传递（非引用）
+let value = 100;
+function update(val) {
+  val = 200;
+  console.log(val); // 200
+}
+update(value);
+console.log(value); // 100 (原值不变)</code></pre>"
+JavaScript参数绑定阶段	"<pre><code class=""language-javascript"">// 参数绑定两个阶段
+function example(a, b = 2) {
+  // 阶段1: 闭包创建时登记参数名(a, b)
+  // 阶段2: 执行时绑定实际值
+  
+  console.log(a, b);
+}
+
+// 调用时绑定
+example(1); // 1 2
+example(1, 3); // 1 3
+
+// 函数作用域内参数可见
+function testParamVisibility(x) {
+  console.log(x); // 100
+  var x = 200;    // 覆盖参数值
+  console.log(x); // 200
+}
+testParamVisibility(100);</code></pre>"
+简单参数与非简单参数对比	"<pre><code class=""language-javascript"">// 简单参数
+function simple(a, b) {
+  console.log(arguments[0]); // 100 (同步)
+  a = 200;
+  console.log(arguments[0]); // 200 (同步)
+}
+simple(100, 200);
+
+// 非简单参数（默认值）
+function complex(x = 1, y = 2) {
+  ""use strict"";
+  console.log(arguments[0]); // 100 (不同步)
+  x = 200;
+  console.log(arguments[0]); // 100 (保持原值)
+}
+complex(100, 200);
+
+// 重名参数检查
+function duplicate(a, a) { // 非严格模式允许
+  console.log(a);
+}
+duplicate(1, 2); // 2
+
+function strictDuplicate(a, a) { // 严格模式报错
+  ""use strict"";
+}
+// strictDuplicate(1, 2); // SyntaxError</code></pre>"
+闭包与作用域冲突处理	"<pre><code class=""language-javascript"">// 闭包环境隔离
+function createCounter() {
+  let count = 0;
+  return {
+    increment: () => count++,
+    getCount: () => count
+  };
+}
+
+const c1 = createCounter();
+const c2 = createCounter();
+c1.increment();
+console.log(c1.getCount()); // 1
+console.log(c2.getCount()); // 0
+
+// 作用域冲突
+function scopeConflict(x) {
+  console.log(x); // 100
+  let x = 200;    // SyntaxError: Identifier 'x' has already been declared
+}
+// scopeConflict(100);</code></pre>"
+ES6默认参数特性	"<pre><code class=""language-javascript"">// 默认参数在函数作用域内求值
+let external = 10;
+
+function withDefaults(x = external + 5) {
+  console.log(x);
+  
+  // 内部同名变量不影响默认值
+  let external = 20;
+  console.log(external); // 20
+}
+
+withDefaults(); // 15 (使用外部的external)
+
+external = 20;
+withDefaults(); // 25
+
+// 默认值表达式动态计算
+function dynamicDefault(value = Date.now()) {
+  console.log(value);
+}
+dynamicDefault(); // 当前时间戳
+setTimeout(() => dynamicDefault(), 1000); // 新时间戳</code></pre>"
+箭头函数特性对比	"<pre><code class=""language-javascript"">// 传统函数
+function traditional() {
+  console.log(this); // 动态绑定
+  console.log(arguments); // 参数对象
+}
+traditional.call({ id: 1 }, 1, 2, 3);
+
+// 箭头函数
+const arrow = () => {
+  console.log(this); // 继承自定义位置
+  // console.log(arguments); // ReferenceError
+};
+arrow.call({ id: 2 }); // this不变
+
+// 构造函数能力
+try {
+  new (() => {})(); // TypeError: arrow is not a constructor
+} catch (e) {
+  console.log(e.message);
+}
+
+// 自动命名
+const namedArrow = () => {};
+console.log(namedArrow.name); // ""namedArrow""</code></pre>"
+函数式抽象与恒等函数	"<pre><code class=""language-javascript"">// 恒等函数
+const identity = x => x;
+console.log(identity(100) === 100); // true
+
+// 函数作为数据
+const operations = {
+  add: (a, b) => a + b,
+  multiply: (a, b) => a * b
+};
+
+console.log(operations.add(2, 3)); // 5
+console.log(operations.multiply(2, 3)); // 6
+
+// 闭包作为状态容器
+const createState = initial => {
+  let state = initial;
+  return {
+    get: () => state,
+    set: newValue => state = newValue
+  };
+};
+
+const counter = createState(0);
+counter.set(counter.get() + 1);
+console.log(counter.get()); // 1</code></pre>"
+参数求值上下文差异	"<pre><code class=""language-javascript"">let y = 10;
+
+function contextTest(x = y + 5) {
+  // 默认参数在外部作用域求值
+  let y = 20;
+  console.log(x); // 15 (使用外部y)
+}
+
+contextTest();
+
+// 实际参数在外部求值
+function externalEval(a, b) {
+  console.log(a, b);
+}
+
+let value = 100;
+externalEval(value, value * 2); // 100 200</code></pre>"
+严格模式对参数的影响	"<pre><code class=""language-javascript"">// 非严格模式
+function nonStrict(a, a) {
+  console.log(a); // 第二个a覆盖第一个
+}
+nonStrict(1, 2); // 2
+
+// 严格模式
+function strictDuplicate(a, a) { // SyntaxError: Duplicate parameter name
+  ""use strict"";
+}
+// strictDuplicate(1, 2);
+
+// arguments分离
+function strictArgs(x, y = 10) {
+  ""use strict"";
+  x = 20;
+  console.log(arguments[0]); // 100 (不变)
+}
+strictArgs(100);</code></pre>"
+参数模式最佳实践	"<pre><code class=""language-javascript"">// 1. 可选配置项：解构+默认值
+function renderContent({ title = ""Untitled"", content = """" } = {}) {
+  console.log(`<h1>${title}</h1><p>${content}</p>`);
+}
+renderContent({ content: ""Hello"" });
+
+// 2. 必需参数：简单形式
+function requiredParams(username, password) {
+  // 验证逻辑
+}
+
+// 3. 动态参数数量：Rest参数
+function dynamicParams(...args) {
+  console.log(args.length, args);
+}
+dynamicParams(1, 2, 3);</code></pre>"
+
+
+# 09 | (...x)：不是表达式、语句、函数，但它却能执行
+
+#separator:tab
+#html:true
+JavaScript迭代器协议实现	"<pre><code class=""language-javascript"">// 自定义迭代器实现
+const countdown = {
+  from: 5,
+  to: 1,
+  
   [Symbol.iterator]() {
-    let index = 0;
+    let current = this.from;
     return {
       next: () => {
-        return index < this.data.length ? 
-          { value: this.data[index++], done: false } : 
-          { done: true };
+        if (current >= this.to) {
+          return { value: current-- };
+        }
+        return { done: true };
       }
     };
   }
 };
 
-for (let num of customIterator) {
-  console.log(num); // 10, 20, 30
+// 使用迭代器
+const iterator = countdown[Symbol.iterator]();
+console.log(iterator.next().value); // 5
+console.log(iterator.next().value); // 4
+console.log(iterator.next().done);  // false</code></pre>"
+JavaScript可迭代对象创建	"<pre><code class=""language-javascript"">// 将普通对象转为可迭代对象
+const dataSet = {
+  values: [""A"", ""B"", ""C""],
+  [Symbol.iterator]() {
+    let index = 0;
+    return {
+      next: () => 
+        index < this.values.length 
+          ? { value: this.values[index++] } 
+          : { done: true }
+    };
+  }
+};
+
+// 使用for...of遍历
+for (const item of dataSet) {
+  console.log(item); // A, B, C
 }</code></pre>"
-生成器函数中yield如何实现双向通信？	"<pre><code class=""language-javascript"">function* twoWayGen() {
-  const name = yield ""请输入名字"";
-  const age = yield `你好${name}, 请输入年龄`;
-  return `${name}:${age}岁`;
-}
-
-const gen = twoWayGen();
-console.log(gen.next().value); // ""请输入名字""
-console.log(gen.next(""张三"").value); // ""你好张三, 请输入年龄""
-console.log(gen.next(30).value); // ""张三:30岁""</code></pre>"
-执行上下文包含哪些核心组件？	"<pre><code class=""language-javascript"">function demoContext() {
-  // 变量环境(var)
-  var varVariable = ""hoisted"";
+JavaScript展开语法本质	"<pre><code class=""language-javascript"">// 展开语法特性演示
+function showSpreadProperties() {
+  // 1. 语法而非运算符
+  // const result = ...dataSet; // 语法错误
   
-  // 词法环境(let/const)
-  let lexicalVar = ""scoped"";
+  // 2. 无返回值
+  const arr = [...dataSet];
+  console.log(arr); // [""A"",""B"",""C""]
   
-  // this绑定
-  console.log(this); // 取决于调用方式
+  // 3. 异常不传递
+  const brokenIter = {
+    [Symbol.iterator]() {
+      throw new Error(""迭代异常"");
+    }
+  };
+  try {
+    console.log(...brokenIter); // 直接抛出异常
+  } catch(e) {
+    console.error(e.message); // ""迭代异常""
+  }
 }
-
-// 模拟执行上下文结构
-const executionContext = {
-  VariableEnvironment: { varVariable: undefined },
-  LexicalEnvironment: { lexicalVar: ""<uninitialized>"" },
-  ThisBinding: globalThis
-};</code></pre>"
-new.target在构造函数中的作用？	"<pre><code class=""language-javascript"">class Parent {
-  constructor() {
-    // 检测调用方式
-    if (!new.target) throw ""必须使用new调用"";
+showSpreadProperties();</code></pre>"
+JavaScript迭代器生命周期控制	"<pre><code class=""language-javascript"">// 资源管理迭代器
+const managedResource = {
+  [Symbol.iterator]() {
+    let resource = ""资源已分配"";
+    let count = 3;
     
-    // 访问当前构造器
-    console.log(new.target.name); // ""Child""
+    return {
+      next() {
+        if (count-- > 0) return { value: count };
+        return { done: true };
+      },
+      return() {
+        console.log(""清理资源:"", resource);
+        resource = null;
+        return { done: true };
+      },
+      throw(e) {
+        console.error(""处理异常:"", e.message);
+        this.return();
+        throw e;
+      }
+    };
+  }
+};
+
+// 测试中断处理
+for (const num of managedResource) {
+  if (num === 1) break; // 触发return()
+}
+// 输出: 清理资源: 资源已分配</code></pre>"
+JavaScript for...of中断处理	"<pre><code class=""language-javascript"">// 循环中断触发return()
+const interruptible = {
+  [Symbol.iterator]() {
+    return {
+      next: () => ({ value: Math.random() }),
+      return: () => console.log(""循环中断"")
+    };
+  }
+};
+
+for (const num of interruptible) {
+  if (num > 0.5) break; // 触发return()
+  // 输出: 循环中断
+}
+
+// 异常不会触发throw()
+try {
+  for (const num of interruptible) {
+    throw new Error(""测试异常"");
+  }
+} catch(e) {
+  console.log(e.message); // ""测试异常"" (不会调用throw)
+}</code></pre>"
+JavaScript迭代异常处理边界	"<pre><code class=""language-javascript"">// 迭代器异常处理
+const criticalIter = {
+  [Symbol.iterator]() {
+    let count = 3;
+    return {
+      next: () => {
+        if (count === 2) throw new Error(""关键错误"");
+        return { value: count-- };
+      },
+      throw: (e) => console.log(""捕获:"", e.message)
+    };
+  }
+};
+
+// 函数内异常
+try {
+  for (const item of criticalIter) {
+    console.log(item);
+  }
+} catch(e) {
+  console.error(""外部捕获:"", e.message); // ""关键错误""
+}
+
+// 展开语法不处理异常
+console.log(...criticalIter); // 直接抛出异常</code></pre>"
+JavaScript递归与迭代对比	"<pre><code class=""language-javascript"">// 递归实现
+function recursiveCountdown(n) {
+  if (n <= 0) return;
+  console.log(n);
+  recursiveCountdown(n - 1);
+}
+recursiveCountdown(3); // 3,2,1
+
+// 迭代实现
+function iterativeCountdown(n) {
+  const iter = {
+    [Symbol.iterator]() {
+      let current = n;
+      return {
+        next: () => {
+          if (current > 0) return { value: current-- };
+          return { done: true };
+        }
+      };
+    }
+  };
+  
+  for (const num of iter) {
+    console.log(num); // 3,2,1
+  }
+}
+iterativeCountdown(3);</code></pre>"
+JavaScript迭代器规范实现	"<pre><code class=""language-javascript"">// 完整的迭代器实现
+const safeIter = {
+  data: [10, 20, 30],
+  
+  [Symbol.iterator]() {
+    let current = 0;
+    const that = this;
+    
+    return {
+      next() {
+        if (current < that.data.length) {
+          return { value: that.data[current++] };
+        }
+        return { done: true };
+      },
+      return() {
+        console.log(""迭代提前终止"");
+        return { done: true };
+      },
+      throw(e) {
+        console.error(""迭代异常:"", e.message);
+        this.return();
+        return { done: true };
+      }
+    };
+  }
+};
+
+// 测试资源清理
+for (const num of safeIter) {
+  if (num === 20) break; // 触发return()
+  // 输出: 迭代提前终止
+}</code></pre>"
+JavaScript展开语法适用场景	"<pre><code class=""language-javascript"">// 推荐场景：数据转换
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+console.log([...arr1, ...arr2]); // 合并数组
+
+const obj1 = { a: 1 };
+const obj2 = { b: 2 };
+console.log({ ...obj1, ...obj2 }); // 合并对象
+
+// 避免场景：含副作用的迭代
+let counter = 0;
+const sideEffectIter = {
+  [Symbol.iterator]() {
+    return {
+      next: () => {
+        counter++;
+        return { value: counter };
+      }
+    };
+  }
+};
+
+// 不可预测行为（可能因异常中断）
+try {
+  const result = [...sideEffectIter];
+} catch(e) {
+  console.log(counter); // 不确定值
+}</code></pre>"
+JavaScript迭代器综合示例	"<pre><code class=""language-javascript"">const managedObj = {
+  data: [""文件1"", ""文件2"", ""文件3""],
+  openResources: [],
+  
+  [Symbol.iterator]() {
+    let index = 0;
+    const that = this;
+    
+    return {
+      next() {
+        if (index >= that.data.length) 
+          return { done: true };
+          
+        const resource = `打开:${that.data[index]}`;
+        that.openResources.push(resource);
+        return { value: resource };
+      },
+      return() {
+        console.log(""清理资源:"", that.openResources);
+        that.openResources = [];
+        return { done: true };
+      },
+      throw(e) {
+        console.error(`处理错误:${e.message}`);
+        this.return();
+        throw e;
+      }
+    };
+  }
+};
+
+// 场景1: 正常迭代
+for (const res of managedObj) {
+  console.log(res);
+}
+console.log(managedObj.openResources); // []
+
+// 场景2: 中断触发清理
+for (const res of managedObj) {
+  if (res.includes(""2"")) break; // 触发return()
+  // 输出: 清理资源: [""打开:文件1"", ""打开:文件2""]
+}</code></pre>"
+
+# 10 | x = yield x：迭代过程的“函数式化”
+
+#separator:tab
+#html:true
+JavaScript生成器函数定义与特性	"<pre><code class=""language-javascript"">// 生成器函数定义
+function* counter(start = 5) {
+  // 调用时不立即执行
+  console.log(""首次调用.next()前不执行"");
+  
+  while (start--) {
+    yield start; // 暂停点
+  }
+  return ""完成"";
+}
+
+// 创建生成器对象
+const gen = counter(3);
+console.log(gen.next().value); // 2 (首次执行到第一个yield)
+console.log(gen.next().value); // 1</code></pre>"
+JavaScript生成器执行状态管理	"<pre><code class=""language-javascript"">function* stateDemo() {
+  console.log(""状态: executing"");
+  yield ""暂停1"";
+  console.log(""恢复执行"");
+  yield ""暂停2"";
+}
+
+const gen = stateDemo();
+console.log(gen.next()); // { value: ""暂停1"", done: false }
+// 状态: executing
+console.log(gen.next()); // { value: ""暂停2"", done: false }
+// 恢复执行
+console.log(gen.next()); // { value: undefined, done: true }</code></pre>"
+yield双通道数据传递机制	"<pre><code class=""language-javascript"">function* dataChannel() {
+  // 值传出
+  const received1 = yield ""传出值1"";
+  console.log(received1); // 输入值1
+  
+  // 值传入
+  const received2 = yield ""传出值2"";
+  console.log(received2); // 输入值2
+}
+
+const gen = dataChannel();
+console.log(gen.next().value); // ""传出值1""
+console.log(gen.next(""输入值1"").value); // ""传出值2""
+gen.next(""输入值2"");</code></pre>"
+生成器上下文保留机制	"<pre><code class=""language-javascript"">function* contextPreserve() {
+  let count = 0;
+  while (true) {
+    // 每次暂停保留count状态
+    count += yield count;
   }
 }
 
-class Child extends Parent {
-  constructor() {
-    super();
-    // 访问父类构造器
-    console.log(new.target.super); // Parent
+const gen = contextPreserve();
+console.log(gen.next().value);  // 0 (初始值)
+console.log(gen.next(5).value); // 5 (0+5)
+console.log(gen.next(3).value); // 8 (5+3)</code></pre>"
+生成器初始参数绑定	"<pre><code class=""language-javascript"">function* parameterBinding(x, y = 10) {
+  yield `x=${x}`;
+  yield `y=${y}`;
+  yield `总和=${x + y}`;
+}
+
+const gen = parameterBinding(5);
+console.log(gen.next().value); // x=5
+console.log(gen.next().value); // y=10
+console.log(gen.next().value); // 总和=15</code></pre>"
+yield接收参数原理	"<pre><code class=""language-javascript"">function* parameterLogic() {
+  const a = yield;      // 接收第1次.next(v)的值
+  const b = yield a;    // 接收第2次.next(v)的值
+  yield a + b;
+}
+
+const gen = parameterLogic();
+gen.next();         // 启动生成器
+console.log(gen.next(10).value);  // 10 (a=10)
+console.log(gen.next(20).value);  // 30 (b=20, 返回10+20)</code></pre>"
+生成器栈帧分离机制	"<pre><code class=""language-text"">// 生成器上下文存储位置对比
+普通函数上下文:
+  - 存储位置: 调用栈
+  - 生命周期: 函数执行期间
+  - 示例: function call() { ... }
+
+生成器上下文:
+  - 存储位置: 堆内存
+  - 生命周期: 生成器对象存活期间
+  - 示例: function* gen() { ... }
+
+关键技术: 栈帧分离使生成器可暂停/恢复</code></pre>"
+嵌套生成器执行	"<pre><code class=""language-javascript"">function* inner() {
+  yield ""内层1"";
+  yield ""内层2"";
+}
+
+function* outer() {
+  yield ""外层开始"";
+  yield* inner(); // 委托执行
+  yield ""外层结束"";
+}
+
+const gen = outer();
+console.log(gen.next().value); // 外层开始
+console.log(gen.next().value); // 内层1
+console.log(gen.next().value); // 内层2
+console.log(gen.next().value); // 外层结束</code></pre>"
+生成器资源管理	"<pre><code class=""language-javascript"">// 结合try...finally确保资源释放
+function* resourceManager() {
+  let resource = ""打开资源"";
+  try {
+    yield `使用中: ${resource}`;
+    yield `继续使用: ${resource}`;
+  } finally {
+    console.log(`清理: ${resource}`);
+    resource = null;
   }
 }
 
-const child = new Child();</code></pre>"
-如何正确创建派生类实例？	"<pre><code class=""language-javascript"">class Animal {
+const gen = resourceManager();
+console.log(gen.next().value); // 使用中: 打开资源
+gen.return(); // 触发finally块
+// 输出: 清理: 打开资源</code></pre>"
+生成器迭代协议实现	"<pre><code class=""language-javascript"">// 生成器是迭代器也是可迭代对象
+function* countdown(from) {
+  while (from--) yield from;
+}
+
+const gen = countdown(3);
+console.log(gen.next().value); // 3
+console.log(gen.next().value); // 2
+
+// 自引用特性
+const iterator = gen[Symbol.iterator]();
+console.log(iterator === gen); // true
+
+// 可迭代特性
+for (const num of countdown(2)) {
+  console.log(num); // 2, 1
+}</code></pre>"
+生成器与普通函数对比	"<pre><code class=""language-javascript"">// 普通函数 vs 生成器函数
+function normalFunc() {
+  return ""单次返回"";
+}
+
+function* generatorFunc() {
+  yield ""多次暂停"";
+  return ""最终返回"";
+}
+
+// 执行特性对比
+console.log(normalFunc()); // ""单次返回"" (立即执行)
+
+const gen = generatorFunc();
+console.log(gen.next().value); // ""多次暂停""
+console.log(gen.next().value); // ""最终返回""
+
+// 上下文存储差异
+function testClosure() {
+  let x = 10;
+  return function() { return x++; };
+}
+const closure = testClosure();
+console.log(closure()); // 10
+
+function* testGenClosure() {
+  let x = 10;
+  while (true) yield x++;
+}
+const genClosure = testGenClosure();
+console.log(genClosure.next().value); // 10</code></pre>"
+yield函数式迭代应用	"<pre><code class=""language-javascript"">// 将循环展开为离散步骤
+function* range(start, end) {
+  while (start < end) yield start++;
+}
+
+// 模拟reduce操作
+const numbers = range(1, 4);
+let sum = 0;
+for (const n of numbers) {
+  sum += n; // 1+2+3
+}
+console.log(sum); // 6
+
+// 实现函数式流程
+function* processSteps(steps) {
+  for (const step of steps) {
+    const result = yield step;
+    console.log(result);
+  }
+}
+
+const workflow = processSteps([""步骤1"", ""步骤2""]);
+workflow.next(); // { value: ""步骤1"", done: false }
+workflow.next(""结果1""); // 输出: 结果1
+workflow.next(""结果2"");</code></pre>"
+
+# 11 | throw 1;：它在“最简单语法榜”上排名第三
+
+#separator:tab
+#html:true
+JavaScript完成记录三要素	"<pre><code class=""language-javascript"">// 完成记录的结构
+{
+  [[Type]]: ""normal"" | ""throw"" | ""break"" | ""continue"" | ""return"",
+  [[Value]]: any,  // 值或异常对象
+  [[Target]]: """"  // 仅break/continue需要
+}
+
+// 五种状态类型示例:
+1. normal: { type: ""normal"", value: 1 }   // 正常完成
+2. throw: { type: ""throw"", value: Error } // 异常抛出
+3. break: { type: ""break"", target: ""loop"" } // 循环中断
+4. continue: { type: ""continue"", target: ""inner"" } // 继续循环
+5. return: { type: ""return"", value: ""结果"" }  // 函数返回</code></pre>"
+JavaScript语句块执行规则	"<pre><code class=""language-javascript"">// 1. 空值不覆盖规则
+console.log(eval(`{
+  1;
+  ; // 空语句
+}`)); // 1
+
+// 2. undefined默认覆盖
+console.log(eval(`{
+  if (true);
+}`)); // undefined
+
+// 3. 最终值保留规则
+console.log(eval(`{
+  ; // 空语句
+  2; 
+  ""最后"";
+}`)); // ""最后""
+
+// 混合规则测试
+console.log(eval(`{
+  let x = 10;
+  x + 5;
+  ; // 被忽略
+}`)); // 15</code></pre>"
+throw语句三阶段机制	"<pre><code class=""language-javascript"">// throw expression执行逻辑
+function testThrow(expr) {
+  try {
+    // 阶段1: 计算表达式
+    const exprRef = eval(expr);
+    
+    // 阶段2: 获取值
+    const exprValue = exprRef;
+    
+    // 阶段3: 返回throw完成记录
+    throw exprValue;
+  } catch (e) {
+    return e;
+  }
+}
+
+console.log(testThrow(""new Error('测试')"")); // Error: 测试
+console.log(testThrow(""123"")); // 123</code></pre>"
+try-catch完成记录转换	"<pre><code class=""language-javascript"">// 异常捕获后转为normal完成
+function testCatch() {
+  try {
+    throw ""异常值"";
+  } catch(e) {
+    console.log(`捕获: ${e}`);
+    return ""处理结果"";
+  }
+}
+
+const result = testCatch();
+// 输出: 捕获: 异常值
+console.log(result); // ""处理结果"" (返回normal完成)</code></pre>"
+GetValue操作与异常短路	"<pre><code class=""language-javascript"">// GetValue解引用过程
+const obj = { prop: ""值"" };
+const ref = {
+  base: obj,
+  name: ""prop""
+};
+
+// GetValue实现
+function GetValue(ref) {
+  if (ref instanceof Reference) {
+    return ref.base[ref.name];
+  }
+  return ref;
+}
+
+console.log(GetValue(ref)); // ""值""
+
+// 异常短路机制
+function ReturnIfAbrupt(x) {
+  if (x &amp;&amp; x.type === ""throw"") {
+    throw x.value; // 抛出异常
+  }
+  return x;
+}
+
+try {
+  const result = ReturnIfAbrupt({ type: ""throw"", value: ""错误"" });
+} catch(e) {
+  console.log(e); // ""错误""
+}</code></pre>"
+执行体系分层模型	"<pre><code class=""language-text"">// ECMAScript执行体系分层
+1. 解析层 (Parse Tree)
+   - 语法结构抽象
+   - 示例: if语句 → IfStatement节点
+
+2. 执行层 (Completion Record)
+   - 状态跟踪
+   - 示例: { type: ""normal"", value: undefined }
+
+3. 异常控制层 (ReturnIfAbrupt)
+   - 错误传播管理
+   - 示例: 
+        if (completion.type === ""throw"") 
+            throw completion.value;</code></pre>"
+throw关键特性示例	"<pre><code class=""language-javascript"">// 1. 可抛出任意值类型
+throw ""字符串错误"";
+throw { code: 500, message: ""服务错误"" };
+throw new Error(""标准错误"");
+
+// 2. 必须被捕获
+try {
+  throw ""未捕获错误"";
+} catch (e) {
+  console.log(`捕获: ${e}`); // 捕获: 未捕获错误
+}
+
+// 3. 控制流滥用反例
+function badPractice(condition) {
+  if (!condition) throw ""条件不满足"";
+  return ""正常"";
+}
+
+// 应使用
+function goodPractice(condition) {
+  if (!condition) return ""条件不满足"";
+  return ""正常"";
+}</code></pre>"
+JavaScript空语句特性	"<pre><code class=""language-javascript"">// 空语句执行结果
+const emptyStatement = eval("";"");
+console.log(emptyStatement); // undefined (但完成记录value为empty)
+
+// 与undefined区别
+console.log(eval(""undefined"")); // undefined
+console.log(eval("";"")); // undefined
+
+// 完成记录验证
+function testEmpty() {
+  ;
+}
+const completion = testEmpty();
+// completion = { type: ""normal"", value: undefined }</code></pre>"
+异常传播生命周期	"<pre><code class=""language-javascript"">// 异常传播过程
+function level1() {
+  level2();
+}
+
+function level2() {
+  level3();
+}
+
+function level3() {
+  throw new Error(""深层错误"");
+}
+
+try {
+  level1();
+} catch(e) {
+  console.log(e.stack); 
+  // 显示错误从level3冒泡到level1
+}
+
+// 自定义错误处理
+class CustomError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = ""CustomError"";
+  }
+}
+
+throw new CustomError(""自定义错误"");</code></pre>"
+最佳实践：异常处理封装	"<pre><code class=""language-javascript"">// 1. 统一错误处理
+function safeOperation() {
+  try {
+    validateInput();
+    return process();
+  } catch(e) {
+    logError(e);
+    recover();
+    return null;
+  }
+}
+
+// 2. 错误类型区分
+try {
+  fetchData();
+} catch(e) {
+  if (e instanceof NetworkError) {
+    retry();
+  } else if (e instanceof ValidationError) {
+    showUserMessage(e.message);
+  } else {
+    throw e; // 重新抛出未知错误
+  }
+}
+
+// 3. 避免过度使用throw
+function validateUser(user) {
+  // 反模式: if (!user.name) throw ""No name""
+  // 推荐:
+  if (!user.name) return { valid: false, reason: ""缺少姓名"" };
+  return { valid: true };
+}</code></pre>"
+
+
+# 12 | 1 in 1..constructor：这行代码的结果值，既可能是true，也可能是false
+
+#separator:tab
+#html:true
+JavaScript原型继承实现示例	"<pre><code class=""language-javascript"">// 父类构造函数
+function Animal(name) {
+  this.name = name;
+}
+
+// 父类方法
+Animal.prototype.speak = function() {
+  return `${this.name} makes a sound`;
+};
+
+// 子类构造函数
+function Dog(name, breed) {
+  Animal.call(this, name);  // 继承属性
+  this.breed = breed;
+}
+
+// 设置原型链继承
+Dog.prototype = Object.create(Animal.prototype);
+Dog.prototype.constructor = Dog;  // 修复constructor指向
+
+// 子类新增方法
+Dog.prototype.bark = function() {
+  return `${this.name} barks loudly!`;
+};
+
+// 测试
+const myDog = new Dog('Rex', 'Labrador');
+console.log(myDog.speak()); // Rex makes a sound
+console.log(myDog.bark());  // Rex barks loudly!</code></pre>"
+JavaScript属性描述符配置演示	"<pre><code class=""language-javascript"">const obj = {};
+
+Object.defineProperty(obj, 'secretValue', {
+  value: 42,
+  writable: false,     // 不可修改
+  enumerable: false,   // 不可枚举
+  configurable: false  // 不可删除或重配置
+});
+
+// 测试属性特性
+console.log(obj.secretValue); // 42
+obj.secretValue = 100;        // 静默失败（严格模式报错）
+console.log(obj.secretValue); // 42
+
+console.log(Object.keys(obj)); // [] (不可枚举)
+delete obj.secretValue;        // false (不可删除)</code></pre>"
+JavaScript包装类机制示例	"<pre><code class=""language-javascript"">const str = ""hello"";
+const num = 42;
+
+// 基本类型调用方法时自动包装
+console.log(str.toUpperCase()); // ""HELLO""
+console.log(num.toString(2));   // ""101010""
+
+// 显式包装对象
+const strObj = new String(str);
+const numObj = new Number(num);
+
+// 字面量陷阱解决方法
+console.log(1..toString());    // ""1"" (正确)
+console.log((1).toString());   // ""1"" (正确)
+// console.log(1.toString());  // 语法错误</code></pre>"
+JavaScript动态原型修改案例	"<pre><code class=""language-javascript"">// 原始原型状态
+console.log(1 in 1..constructor); // false (Number[1]不存在)
+
+// 动态修改原型
+Number[1] = true;  // 修改构造函数自身属性
+
+// 再次检查
+console.log(1 in 1..constructor); // true (Number[1]已存在)
+
+// 避免不确定性的方法
+console.log(Object.hasOwnProperty.call(Number, 1)); // true (检查自有属性)</code></pre>"
+JavaScript闭包链管理实现	"<pre><code class=""language-javascript"">function createCounter() {
+  let count = 0; // 闭包捕获的变量
+  
+  return {
+    increment: function() {
+      count++;
+      return count;
+    },
+    current: function() {
+      return count;
+    }
+  };
+}
+
+// 测试闭包
+const counter = createCounter();
+console.log(counter.current()); // 0
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2</code></pre>"
+JavaScript属性枚举控制示例	"<pre><code class=""language-javascript"">const obj = {
+  name: ""Alice"",
+  age: 30,
+  [Symbol('id')]: 12345
+};
+
+// 定义不可枚举属性
+Object.defineProperty(obj, 'password', {
+  value: ""secret"",
+  enumerable: false
+});
+
+// 不同枚举方式比较
+console.log(Object.keys(obj));          // [""name"", ""age""]
+console.log(Object.getOwnPropertyNames(obj)); // [""name"", ""age"", ""password""]
+console.log(Reflect.ownKeys(obj));      // [""name"", ""age"", ""password"", Symbol(id)]</code></pre>"
+JavaScript存取描述符应用	"<pre><code class=""language-javascript"">const temperature = {
+  _celsius: 25,
+  
+  // getter模拟无括号调用
+  get celsius() {
+    return this._celsius;
+  },
+  
+  // setter控制赋值范围
+  set celsius(value) {
+    if (value < -273) throw ""低于绝对零度"";
+    this._celsius = value;
+  },
+  
+  // 计算属性（无括号调用）
+  get fahrenheit() {
+    return this._celsius * 9/5 + 32;
+  }
+};
+
+// 测试存取器
+console.log(temperature.celsius); // 25 (无括号调用)
+temperature.celsius = 30;
+console.log(temperature.fahrenheit); // 86 (无括号调用)
+// temperature.celsius = -300; // 抛出错误</code></pre>"
+
+
+# 13 | new X：从构造器到类，为你揭密对象构造的全程
+
+#separator:tab
+#html:true
+JavaScript 1.0类抄写机制实现	"<pre><code class=""language-javascript"">// 类抄写方式（无原型继承）
+function Car(brand) {
+  // 类抄写：直接向this添加属性
+  this.brand = brand;
+  this.start = function() {
+    return `${this.brand} engine started`;
+  };
+}
+
+// 创建实例
+const myCar = new Car('Tesla');
+console.log(myCar.start()); // ""Tesla engine started""
+console.log(myCar.hasOwnProperty('start')); // true（方法在实例上）</code></pre>"
+JavaScript原型继承实现示例	"<pre><code class=""language-javascript"">// 父类
+function Device(name) {
+  this.name = name;
+}
+
+// 父类方法
+Device.prototype.powerOn = function() {
+  return `${this.name} powering on...`;
+};
+
+// 子类
+function Smartphone(name, os) {
+  Device.call(this, name); // 继承属性
+  this.os = os;
+}
+
+// 设置原型链
+Smartphone.prototype = Object.create(Device.prototype);
+Smartphone.prototype.constructor = Smartphone;
+
+// 子类特有方法
+Smartphone.prototype.checkOS = function() {
+  return `${this.name} runs ${this.os}`;
+};
+
+// 测试继承
+const phone = new Smartphone('iPhone', 'iOS');
+console.log(phone.powerOn());  // 继承方法
+console.log(phone.checkOS());  // 子类方法</code></pre>"
+ES6类声明与继承示例	"<pre><code class=""language-javascript"">class Animal {
   constructor(name) {
     this.name = name;
+  }
+  
+  // ES6方法（无prototype属性）
+  speak() {
+    return `${this.name} makes a sound`;
   }
 }
 
 class Dog extends Animal {
   constructor(name, breed) {
-    super(name); // 必须先调用super!
+    super(name); // 必须调用super
     this.breed = breed;
+  }
+  
+  // 子类方法
+  bark() {
+    return `${super.speak()} loudly!`;
   }
 }
 
-// 错误示例（未调用super）：
-// class Cat extends Animal {
-//   constructor() {
-//     this.paws = 4; // ReferenceError
-//   }
-// }
+// 测试
+const rex = new Dog('Rex', 'Labrador');
+console.log(rex.bark()); // ""Rex makes a sound loudly!""
+// Animal(); // TypeError（类必须new调用）</code></pre>"
+instanceof原型链检查机制	"<pre><code class=""language-javascript"">class Device {}
+class Phone extends Device {}
+class SmartPhone extends Phone {}
 
-const myDog = new Dog(""Max"", ""Labrador"");
-console.log(myDog.name); // ""Max""</code></pre>"
-ES6模块在导入阶段会执行代码吗？	"<pre><code class=""language-javascript"">// moduleA.js
-console.log(""模块A执行"");
-export const value = ""data"";
+const device = new SmartPhone();
 
-// moduleB.js
-import { value } from './moduleA.js';
-console.log(""模块B执行"", value);
+// instanceof递归检查原型链
+console.log(device instanceof SmartPhone); // true
+console.log(device instanceof Phone);      // true
+console.log(device instanceof Device);     // true
+console.log(device instanceof Object);     // true
 
-// 输出顺序：
-// 1. 模块A执行
-// 2. 模块B执行 data
-// 说明：导入时执行被导入模块</code></pre>"
-JavaScript引用类型的三个组成部分？	"<pre><code class=""language-javascript"">// 模拟引用类型
-const reference = {
-  base: window,       // 基对象
-  name: ""location"",   // 属性名
-  strict: false       // 严格模式标志
-};
-
-// 属性访问过程
-function resolveReference(ref) {
-  return ref.base[ref.name];
+// 手动验证原型链
+console.log(
+  Object.getPrototypeOf(device) === SmartPhone.prototype
+); // true
+console.log(
+  Object.getPrototypeOf(SmartPhone.prototype) === Phone.prototype
+); // true</code></pre>"
+构造器返回值规则演示	"<pre><code class=""language-javascript"">class Base {
+  constructor() {
+    return { custom: 'object' }; // 返回对象
+  }
 }
 
-console.log(resolveReference(reference)); // window.location</code></pre>"
+class Derived extends Base {
+  constructor() {
+    super();
+    // 派生类必须返回对象（或默认this）
+    return 123; // TypeError（不能返回原始值）
+  }
+}
+
+class Regular {
+  constructor() {
+    return 'primitive'; // 非派生类可返回原始值
+  }
+}
+
+// 测试
+console.log(new Base());    // { custom: 'object' }
+console.log(new Regular()); // Regular {}（原始值被忽略）
+// new Derived(); // 抛出TypeError</code></pre>"
+内置构造器继承限制对比	"<pre><code class=""language-javascript"">// ES5尝试继承Function（失败）
+function MyFunctionES5() {}
+MyFunctionES5.prototype = new Function();
+const f5 = new MyFunctionES5();
+// f5(); // TypeError: f5 is not a function
+
+// ES6继承Function（成功）
+class MyFunctionES6 extends Function {
+  constructor() {
+    super('return 42');
+  }
+}
+
+const f6 = new MyFunctionES6();
+console.log(f6()); // 42（成功调用）</code></pre>"
+方法特性与super实现原理	"<pre><code class=""language-javascript"">class Computer {
+  constructor(cpu) {
+    this.cpu = cpu;
+  }
+  
+  // 方法（无prototype属性）
+  benchmark() {
+    return `${this.cpu} score: 1000`;
+  }
+}
+
+class GamingPC extends Computer {
+  constructor(cpu, gpu) {
+    super(cpu);
+    this.gpu = gpu;
+  }
+  
+  // 方法使用super
+  benchmark() {
+    // super基于[[HomeObject]]实现
+    return `${super.benchmark()} + ${this.gpu} boost`;
+  }
+}
+
+// 方法特性检查
+console.log(typeof GamingPC.prototype.benchmark); // ""function""
+console.log('prototype' in GamingPC.prototype.benchmark); // false</code></pre>"
+原型链动态控制示例	"<pre><code class=""language-javascript"">class Vehicle {
+  move() { return ""Moving...""; }
+}
+
+// 动态修改原型
+Vehicle.prototype.fly = function() {
+  return ""Flying!"";
+};
+
+// 创建实例
+const car = new Vehicle();
+
+// 实例获得新方法
+console.log(car.fly()); // ""Flying!""
+
+// 切断原型链
+Object.setPrototypeOf(car, null);
+// car.move(); // TypeError（方法不存在）</code></pre>"
+字面量解析陷阱解决方案	"<pre><code class=""language-javascript"">const num = 42;
+
+// 错误写法（语法错误）
+// console.log(1.toString()); 
+
+// 正确解决方案
+console.log(1..toString());     // ""1""（双点号）
+console.log((1).toString());    // ""1""（括号包裹）
+console.log(1.0.toString());    // ""1""（明确浮点）
+console.log(num.toString(2));   // ""101010""（变量调用）</code></pre>"
+
+# 14 | super.xxx()：虽然直到ES10还是个半吊子实现，却也值得一讲
+
+#separator:tab
+#html:true
+JavaScript类方法中的super调用示例	"<pre><code class=""language-javascript"">class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  speak() {
+    return `${this.name} makes a noise.`;
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    // 通过super调用父类方法
+    return super.speak() + "" Woof!"";
+  }
+}
+
+const rex = new Dog('Rex');
+console.log(rex.speak()); // ""Rex makes a noise. Woof!""</code></pre>"
+JavaScript静态方法中的super调用	"<pre><code class=""language-javascript"">class Base {
+  static staticMethod() {
+    return 'Base static method';
+  }
+}
+
+class Derived extends Base {
+  static staticMethod() {
+    // 静态方法中super指向父类
+    return super.staticMethod() + ' - called from Derived';
+  }
+}
+
+console.log(Derived.staticMethod()); // ""Base static method - called from Derived""</code></pre>"
+JavaScript构造方法中的super规则	"<pre><code class=""language-javascript"">class Vehicle {
+  constructor(type) {
+    this.type = type;
+  }
+}
+
+class Car extends Vehicle {
+  constructor(type, brand) {
+    // 必须先调用super才能使用this
+    super(type);
+    this.brand = brand;
+  }
+  
+  // 错误示例：未调用super前访问this
+  // constructor() {
+  //   console.log(this); // ReferenceError
+  // }
+}
+
+const myCar = new Car('Sedan', 'Toyota');
+console.log(myCar.brand); // ""Toyota""</code></pre>"
+JavaScript对象字面量中的super使用	"<pre><code class=""language-javascript"">const parent = {
+  greet() {
+    return ""Hello from parent"";
+  }
+};
+
+const child = {
+  greet() {
+    // 对象字面量中super指向原型对象
+    return super.greet() + "" and child"";
+  }
+};
+
+Object.setPrototypeOf(child, parent);
+console.log(child.greet()); // ""Hello from parent and child""</code></pre>"
+JavaScript箭头函数中使用super的限制	"<pre><code class=""language-javascript"">class Base {
+  baseMethod() {
+    return 'Base method';
+  }
+}
+
+class Derived extends Base {
+  // 错误示例：箭头函数不能使用super
+  // arrowMethod = () => {
+  //   return super.baseMethod();
+  // }
+  
+  // 正确方法：使用普通方法
+  normalMethod() {
+    const arrow = () => super.baseMethod();
+    return arrow();
+  }
+}
+
+const obj = new Derived();
+console.log(obj.normalMethod()); // ""Base method""</code></pre>"
+JavaScript的[[HomeObject]]机制验证	"<pre><code class=""language-javascript"">let homeObject;
+
+const obj = {
+  method() {
+    // 获取方法的[[HomeObject]]
+    homeObject = Object.getPrototypeOf(this).constructor;
+  }
+};
+
+class MyClass {
+  classMethod() {
+    homeObject = MyClass;
+  }
+}
+
+// 验证对象方法的[[HomeObject]]
+obj.method();
+console.log(homeObject === Object); // true（obj的原型是Object）
+
+// 验证类方法的[[HomeObject]]
+const instance = new MyClass();
+instance.classMethod();
+console.log(homeObject === MyClass); // true</code></pre>"
+JavaScript中super绑定的隐式丢失问题	"<pre><code class=""language-javascript"">class Parent {
+  value = 42;
+  
+  getValue() {
+    return this.value;
+  }
+}
+
+class Child extends Parent {
+  getParentValue() {
+    const method = super.getValue;
+    return method(); // 此时this为undefined（严格模式）
+  }
+}
+
+const child = new Child();
+// console.log(child.getParentValue()); // TypeError: Cannot read properties of undefined
+
+// 正确做法：直接调用super.method()
+class SafeChild extends Parent {
+  getParentValue() {
+    return super.getValue(); // 正确绑定this
+  }
+}</code></pre>"
+
+# 15 | return Object.create(new.target.prototype)：做框架设计的基本功：写一个根类
+
+#separator:tab
+#html:true
+JavaScript中new.target元属性使用示例	"<pre><code class=""language-javascript"">class Parent {
+  constructor() {
+    // new.target指向实际被实例化的类
+    console.log(new.target.name);
+  }
+}
+
+class Child extends Parent {
+  constructor() {
+    super(); // 传递new.target给父类
+  }
+}
+
+// 测试
+new Parent(); // 输出""Parent""
+new Child();  // 输出""Child""（证明new.target指向子类）</code></pre>"
+非派生类的构造器返回值规则	"<pre><code class=""language-javascript"">class BasicClass {
+  constructor() {
+    this.value = 42;
+    // 返回原始值将被忽略
+    return ""primitive"";
+  }
+}
+
+class ReturnsObject {
+  constructor() {
+    // 返回对象将替换默认this
+    return { custom: ""object"" };
+  }
+}
+
+// 测试
+const basic = new BasicClass();
+console.log(basic.value); // 42（使用默认this）
+
+const custom = new ReturnsObject();
+console.log(custom.custom); // ""object""（使用返回对象）</code></pre>"
+派生自null的类实现模式	"<pre><code class=""language-javascript"">class NullDerived extends null {
+  constructor() {
+    // 无法调用super()
+    // 必须手动创建实例
+    const instance = Object.create(new.target.prototype);
+    // 添加属性
+    instance.value = 42;
+    return instance;
+  }
+  
+  // 方法定义
+  getValue() {
+    return this.value;
+  }
+}
+
+// 测试
+const obj = new NullDerived();
+console.log(obj.getValue()); // 42
+console.log(Object.getPrototypeOf(obj) === NullDerived.prototype); // true</code></pre>"
+框架根类的通用实现模式	"<pre><code class=""language-javascript"">class FrameworkRoot {
+  constructor() {
+    // 创建基于子类原型的实例
+    const instance = Object.create(new.target.prototype);
+    
+    // 初始化逻辑
+    instance.initialized = true;
+    instance.createdAt = new Date();
+    
+    return instance;
+  }
+}
+
+class Plugin extends FrameworkRoot {
+  run() {
+    return ""Plugin running"";
+  }
+}
+
+// 测试
+const plugin = new Plugin();
+console.log(plugin.run()); // ""Plugin running""
+console.log(plugin.initialized); // true</code></pre>"
+构造器中的原型链维护解决方案	"<pre><code class=""language-javascript"">class CustomInstanceCreator {
+  constructor() {
+    // 返回自定义对象
+    return { custom: ""value"" };
+  }
+}
+
+class ChildClass extends CustomInstanceCreator {
+  constructor() {
+    super();
+    // 必须手动设置原型链
+    Object.setPrototypeOf(this, ChildClass.prototype);
+    this.childProp = ""child"";
+  }
+}
+
+// 测试
+const child = new ChildClass();
+console.log(child.childProp); // ""child""
+console.log(child instanceof ChildClass); // true</code></pre>"
+ES5与ES6构造过程对比	"<pre><code class=""language-javascript"">// ES5构造方式
+function ES5Class(value) {
+  this.value = value;
+}
+ES5Class.prototype.getValue = function() {
+  return this.value;
+};
+
+// ES6类语法
+class ES6Class {
+  constructor(value) {
+    this.value = value;
+  }
+  
+  getValue() {
+    return this.value;
+  }
+}
+
+// 测试
+const es5 = new ES5Class(42);
+const es6 = new ES6Class(24);
+
+console.log(es5.getValue()); // 42
+console.log(es6.getValue()); // 24</code></pre>"
+构造器返回值规则流程图实现	"<pre><code class=""language-javascript"">function constructorReturnRule(constructor) {
+  try {
+    const instance = new constructor();
+    
+    // 检查返回类型
+    if (typeof instance === 'object' && instance !== null) {
+      return '使用返回对象';
+    } else {
+      return '使用默认this';
+    }
+  } catch (e) {
+    return '错误：' + e.message;
+  }
+}
+
+// 测试
+class ReturnObject { constructor() { return {} } }
+class ReturnPrimitive { constructor() { return 42 } }
+class ThrowError { constructor() { throw new Error('test') } }
+
+console.log(constructorReturnRule(ReturnObject));     // ""使用返回对象""
+console.log(constructorReturnRule(ReturnPrimitive));  // ""使用默认this""
+console.log(constructorReturnRule(ThrowError));       // ""错误：test""</code></pre>"
+
+
+# 16 | [a, b] = {a, b}：让你从一行代码看到对象的本质
+
+#separator:tab
+#html:true
+JavaScript对象作为关联数组的证明	"<pre><code class=""language-javascript"">// 创建对象（关联数组）
+const person = {
+  name: ""Alice"",
+  age: 30,
+  // 动态计算键名
+  [""user_"" + ""id""]: 12345
+};
+
+// 访问方式证明关联数组特性
+console.log(person[""name""]); // ""Alice""（通过字符串键访问）
+console.log(person[""age""]);  // 30（通过字符串键访问）
+console.log(person.user_id);  // 12345（通过计算属性访问）</code></pre>"
+JavaScript数组作为对象的证明	"<pre><code class=""language-javascript"">// 创建数组（索引数组）
+const numbers = [10, 20, 30];
+
+// 证明数组也是对象
+console.log(typeof numbers); // ""object""
+console.log(Array.isArray(numbers)); // true
+
+// 添加非数字键属性
+numbers.customProperty = ""value"";
+console.log(numbers.customProperty); // ""value""
+
+// 通过字符串索引访问
+console.log(numbers[""0""]); // 10（等同于numbers[0]）</code></pre>"
+JavaScript解构赋值错误分析及解决方案	"<pre><code class=""language-javascript"">const a = 100;
+const b = 200;
+
+// 错误示例：尝试解构普通对象
+try {
+  [x, y] = {a, b}; // TypeError: 对象不可迭代
+} catch (e) {
+  console.log(e.message);
+}
+
+// 解决方案1：使用Object.values转换为可迭代结构
+const values = Object.values({a, b});
+[x, y] = values;
+console.log(x, y); // 100, 200
+
+// 解决方案2：使用索引映射
+({0: x, 1: y} = [a, b]);
+console.log(x, y); // 100, 200</code></pre>"
+JavaScript展开语法的属性复制特性	"<pre><code class=""language-javascript"">// 创建原型对象
+const proto = { inherited: true };
+
+// 创建对象（包含自有属性和原型属性）
+const obj = Object.create(proto);
+obj.ownProp = ""value"";
+
+// 使用展开语法复制
+const copy = { ...obj };
+
+// 验证：只复制自有属性（忽略原型属性）
+console.log(copy.ownProp); // ""value""
+console.log(copy.inherited); // undefined</code></pre>"
+JavaScript使用展开语法在数组和对象间转换	"<pre><code class=""language-javascript"">// 数组 → 对象转换
+const arr = [100, 200];
+const objFromArr = { ...arr };
+console.log(objFromArr); // {0: 100, 1: 200}
+
+// 对象 → 数组转换（需要实现迭代器）
+const obj = { a: 300, b: 400 };
+// 添加迭代器实现
+obj[Symbol.iterator] = function*() {
+  yield this.a;
+  yield this.b;
+};
+const arrFromObj = [...obj];
+console.log(arrFromObj); // [300, 400]</code></pre>"
+JavaScript自定义迭代器实现	"<pre><code class=""language-javascript"">class CustomCollection {
+  constructor(items) {
+    this.items = items;
+  }
+  
+  // 自定义迭代器
+  *[Symbol.iterator]() {
+    for (const item of this.items) {
+      // 对每个元素进行处理
+      yield item * 2;
+    }
+  }
+}
+
+// 使用自定义迭代器
+const collection = new CustomCollection([1, 2, 3]);
+
+// 支持展开语法和解构
+console.log([...collection]); // [2, 4, 6]
+const [first] = collection;
+console.log(first); // 2</code></pre>"
+JavaScript函数式替代对象封装模式	"<pre><code class=""language-javascript"">// 函数式编程替代对象封装
+const createUser = (name, age) => ({
+  getName: () => name,
+  getAge: () => age,
+  setName: newName => createUser(newName, age),
+  setAge: newAge => createUser(name, newAge)
+});
+
+// 使用示例
+const user = createUser(""Alice"", 30);
+console.log(user.getName()); // ""Alice""
+
+const updatedUser = user.setAge(31);
+console.log(updatedUser.getAge()); // 31
+
+// 数据不可变性
+console.log(user.getAge()); // 30（原始数据未改变）</code></pre>"
+
+
+# 17 | Object.setPrototypeOf(x, null)：连Brendan Eich都认错，但null值还活着
+
+#separator:tab
+#html:true
+JavaScript中创建原子对象（无原型）	"<pre><code class=""language-javascript"">// 创建无原型的原子对象
+const atomicObj = Object.create(null);
+
+// 添加属性
+atomicObj.name = ""Atomic Object"";
+atomicObj.value = 42;
+
+// 验证原型链
+console.log(Object.getPrototypeOf(atomicObj)); // null
+console.log(atomicObj.toString); // undefined（无继承方法）</code></pre>"
+JavaScript创建派生自null的类	"<pre><code class=""language-javascript"">class NullDerived extends null {
+  constructor() {
+    // 必须手动创建实例
+    const instance = Object.create(new.target.prototype);
+    instance.createdAt = new Date();
+    return instance;
+  }
+  
+  // 类方法
+  logCreation() {
+    console.log(`Created at: ${this.createdAt}`);
+  }
+}
+
+// 测试
+const obj = new NullDerived();
+obj.logCreation(); // 输出创建时间
+console.log(obj instanceof NullDerived); // true</code></pre>"
+JavaScript证明数组本质是对象	"<pre><code class=""language-javascript"">const arr = [1, 2, 3];
+
+// 1. 添加非数字键属性
+arr.customProperty = ""value"";
+console.log(arr.customProperty); // ""value""
+
+// 2. 通过字符串索引访问
+console.log(arr[""0""]); // 1（等同于arr[0]）
+
+// 3. 检查类型
+console.log(typeof arr); // ""object""
+console.log(arr instanceof Object); // true</code></pre>"
+JavaScript实现原子函数类	"<pre><code class=""language-javascript"">class AtomicFunction extends null {
+  constructor() {
+    // 创建函数实例
+    const func = function() {
+      return ""Called atomic function"";
+    };
+    
+    // 设置原型链
+    Object.setPrototypeOf(func, new.target.prototype);
+    return func;
+  }
+}
+
+// 设置类原型链
+Object.setPrototypeOf(AtomicFunction, Function);
+Object.setPrototypeOf(AtomicFunction.prototype, null);
+
+// 测试
+const atomicFunc = new AtomicFunction();
+console.log(atomicFunc()); // ""Called atomic function""</code></pre>"
+JavaScript代理对象的原子行为拦截	"<pre><code class=""language-javascript"">const target = {};
+const handler = {
+  // 拦截属性获取
+  get: function(target, prop) {
+    console.log(`Getting property: ${prop}`);
+    return prop in target ? target[prop] : 42;
+  },
+  
+  // 拦截属性设置
+  set: function(target, prop, value) {
+    console.log(`Setting property: ${prop} = ${value}`);
+    target[prop] = value;
+    return true; // 表示成功
+  },
+  
+  // 拦截原型访问
+  getPrototypeOf: function(target) {
+    console.log(""Accessing prototype"");
+    return Object.getPrototypeOf(target);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+// 测试代理行为
+proxy.name = ""Alice""; // 日志: Setting property: name = Alice
+console.log(proxy.age); // 日志: Getting property: age → 输出: 42
+Object.getPrototypeOf(proxy); // 日志: Accessing prototype</code></pre>"
+JavaScript手动实现数组迭代功能	"<pre><code class=""language-javascript"">// 创建无原型数组对象
+const arrayLike = Object.create(null);
+arrayLike[0] = ""A"";
+arrayLike[1] = ""B"";
+arrayLike[2] = ""C"";
+
+// 手动添加迭代器
+arrayLike[Symbol.iterator] = function() {
+  let index = 0;
+  return {
+    next: () => {
+      if (index in this) {
+        return { value: this[index++], done: false };
+      } else {
+        return { done: true };
+      }
+    }
+  };
+};
+
+// 测试迭代功能
+console.log([...arrayLike]); // [""A"", ""B"", ""C""]
+for (const item of arrayLike) {
+  console.log(item); // 输出 A, B, C
+}</code></pre>"
+JavaScript创建原子日期对象	"<pre><code class=""language-javascript"">class AtomicDate extends null {
+  constructor() {
+    // 创建日期实例
+    const date = new Date();
+    
+    // 设置原型链
+    Object.setPrototypeOf(date, new.target.prototype);
+    return date;
+  }
+}
+
+// 设置类原型链
+Object.setPrototypeOf(AtomicDate, Date);
+Object.setPrototypeOf(AtomicDate.prototype, null);
+
+// 测试
+const atomicDate = new AtomicDate();
+console.log(atomicDate instanceof Date); // true
+console.log(atomicDate.toISOString()); // 输出当前ISO时间字符串</code></pre>"
+JavaScript实现原子数组类	"<pre><code class=""language-javascript"">class AtomicArray extends null {
+  constructor(...items) {
+    const arr = [];
+    items.forEach(item => arr.push(item));
+    
+    // 设置原型链
+    Object.setPrototypeOf(arr, new.target.prototype);
+    return arr;
+  }
+}
+
+// 设置类原型链
+Object.setPrototypeOf(AtomicArray, Array);
+Object.setPrototypeOf(AtomicArray.prototype, null);
+
+// 测试
+const atomicArr = new AtomicArray(1, 2, 3);
+console.log(atomicArr.length); // 3
+console.log(atomicArr.map(x => x * 2)); // [2, 4, 6]</code></pre>"
+
+
+# 18 | a + b：动态类型是灾难之源还是最好的特性？（上）
+#separator:tab
+#html:true
+JavaScript原始值类型验证	"<pre><code class=""language-javascript"">// 原始值特性验证
+const values = [
+  ""hello"",        // string
+  42,              // number
+  true,            // boolean
+  Symbol(""id""),    // symbol
+  100n,            // bigint
+  undefined,       // undefined
+  null             // null
+];
+
+values.forEach(value => {
+  console.log(`类型: ${typeof value}, 有方法: ${!!value.toString}, 有原型: ${!!Object.getPrototypeOf(value)}`);
+});
+
+// 验证原始值不可变性
+let str = ""abc"";
+let str2 = str;
+str = ""def"";
+console.log(str2); // ""abc""（证明原始值不可变）</code></pre>"
+JavaScript值类型与对象转换（装箱拆箱）	"<pre><code class=""language-javascript"">// 装箱：原始值转对象
+const num = 42;
+const numObj = Object(num); // 创建包装对象
+console.log(typeof numObj); // ""object""
+console.log(numObj instanceof Number); // true
+
+// 拆箱：对象转原始值
+const strObj = new String(""text"");
+const strValue = strObj.valueOf(); // 获取原始值
+console.log(typeof strValue); // ""string""
+console.log(strValue); // ""text""
+
+// 私有槽验证
+console.log(numObj[[NumberData]]); // undefined（用户无法访问私有槽）
+console.log(numObj.valueOf()); // 42（通过公开方法访问）</code></pre>"
+Symbol.toPrimitive自定义转换	"<pre><code class=""language-javascript"">const customObj = {
+  value: 100,
+  
+  // 自定义转换逻辑
+  [Symbol.toPrimitive](hint) {
+    switch (hint) {
+      case 'number':
+        return this.value;
+      case 'string':
+        return `Value: ${this.value}`;
+      case 'default':
+        return this.value.toString(2); // 二进制表示
+    }
+  }
+};
+
+// 测试不同转换
+console.log(+customObj); // 100 (数字转换)
+console.log(`${customObj}`); // ""Value: 100"" (字符串转换)
+console.log(customObj + 1); // ""1001"" (默认转换 - 二进制100 + 1)</code></pre>"
+JavaScript著名隐式转换案例	"<pre><code class=""language-javascript"">// Gary Bernhardt 2012案例
+console.log([] + {}); // ""[object Object]"" (数组转"""" + 对象转""[object Object]"")
+console.log({} + []); // 0 ({}解释为空代码块，+[]转数字0)
+console.log([] + []); // """" (空数组转空字符串)
+console.log({} + {}); // NaN (对象转数字失败)
+
+// 布尔转换陷阱
+const emptyObj = {};
+if (emptyObj) {
+  console.log(""空对象为真值"");
+} else {
+  console.log(""空对象为假值"");
+}</code></pre>"
+JavaScript布尔转换规则	"<pre><code class=""language-javascript"">// Falsey值清单
+const falseyValues = [
+  undefined,
+  null,
+  0,
+  NaN,
+  """",
+  0n
+];
+
+// Truthy值示例
+const truthyValues = [
+  ""0"", // 非空字符串
+  [],   // 空数组
+  {},   // 空对象
+  function(){}
+];
+
+// 测试转换
+console.log(""Falsey值测试:"");
+falseyValues.forEach(val => {
+  console.log(`${val} → ${Boolean(val)}`); // 全部为false
+});
+
+console.log(""\nTruthy值测试:"");
+truthyValues.forEach(val => {
+  console.log(`${val} → ${Boolean(val)}`); // 全部为true
+});</code></pre>"
+JavaScript显式与隐式转换对比	"<pre><code class=""language-javascript"">// 显式转换 - 推荐
+const numStr = ""123"";
+const explicitNum = Number(numStr); // 明确转换为数字
+console.log(typeof explicitNum); // ""number""
+
+// 隐式转换 - 易出错
+const result = numStr + 1;
+console.log(result); // ""1231"" (字符串拼接而非加法)
+
+// 显式转换最佳实践
+const userInput = document.getElementById(""input"").value;
+const safeValue = Number(userInput) || 0; // 显式转换+默认值
+
+// 运算符类型收敛
+console.log(100 - ""10""); // 90 (数字运算)
+console.log(100 + ""10""); // ""10010"" (字符串拼接)</code></pre>"
+JavaScript特殊类型转换特性	"<pre><code class=""language-javascript"">// Symbol转换特性
+const id = Symbol(""identifier"");
+console.log(String(id)); // ""Symbol(identifier)""
+console.log(Number(id)); // TypeError: Cannot convert a Symbol value to a number
+
+// BigInt转换
+const big = 100n;
+console.log(big + 1n); // 101n (BigInt运算)
+console.log(big + 1); // TypeError: Cannot mix BigInt and other types
+
+// null的特殊性
+console.log(typeof null); // ""object""
+console.log(null instanceof Object); // false
+console.log(null + 10); // 10 (null转0)</code></pre>"
+JavaScript类型判断最佳实践	"<pre><code class=""language-javascript"">// 精确类型判断
+function getType(value) {
+  // null特殊处理
+  if (value === null) return ""null"";
+  
+  // 基础类型
+  const type = typeof value;
+  if (type !== ""object"") return type;
+  
+  // 内置对象
+  const toString = Object.prototype.toString.call(value);
+  return toString.slice(8, -1).toLowerCase();
+}
+
+// 测试
+console.log(getType(42)); // ""number""
+console.log(getType([])); // ""array""
+console.log(getType(null)); // ""null""
+console.log(getType(new Date())); // ""date""
+console.log(getType(Symbol())); // ""symbol""</code></pre>"
+
+
+# 19 | a + b：动态类型是灾难之源还是最好的特性？（下）
+#separator:tab
+#html:true
+JavaScript对象到原始值的转换规则	"<pre><code class=""language-javascript"">// 普通对象转换
+const obj = {};
+console.log(obj.valueOf() === obj); // true（返回对象自身）
+console.log(obj.toString()); // ""[object Object]""
+
+// 数组对象转换
+const arr = [1, 2];
+console.log(arr.valueOf()); // [1, 2]（返回数组本身）
+console.log(arr.toString()); // ""1,2""
+
+// Date对象转换（特殊顺序）
+const now = new Date();
+console.log(now.toString()); // 可读日期字符串
+console.log(now.valueOf()); // 时间戳（数字）</code></pre>"
+JavaScript加号运算符的转换机制	"<pre><code class=""language-javascript"">// 加号运算符的双阶段处理
+function explainPlus(a, b) {
+  const aPrim = a.valueOf && a.valueOf() !== a ? a.valueOf() : a.toString();
+  const bPrim = b.valueOf && b.valueOf() !== b ? b.valueOf() : b.toString();
+  
+  if (typeof aPrim === ""string"" || typeof bPrim === ""string"") {
+    return String(aPrim) + String(bPrim);
+  } else {
+    return Number(aPrim) + Number(bPrim);
+  }
+}
+
+// 测试经典四连问
+console.log(explainPlus([], {})); // ""[object Object]""
+console.log(explainPlus({}, [])); // ""[object Object]""（实际浏览器中为0，因{}被解析为代码块）
+console.log(explainPlus([], [])); // """"（空字符串）
+console.log(explainPlus({}, {})); // ""[object Object][object Object]""（实际浏览器中为NaN）</code></pre>"
+JavaScript中预期类型的应用场景	"<pre><code class=""language-javascript"">// 加号运算符的预期类型（无法确定）
+const a = 10;
+const b = ""20"";
+console.log(a + b); // ""1020""（字符串连接优先）
+
+// 等值运算的预期类型（default）
+const num = 10;
+const str = ""10"";
+console.log(num == str); // true（都转为数字比较）
+
+// 属性访问的预期类型（string）
+const obj = { 1: ""one"", ""1"": ""ONE"" };
+console.log(obj[1]); // ""ONE""（数字键转为字符串）</code></pre>"
+JavaScript自定义转换逻辑（Symbol.toPrimitive）	"<pre><code class=""language-javascript"">class CustomConverter {
+  constructor(value) {
+    this.value = value;
+  }
+  
+  // 自定义转换逻辑
+  [Symbol.toPrimitive](hint) {
+    switch (hint) {
+      case ""number"":
+        return this.value * 2;
+      case ""string"":
+        return `Value: ${this.value}`;
+      default: // ""default""
+        return this.value;
+    }
+  }
+}
+
+// 测试不同转换场景
+const obj = new CustomConverter(10);
+console.log(+obj);        // 20（数字转换）
+console.log(`${obj}`);    // ""Value: 10""（字符串转换）
+console.log(obj + 5);     // 15（默认转换）</code></pre>"
+JavaScript显式转换最佳实践	"<pre><code class=""language-javascript"">// 数学运算：显式转为数字
+function safeSum(a, b) {
+  const numA = Number(a);
+  const numB = Number(b);
+  
+  if (isNaN(numA) || isNaN(numB)) {
+    throw new Error(""无效输入"");
+  }
+  
+  return numA + numB;
+}
+
+// 字符串拼接：使用模板字符串
+const user = { name: ""Alice"", age: 30 };
+const message = `用户: ${String(user.name)}, 年龄: ${Number(user.age)}`;
+console.log(message);
+
+// 避免隐式转换陷阱
+const value = ""100"";
+const calculation = Number(value) + 50; // 150（显式转换）</code></pre>"
+JavaScript特殊转换场景处理	"<pre><code class=""language-javascript"">// 大括号开头语句的处理
+const result1 = {} + []; // 0（浏览器中{}被解释为代码块）
+const result2 = ({} + []); // ""[object Object]""（正确结果）
+
+// Date对象的特殊转换
+const date = new Date();
+console.log(date + 1000); // 字符串拼接（如""Fri Jul 17 2020 10:00:00 GMT+08001000""）
+console.log(date * 2);    // 数字运算（时间戳*2）
+
+// 避免==比较
+console.log(0 == false);  // true（隐式转换）
+console.log(0 === false); // false（严格相等）</code></pre>"
+JavaScript类型转换函数实现	"<pre><code class=""language-javascript"">// 实现ToPrimitive逻辑
+function toPrimitive(input, preferredType) {
+  if (typeof input !== ""object"") return input;
+  
+  // 处理Date特殊类型
+  if (input instanceof Date) {
+    return preferredType === ""string"" ? input.toString() : input.valueOf();
+  }
+  
+  // 处理自定义转换
+  if (typeof input[Symbol.toPrimitive] === ""function"") {
+    return input[Symbol.toPrimitive](preferredType || ""default"");
+  }
+  
+  // 普通对象处理
+  if (preferredType === ""string"") {
+    return input.toString() || input.valueOf();
+  } else {
+    return input.valueOf() || input.toString();
+  }
+}
+
+// 测试
+console.log(toPrimitive([1, 2], ""string"")); // ""1,2""
+console.log(toPrimitive(new Date(), ""number"")); // 时间戳（数字）</code></pre>"
+JavaScript类型转换检测工具	"<pre><code class=""language-javascript"">// 创建转换检测对象
+const conversionDetector = {
+  calls: [],
+  
+  valueOf() {
+    this.calls.push(""valueOf"");
+    return this;
+  },
+  
+  toString() {
+    this.calls.push(""toString"");
+    return ""[object Detector]"";
+  },
+  
+  [Symbol.toPrimitive](hint) {
+    this.calls.push(`Symbol.toPrimitive(${hint})`);
+    return hint === ""string"" ? ""[custom]"" : 42;
+  },
+  
+  reset() {
+    this.calls = [];
+  }
+};
+
+// 测试不同场景的转换顺序
+conversionDetector.reset();
+console.log(conversionDetector + 10);
+console.log(conversionDetector.calls); // [""Symbol.toPrimitive(default)""]
+
+conversionDetector.reset();
+alert(conversionDetector);
+console.log(conversionDetector.calls); // [""Symbol.toPrimitive(string)""]</code></pre>"
+
+
+# 20 | (0, eval)("x = 100") ：一行让严格模式形同虚设的破坏性设计（上）
+#separator:tab
+#html:true
+JavaScript eval函数的基本用法	"<pre><code class=""language-javascript"">// 基本eval使用
+const expression = ""2 + 3 * 4"";
+const result = eval(expression); // 计算表达式
+console.log(result); // 14
+
+// 字符串参数要求
+console.log(eval(""012"")); // 10（8进制解析）
+console.log(eval(""abc:1"")); // 1（标签语句）
+
+// 非字符串参数
+const obj = { value: 42 };
+console.log(eval(obj)); // {value: 42}（直接返回非字符串参数）</code></pre>"
+JavaScript执行环境类型验证	"<pre><code class=""language-javascript"">// 全局环境
+console.log(""全局环境:"", typeof window !== ""undefined"" ? ""浏览器环境"" : ""Node环境"");
+
+// 函数环境
+function testFunctionEnv() {
+  console.log(""函数环境:"", arguments.callee.name); // arguments.callee访问当前函数
+}
+testFunctionEnv();
+
+// 模块环境
+if (typeof import.meta !== ""undefined"") {
+  console.log(""模块环境:"", import.meta.url);
+}
+
+// Eval环境
+eval('console.log(""Eval环境内:"");');
+</code></pre>"
+JavaScript词法环境与变量环境	"<pre><code class=""language-javascript"">function demonstrateEnvironments() {
+  // var变量 - 变量环境
+  var functionScoped = ""函数作用域"";
+  
+  // let变量 - 词法环境
+  let blockScoped = ""块作用域"";
+  
+  {
+    // 同一个块内的新绑定
+    let blockScoped = ""内部块作用域"";
+    console.log(blockScoped); // ""内部块作用域""
+  }
+  
+  console.log(functionScoped); // ""函数作用域""
+  console.log(blockScoped); // ""块作用域""
+}
+
+demonstrateEnvironments();</code></pre>"
+JavaScript严格模式下的eval环境	"<pre><code class=""language-javascript"">function strictEvalExample() {
+  ""use strict"";
+  var x = 100;
+  
+  // 严格模式下的eval
+  eval('var y = 200; console.log(""eval内部y:"", y)'); // 200
+  console.log(""外部y:"", typeof y); // ""undefined""（严格模式下隔离）
+  
+  try {
+    eval('var x = 300;'); // 尝试修改外部变量
+  } catch (e) {
+    console.log(""错误:"", e.message); // 严格模式下无法修改外部变量
+  }
+  
+  console.log(""外部x:"", x); // 100（未修改）
+}
+
+strictEvalExample();</code></pre>"
+JavaScript间接eval调用技术	"<pre><code class=""language-javascript"">// 直接eval
+function directEval() {
+  var x = 100;
+  eval('x = 200');
+  console.log(""直接eval修改:"", x); // 200（非严格模式）
+}
+
+directEval();
+
+// 间接eval
+function indirectEval() {
+  var x = 100;
+  
+  // 方法1：逗号操作符
+  (0, eval)('x = 200'); // 间接调用
+  
+  // 方法2：赋值给变量
+  const ev = eval;
+  ev('x = 300');
+  
+  console.log(""间接eval修改:"", x); // 100（未修改，但在全局创建了变量）
+}
+
+indirectEval();
+
+// 检查全局变量
+console.log(""全局x:"", typeof x !== ""undefined"" ? x : ""未定义""); // 300</code></pre>"
+JavaScript模块环境与严格模式	"<pre><code class=""language-javascript"">// 模块环境默认为严格模式
+const moduleCode = `
+  export default function test() {
+    var x = 100;
+    
+    // 尝试非严格模式行为
+    try {
+      eval('var x = 200;');
+      console.log(""模块内x:"", x);
+    } catch (e) {
+      console.log(""模块内错误:"", e.message);
+    }
+  }
+`;
+
+// 模拟模块执行（实际中通过import加载）
+const executeModule = new Function('exports', 'module', moduleCode);
+const module = { exports: {} };
+executeModule(module.exports, module);
+
+// 执行模块函数
+module.exports.default();</code></pre>"
+JavaScript eval环境隔离检测	"<pre><code class=""language-javascript"">function detectEvalEnvironment() {
+  var varVariable = ""var变量"";
+  let letVariable = ""let变量"";
+  
+  // 创建检测对象
+  const detector = {
+    getVar() {
+      return varVariable;
+    },
+    getLet() {
+      return letVariable;
+    }
+  };
+  
+  // 在eval中尝试访问变量
+  eval(`
+    try {
+      console.log(""访问var变量:"", varVariable); // 非严格模式可访问
+    } catch (e) {
+      console.log(""var访问错误:"", e.message);
+    }
+    
+    try {
+      console.log(""访问let变量:"", letVariable); // 严格模式不可访问
+    } catch (e) {
+      console.log(""let访问错误:"", e.message);
+    }
+    
+    // 尝试修改
+    varVariable = ""eval修改的var"";
+    try {
+      letVariable = ""eval修改的let"";
+    } catch (e) {
+      console.log(""let修改错误:"", e.message);
+    }
+  `);
+  
+  console.log(""外部var变量:"", varVariable);
+  console.log(""外部let变量:"", letVariable);
+}
+
+detectEvalEnvironment();</code></pre>"
+JavaScript词法环境穿透技术	"<pre><code class=""language-javascript"">// 通过eval突破词法作用域
+function lexicalScopeBreak() {
+  let privateVar = ""私有数据"";
+  
+  // 正常情况下无法访问
+  console.log(privateVar); // ""私有数据""
+  
+  try {
+    // 直接访问失败
+    eval('console.log(privateVar)');
+  } catch (e) {
+    console.log(""直接访问错误:"", e.message);
+  }
+  
+  // 通过函数作用域突破
+  const getPrivate = () => privateVar;
+  const code = `(${getPrivate})()`;
+  const result = eval(code);
+  console.log(""通过函数访问:"", result);
+}
+
+lexicalScopeBreak();</code></pre>"
+
+
+# 21 | (0, eval)("x = 100") ：一行让严格模式形同虚设的破坏性设计（下）
+
+#separator:tab
+#html:true
+JavaScript直接调用eval示例	"<pre><code class=""language-javascript"">// 直接调用eval - 继承当前环境
+function directEvalDemo() {
+  ""use strict"";
+  var privateVar = ""敏感数据"";
+  
+  // 直接调用尝试访问变量
+  try {
+    eval('console.log(privateVar);');
+  } catch (e) {
+    console.log(""直接调用错误:"", e.message); // 严格模式下无法访问私有变量
+  }
+  
+  // 尝试修改严格模式限制
+  try {
+    eval('arguments = 100;'); // 严格模式下禁止修改arguments
+  } catch (e) {
+    console.log(""严格模式限制:"", e.message);
+  }
+}
+
+directEvalDemo();</code></pre>"
+JavaScript间接调用eval技术	"<pre><code class=""language-javascript"">// 间接调用eval - 在全局环境执行
+function indirectEvalDemo() {
+  ""use strict"";
+  
+  // 方法1: 逗号操作符
+  (0, eval)('console.log(""逗号操作符间接调用"");');
+  
+  // 方法2: 赋值给变量
+  const globalEval = eval;
+  globalEval('console.log(""变量赋值间接调用"");');
+  
+  // 方法3: 通过window对象
+  window.eval('console.log(""window.eval调用"");');
+}
+
+indirectEvalDemo();
+
+// 验证全局执行
+console.log(""全局变量访问:"", typeof privateVar === ""undefined""); // true</code></pre>"
+JavaScript间接调用突破限制案例	"<pre><code class=""language-javascript"">// 使用间接调用突破严格模式限制
+function bypassStrictMode() {
+  ""use strict"";
+  
+  // 突破1: 重新定义arguments
+  (0, eval)('arguments = 100');
+  console.log(""arguments值:"", arguments); // 100
+  
+  // 突破2: 使用八进制字面量
+  const octalResult = (0, eval)('012');
+  console.log(""八进制结果:"", octalResult); // 10
+  
+  // 突破3: 隐式创建全局变量
+  (0, eval)('leakedData = ""机密信息""');
+  console.log(""全局变量:"", leakedData); // ""机密信息""
+}
+
+bypassStrictMode();</code></pre>"
+JavaScript严格模式特性验证	"<pre><code class=""language-javascript"">// 严格模式原生限制
+function strictModeFeatures() {
+  ""use strict"";
+  
+  // 限制1: 参数重定义
+  try {
+    eval('function fn(a) { var a = 10; }');
+  } catch (e) {
+    console.log(""参数重定义错误:"", e.message);
+  }
+  
+  // 限制2: with语句禁用
+  try {
+    eval('with({}) {}');
+  } catch (e) {
+    console.log(""with语句错误:"", e.message);
+  }
+  
+  // 限制3: 删除不可删除属性
+  try {
+    eval('delete Object.prototype;');
+  } catch (e) {
+    console.log(""删除操作错误:"", e.message);
+  }
+}
+
+strictModeFeatures();</code></pre>"
+JavaScript eval豁免案例	"<pre><code class=""language-javascript"">// eval调用的豁免场景
+function evalExemptions() {
+  // 豁免1: with语句中的对象属性
+  const obj = { eval };
+  with (obj) {
+    eval('console.log(""with中的eval调用"");');
+  }
+  
+  // 豁免2: 函数默认参数
+  function fn(x, evalFn = eval) {
+    evalFn('console.log(""默认参数中的eval"");');
+  }
+  fn();
+  
+  // 豁免3: 词法环境保留引用
+  const lexEval = globalThis.eval;
+  lexEval('console.log(""词法环境引用"");');
+}
+
+evalExemptions();</code></pre>"
+JavaScript安全eval替代方案	"<pre><code class=""language-javascript"">// 安全的eval替代方法
+function safeEvaluation(userInput) {
+  // 危险的原生eval
+  try {
+    eval(userInput);
+    console.log(""原生eval执行成功"");
+  } catch (e) {
+    console.log(""原生eval风险:"", e.message);
+  }
+  
+  // 替代方案1: Function构造函数
+  try {
+    const fn = new Function(userInput);
+    fn();
+    console.log(""Function构造器执行成功"");
+  } catch (e) {
+    console.log(""Function构造器错误:"", e.message);
+  }
+  
+  // 替代方案2: 沙箱执行
+  try {
+    const safeEval = (code) => Function(`""use strict""; ${code}`)();
+    safeEval(userInput);
+    console.log(""沙箱执行成功"");
+  } catch (e) {
+    console.log(""沙箱执行错误:"", e.message);
+  }
+}
+
+// 测试安全执行
+safeEvaluation('console.log(""安全执行"");');
+// safeEvaluation('while(true) {}'); // 测试无限循环防护</code></pre>"
+JavaScript间接调用原理验证	"<pre><code class=""language-javascript"">// 验证间接调用机制
+function verifyIndirectMechanism() {
+  const evalRef = eval;
+  
+  // 引用验证
+  console.log(""直接调用类型:"", typeof eval); // ""function""
+  console.log(""间接引用类型:"", typeof evalRef); // ""function""
+  
+  // 执行环境验证
+  (0, eval)('console.log(""间接调用环境:"", this === window);'); // true
+  
+  // 严格模式状态
+  (0, eval)('console.log(""间接调用严格模式:"", (function() { return !this; })());'); // false
+}
+
+verifyIndirectMechanism();</code></pre>"
+JavaScript eval性能对比	"<pre><code class=""language-javascript"">// eval性能测试
+function evalPerformanceTest() {
+  const iterations = 10000;
+  const code = 'let sum = 0; for(let i=0; i<100; i++) sum += i;';
+  
+  // 原生eval测试
+  console.time(""原生eval"");
+  for (let i = 0; i < iterations; i++) {
+    eval(code);
+  }
+  console.timeEnd(""原生eval"");
+  
+  // Function构造器测试
+  console.time(""Function构造器"");
+  const dynamicFn = new Function(code);
+  for (let i = 0; i < iterations; i++) {
+    dynamicFn();
+  }
+  console.timeEnd(""Function构造器"");
+  
+  // 预编译函数测试
+  console.time(""预编译函数"");
+  function precompiledFn() {
+    let sum = 0;
+    for(let i=0; i<100; i++) sum += i;
+  }
+  for (let i = 0; i < iterations; i++) {
+    precompiledFn();
+  }
+  console.timeEnd(""预编译函数"");
+}
+
+evalPerformanceTest();</code></pre>"
+
+
+# 22 | new Function('x = 100')();：函数的类化是对动态与静态系统的再次统一
+
+#separator:tab
+#html:true
+JavaScript静态函数与动态函数对比	"<pre><code class=""language-javascript"">// 静态函数声明
+function staticAdd(a, b) {
+  return a + b;
+}
+
+// 动态函数创建
+const dynamicAdd = new Function('a', 'b', 'return a + b');
+
+// 对比测试
+console.log(""静态函数:"", staticAdd(2, 3)); // 5
+console.log(""动态函数:"", dynamicAdd(2, 3)); // 5
+
+// 作用域绑定差异
+function testScope() {
+  const local = 10;
+  
+  // 静态函数可访问局部变量
+  function staticAccess() {
+    return local;
+  }
+  
+  // 动态函数无法访问局部变量
+  const dynamicAccess = new Function('return local');
+  
+  console.log(""静态访问:"", staticAccess()); // 10
+  try {
+    console.log(""动态访问:"", dynamicAccess()); // ReferenceError
+  } catch (e) {
+    console.log(""动态访问错误:"", e.message);
+  }
+}
+
+testScope();</code></pre>"
+JavaScript四类动态函数创建示例	"<pre><code class=""language-javascript"">// 1. 普通函数
+const normalFn = new Function('x', 'y', 'return x * y');
+console.log(""普通函数:"", normalFn(3, 4)); // 12
+
+// 2. 生成器函数
+const GeneratorFn = (function*(){}).constructor;
+const genFn = new GeneratorFn('x', 'y', `
+  yield x;
+  yield y;
+  return x + y;
+`);
+const gen = genFn(1, 2);
+console.log(gen.next().value); // 1
+console.log(gen.next().value); // 2
+console.log(gen.next().value); // 3
+
+// 3. 异步生成器函数
+const AsyncGeneratorFn = (async function*(){}).constructor;
+const asyncGenFn = new AsyncGeneratorFn('x', 'y', `
+  yield await x;
+  yield await y;
+`);
+const asyncGen = asyncGenFn(Promise.resolve(10), Promise.resolve(20));
+asyncGen.next().then(result => console.log(""异步生成器:"", result.value)); // 10
+
+// 4. 异步函数
+const AsyncFn = (async ()=>{}).constructor;
+const asyncFn = new AsyncFn('x', 'y', 'return await x + await y;');
+asyncFn(Promise.resolve(5), Promise.resolve(7)).then(console.log); // 12</code></pre>"
+JavaScript函数子类化实现	"<pre><code class=""language-javascript"">class CustomFunction extends Function {
+  constructor() {
+    // 调用父类构造器
+    super('...args', 'return this.execute(...args)');
+    
+    // 绑定实例方法
+    const instance = this.bind(this);
+    Object.setPrototypeOf(instance, CustomFunction.prototype);
+    return instance;
+  }
+  
+  // 自定义执行逻辑
+  execute(...args) {
+    console.log(""接收参数:"", args);
+    return args.reduce((sum, val) => sum + val, 0);
+  }
+}
+
+// 使用自定义函数类
+const customFn = new CustomFunction();
+console.log(""执行结果:"", customFn(1, 2, 3)); // 6</code></pre>"
+JavaScript动态函数作用域隔离验证	"<pre><code class=""language-javascript"">function createScopedFunction() {
+  const privateData = ""机密信息"";
+  
+  // 1. 闭包函数
+  const closureFn = () => privateData;
+  
+  // 2. 动态创建的函数
+  const dynamicFn = new Function('return privateData');
+  
+  return { closureFn, dynamicFn };
+}
+
+const { closureFn, dynamicFn } = createScopedFunction();
+
+console.log(""闭包函数访问:"", closureFn()); // ""机密信息""
+try {
+  console.log(""动态函数访问:"", dynamicFn()); // ReferenceError
+} catch (e) {
+  console.log(""动态函数错误:"", e.message); // privateData未定义
+}
+
+// 全局作用域绑定验证
+dynamicFn.call({ privateData: ""伪造数据"" }); // 仍然报错（无法绑定作用域）</code></pre>"
+JavaScript动态函数严格模式特性	"<pre><code class=""language-javascript"">// 严格模式下的函数
+function strictEnvironment() {
+  ""use strict"";
+  
+  // 动态函数继承全局严格模式状态
+  const dynamicFn = new Function(`
+    try {
+      undeclaredVar = 42; // 严格模式下禁止隐式全局变量
+    } catch (e) {
+      return ""捕获错误:"" + e.message;
+    }
+  `);
+  
+  console.log(""动态函数执行:"", dynamicFn());
+}
+
+// 非严格模式下的函数
+function nonStrictEnvironment() {
+  const dynamicFn = new Function(`
+    undeclaredVar = 42; // 非严格模式允许
+    return undeclaredVar;
+  `);
+  
+  console.log(""动态函数执行:"", dynamicFn()); // 42
+}
+
+strictEnvironment();
+nonStrictEnvironment();</code></pre>"
+JavaScript安全沙箱实现	"<pre><code class=""language-javascript"">// 安全沙箱函数
+function createSafeSandbox(code) {
+  // 使用动态函数创建沙箱
+  return new Function('data', `
+    ""use strict"";
+    try {
+      // 限制访问危险对象
+      const safeGlobals = { 
+        console, 
+        JSON,
+        Math,
+        Array,
+        Object,
+        Date
+      };
+      
+      // 封装执行环境
+      with (safeGlobals) {
+        ${code}
+      }
+    } catch (e) {
+      console.error(""沙箱错误:"", e);
+      return null;
+    }
+  `);
+}
+
+// 使用安全沙箱
+const sandbox = createSafeSandbox('return data.map(item => item * 2)');
+const result = sandbox([1, 2, 3]);
+console.log(""沙箱执行结果:"", result); // [2, 4, 6]</code></pre>"
+JavaScript动态模板函数	"<pre><code class=""language-javascript"">// 动态模板系统
+class TemplateEngine {
+  constructor(template) {
+    // 动态创建模板函数
+    this.render = new Function('data', `
+      try {
+        with(data) {
+          return \`${template}\`;
+        }
+      } catch (e) {
+        return ""<div>渲染错误</div>"";
+      }
+    `);
+  }
+}
+
+// 使用模板引擎
+const userTemplate = new TemplateEngine(`
+  <div class=""user"">
+    <h2>\${name}</h2>
+    <p>邮箱: \${email}</p>
+    <p>注册时间: \${new Date(registered).toLocaleDateString()}</p>
+  </div>
+`);
+
+const userData = {
+  name: ""Alice"",
+  email: ""alice@example.com"",
+  registered: ""2023-01-15""
+};
+
+console.log(""渲染结果:"", userTemplate.render(userData));</code></pre>"
+JavaScript动态函数性能优化	"<pre><code class=""language-javascript"">// 函数性能对比测试
+function performanceTest() {
+  const iterations = 100000;
+  const testValues = Array(1000).fill().map((_, i) => i);
+  
+  // 预编译静态函数
+  function staticSum(arr) {
+    return arr.reduce((sum, val) => sum + val, 0);
+  }
+  
+  // 动态创建函数
+  const dynamicSum = new Function('arr', `
+    return arr.reduce((sum, val) => sum + val, 0);
+  `);
+  
+  // 测试静态函数
+  console.time(""静态函数"");
+  for (let i = 0; i < iterations; i++) {
+    staticSum(testValues);
+  }
+  console.timeEnd(""静态函数"");
+  
+  // 测试动态函数
+  console.time(""动态函数"");
+  for (let i = 0; i < iterations; i++) {
+    dynamicSum(testValues);
+  }
+  console.timeEnd(""动态函数"");
+}
+
+performanceTest();</code></pre>"
