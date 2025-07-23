@@ -1,0 +1,191 @@
+# https://juejin.cn/post/6844903630655471624
+
+#separator:tab
+#html:true
+响应式布局中理想视口的HTML meta设置	"<pre><code class=""language-html"">&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no""&gt;</code></pre>"
+CSS媒体查询实现多分辨率适配	"<pre><code class=""language-css"">@media (max-width: 768px) {
+  /* 平板样式 */
+  .container { padding: 10px; }
+}
+@media (max-width: 480px) {
+  /* 手机样式 */
+  .container { padding: 5px; }
+}</code></pre>"
+使用CSS百分比创建4:3宽高比容器	"<pre><code class=""language-css"">.aspect-ratio {
+  width: 100%;
+  height: 0;
+  padding-top: 75%; /* 4:3比例 (3/4=0.75) */
+  position: relative;
+}
+.content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}</code></pre>"
+JavaScript动态计算REM基准值	"<pre><code class=""language-javascript"">function setRem() {
+  const docEl = document.documentElement;
+  const width = docEl.clientWidth || window.innerWidth;
+  const rem = width / 10; // 将视口10等分
+  docEl.style.fontSize = `${rem}px`;
+}
+
+// 初始化+监听窗口变化
+setRem();
+window.addEventListener('resize', setRem);</code></pre>"
+Webpack中配置px2rem-loader	"<pre><code class=""language-javascript"">// webpack.config.js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'px2rem-loader',
+            options: {
+              remUnit: 75,   // 设计稿宽度/10 (750/10)
+              remPrecision: 8 // 转换精度
+            }
+          }
+        ]
+      }
+    ]
+  }
+};</code></pre>"
+使用VW单位实现元素自适应	"<pre><code class=""language-css"">.responsive-box {
+  /* 基于375px设计稿: 100px → 100/375 * 100 = 26.666vw */
+  width: 26.666vw;
+  height: 13.333vw; /* 50px等效 */
+  font-size: 4.267vw; /* 16px等效 */
+}</code></pre>"
+PostCSS配置px转vw插件	"<pre><code class=""language-javascript"">// postcss.config.js
+module.exports = {
+  plugins: [
+    require('postcss-px-to-viewport')({
+      viewportWidth: 375,   // 设计稿宽度
+      viewportUnit: 'vw',   // 转换单位
+      minPixelValue: 1,     // 最小转换值
+      selectorBlackList: ['.ignore'] // 忽略转换的选择器
+    })
+  ]
+};</code></pre>"
+响应式图片的srcset实现	"<pre><code class=""language-html"">&lt;img src=""small.jpg""
+     srcset=""small.jpg 320w,
+             medium.jpg 768w,
+             large.jpg 1200w""
+     sizes=""(max-width: 480px) 100vw,
+            (max-width: 1024px) 50vw,
+            1200px""
+     alt=""响应式图片示例""&gt;</code></pre>"
+CSS Grid实现响应式布局	"<pre><code class=""language-css"">.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+}</code></pre>"
+Flexible.js实现REM布局	"<pre><code class=""language-html"">&lt;!-- 引入Flexible.js --&gt;
+&lt;script src=""https://cdn.jsdelivr.net/npm/amfe-flexible""&gt;&lt;/script&gt;
+
+&lt;!-- 使用示例 --&gt;
+&lt;div class=""box""&gt;
+  &lt;!-- 设计稿75px → 转换为0.75rem --&gt;
+  &lt;div style=""width: 0.75rem; height: 0.75rem; background: red""&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+
+
+
+# https://juejin.cn/post/7528500530852708392
+
+
+#separator:tab
+#html:true
+CSS实现0.5px边框解决方案	"<pre><code class=""language-css"">.thin-border {
+  position: relative;
+}
+.thin-border::before {
+  content: """";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  border: 1px solid #000;  /* 原始1px边框 */
+  transform: scale(0.5);   /* 缩放50%实现0.5px效果 */
+  transform-origin: 0 0;
+}</code></pre>"
+CSS实现小于12px字体渲染	"<pre><code class=""language-css"">.tiny-text {
+  display: inline-block;  /* 保证缩放不影响布局 */
+  font-size: 12px;        /* 满足最小字号要求 */
+  transform: scale(0.67); /* 8px/12px≈0.67 */
+}</code></pre>"
+CSS解决文本溢出对齐问题	"<pre><code class=""language-css"">.text-align-fix {
+  line-break: anywhere;   /* 允许任意位置断行 */
+  word-break: break-all;  /* 强制单词内断行 */
+}</code></pre>"
+JavaScript解决刘海屏定位问题	"<pre><code class=""language-javascript"">// 动态计算安全区位置
+function updateSafePosition() {
+  const header = document.querySelector('.header');
+  const fixedElement = document.querySelector('.fixed-element');
+  
+  if (header && fixedElement) {
+    // 获取导航栏高度并设置元素位置
+    const headerHeight = header.offsetHeight;
+    fixedElement.style.top = `${headerHeight}px`;
+  }
+}
+
+// 页面加载和窗口变化时更新
+window.addEventListener('load', updateSafePosition);
+window.addEventListener('resize', updateSafePosition);</code></pre>"
+CSS定制字体解决安卓字重问题	"<pre><code class=""language-css"">@font-face {
+  font-family: 'CustomMedium';
+  src: url('fonts/medium.woff2') format('woff2');
+  font-weight: 500;  /* 明确定义中等字重 */
+}
+
+.element {
+  font-family: 'CustomMedium', sans-serif;
+  font-weight: 500; /* 正常渲染中等字重 */
+}</code></pre>"
+HTML解决GIF色差问题	"<pre><code class=""language-html"">&lt;!-- 使用视频替代GIF并设置背景色 --&gt;
+&lt;div style=""background-color: #F5F5F5; display: inline-block;"">
+  &lt;video autoplay loop muted playsinline&gt;
+    &lt;source src=""animation.mp4"" type=""video/mp4""&gt;
+  &lt;/video&gt;
+&lt;/div&gt;</code></pre>"
+CSS禁用iOS橡皮筋效果	"<pre><code class=""language-css"">.no-bounce {
+  overscroll-behavior: none;        /* 标准属性 */
+  -webkit-overflow-scrolling: auto; /* Safari专属 */
+}</code></pre>"
+CSS解决inline-block幽灵空白	"<pre><code class=""language-css"">.parent {
+  font-size: 0; /* 消除换行符空白 */
+}
+
+.child {
+  display: inline-block;
+  font-size: 16px; /* 单独重置字号 */
+}</code></pre>"
+CSS解决内联元素底部空白	"<pre><code class=""language-css"">.inline-fix {
+  display: inline-block;
+  vertical-align: top; /* 顶部对齐 */
+  line-height: 0;      /* 消除行高间隙 */
+}</code></pre>"
+JavaScript解决DPR差异定位漂移	"<pre><code class=""language-javascript"">// 获取元素精确位置（兼容DPR差异）
+function getDPRPosition(element) {
+  const rect = element.getBoundingClientRect();
+  // 考虑设备像素比和滚动位置
+  return rect.top * window.devicePixelRatio + window.scrollY;
+}
+
+// 使用示例
+const target = document.querySelector('.target-element');
+const position = getDPRPosition(target);
+console.log(`精确位置: ${position}px`);</code></pre>"
