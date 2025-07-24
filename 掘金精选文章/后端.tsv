@@ -1,0 +1,212 @@
+# https://juejin.cn/post/7527237367435722762
+
+
+#separator:tab
+#html:true
+Java配置Redis订单缓存序列化	"<pre><code class=""language-java"">@Configuration
+public class RedisConfig {
+    @Bean
+    public RedisTemplate&lt;String, OrderDTO&gt; redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate&lt;String, OrderDTO&gt; template = new RedisTemplate&lt;&gt;();
+        template.setConnectionFactory(factory);
+        template.setKeySerializer(new StringRedisSerializer());
+        // 使用Jackson序列化对象
+        template.setValueSerializer(new Jackson2JsonRedisSerializer&lt;&gt;(OrderDTO.class));
+        return template;
+    }
+}</code></pre>"
+Java实现订单查询服务逻辑	"<pre><code class=""language-java"">@Service
+public class OrderQueryService {
+    private static final String CACHE_KEY_PREFIX = ""order:"";
+    
+    @Autowired
+    private RedisTemplate&lt;String, OrderDTO&gt; redisTemplate;
+    
+    @Autowired
+    private OrderMapper orderMapper;
+
+    public OrderDTO getOrderById(Long orderId) {
+        String cacheKey = CACHE_KEY_PREFIX + orderId;
+        
+        // 1. 查询Redis缓存
+        OrderDTO cachedOrder = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedOrder != null) {
+            return cachedOrder;
+        }
+        
+        // 2. 缓存未命中，查询数据库
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new OrderNotFoundException(orderId);
+        }
+        
+        OrderDTO dto = convertToDTO(order);
+        
+        // 3. 写入缓存，设定5分钟过期
+        redisTemplate.opsForValue().set(cacheKey, dto, Duration.ofMinutes(5));
+        return dto;
+    }
+    
+    private OrderDTO convertToDTO(Order order) {
+        OrderDTO dto = new OrderDTO();
+        dto.setOrderId(order.getId());
+        dto.setStatus(order.getStatus());
+        dto.setAmount(order.getAmount());
+        dto.setCreatedAt(order.getCreatedAt());
+        return dto;
+    }
+}</code></pre>"
+MyBatis订单查询Mapper实现	"<pre><code class=""language-java"">@Mapper
+public interface OrderMapper {
+    @Select(""SELECT * FROM orders WHERE id = #{id}"")
+    Order selectById(@Param(""id"") Long id);
+}</code></pre>"
+Spring Boot订单查询Controller	"<pre><code class=""language-java"">@RestController
+@RequestMapping(""/api/order"")
+public class OrderController {
+    @Autowired
+    private OrderQueryService orderQueryService;
+    
+    @GetMapping(""/{orderId}"")
+    public ResponseEntity&lt;OrderDTO&gt; getOrder(@PathVariable Long orderId) {
+        OrderDTO dto = orderQueryService.getOrderById(orderId);
+        return ResponseEntity.ok(dto);
+    }
+}</code></pre>"
+Java实现缓存击穿防护	"<pre><code class=""language-java"">public OrderDTO getOrderByIdWithLock(Long orderId) {
+    String cacheKey = CACHE_KEY_PREFIX + orderId;
+    OrderDTO cachedOrder = redisTemplate.opsForValue().get(cacheKey);
+    
+    if (cachedOrder != null) {
+        return cachedOrder;
+    }
+    
+    // 获取分布式锁
+    RLock lock = redissonClient.getLock(""lock:order:"" + orderId);
+    try {
+        lock.lock();
+        // 双重检查缓存
+        cachedOrder = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedOrder != null) {
+            return cachedOrder;
+        }
+        
+        // 查询数据库
+        Order order = orderMapper.selectById(orderId);
+        OrderDTO dto = convertToDTO(order);
+        
+        // 写入缓存
+        redisTemplate.opsForValue().set(cacheKey, dto, Duration.ofMinutes(5));
+        return dto;
+    } finally {
+        lock.unlock();
+    }
+}</code></pre>"
+Java实现双层缓存(Caffeine+Redis)	"<pre><code class=""language-java"">@Bean
+public CacheManager cacheManager() {
+    CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+    cacheManager.setCaffeine(Caffeine.newBuilder()
+        .expireAfterWrite(30, TimeUnit.SECONDS) // 本地缓存30秒
+        .maximumSize(1000)); // 最大1000个订单
+    return cacheManager;
+}
+
+public OrderDTO getOrderById(Long orderId) {
+    String cacheKey = CACHE_KEY_PREFIX + orderId;
+    
+    // 1. 检查本地缓存
+    Cache caffeineCache = cacheManager.getCache(""orders"");
+    OrderDTO localCache = caffeineCache.get(cacheKey, OrderDTO.class);
+    if (localCache != null) {
+        return localCache;
+    }
+    
+    // 2. 检查Redis缓存
+    OrderDTO redisCache = redisTemplate.opsForValue().get(cacheKey);
+    if (redisCache != null) {
+        // 回填本地缓存
+        caffeineCache.put(cacheKey, redisCache);
+        return redisCache;
+    }
+    
+    // 3. 查询数据库
+    Order order = orderMapper.selectById(orderId);
+    OrderDTO dto = convertToDTO(order);
+    
+    // 4. 写入两级缓存
+    caffeineCache.put(cacheKey, dto);
+    redisTemplate.opsForValue().set(cacheKey, dto, Duration.ofMinutes(5));
+    
+    return dto;
+}</code></pre>"
+Java实现订单归档逻辑	"<pre><code class=""language-java"">@Transactional
+public void completeOrder(Long orderId) {
+    // 1. 更新订单状态为已完成
+    orderMapper.updateStatus(orderId, ""COMPLETED"");
+    
+    // 2. 发送归档消息
+    kafkaTemplate.send(""order-archive"", orderId);
+    
+    // 3. 清理缓存
+    String cacheKey = CACHE_KEY_PREFIX + orderId;
+    redisTemplate.delete(cacheKey);
+}
+
+// Kafka消费者处理归档
+@KafkaListener(topics = ""order-archive"")
+public void archiveOrder(Long orderId) {
+    // 1. 查询订单
+    Order order = orderMapper.selectById(orderId);
+    
+    // 2. 写入历史表
+    historyOrderMapper.insert(order);
+    
+    // 3. 从主表删除
+    orderMapper.deleteById(orderId);
+}</code></pre>"
+SQL分库分表示例	"<pre><code class=""language-sql"">-- 按订单ID分片（4个分片）
+CREATE TABLE orders_0 (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT,
+    amount DECIMAL(10,2),
+    CHECK (id % 4 = 0)
+);
+
+CREATE TABLE orders_1 (
+    id BIGINT PRIMARY KEY,
+    user_id BIGINT,
+    amount DECIMAL(10,2),
+    CHECK (id % 4 = 1)
+);
+
+-- 查询时根据ID路由到对应分片
+SELECT * FROM orders_{id % 4} WHERE id = ?;</code></pre>"
+Java实现查询降级方案	"<pre><code class=""language-java"">@HystrixCommand(fallbackMethod = ""getOrderFallback"")
+public OrderDTO getOrderWithFallback(Long orderId) {
+    return orderQueryService.getOrderById(orderId);
+}
+
+private OrderDTO getOrderFallback(Long orderId) {
+    // 降级策略：返回基本订单信息
+    OrderDTO dto = new OrderDTO();
+    dto.setOrderId(orderId);
+    dto.setStatus(""系统繁忙，请稍后查看"");
+    return dto;
+}</code></pre>"
+Java实现异步状态更新	"<pre><code class=""language-java"">@Async
+public void updateOrderStatusAsync(Long orderId, String status) {
+    // 1. 更新数据库
+    orderMapper.updateStatus(orderId, status);
+    
+    // 2. 刷新缓存
+    refreshCache(orderId);
+}
+
+private void refreshCache(Long orderId) {
+    String cacheKey = CACHE_KEY_PREFIX + orderId;
+    Order order = orderMapper.selectById(orderId);
+    if (order != null) {
+        OrderDTO dto = convertToDTO(order);
+        redisTemplate.opsForValue().set(cacheKey, dto, Duration.ofMinutes(5));
+    }
+}</code></pre>"

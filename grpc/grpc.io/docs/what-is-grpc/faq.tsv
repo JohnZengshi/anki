@@ -1,0 +1,91 @@
+#separator:tab
+#html:true
+gRPC发音与全称	"<pre><code class=""language-markdown"">- **全称**: g RPC R emote P rocedure C alls
+- **发音**: /dʒiː ɑːr piː siː/ (Jee-Arr-Pee-See)
+- **核心概念**: 现代开源RPC框架，实现跨平台透明通信</code></pre>"
+gRPC核心价值场景	"<pre><code class=""language-markdown"">// 主要应用场景
+1. 低延迟高扩展的分布式系统
+2. 移动端与云服务通信
+   - 自动生成iOS/Android客户端库
+3. 设计精确高效的多语言协议
+4. 分层扩展架构
+   - 认证
+   - 负载均衡
+   - 监控</code></pre>"
+gRPC移动端优势(Golang)	"<pre><code class=""language-go"">// 模拟移动端通信优化
+func mobileOptimization() {
+	// 1. 自动生成类型安全客户端
+	androidClient := pb.NewMobileServiceClient(androidConn)
+	iosClient := pb.NewMobileServiceClient(iosConn)
+	
+	// 2. 流式传输节省带宽
+	stream, _ := androidClient.GetDataStream(ctx, &pb.MobileRequest{})
+	
+	// 3. 更少TCP连接降低能耗
+	connPool := grpc.WithConnectionPool(4) // 减少连接数
+}</code></pre>"
+gRPC与REST协议对比	"<pre><code class=""language-markdown"">| 特性        | gRPC/HTTP/2          | REST/HTTP/1.1        |
+|------------|----------------------|----------------------|
+| 传输方式    | 二进制帧             | 文本                 |
+| 路径处理    | 静态路径(高性能)     | 动态解析(高延迟)     |
+| 错误处理    | 专用错误码体系       | HTTP状态码           |
+| 流式支持    | 原生全双工           | 需SSE/WebSocket      |</code></pre>"
+gRPC-Web浏览器实现	"<pre><code class=""language-javascript"">// 前端使用gRPC-Web
+import {HelloRequest} from './proto/example_pb';
+import {ExampleServiceClient} from './proto/example_grpc_web_pb';
+
+// 创建客户端
+const client = new ExampleServiceClient('http://localhost:8080');
+
+// 准备请求
+const request = new HelloRequest();
+request.setName('Web User');
+
+// 调用服务端
+client.sayHello(request, {}, (err, response) => {
+  console.log('响应:', response.getMessage());
+});</code></pre>"
+Protocol Buffers扩展支持	"<pre><code class=""language-protobuf"">// 支持多种数据格式
+syntax = ""proto3"";
+
+// 1. 核心支持
+message PBData {
+  string field = 1;
+}
+
+// 2. JSON扩展示例
+import ""google/protobuf/struct.proto"";
+message JSONData {
+  google.protobuf.Struct json_content = 1;
+}</code></pre>"
+gRPC服务网格集成	"<pre><code class=""language-markdown"">// 无代理服务网格功能
+1. **服务发现**: 自动定位后端实例
+2. **负载均衡**: 智能请求分发
+3. **安全策略**: mTLS自动加密
+4. **流量管理**: 
+   - 金丝雀发布
+   - A/B测试
+   
+// 通过xDS API实现</code></pre>"
+gRPC版本策略	"<pre><code class=""language-bash""># 版本管理策略
+## 发布周期
+每6周滚动更新（master分支始终保持稳定）
+
+## 支持范围
+仅支持最新版和前一版本（v1.73.0和v1.72.x）
+
+## 更新类型
+- 安全修复 (critical)
+- Bug修复 (high priority)
+- 不包含新功能 (仅稳定分支)</code></pre>"
+gRPC安全漏洞报告	"<pre><code class=""language-markdown"">// 漏洞报告流程
+1. **发现漏洞**: 通过专用安全邮件报告
+   security@grpc.io
+   
+2. **响应机制**:
+   - 48小时内初步响应
+   - 企业级修复团队介入
+   
+3. **修复发布**:
+   - 优先修复分支创建
+   - 保密期内协调披露</code></pre>"

@@ -1,0 +1,192 @@
+#separator:tab
+#html:true
+gRPC基准测试框架结构(Go)	"<pre><code class=""language-go"">// WorkerService实现
+type workerServer struct {
+	pb.UnimplementedWorkerServiceServer
+}
+
+func (s *workerServer) RunWorker(ctx context.Context, 
+	req *pb.WorkerRequest) (*pb.WorkerResponse, error) {
+	
+	switch req.GetMode() {
+	case pb.WorkerMode_CLIENT:
+		return runClientWorker(req.GetServerConfig())
+	case pb.WorkerMode_SERVER:
+		return runServerWorker()
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, ""无效的工作模式"")
+	}
+}
+
+// BenchmarkService实现
+type benchmarkServer struct {
+	pb.UnimplementedBenchmarkServiceServer
+}
+
+func (s *benchmarkServer) UnaryCall(ctx context.Context, 
+	req *pb.SimpleRequest) (*pb.SimpleResponse, error) {
+	
+	// 创建响应数据（大小由请求指定）
+	payload := make([]byte, req.GetResponseSize())
+	return &pb.SimpleResponse{Payload: payload}, nil
+}</code></pre>"
+延迟测试场景配置(JSON)	"<pre><code class=""language-json"">{
+  ""scenario_name"": ""contentionless_latency"",
+  ""test_method"": ""STREAMING"",
+  ""client_config"": {
+    ""client_channels"": 1,
+    ""outstanding_rpcs_per_channel"": 1,
+    ""rpc_type"": ""UNARY""
+  },
+  ""server_config"": {
+    ""server_type"": ""ASYNC_SERVER""
+  },
+  ""load_params"": {
+    ""closed_loop"": {}
+  },
+  ""security_params"": {
+    ""use_test_ca"": true,
+    ""server_host_override"": ""foo.test.google.fr""
+  }
+}</code></pre>"
+QPS测试场景配置(JSON)	"<pre><code class=""language-json"">{
+  ""scenario_name"": ""high_qps"",
+  ""test_method"": ""STREAMING"",
+  ""client_config"": {
+    ""client_channels"": 64,
+    ""outstanding_rpcs_per_channel"": 100,
+    ""client_type"": ""ASYNC_CLIENT"",
+    ""rpc_type"": ""STREAMING""
+  },
+  ""server_config"": {
+    ""server_type"": ""ASYNC_SERVER""
+  },
+  ""load_params"": {
+    ""closed_loop"": {}
+  },
+  ""payload_config"": {
+    ""simple_params"": {
+      ""resp_size"": 1000
+    }
+  },
+  ""security_params"": {
+    ""use_test_ca"": true
+  }
+}</code></pre>"
+Go流式性能优化实现	"<pre><code class=""language-go"">// 零拷贝流处理优化
+func (s *benchmarkServer) StreamingCall(stream pb.BenchmarkService_StreamingCallServer) error {
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		
+		// 直接复用请求的Payload切片（零拷贝）
+		resp := &pb.SimpleResponse{
+			Payload: req.Payload, // 避免内存分配
+		}
+		
+		if err := stream.Send(resp); err != nil {
+			return err
+		}
+	}
+}</code></pre>"
+C++多核扩展配置	"<pre><code class=""language-cpp"">// 配置服务端线程模型
+void RunServer() {
+  std::string server_address(""0.0.0.0:50051"");
+  BenchmarkServiceImpl service;
+  
+  ServerBuilder builder;
+  // 设置线程模型优化
+  builder.SetSyncServerOption(ServerBuilder::NUM_CQS, 8); // 完成队列数
+  builder.SetSyncServerOption(ServerBuilder::MIN_POLLERS, 16); // 最小轮询线程
+  builder.SetSyncServerOption(ServerBuilder::MAX_POLLERS, 64); // 最大轮询线程
+  
+  // 启用SMP多核扩展
+  builder.SetSyncServerOption(ServerBuilder::MAX_SERVER_THREADS, 256);
+  
+  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+  builder.RegisterService(&service);
+  
+  std::unique_ptr<Server> server(builder.BuildAndStart());
+  server->Wait();
+}</code></pre>"
+性能监控指标(Markdown)	"<pre><code class=""language-markdown"">### 核心性能指标
+1. **延迟指标**
+   - P50: 中位数延迟
+   - P90: 90%请求延迟
+   - P99: 尾部延迟
+   - P999: 极端延迟
+
+2. **吞吐指标**
+   - QPS: 每秒查询数
+   - MB/s: 吞吐带宽
+   - 连接数: 活动连接数
+
+3. **资源指标**
+   - CPU使用率 (%)
+   - 内存占用 (MB)
+   - 网络IO (MB/s)
+
+### 性能优化关键点
+- 流式零拷贝
+- 连接多路复用
+- 批处理机制
+- 线程/协程模型</code></pre>"
+测试驱动执行逻辑(Go)	"<pre><code class=""language-go"">// 测试驱动程序逻辑
+func runTestScenario(scenarioFile string) {
+	// 1. 加载场景配置
+	config := loadScenario(scenarioFile)
+	
+	// 2. 启动服务端worker
+	serverProc := startWorker(config.ServerConfig)
+	
+	// 3. 启动客户端worker
+	clientProc := startWorker(config.ClientConfig)
+	
+	// 4. 发送测试指令
+	serverAddr := serverProc.GetAddress()
+	clientConn := dialWorker(clientProc.GetAddress())
+	
+	// 5. 配置客户端连接服务端
+	clientReq := &pb.ClientConfig{
+		ServerTargets: []string{serverAddr},
+		RpcType:       config.RpcType,
+	}
+	clientConn.SetConfig(ctx, clientReq)
+	
+	// 6. 启动负载测试
+	results := clientConn.StartTest(ctx, &pb.LoadParams{
+		Config: config.LoadParams,
+	})
+	
+	// 7. 收集并报告指标
+	reportMetrics(results)
+}</code></pre>"
+基准测试安全配置(Go)	"<pre><code class=""language-go"">// 创建安全凭证
+func createSecureCredentials() credentials.TransportCredentials {
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(testCA) {
+		log.Fatal(""证书加载失败"")
+	}
+	
+	return credentials.NewTLS(&tls.Config{
+		ServerName:   ""performance.test"",
+		RootCAs:      certPool,
+		Certificates: []tls.Certificate{testCert},
+	})
+}
+
+// 服务端安全配置
+serverOpts := []grpc.ServerOption{
+	grpc.Creds(createSecureCredentials()),
+}
+
+// 客户端安全配置
+clientOpts := []grpc.DialOption{
+	grpc.WithTransportCredentials(createSecureCredentials()),
+	grpc.WithAuthority(""performance.test""), // 设置授权名
+}</code></pre>"

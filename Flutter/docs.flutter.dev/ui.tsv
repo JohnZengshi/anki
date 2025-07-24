@@ -1,0 +1,160 @@
+#separator:tab
+#html:true
+Flutter基础：创建StatelessWidget	"<pre><code class=""language-dart"">class MyText extends StatelessWidget {
+  const MyText(this.text, {super.key});
+  final String text; // 不可变属性
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(fontSize: 24),
+    );
+  }
+}</code></pre>"
+Flutter状态管理：StatefulWidget计数器	"<pre><code class=""language-dart"">class Counter extends StatefulWidget {
+  const Counter({super.key});
+
+  @override
+  State&lt;Counter&gt; createState() => _CounterState();
+}
+
+class _CounterState extends State&lt;Counter&gt; {
+  int _count = 0;
+
+  void _increment() {
+    setState(() {  // 必须调用setState触发重建
+      _count++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Count: $_count'),
+        ElevatedButton(
+          onPressed: _increment,
+          child: const Text('+1'),
+        ),
+      ],
+    );
+  }
+}</code></pre>"
+Flutter布局：使用Row+Column组合	"<pre><code class=""language-dart"">Widget build(BuildContext context) {
+  return Column(
+    children: [
+      Row(  // 水平布局
+        children: [
+          Icon(Icons.star),
+          Expanded(  // 占据剩余空间
+            child: Text('Flutter Layout'),
+          ),
+          Icon(Icons.menu),
+        ],
+      ),
+      Container(  // 矩形装饰元素
+        padding: EdgeInsets.all(16),
+        color: Colors.blue[100],
+        child: Text('Content area'),
+      ),
+    ],
+  );
+}</code></pre>"
+Flutter手势检测：GestureDetector用法	"<pre><code class=""language-dart"">GestureDetector(
+  onTap: () {
+    print('Container tapped!');
+  },
+  onDoubleTap: () {
+    print('Double tap detected');
+  },
+  child: Container(
+    width: 200,
+    height: 100,
+    color: Colors.amber,
+    child: Center(child: Text('Tap Me')),
+  ),
+)</code></pre>"
+Flutter Material组件：Scaffold基础结构	"<pre><code class=""language-dart"">Scaffold(
+  appBar: AppBar(  // 顶部导航栏
+    title: Text('Demo App'),
+    actions: [IconButton(icon: Icon(Icons.search), onPressed: () {})],
+  ),
+  body: Center(  // 主体内容
+    child: Text('Hello World'),
+  ),
+  floatingActionButton: FloatingActionButton(  // 悬浮按钮
+    onPressed: () {},
+    child: Icon(Icons.add),
+  ),
+  drawer: Drawer(),  // 侧边栏
+)</code></pre>"
+Flutter生命周期：StatefulWidget关键方法	"<pre><code class=""language-dart"">class _MyState extends State&lt;MyWidget&gt; {
+  @override
+  void initState() {
+    super.initState();
+    // 初始化操作：加载数据、注册监听器
+  }
+
+  @override
+  void didUpdateWidget(MyWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 当widget配置更新时调用
+  }
+
+  @override
+  void dispose() {
+    // 清理资源：取消订阅、停止动画
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) => Placeholder();
+}</code></pre>"
+Flutter Key使用场景：列表项优化	"<pre><code class=""language-dart"">ListView.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) {
+    return ShoppingListItem(
+      key: ObjectKey(items[index]),  // 唯一Key
+      product: items[index],
+      // ...其他参数
+    );
+  },
+)</code></pre>"
+Flutter状态提升模式实现	"<pre><code class=""language-dart"">// 父组件管理状态
+class ParentWidget extends StatefulWidget {
+  @override
+  _ParentState createState() => _ParentState();
+}
+
+class _ParentState extends State&lt;ParentWidget&gt; {
+  bool _active = false;
+
+  void _handleTap(bool newValue) {
+    setState(() => _active = newValue);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChildWidget(
+      active: _active,
+      onChanged: _handleTap,  // 回调给子组件
+    );
+  }
+}
+
+// 无状态子组件
+class ChildWidget extends StatelessWidget {
+  const ChildWidget({this.active, this.onChanged});
+  
+  final bool active;
+  final ValueChanged&lt;bool&gt; onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onChanged(!active),
+      child: Container(color: active ? Colors.red : Colors.grey),
+    );
+  }
+}</code></pre>"

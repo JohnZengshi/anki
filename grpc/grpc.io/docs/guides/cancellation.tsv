@@ -1,0 +1,127 @@
+#separator:tab
+#html:true
+Go客户端取消实现	"<pre><code class=""language-go"">// 创建可取消上下文
+ctx, cancel := context.WithCancel(context.Background())
+
+// 执行RPC调用
+go func() {
+  response, err := client.GetData(ctx, &pb.DataRequest{})
+  if err != nil {
+    log.Printf(""调用失败: %v"", err)
+  }
+}()
+
+// 用户触发取消
+cancelButton.Clicked(func() {
+  cancel()  // 取消RPC
+  log.Println(""用户取消数据请求"")
+})</code></pre>"
+Go服务端取消检查	"<pre><code class=""language-go"">func (s *server) StreamingCall(stream pb.Service_StreamingCallServer) error {
+  for {
+    select {
+    case <-stream.Context().Done():
+      // 上下文取消时清理
+      cleanup()
+      return status.Error(codes.Canceled, ""客户端取消"")
+    default:
+      // 处理工作单元
+      req, err := stream.Recv()
+      if err == io.EOF {
+        return nil
+      }
+      // ...处理逻辑
+    }
+  }
+}</code></pre>"
+取消传播机制(Go)	"<pre><code class=""language-go"">// 服务端作为客户端时的取消传播
+func (s *server) ProcessRequest(ctx context.Context, req *pb.Request) (*pb.Response, error) {
+  // 检查上级调用是否取消
+  if err := ctx.Err(); err != nil {
+    return nil, err // 自动传播
+  }
+  
+  // 调用上游服务（传递相同上下文）
+  upstreamResp, err := upstreamClient.GetData(ctx, &pb.UpstreamRequest{})
+  if err != nil {
+    return nil, err
+  }
+  
+  // ...处理逻辑
+}</code></pre>"
+资源清理最佳实践	"<pre><code class=""language-go"">func handleRPC(ctx context.Context) error {
+  // 1. 初始化资源
+  dbConn := initDB()
+  fileLock := acquireFileLock()
+  tx := beginTransaction()
+  
+  // 2. 确保资源清理
+  defer func() {
+    dbConn.Close()
+    fileLock.Unlock()
+    if ctx.Err() != nil { // 检查是否取消
+      tx.Rollback()
+    } else {
+      tx.Commit()
+    }
+  }()
+  
+  // 3. 处理逻辑（定期检查取消）
+  for {
+    if err := ctx.Err(); err != nil {
+      return err
+    }
+    // ...业务逻辑
+  }
+}</code></pre>"
+截止时间与取消协作	"<pre><code class=""language-go"">// 带截止时间的上下文
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+defer cancel()
+
+// 执行可能长时间运行的操作
+resultChan := make(chan Result)
+go func() {
+  result := computeIntensiveTask()
+  resultChan <- result
+}()
+
+select {
+case res := <-resultChan:
+  return res // 正常完成
+case <-ctx.Done():
+  // 截止时间到或被取消
+  return nil, status.Error(codes.DeadlineExceeded, ""操作超时"")
+}</code></pre>"
+取消错误处理规范	"<pre><code class=""language-go"">// 客户端错误处理
+response, err := client.Method(ctx, request)
+if err != nil {
+  st, ok := status.FromError(err)
+  if ok {
+    switch st.Code() {
+    case codes.Canceled:
+      log.Println(""操作被取消"")
+    case codes.DeadlineExceeded:
+      log.Println(""操作超时"")
+    default:
+      log.Printf(""其他错误: %s"", st.Message())
+    }
+  }
+}
+
+// 服务端返回取消状态
+if isCancelled(ctx) {
+  return nil, status.Error(codes.Canceled, ""请求被客户端取消"")
+}</code></pre>"
+分布式取消跟踪	"<pre><code class=""language-go"">// 使用OpenTelemetry传播取消
+ctx, span := otel.Tracer(""app"").Start(ctx, ""RPCProcessing"")
+defer span.End()
+
+// 检查取消时记录事件
+select {
+case <-ctx.Done():
+  span.AddEvent(""请求取消"", trace.WithAttributes(
+    attribute.String(""reason"", ctx.Err().Error()),
+  ))
+  return nil
+default:
+  // 继续处理
+}</code></pre>"

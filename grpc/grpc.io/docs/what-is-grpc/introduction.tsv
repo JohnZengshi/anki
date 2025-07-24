@@ -1,0 +1,202 @@
+#separator:tab
+#html:true
+定义proto3服务接口	"<pre><code class=""language-protobuf"">// 服务定义
+service UserService {
+  // 创建用户 (一元RPC)
+  rpc CreateUser (CreateUserRequest) returns (UserResponse);
+  
+  // 获取用户流 (服务端流)
+  rpc GetUserStream (UserQuery) returns (stream UserResponse);
+}
+
+// 请求消息
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  int32 age = 3;
+}
+
+// 响应消息
+message UserResponse {
+  int32 id = 1;
+  string name = 2;
+  string status = 3;
+}</code></pre>"
+Golang实现gRPC服务端	"<pre><code class=""language-go"">package main
+
+import (
+	""context""
+	""log""
+	""net""
+	""google.golang.org/grpc""
+	pb ""path/to/your/proto/package""
+)
+
+type server struct {
+	pb.UnimplementedUserServiceServer
+}
+
+// 实现CreateUser方法
+func (s *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
+	log.Printf(""收到创建用户请求: %v"", req.GetName())
+	
+	// 模拟创建逻辑
+	return &pb.UserResponse{
+		Id:     1001,
+		Name:   req.GetName(),
+		Status: ""ACTIVE"",
+	}, nil
+}
+
+func main() {
+	lis, _ := net.Listen(""tcp"", "":50051"")
+	s := grpc.NewServer()
+	pb.RegisterUserServiceServer(s, &server{})
+	log.Printf(""服务端监听中 %v"", lis.Addr())
+	s.Serve(lis)
+}</code></pre>"
+Golang实现gRPC客户端调用	"<pre><code class=""language-go"">package main
+
+import (
+	""context""
+	""log""
+	""time""
+	""google.golang.org/grpc""
+	pb ""path/to/your/proto/package""
+)
+
+func main() {
+	conn, _ := grpc.Dial(""localhost:50051"", grpc.WithInsecure())
+	defer conn.Close()
+	c := pb.NewUserServiceClient(conn)
+
+	// 设置超时上下文
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 创建用户请求
+	user, err := c.CreateUser(ctx, &pb.CreateUserRequest{
+		Name:  ""Alice"",
+		Email: ""alice@example.com"",
+		Age:   28,
+	})
+	
+	if err != nil {
+		log.Fatalf(""创建失败: %v"", err)
+	}
+	log.Printf(""创建的用户ID: %d"", user.GetId())
+}</code></pre>"
+Protocol Buffers消息定义	"<pre><code class=""language-protobuf"">// 订单消息
+message Order {
+  int64 id = 1;                // 订单ID
+  string customer_id = 2;       // 客户ID
+  repeated Item items = 3;     // 重复字段：订单项
+  OrderStatus status = 4;       // 枚举字段
+  google.protobuf.Timestamp created_at = 5; // 时间戳
+}
+
+// 订单项子消息
+message Item {
+  string sku = 1;
+  int32 quantity = 2;
+  double price = 3;
+}
+
+// 订单状态枚举
+enum OrderStatus {
+  PENDING = 0;
+  PROCESSING = 1;
+  SHIPPED = 2;
+  DELIVERED = 3;
+  CANCELLED = 4;
+}</code></pre>"
+gRPC双向流实现（Golang）	"<pre><code class=""language-go"">// 服务端流方法实现
+func (s *server) GetUserStream(req *pb.UserQuery, stream pb.UserService_GetUserStreamServer) error {
+	for i := 0; i < 5; i++ {
+		// 模拟流式响应
+		if err := stream.Send(&pb.UserResponse{
+			Id:     int32(1000 + i),
+			Name:   fmt.Sprintf(""用户%d"", i+1),
+			Status: ""ACTIVE"",
+		}); err != nil {
+			return err
+		}
+		time.Sleep(1 * time.Second) // 模拟处理延迟
+	}
+	return nil
+}
+
+// 客户端流调用
+stream, _ := c.GetUserStream(context.Background(), &pb.UserQuery{})
+for {
+	user, err := stream.Recv()
+	if err == io.EOF {
+		break
+	}
+	log.Printf(""收到用户: %s (ID: %d)"", user.GetName(), user.GetId())
+}</code></pre>"
+gRPC错误处理（Golang）	"<pre><code class=""language-go"">// 服务端返回错误
+if req.Age < 18 {
+	return nil, status.Errorf(
+		codes.InvalidArgument,
+		""年龄必须满18岁 (收到: %d)"",
+		req.Age,
+	)
+}
+
+// 客户端处理错误
+user, err := c.CreateUser(ctx, request)
+if err != nil {
+	if status, ok := status.FromError(err); ok {
+		switch status.Code() {
+		case codes.InvalidArgument:
+			log.Printf(""无效参数: %s"", status.Message())
+		case codes.DeadlineExceeded:
+			log.Println(""请求超时"")
+		default:
+			log.Printf(""RPC错误: %v"", status.Code())
+		}
+	}
+}</code></pre>"
+gRPC拦截器（中间件）	"<pre><code class=""language-go"">// 客户端拦截器：添加认证令牌
+func authInterceptor(ctx context.Context, method string, req, reply interface{}, 
+	cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	
+	// 添加认证头
+	ctx = metadata.AppendToOutgoingContext(ctx, ""authorization"", ""Bearer xyz123"")
+	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
+// 使用拦截器创建连接
+conn, _ := grpc.Dial(""localhost:50051"",
+	grpc.WithInsecure(),
+	grpc.WithUnaryInterceptor(authInterceptor),
+)
+
+// 服务端拦截器：记录日志
+func loggingInterceptor(ctx context.Context, req interface{}, 
+	info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	
+	log.Printf(""收到请求: %s"", info.FullMethod)
+	return handler(ctx, req)
+}</code></pre>"
+Protocol Buffers编译命令	"<pre><code class=""language-bash""># 安装protoc编译器 (macOS)
+brew install protobuf
+
+# 安装Go语言插件
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+# 编译proto文件生成代码
+protoc --go_out=. --go_opt=paths=source_relative \
+       --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+       service/user_service.proto</code></pre>"
+gRPC与REST对比	"<pre><code class=""language-markdown"">| 特性          | gRPC                     | REST/HTTP-JSON         |
+|---------------|--------------------------|------------------------|
+| **协议**      | HTTP/2                   | HTTP/1.1              |
+| **数据格式**  | Protocol Buffers (二进制)| JSON (文本)           |
+| **接口定义**  | .proto 文件 (强类型)     | OpenAPI (弱类型)      |
+| **性能**      | 高 (二进制+多路复用)     | 中等                  |
+| **流式支持**  | 原生支持                 | 需要SSE/WebSocket     |
+| **浏览器支持**| 有限 (需要gRPC-Web)      | 原生支持              |
+| **代码生成**  | 官方多语言支持           | 第三方工具            |</code></pre>"

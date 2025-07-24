@@ -1,0 +1,126 @@
+#separator:tab
+#html:true
+gRPC认证机制概览	"<pre><code class=""language-markdown"">### 核心认证机制
+1. **SSL/TLS** 
+   - 服务器认证 + 数据加密
+2. **ALTS** 
+   - Google环境专用（GCE/GKE）
+3. **Google令牌** 
+   - 服务账户/GCE自动认证
+4. **OAuth2** 
+   - 行业标准授权协议
+5. **自定义插件** 
+   - 扩展认证机制</code></pre>"
+SSL/TLS认证实现(Go)	"<pre><code class=""language-go"">// 创建SSL凭证
+creds := credentials.NewTLS(&tls.Config{
+  ServerName: ""api.example.com"",
+  RootCAs:    x509.NewCertPool(), // 根证书池
+})
+
+// 建立安全连接
+conn, err := grpc.Dial(""service:443"", grpc.WithTransportCredentials(creds))
+if err != nil {
+  log.Fatalf(""连接失败: %v"", err)
+}
+defer conn.Close()</code></pre>"
+Google令牌认证(Go)	"<pre><code class=""language-go"">// 获取Google默认凭证
+creds, err := google.FindDefaultCredentials(context.Background())
+if err != nil {
+  log.Fatalf(""获取凭证失败: %v"", err)
+}
+
+// 创建gRPC连接选项
+opts := []grpc.DialOption{
+  grpc.WithPerRPCCredentials(oauth.TokenSource{
+    TokenSource: creds.TokenSource,
+  }),
+  grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
+}
+
+// 建立连接
+conn, _ := grpc.Dial(""google-service:443"", opts...)</code></pre>"
+OAuth2认证流程(Go)	"<pre><code class=""language-go"">// 1. 获取OAuth令牌
+token, err := oauth2Service.GetToken(ctx)
+if err != nil {
+  log.Fatalf(""令牌获取失败: %v"", err)
+}
+
+// 2. 创建调用凭证
+callCreds := oauth.NewOauthAccess(token)
+
+// 3. 组合通道凭证
+sslCreds := credentials.NewTLS(&tls.Config{})
+comboCreds := grpc.NewCompositeCallCredentials(callCreds, sslCreds)
+
+// 4. 发起认证请求
+conn, _ := grpc.Dial(""service:443"", grpc.WithCallCredentials(comboCreds))</code></pre>"
+自定义认证插件(Go)	"<pre><code class=""language-go"">// 实现PerRPCCredentials接口
+type customAuth struct {
+	token string
+}
+
+func (c customAuth) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+	return map[string]string{
+		""authorization"": ""Bearer "" + c.token,
+	}, nil
+}
+
+func (c customAuth) RequireTransportSecurity() bool {
+	return true // 要求启用TLS
+}
+
+// 使用自定义认证
+auth := customAuth{token: ""secure-token-123""}
+conn, _ := grpc.Dial(
+	""service:443"",
+	grpc.WithPerRPCCredentials(auth),
+	grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
+)</code></pre>"
+服务端认证拦截器(Go)	"<pre><code class=""language-go"">// 认证拦截器实现
+func authInterceptor(ctx context.Context, req interface{}, 
+	info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	
+	// 提取元数据
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, ""缺少元数据"")
+	}
+
+	// 验证令牌
+	tokens := md.Get(""authorization"")
+	if len(tokens) == 0 || !validToken(tokens[0]) {
+		return nil, status.Error(codes.PermissionDenied, ""无效凭证"")
+	}
+
+	// 继续处理请求
+	return handler(ctx, req)
+}
+
+// 注册拦截器
+server := grpc.NewServer(
+	grpc.UnaryInterceptor(authInterceptor),
+)</code></pre>"
+ALTS认证适用场景	"<pre><code class=""language-markdown"">### ALTS使用场景
+1. **Google Compute Engine (GCE)** 
+   - 虚拟机间通信
+2. **Google Kubernetes Engine (GKE)** 
+   - 容器集群内服务通信
+3. **Google云服务集成**
+   - 内部服务认证
+
+### 核心优势
+- 自动凭证管理
+- 无配置身份验证
+- 深度Google云集成</code></pre>"
+gRPC安全最佳实践	"<pre><code class=""language-markdown"">### 强制安全措施
+1. **始终启用传输加密**
+   - 禁用`grpc.WithInsecure()`
+2. **令牌最小权限原则**
+   - 仅授予必要权限
+3. **敏感信息防护**
+   - 禁止明文存储凭证
+
+### 增强建议
+- JWT短期令牌
+- 证书自动轮换
+- 双向TLS认证</code></pre>"

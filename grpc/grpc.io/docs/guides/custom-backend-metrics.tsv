@@ -1,0 +1,80 @@
+#separator:tab
+#html:true
+gRPC自定义后端指标的核心目的	"<pre><code class=""language-markdown"">允许在gRPC服务器注入业务指标(如队列深度)，客户端通过LB策略消费这些指标实现智能路由决策</code></pre>"
+Go中如何通过尾部元数据返回Per-query指标	"<pre><code class=""language-go"">func (s *server) UnaryCall(ctx context.Context, req *pb.Request) (*pb.Response, error) {
+    // 业务逻辑处理...
+    res := &pb.Response{Data: ""processed""}
+    
+    // 注入自定义指标到尾部元数据
+    md := metadata.Pairs(
+        ""orca-cpu-utilization"", ""0.85"",
+        ""orca-queue-depth"", ""12"",
+    )
+    grpc.SetTrailer(ctx, md)
+    
+    return res, nil
+}</code></pre>"
+ORCA标准在gRPC中的作用	"<pre><code class=""language-markdown"">提供开放标准：
+1. 定义指标格式(cpu/utilization等)
+2. 标准化传输协议
+3. 确保跨语言兼容性
+4. 支持服务发现集成</code></pre>"
+两种指标报告机制的区别	"<pre><code class=""language-markdown"">| 类型         | 传输方式              | 指标内容         | 最佳场景         |
+|--------------|-----------------------|------------------|------------------|
+| Per-query    | RPC尾部元数据         | 单次请求开销     | 短时Unary调用    |
+| Out-of-band  | 独立通道定期推送      | 系统级资源指标   | 流式调用/空闲监控|</code></pre>"
+Go中实现OOB指标定期推送	"<pre><code class=""language-go"">func startOOBReporter(conn *grpc.ClientConn) {
+    ticker := time.NewTicker(10 * time.Second)
+    defer ticker.Stop()
+    
+    client := orca.NewOpenRcaServiceClient(conn)
+    for range ticker.C {
+        // 收集系统指标
+        report := &orca.LoadReport{
+            CpuUtilization: getCPUUsage(),
+            MemUtilization: getMemUsage(),
+        }
+        
+        // 推送指标到客户端
+        client.ReportLoad(context.Background(), report)
+    }
+}</code></pre>"
+自定义LB策略如何消费后端指标	"<pre><code class=""language-go"">type customBalancer struct{}
+
+func (b *customBalancer) HandleSubConnStateChange(sc balancer.SubConn, state connectivity.State) {
+    // 状态变更处理
+}
+
+func (b *customBalancer) HandleResolvedAddrs(addrs []resolver.Address, err error) {
+    // 地址解析
+}
+
+func (b *customBalancer) UpdateClientMetrics(metrics *orca.LoadReport) {
+    // 核心：根据指标更新路由权重
+    for _, addr := range b.addresses {
+        if metrics.CpuUtilization > 0.8 {
+            addr.weight = 20  // 高负载节点降权
+        } else {
+            addr.weight = 100
+        }
+    }
+}</code></pre>"
+C++中自定义LB策略的指标处理	"<pre><code class=""language-cpp"">class CustomLbPolicy : public LoadBalancingPolicy {
+public:
+    void UpdateBackendMetric(const Backend& backend, const orca::v3::LoadReport& report) {
+        // 根据ORCA报告调整权重
+        double utilization = report.cpu_utilization();
+        int new_weight = 100 - (utilization * 80);
+        backend.set_weight(std::max(new_weight, 10));
+    }
+    
+    // 创建策略实例
+    static RefCountedPtr<CustomLbPolicy> Create(Args args) {
+        return MakeRefCounted<CustomLbPolicy>();
+    }
+};</code></pre>"
+gRPC自定义指标的适用场景	"<pre><code class=""language-markdown"">✅ 加权轮询(基于实时负载)
+✅ 成本敏感路由(按DB查询成本分配)
+✅ 故障规避(高延迟节点自动降权)
+✅ 资源优化(根据内存使用引流)
+❌ 简单服务(无需复杂LB的小型应用)</code></pre>"

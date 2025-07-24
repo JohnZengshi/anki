@@ -1,0 +1,52 @@
+#separator:tab
+#html:true
+gRPC压缩的基本目的是什么	"<pre><code class=""language-markdown"">减少对等通信时的网络带宽占用，通过压缩算法提升传输效率</code></pre>"
+在Go中如何启用gRPC的Gzip压缩	"<pre><code class=""language-go"">// 服务端启用压缩
+s := grpc.NewServer(
+    grpc.RPCCompressor(grpc.NewGZIPCompressor()),
+)
+
+// 客户端调用时指定压缩
+conn, _ := grpc.Dial(""localhost:50051"", grpc.WithDefaultCallOptions(
+    grpc.UseCompressor(""gzip""),
+))</code></pre>"
+gRPC不对称压缩的核心行为	"<pre><code class=""language-markdown"">请求和响应可使用不同压缩方式：
+- 服务端可返回未压缩响应（即使请求被压缩）
+- 当压缩收益低（如小数据包）时自动禁用
+- 客户端通过grpc-accept-encoding头声明支持算法</code></pre>"
+Go中如何禁用单条消息的压缩	"<pre><code class=""language-go"">// 创建禁用压缩的调用选项
+noCompress := grpc.UseCompressor(""identity"")
+
+// 发起RPC调用
+resp, err := client.GetData(ctx, &pb.Request{}, noCompress)
+
+// 流式调用中禁用单条消息压缩
+stream.Send(&pb.Message{}, grpc.UseCompressor(""identity""))</code></pre>"
+当客户端使用不支持的压缩算法时	"<pre><code class=""language-markdown"">服务端会返回UNIMPLEMENTED错误(状态码12)
+响应头包含支持的算法：
+grpc-accept-encoding: gzip,deflate,custom</code></pre>"
+gRPC压缩的安全注意事项	"<pre><code class=""language-markdown"">必须禁用压缩的场景：
+1. 防止BEAST/CRIME攻击（利用压缩特性窃取数据）
+2. 传输敏感信息（如认证令牌）
+3. 客户端明确要求禁用时</code></pre>"
+在Go中如何实现自定义压缩器	"<pre><code class=""language-go"">type ZstdCompressor struct{}
+
+func (c *ZstdCompressor) Compress(w io.Writer) (io.WriteCloser, error) {
+    return zstd.NewWriter(w)
+}
+
+func (c *ZstdCompressor) Decompress(r io.Reader) (io.Reader, error) {
+    return zstd.NewReader(r)
+}
+
+// 注册自定义压缩器
+compressor := grpc.NewCompressor(""zstd"", &ZstdCompressor{})</code></pre>"
+gRPC压缩的性能优化建议	"<pre><code class=""language-go"">// 根据数据大小动态启用压缩
+func shouldCompress(data []byte) bool {
+    return len(data) > 1024 // 仅压缩大于1KB的数据
+}
+
+// 调用时动态设置
+opts := grpc.UseCompressor(grpc.SelectCompressor(
+    shouldCompress, ""gzip"", ""identity""
+))</code></pre>"

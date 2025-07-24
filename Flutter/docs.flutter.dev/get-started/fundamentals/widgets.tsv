@@ -1,0 +1,121 @@
+#separator:tab
+#html:true
+Flutter中如何创建无状态Widget?	"<pre><code class=""language-dart"">// 无状态Widget示例
+import 'package:flutter/material.dart';
+
+class MyStatelessWidget extends StatelessWidget {
+  // 构造函数可接收不可变参数
+  const MyStatelessWidget({super.key});
+
+  // 必须实现build方法
+  @override
+  Widget build(BuildContext context) {
+    return const Padding( // 布局Widget
+      padding: EdgeInsets.all(16.0),
+      child: Text( // 显示文本的Widget
+        'Hello, Stateless Widget!',
+        style: TextStyle(fontSize: 20),
+      ),
+    );
+  }
+}</code></pre>"
+如何实现有状态Widget和状态更新?	"<pre><code class=""language-dart"">import 'package:flutter/material.dart';
+
+class CounterWidget extends StatefulWidget {
+  @override
+  State<CounterWidget> createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
+  int _counter = 0; // 可变状态保存在State类中
+
+  void _incrementCounter() {
+    setState(() { // 调用setState触发UI更新
+      _counter++; // 修改状态
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column( // 垂直排列子Widget
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Count: $_counter'),
+        ElevatedButton( // 按钮Widget
+          onPressed: _incrementCounter,
+          child: const Text('Increment'),
+        ),
+      ],
+    );
+  }
+}</code></pre>"
+如何使用Scaffold构建基本页面结构?	"<pre><code class=""language-dart"">import 'package:flutter/material.dart';
+
+class MyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold( // 提供基础Material Design布局
+      appBar: AppBar( // 顶部应用栏
+        title: const Text('My App'),
+      ),
+      body: Center( // 页面主体
+        child: Container( // 容器Widget
+          padding: const EdgeInsets.all(20),
+          color: Colors.blue[100],
+          child: const Text('Main Content'),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton( // 悬浮按钮
+        onPressed: () {},
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}</code></pre>"
+如何组合Row和Column实现布局?	"<pre><code class=""language-dart"">Widget build(BuildContext context) {
+  return Column( // 垂直排列
+    children: [
+      Row( // 水平排列
+        children: [
+          Icon(Icons.star, color: Colors.yellow),
+          Text('Rating: 4.5'),
+        ],
+      ),
+      const SizedBox(height: 10), // 间距Widget
+      Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Title', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Description text...'),
+          ],
+        ),
+      ),
+    ],
+  );
+}</code></pre>"
+Flutter中如何处理用户交互?	"<pre><code class=""language-dart"">Widget build(BuildContext context) {
+  return Column(
+    children: [
+      // 按钮点击事件
+      ElevatedButton(
+        onPressed: () {
+          print('Button clicked!'); // 处理点击
+        },
+        child: const Text('Click Me'),
+      ),
+      
+      // 手势检测
+      GestureDetector(
+        onTap: () => print('Tapped'), // 点击手势
+        onDoubleTap: () => print('Double Tapped'), // 双击手势
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          color: Colors.green[200],
+          child: const Text('Tap Area'),
+        ),
+      ),
+    ],
+  );
+}</code></pre>"
