@@ -1,0 +1,111 @@
+#separator:tab
+#html:true
+Dart中如何发起基础HTTP GET请求	"<pre><code class=""language-dart"">import ""package:http/http.dart"" as http;
+
+Future<void> fetchAlbum() async {
+  final response = await http.get(
+    Uri.parse(""https://jsonplaceholder.typicode.com/albums/1""),
+  );
+  if (response.statusCode == 200) {
+    print(""请求成功：${response.body}"");
+  } else {
+    print(""请求失败：${response.statusCode}"");
+  }
+}</code></pre>"
+Flutter如何处理JSON数据解析	"<pre><code class=""language-dart"">// 手动解析JSON示例
+class Album {
+  final int userId;
+  final int id;
+  final String title;
+
+  Album({required this.userId, required this.id, required this.title});
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      userId: json['userId'] as int,
+      id: json['id'] as int,
+      title: json['title'] as String,
+    );
+  }
+}
+
+// 使用示例
+void parseResponse(String responseBody) {
+  final parsed = jsonDecode(responseBody) as Map<String, dynamic>;
+  final album = Album.fromJson(parsed);
+  print(""专辑标题：${album.title}"");
+}</code></pre>"
+Flutter中如何发送POST请求	"<pre><code class=""language-dart"">Future<void> createAlbum(String title) async {
+  final response = await http.post(
+    Uri.parse(""https://jsonplaceholder.typicode.com/albums""),
+    headers: <String, String>{
+      ""Content-Type"": ""application/json; charset=UTF-8"",
+    },
+    body: jsonEncode(<String, String>{
+      ""title"": title,
+    }),
+  );
+  
+  if (response.statusCode == 201) {
+    print(""创建成功：${response.body}"");
+  } else {
+    throw Exception(""创建失败"");
+  }
+}</code></pre>"
+如何使用FutureBuilder处理异步数据	"<pre><code class=""language-dart"">FutureBuilder<Album>(
+  future: fetchAlbum(),
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+      return Text(snapshot.data!.title);
+    } else if (snapshot.hasError) {
+      return Text(""${snapshot.error}"");
+    }
+    return const CircularProgressIndicator();
+  },
+)</code></pre>"
+Flutter如何处理授权请求	"<pre><code class=""language-dart"">Future<void> fetchProtectedData() async {
+  final response = await http.get(
+    Uri.parse(""https://api.example.com/protected""),
+    headers: {
+      ""Authorization"": ""Bearer YOUR_ACCESS_TOKEN"",
+    },
+  );
+  // 处理响应...
+}</code></pre>"
+Dart中JSON序列化最佳实践	"<pre><code class=""language-dart"">// 使用freezed自动生成序列化代码
+import ""package:freezed_annotation/freezed_annotation.dart"";
+part ""album.freezed.dart"";
+part ""album.g.dart"";
+
+@freezed
+class Album with _$Album {
+  factory Album({
+    required int userId,
+    required int id,
+    required String title,
+  }) = _Album;
+
+  factory Album.fromJson(Map<String, dynamic> json) => _$AlbumFromJson(json);
+}
+
+// 使用示例
+final albumJson = album.toJson(); // 序列化
+final album = Album.fromJson(json); // 反序列化</code></pre>"
+如何使用DevTools分析网络请求	"<pre><code class=""language-javascript"">// 概念说明卡片
+/* Flutter DevTools网络面板使用步骤：
+1. 运行应用时添加--observe参数
+2. 打开浏览器访问 http://localhost:XXXX (端口见运行日志)
+3. 导航到Network标签页
+4. 触发网络请求后查看详情：
+   - 请求/响应头
+   - 响应内容
+   - 请求时间线
+5. 筛选和搜索特定请求 */</code></pre>"
+Flutter如何处理CORS问题	"<pre><code class=""language-javascript"">/* 解决CORS问题的策略：
+1. 后端配置：添加Access-Control-Allow-Origin头
+2. 开发代理：使用本地代理服务器中转请求
+   // 示例：flutter run --web-renderer=html --web-port=3000
+3. 平台特定方案：
+   - Android/iOS：使用flutter_web_browser插件
+   - Web：配置index.html添加CORS策略
+4. 避免方案：不要禁用浏览器安全设置 */</code></pre>"

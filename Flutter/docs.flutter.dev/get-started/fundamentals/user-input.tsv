@@ -1,0 +1,139 @@
+#separator:tab
+#html:true
+Flutter按钮基本实现	"<pre><code class=""language-dart"">ElevatedButton(
+  onPressed: () {
+    // 状态更新逻辑
+    setState(() => counter++);
+  },
+  child: Text('点击计数: $counter'),
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.all(16),
+  ),
+)</code></pre>"
+TextField文本输入实现	"<pre><code class=""language-dart"">final controller = TextEditingController();
+
+TextField(
+  controller: controller,
+  decoration: InputDecoration(
+    labelText: ""用户名"",
+    hintText: ""输入3-10个字符"",
+    border: OutlineInputBorder(),
+  ),
+  onChanged: (value) {
+    // 实时验证输入
+    if(value.length < 3) {
+      setState(() => error = ""太短"");
+    }
+  },
+)</code></pre>"
+表单验证实现	"<pre><code class=""language-dart"">final _formKey = GlobalKey<FormState>();
+
+Form(
+  key: _formKey,
+  child: Column(
+    children: [
+      TextFormField(
+        validator: (value) {
+          if (value!.isEmpty) return ""必填字段"";
+          return null;
+        },
+      ),
+      ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            // 提交有效表单
+          }
+        },
+        child: Text(""提交""),
+      )
+    ],
+  ),
+)</code></pre>"
+单选按钮实现	"<pre><code class=""language-dart"">enum Option { A, B }
+Option? selectedOption = Option.A;
+
+Column(
+  children: [
+    RadioListTile<Option>(
+      title: Text(""选项A""),
+      value: Option.A,
+      groupValue: selectedOption,
+      onChanged: (Option? value) {
+        setState(() => selectedOption = value);
+      },
+    ),
+    RadioListTile<Option>(
+      title: Text(""选项B""),
+      value: Option.B,
+      groupValue: selectedOption,
+      onChanged: (Option? value) {
+        setState(() => selectedOption = value);
+      },
+    ),
+  ],
+)</code></pre>"
+下拉菜单实现	"<pre><code class=""language-dart"">String dropdownValue = '苹果';
+
+DropdownButton<String>(
+  value: dropdownValue,
+  onChanged: (String? newValue) {
+    setState(() => dropdownValue = newValue;
+  },
+  items: <String>['苹果', '香蕉', '橙子']
+      .map<DropdownMenuItem<String>>((String value) {
+    return DropdownMenuItem<String>(
+      value: value,
+      child: Text(value),
+    );
+  }).toList(),
+)</code></pre>"
+滑块控件实现	"<pre><code class=""language-dart"">double _sliderValue = 50;
+
+Slider(
+  value: _sliderValue,
+  min: 0,
+  max: 100,
+  divisions: 10,
+  label: _sliderValue.round().toString(),
+  onChanged: (double value) {
+    setState(() => _sliderValue = value);
+  },
+)</code></pre>"
+选择文本实现	"<pre><code class=""language-dart"">SelectableText(
+  ""长按可选择此文本内容"",
+  style: TextStyle(fontSize: 18),
+  textAlign: TextAlign.center,
+)</code></pre>"
+开关切换实现	"<pre><code class=""language-dart"">bool _switchValue = false;
+
+Switch(
+  value: _switchValue,
+  onChanged: (bool value) {
+    setState(() => _switchValue = value);
+  },
+  activeTrackColor: Colors.lightGreen,
+  activeColor: Colors.green,
+)</code></pre>"
+标签选择器实现	"<pre><code class=""language-dart"">Wrap(
+  spacing: 8,
+  children: [
+    FilterChip(
+      label: Text(""标签1""),
+      selected: selectedTags.contains(1),
+      onSelected: (bool selected) {
+        setState(() {
+          selectedTags.add(1);
+        });
+      },
+    ),
+    FilterChip(
+      label: Text(""标签2""),
+      selected: selectedTags.contains(2),
+      onSelected: (bool selected) {
+        setState(() {
+          selectedTags.add(2);
+        });
+      },
+    ),
+  ],
+)</code></pre>"

@@ -1,0 +1,207 @@
+#separator:tab
+#html:true
+Flutter布局的核心机制是什么	"<pre><code class=""language-dart"">// Flutter布局基于约束传递机制：
+// 1. 父组件向子组件传递布局约束（最小/最大宽高）
+// 2. 子组件根据约束决定自身尺寸
+// 3. 父组件根据子组件尺寸确定位置
+// 4. 最终完成整个UI树布局
+
+class ConstraintExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 父容器（约束: 宽度300-500, 高度200-400）
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: 300, maxWidth: 500,
+        minHeight: 200, maxHeight: 400,
+      ),
+      // 子组件（在父约束范围内决定尺寸）
+      child: Container(color: Colors.blue),
+    );
+  }
+}</code></pre>"
+常用的5个Flutter布局Widget有哪些	"<pre><code class=""language-dart"">// 1. Row - 水平布局
+Row(
+  children: [Icon(Icons.star), Text('评分')],
+)
+
+// 2. Column - 垂直布局
+Column(
+  children: [Text('标题'), Text('副标题')],
+)
+
+// 3. Stack - 层叠布局
+Stack(
+  children: [BackgroundImage(), Positioned(child: Button())],
+)
+
+// 4. Expanded - 空间分配
+Row(
+  children: [
+    Expanded(child: Container(color: Colors.red)), // 占剩余空间
+    Container(width: 50, color: Colors.blue),
+  ],
+)
+
+// 5. ListView - 滚动列表
+ListView.builder(
+  itemCount: 100,
+  itemBuilder: (ctx, i) => ListTile(title: Text('项目$i')),
+)</code></pre>"
+如何使用DevTools调试Flutter布局	"<pre><code class=""language-shell""># 调试步骤：
+1. 启动应用时添加 --debug 参数
+flutter run --debug
+
+2. 打开DevTools（两种方式）：
+   - 终端运行: dart devtools
+   - VS Code: 按 F5 启动调试
+
+3. 连接运行中的应用
+
+4. 使用布局检查器：
+   a. 点击 ""布局资源管理器"" 图标
+   b. 选择要检查的Widget
+   c. 查看约束、尺寸、布局方向
+   d. 使用3D视图查看层级关系
+
+5. 性能分析：
+   - 查看布局耗时
+   - 检测过度渲染（使用渲染层标签）</code></pre>"
+如何解决Flutter unbounded constraints错误	"<pre><code class=""language-dart"">// 错误场景：Column内部嵌套ListView
+Column(
+  children: [
+    Text('Header'),
+    ListView(children: [/*...*/]), // ❌ 错误！垂直方向无边界约束
+  ],
+)
+
+// ✅ 解决方案1：使用Expanded限定范围
+Column(
+  children: [
+    Text('Header'),
+    Expanded( // 限制ListView高度
+      child: ListView(children: [/*...*/]),
+    ),
+  ],
+)
+
+// ✅ 解决方案2：使用shrinkWrap属性
+Column(
+  children: [
+    Text('Header'),
+    ListView(
+      shrinkWrap: true, // 自适应内容高度
+      children: [/*...*/],
+    ),
+  ],
+)</code></pre>"
+如何创建带间距和圆角的卡片布局	"<pre><code class=""language-dart"">Card(
+  elevation: 5, // 阴影深度
+  shape: RoundedRectangleBorder( // 圆角
+    borderRadius: BorderRadius.circular(15),
+  ),
+  child: Padding( // 内边距
+    padding: EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('卡片标题', style: TextStyle(fontSize: 20)),
+        SizedBox(height: 10), // 间距组件
+        Text('卡片内容...'),
+        Align( // 右对齐按钮
+          alignment: Alignment.centerRight,
+          child: TextButton(onPressed: () {}, child: Text('更多')),
+        ),
+      ],
+    ),
+  ),
+)</code></pre>"
+如何使用Stack实现层叠布局	"<pre><code class=""language-dart"">Stack(
+  children: [
+    // 背景图（充满整个区域）
+    Positioned.fill(
+      child: Image.network('url', fit: BoxFit.cover),
+    ),
+    
+    // 顶部导航栏（固定在顶部）
+    Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: AppBar(title: Text('标题')),
+    ),
+    
+    // 居中内容
+    Center(
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text('居中卡片内容'),
+        ),
+      ),
+    ),
+    
+    // 右下角按钮
+    Positioned(
+      bottom: 20,
+      right: 20,
+      child: FloatingActionButton(onPressed: () {}),
+    ),
+  ],
+)</code></pre>"
+如何在Flutter中创建响应式布局	"<pre><code class=""language-dart"">// 方法1：使用LayoutBuilder获取父容器约束
+LayoutBuilder(
+  builder: (context, constraints) {
+    if (constraints.maxWidth > 600) {
+      return _buildWideLayout(); // 宽屏布局
+    } else {
+      return _buildNarrowLayout(); // 窄屏布局
+    }
+  },
+)
+
+// 方法2：使用MediaQuery获取屏幕尺寸
+Widget build(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  
+  return Flex(
+    // 根据宽度选择布局方向
+    direction: width > 500 ? Axis.horizontal : Axis.vertical,
+    children: [Sidebar(), Content()],
+  );
+}</code></pre>"
+如何优化Flutter列表性能	"<pre><code class=""language-dart"">// ✅ 正确做法
+ListView.builder( // 懒加载
+  itemCount: 10000,
+  itemBuilder: (context, index) {
+    return ListTile(
+      key: ValueKey(index), // 唯一key
+      title: Text('项目$index'),
+    );
+  },
+)
+
+// ❌ 避免做法
+ListView( // 立即创建所有子项
+  children: [
+    for (var i = 0; i < 10000; i++)
+      ListTile(title: Text('项目$i')),
+  ],
+)
+
+// 高级优化：使用const构造函数
+ListView.builder(
+  itemBuilder: (ctx, i) => const MyListItem(), // 常量组件
+)</code></pre>"
+如何创建带分隔线的列表布局	"<pre><code class=""language-dart"">ListView.separated( // 带分隔符的列表
+  itemCount: 20,
+  separatorBuilder: (context, index) => Divider(height: 1), // 分隔线
+  itemBuilder: (context, index) {
+    return ListTile(
+      leading: CircleAvatar(), // 头像
+      title: Text('联系人${index + 1}'),
+      subtitle: Text('电话号码'),
+      trailing: Icon(Icons.chevron_right),
+    );
+  },
+)</code></pre>"

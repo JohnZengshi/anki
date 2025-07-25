@@ -1,0 +1,100 @@
+#separator:tab
+#html:true
+Flutter内存缓存的三步策略伪代码	"<pre><code class=""language-dart"">Data? _cachedData;
+
+Future<Data> get data async {
+  // 1. 检查缓存是否存在
+  if (_cachedData == null) {
+    // 2. 缓存为空则加载数据
+    _cachedData = await _readData(); 
+  }
+  // 3. 返回缓存数据
+  return _cachedData!;
+}</code></pre>"
+Dart实现内存缓存的UserRepository示例	"<pre><code class=""language-dart"">class UserRepository {
+  final Map<int, User?> _userCache = {};
+  
+  Future<User?> loadUser(int id) async {
+    // 检查缓存是否存在
+    if (!_userCache.containsKey(id)) {
+      // 缓存未命中时从API加载
+      final response = await api.get(id);
+      
+      if (response.statusCode == 200) {
+        // 成功时缓存用户数据
+        _userCache[id] = User.fromJson(response.body);
+      } else {
+        // 失败时缓存null值
+        _userCache[id] = null;
+      }
+    }
+    // 返回缓存数据
+    return _userCache[id];
+  }
+}</code></pre>"
+Flutter中缓存命中和缓存未命中的定义	"<pre><code class=""language-markdown"">**缓存命中 (Cache Hit)**
+- 当请求的数据已存在于缓存中
+- 无需从数据源重新加载
+
+**缓存未命中 (Cache Miss)**
+- 当请求的数据不在缓存中
+- 需要从数据源加载数据
+- 加载后存入缓存供后续使用</code></pre>"
+Flutter处理陈旧缓存的常见方案	"<pre><code class=""language-dart"">// 添加过期时间戳
+final DateTime _cacheTimestamp = DateTime.now();
+const Duration cacheTTL = Duration(hours: 1);
+
+bool get isCacheValid {
+  // 检查缓存是否过期
+  return DateTime.now().difference(_cacheTimestamp) < cacheTTL;
+}
+
+Future<Data> getData() async {
+  if (_cachedData == null || !isCacheValid) {
+    // 缓存无效时重新加载
+    _cachedData = await _fetchFreshData();
+    _cacheTimestamp = DateTime.now();
+  }
+  return _cachedData!;
+}</code></pre>"
+Flutter三种持久化缓存方案对比	"<pre><code class=""language-markdown"">| 方案               | 适用场景                      | 特点                     |
+|--------------------|-----------------------------|--------------------------|
+| **shared_preferences** | 小量键值数据(用户设置)        | 简单易用，基于平台存储    |
+| **文件系统**         | 中等数据量(JSON/二进制)      | 灵活，需手动管理文件      |
+| **本地数据库**       | 大量结构化数据(用户历史记录) | 高性能，支持复杂查询      |</code></pre>"
+Flutter中图片缓存的实现方法	"<pre><code class=""language-dart"">CachedNetworkImage(
+  imageUrl: ""https://example.com/image.jpg"",
+  placeholder: (context, url) => CircularProgressIndicator(),
+  errorWidget: (context, url, error) => Icon(Icons.error),
+  // 自动管理文件系统缓存
+  cacheKey: ""unique_image_key"", 
+);</code></pre>"
+Flutter状态恢复(State Restoration)的核心机制	"<pre><code class=""language-dart"">void main() {
+  runApp(
+    // 启用状态恢复
+    RestorationScope(
+      restorationId: ""root"",
+      child: MyApp(),
+    ),
+  );
+}
+
+class _MyPageState extends State<MyPage> with RestorationMixin {
+  // 1. 注册可恢复状态
+  final RestorableInt _counter = RestorableInt(0);
+  
+  @override
+  String get restorationId => ""my_page"";
+  
+  @override
+  void restoreState(RestorationBucket? oldBucket) {
+    // 2. 恢复保存的状态
+    registerForRestoration(_counter, ""counter"");
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    // 3. 使用可恢复状态
+    return Text('""${_counter.value}""');
+  }
+}</code></pre>"
