@@ -1,0 +1,113 @@
+#separator:tab
+#html:true
+ES6模块的基本特征是什么？	"<pre><code class=""language-markdown"">1. 外部特征：与其他模块的接口规范（输入/输出参数）
+2. 内部特征：模块内部的局部数据和代码逻辑
+3. 静态编译：依赖关系在编译时确定
+4. 严格模式：模块默认启用严格模式</code></pre>"
+ES6模块的导出(export)基础语法	"<pre><code class=""language-javascript"">// 直接导出变量
+export const PI = 3.14;
+
+// 导出函数
+export function double(x) {
+  return x * 2;
+}
+
+// 统一导出（推荐）
+const apiKey = ""ABC-123"";
+const fetchData = () => {/*...*/};
+export { apiKey, fetchData };</code></pre>"
+ES6模块的导入(import)基础语法	"<pre><code class=""language-javascript"">// 基本导入
+import { PI, double } from './mathUtils.js';
+
+// 整体导入
+import * as math from './mathUtils.js';
+console.log(math.PI);
+
+// 默认导入
+import customName from './defaultExport.js';</code></pre>"
+ES6模块的导出重命名(as)	"<pre><code class=""language-javascript"">// 重命名导出
+const secureToken = ""xyz-789"";
+export { secureToken as apiToken };
+
+// 重命名导入
+import { apiToken as token } from './auth.js';
+console.log(token); // ""xyz-789""</code></pre>"
+ES6模块的默认导出(export default)	"<pre><code class=""language-javascript"">// 默认导出函数
+export default function logger(message) {
+  console.log(`[LOG] ${message}`);
+}
+
+// 默认导出对象
+const config = { debug: true };
+export default config;
+
+// 默认导出类
+export default class HttpClient {
+  // 类实现...
+}</code></pre>"
+ES6模块的动态导入(import())	"<pre><code class=""language-javascript"">// 按需加载模块
+button.addEventListener('click', async () => {
+  const module = await import('./dialog.js');
+  module.showDialog('Hello!');
+});
+
+// 错误处理
+try {
+  const utils = await import('./utils.js');
+} catch (error) {
+  console.error('模块加载失败', error);
+}</code></pre>"
+ES6模块的复合写法	"<pre><code class=""language-javascript"">// 直接转发导出
+export { Button, Input } from './uiComponents.js';
+
+// 重命名转发
+export { LoginForm as AuthForm } from './forms.js';
+
+// 转发默认导出
+export { default } from './apiService.js';
+
+// 整体转发
+export * from './validators.js';</code></pre>"
+ES6模块与CommonJS的核心区别	"<pre><code class=""language-markdown"">| 特性         | ES6 Module       | CommonJS       |
+|--------------|------------------|----------------|
+| 加载时机     | 编译时静态分析   | 运行时动态加载 |
+| 值类型       | 动态绑定（引用） | 值拷贝         |
+| 循环依赖处理 | 更优             | 有限支持       |
+| 顶层this     | undefined        | 当前模块exports|
+| 严格模式     | 始终启用         | 可选           |</code></pre>"
+ES6模块的循环依赖解决方案	"<pre><code class=""language-javascript"">// moduleA.js
+import { b } from './moduleB.js';
+export const a = () => b() + 1;
+
+// moduleB.js
+import { a } from './moduleA.js';
+export const b = () => a() * 2;  // 注意：执行顺序问题！
+
+// 解决方案：函数提升
+// moduleA.js
+export function a() { return b() + 1 }
+
+// moduleB.js
+export function b() { return a() * 2 }</code></pre>"
+React中的ES6模块使用	"<pre><code class=""language-jsx"">// Button.jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+
+// 默认导出组件
+export default function Button({ children }) {
+  return &lt;button className=""btn"">{children}&lt;/button>;
+}
+
+// 类型检查（单独导出）
+export const ButtonProps = {
+  children: PropTypes.node.isRequired
+};
+
+// App.js
+import Button, { ButtonProps } from './Button.js';
+
+function App() {
+  return (
+    &lt;Button>Click Me!&lt;/Button>
+  );
+}</code></pre>"

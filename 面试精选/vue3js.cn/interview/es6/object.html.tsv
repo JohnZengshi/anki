@@ -1,0 +1,123 @@
+#separator:tab
+#html:true
+ES6对象属性简写示例	"<pre><code class=""language-javascript"">// 键名与变量名相同时可简写
+const name = ""小明"";
+const age = 18;
+
+// 传统写法
+const obj1 = {
+  name: name,
+  age: age
+};
+
+// ES6简写
+const obj2 = { name, age };
+
+console.log(obj2); // {name: ""小明"", age: 18}</code></pre>"
+ES6对象方法简写示例	"<pre><code class=""language-javascript"">// 方法定义简写
+const calculator = {
+  // 传统写法
+  add: function(a, b) {
+    return a + b;
+  },
+  
+  // ES6简写
+  subtract(a, b) {
+    return a - b;
+  }
+};
+
+console.log(calculator.add(5, 3));     // 8
+console.log(calculator.subtract(5, 3)); // 2</code></pre>"
+ES6属性名表达式示例	"<pre><code class=""language-javascript"">// 动态属性名
+const dynamicKey = ""email"";
+const prefix = ""user_"";
+const index = 1;
+
+const person = {
+  name: ""Alice"",
+  // 使用表达式作为属性名
+  [dynamicKey]: ""alice@example.com"",
+  [prefix + ""id""]: ""A123"",
+  [""score"" + index]: 95
+};
+
+console.log(person);
+// {
+//   name: ""Alice"",
+//   email: ""alice@example.com"",
+//   user_id: ""A123"",
+//   score1: 95
+// }</code></pre>"
+ES6 super关键字示例	"<pre><code class=""language-javascript"">// 使用super访问原型方法
+const parent = {
+  greet() {
+    return ""Hello from parent!"";
+  }
+};
+
+const child = {
+  greet() {
+    // 通过super调用原型方法
+    return super.greet() + "" And child!"";
+  }
+};
+
+Object.setPrototypeOf(child, parent);
+console.log(child.greet()); // ""Hello from parent! And child!""</code></pre>"
+ES6对象扩展运算符示例	"<pre><code class=""language-javascript"">// 对象扩展运算符的使用
+const objA = { a: 1, b: 2 };
+const objB = { b: 3, c: 4 };
+
+// 合并对象（浅拷贝）
+const merged = { ...objA, ...objB };
+console.log(merged); // {a: 1, b: 3, c: 4}
+
+// 解构赋值中的剩余属性
+const { a, ...rest } = merged;
+console.log(rest); // {b: 3, c: 4}</code></pre>"
+Object.is()方法示例	"<pre><code class=""language-javascript"">// Object.is() 特殊值比较
+console.log(Object.is(NaN, NaN)); // true
+console.log(NaN === NaN);         // false
+
+console.log(Object.is(0, -0));    // false
+console.log(0 === -0);            // true
+
+console.log(Object.is(""foo"", ""foo"")); // true
+console.log(Object.is({}, {}));    // false</code></pre>"
+Object.entries()方法示例	"<pre><code class=""language-javascript"">// 对象转键值对数组
+const user = {
+  name: ""Bob"",
+  age: 30,
+  city: ""New York""
+};
+
+const entries = Object.entries(user);
+console.log(entries);
+// [
+//   [""name"", ""Bob""],
+//   [""age"", 30],
+//   [""city"", ""New York""]
+// ]
+
+// 配合数组方法使用
+const userInfo = entries.map(([key, value]) => `${key}: ${value}`);
+console.log(userInfo.join("", "")); // ""name: Bob, age: 30, city: New York""</code></pre>"
+Object.fromEntries()方法示例	"<pre><code class=""language-javascript"">// 键值对数组转对象
+const entries = [
+  [""name"", ""Carol""],
+  [""age"", 25],
+  [""isAdmin"", true]
+];
+
+const user = Object.fromEntries(entries);
+console.log(user);
+// {
+//   name: ""Carol"",
+//   age: 25,
+//   isAdmin: true
+// }
+
+// URL查询参数转换
+const params = new URLSearchParams(""name=Dave&age=40"");
+console.log(Object.fromEntries(params)); // {name: ""Dave"", age: ""40""}</code></pre>"

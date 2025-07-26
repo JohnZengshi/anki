@@ -1,0 +1,119 @@
+#separator:tab
+#html:true
+ES6函数如何设置参数默认值？	"<pre><code class=""language-javascript"">// 基本默认值设置
+function greet(name = 'Guest', message = 'Welcome!') {
+  return `${message} ${name}`;
+}
+console.log(greet()); // ""Welcome! Guest""
+console.log(greet('Alice')); // ""Welcome! Alice""
+
+// 注意：默认参数必须放在尾部
+function connect(url, timeout = 3000) {
+  console.log(`Connecting to ${url} with ${timeout}ms timeout`);
+}</code></pre>"
+如何在ES6函数中将解构赋值与参数默认值结合？	"<pre><code class=""language-javascript"">// 安全解构对象参数
+function drawChart({ 
+  size = 'md', 
+  color = 'blue',
+  coords = { x: 0, y: 0 }
+} = {}) {
+  console.log(`Size: ${size}, Color: ${color}`);
+  console.log(`Position: (${coords.x}, ${coords.y})`);
+}
+
+drawChart(); // 安全调用不会报错
+drawChart({ size: 'lg' }); // 使用部分默认值
+
+// 数组解构示例
+function sum([a = 0, b = 0] = []) {
+  return a + b;
+}
+console.log(sum([5])); // 5 + 0 = 5</code></pre>"
+ES6函数的length属性有哪些特殊行为？	"<pre><code class=""language-javascript"">console.log((function(a) {}).length); // 1
+console.log((function(a = 5) {}).length); // 0
+console.log((function(a, b, c = 10) {}).length); // 2
+console.log((function(a = 1, b) {}).length); // 0
+console.log((function(a, b = 2, c) {}).length); // 1
+console.log((function(...args) {}).length); // 0</code></pre>"
+ES6箭头函数有哪些核心特性？	"<pre><code class=""language-javascript"">// 1. 简洁语法
+const square = n => n * n;
+
+// 2. this绑定（重要！）
+const counter = {
+  count: 0,
+  increment: function() {
+    setInterval(() => {
+      this.count++; // 箭头函数继承外层this
+      console.log(this.count);
+    }, 1000);
+  }
+};
+counter.increment();
+
+// 3. 限制特性
+const Person = (name) => { this.name = name }; 
+try { new Person('Alice') } // TypeError: 不能作为构造函数
+catch(e) { console.error(e.message) }
+
+// 4. 多行语句需大括号
+const formatName = (firstName, lastName) => {
+  const full = `${firstName} ${lastName}`;
+  return full.toUpperCase();
+}</code></pre>"
+ES6函数参数作用域有什么特殊机制？	"<pre><code class=""language-javascript"">let global = 10;
+
+function outerScope() {
+  let outer = 20;
+  
+  function test(
+    param = outer,   // 访问外层作用域
+    inner = global   // 访问全局作用域
+  ) {
+    let local = 30;
+    console.log(param, inner); 
+  }
+  
+  test(); // 20 10 (非全局)
+}
+
+outerScope();</code></pre>"
+如何在ES6函数中安全使用严格模式？	"<pre><code class=""language-javascript"">// 方案1：全局严格模式
+'use strict';
+
+function safe(a = 5) {
+  // 允许使用严格模式
+  delete Object.prototype; // 严格模式报错
+}
+
+// 方案2：IIFE包裹
+const calculator = (function() {
+  'use strict';
+  return {
+    add: (x, y) => x + y,
+    divide: (x, y = 1) => x / y
+  };
+})();
+
+// 错误示例（会报错）：
+function invalid(a = 1) {
+  'use strict'; // SyntaxError
+}</code></pre>"
+如何正确返回对象的ES6箭头函数？	"<pre><code class=""language-javascript"">// 正确：用括号包裹对象
+const makeUser = (id, name) => ({
+  id: id,
+  name: name,
+  isAdmin: false
+});
+
+// 错误：缺少括号会解析为代码块
+const invalidUser = (id, name) => { 
+  id: id,      // 被解析为label
+  name: name   // 语法错误
+};
+
+// 带默认值的对象返回
+const createConfig = (options = {}) => ({
+  ...options,
+  version: '1.0',
+  debug: options.debug || false
+});</code></pre>"

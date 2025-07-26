@@ -1,0 +1,49 @@
+#separator:tab
+#html:true
+JavaScript中var变量提升示例	"<pre><code class=""language-javascript"">console.log(a); // undefined (变量提升)
+var a = 10;
+console.log(a); // 10</code></pre>"
+JavaScript中let暂时性死区(TDZ)示例	"<pre><code class=""language-javascript"">console.log(b); // ReferenceError (TDZ)
+let b = 20;
+console.log(b); // 20</code></pre>"
+JavaScript中const声明基本类型	"<pre><code class=""language-javascript"">const PI = 3.14;
+console.log(PI); // 3.14
+PI = 3.1415; // TypeError: Assignment to constant variable</code></pre>"
+JavaScript中const声明对象类型	"<pre><code class=""language-javascript"">const user = { name: ""Alice"" };
+user.name = ""Bob""; // 允许修改属性
+console.log(user); // { name: ""Bob"" }
+user = { name: ""Charlie"" }; // TypeError (禁止重新赋值)</code></pre>"
+JavaScript中var函数作用域示例	"<pre><code class=""language-javascript"">function test() {
+  if (true) {
+    var x = 5; // 函数作用域
+  }
+  console.log(x); // 5 (在函数内可访问)
+}
+test();</code></pre>"
+JavaScript中let块级作用域示例	"<pre><code class=""language-javascript"">function test() {
+  if (true) {
+    let y = 10; // 块级作用域
+  }
+  console.log(y); // ReferenceError (块外不可访问)
+}
+test();</code></pre>"
+JavaScript中var重复声明示例	"<pre><code class=""language-javascript"">var z = 15;
+var z = 25; // 允许重复声明
+console.log(z); // 25</code></pre>"
+JavaScript中let重复声明错误	"<pre><code class=""language-javascript"">let w = 30;
+let w = 40; // SyntaxError: Identifier ""w"" has already been declared</code></pre>"
+JavaScript中var全局属性特性	"<pre><code class=""language-javascript"">var globalVar = ""global"";
+console.log(window.globalVar); // ""global"" (浏览器环境)</code></pre>"
+JavaScript中let非全局属性特性	"<pre><code class=""language-javascript"">let moduleVar = ""local"";
+console.log(window.moduleVar); // undefined</code></pre>"
+JavaScript循环中var和let区别	"<pre><code class=""language-javascript"">// 使用var
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100); // 输出3次3
+}
+
+// 使用let
+for (let j = 0; j < 3; j++) {
+  setTimeout(() => console.log(j), 100); // 输出0,1,2
+}</code></pre>"
+JavaScript中const声明要求	"<pre><code class=""language-javascript"">const VALUE; // SyntaxError: Missing initializer
+const valid = 100; // 必须初始化</code></pre>"

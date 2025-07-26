@@ -1,0 +1,119 @@
+#separator:tab
+#html:true
+ES6扩展运算符如何将数组转为参数序列？	"<pre><code class=""language-javascript"">// 基本用法：数组展开为参数序列
+console.log(...[1, 2, 3]); // 输出: 1 2 3
+console.log(1, ...[2, 3, 4], 5); // 输出: 1 2 3 4 5
+
+// 函数参数传递
+function add(x, y) { return x + y; }
+const nums = [4, 38];
+console.log(add(...nums)); // 输出: 42</code></pre>"
+如何使用ES6扩展运算符实现数组浅拷贝？	"<pre><code class=""language-javascript"">// 数组浅拷贝示例
+const original = [1, 2, [3, 4]];
+const copy = [...original]; 
+
+// 修改原始数组的嵌套元素
+original[2][0] = 99;
+
+console.log(copy[2][0]); // 输出: 99 (同步修改证明是浅拷贝)
+console.log(copy); // 输出: [1, 2, [99, 4]]</code></pre>"
+ES6中Array.from()如何转换类数组对象？	"<pre><code class=""language-javascript"">// 转换类数组对象
+const arrayLike = {
+  '0': 'a',
+  '1': 'b',
+  '2': 'c',
+  length: 3
+};
+
+// 基本转换
+console.log(Array.from(arrayLike)); // 输出: ['a', 'b', 'c']
+
+// 带映射函数的转换
+console.log(Array.from([1, 2, 3], x => x * x)); // 输出: [1, 4, 9]</code></pre>"
+ES6的find()和findIndex()方法如何使用？	"<pre><code class=""language-javascript"">const numbers = [10, 20, 30, 40];
+
+// find()返回第一个符合条件的元素
+const found = numbers.find(num => num > 25);
+console.log(found); // 输出: 30
+
+// findIndex()返回符合条件的元素索引
+const index = numbers.findIndex(num => num > 25);
+console.log(index); // 输出: 2
+
+// 绑定this上下文
+const person = { threshold: 25 };
+const result = numbers.find(function(num) {
+  return num > this.threshold;
+}, person);
+console.log(result); // 输出: 30</code></pre>"
+ES6中flat()和flatMap()如何扁平化数组？	"<pre><code class=""language-javascript"">// 基本扁平化
+const nested = [1, [2, [3, [4]]]];
+console.log(nested.flat());    // 输出: [1, 2, [3, [4]]] (默认1层)
+console.log(nested.flat(2));   // 输出: [1, 2, 3, [4]] 
+console.log(nested.flat(Infinity)); // 输出: [1, 2, 3, 4]
+
+// flatMap = map() + flat()
+const arr = [2, 3, 4];
+console.log(arr.flatMap(x => [x, x*2])); 
+// 输出: [2, 4, 3, 6, 4, 8]</code></pre>"
+ES6的includes()方法与indexOf()有何区别？	"<pre><code class=""language-javascript"">const data = [1, 2, NaN, 'a'];
+
+// includes可以检测NaN
+console.log(data.includes(NaN)); // true
+console.log(data.indexOf(NaN));  // -1 (无法检测)
+
+// 字符串包含检测
+console.log(data.includes('a')); // true
+
+// 指定起始位置
+console.log(data.includes(2, 2)); // false (从索引2开始查找)
+console.log(data.includes(2, -3)); // true (倒数第3个位置开始)</code></pre>"
+如何使用ES6的fill()方法填充数组？	"<pre><code class=""language-javascript"">// 基本填充
+const arr = [1, 2, 3];
+console.log(arr.fill(0)); // 输出: [0, 0, 0]
+
+// 指定填充范围
+console.log(['a', 'b', 'c'].fill(7, 1, 2)); // 输出: ['a', 7, 'c']
+
+// 对象填充(注意浅拷贝)
+const obj = {value: 10};
+const filled = new Array(3).fill(obj);
+obj.value = 20;
+console.log(filled[0].value); // 输出: 20 (同步修改)</code></pre>"
+ES6的entries()/keys()/values()如何遍历数组？	"<pre><code class=""language-javascript"">const fruits = ['apple', 'banana'];
+
+// keys()遍历索引
+for (const index of fruits.keys()) {
+  console.log(index); // 输出: 0 → 1
+}
+
+// values()遍历元素
+for (const fruit of fruits.values()) {
+  console.log(fruit); // 输出: 'apple' → 'banana'
+}
+
+// entries()遍历键值对
+for (const [idx, fruit] of fruits.entries()) {
+  console.log(`${idx}: ${fruit}`); 
+  // 输出: '0: apple' → '1: banana'
+}</code></pre>"
+ES6如何解决数组空位问题？	"<pre><code class=""language-javascript"">// ES5空位表现
+const es5Arr = [1, , 3];
+console.log(es5Arr[1]); // undefined
+console.log('1' in es5Arr); // false
+
+// ES6将空位视为undefined
+console.log([...es5Arr]); // 输出: [1, undefined, 3]
+console.log(Array.from(es5Arr)); // 输出: [1, undefined, 3]
+
+// 建议避免空位
+const safeArr = [1, undefined, 3]; // 显式定义undefined</code></pre>"
+Array.of()如何解决Array()构造函数的问题？	"<pre><code class=""language-javascript"">// Array()构造函数的怪异行为
+console.log(Array()); // []
+console.log(Array(3)); // [empty × 3] (长度3的空数组)
+console.log(Array(3, 11)); // [3, 11]
+
+// Array.of()的一致行为
+console.log(Array.of()); // []
+console.log(Array.of(3)); // [3]
+console.log(Array.of(3, 11)); // [3, 11]</code></pre>"

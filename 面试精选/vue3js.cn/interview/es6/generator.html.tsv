@@ -1,0 +1,190 @@
+#separator:tab
+#html:true
+JavaScript: Generator函数的基本语法	"<pre><code class=""language-javascript"">// Generator函数特征：function关键字后有星号(*)
+function* myGenerator() {
+  // 使用yield表达式定义不同状态
+  yield 'first state';
+  yield 'second state';
+  return 'final state';
+}
+
+// 创建Generator实例
+const gen = myGenerator();
+
+console.log(gen.next()); // { value: 'first state', done: false }
+console.log(gen.next()); // { value: 'second state', done: false }
+console.log(gen.next()); // { value: 'final state', done: true }</code></pre>"
+JavaScript: next()方法传参机制	"<pre><code class=""language-javascript"">function* calcGenerator() {
+  const a = yield 10;  // 第一次next()忽略参数
+  const b = yield a * 2; // 第二次next()的参数赋值给a
+  return a + b;          // 第三次next()的参数赋值给b
+}
+
+const gen = calcGenerator();
+
+console.log(gen.next());   // { value: 10, done: false }
+console.log(gen.next(5));  // a=5, { value: 10, done: false }
+console.log(gen.next(3));  // b=3, { value: 8, done: true }</code></pre>"
+JavaScript: 使用Generator实现异步流程控制	"<pre><code class=""language-javascript"">function* asyncGenerator() {
+  try {
+    // 模拟异步操作
+    const userData = yield fetchUser();
+    const posts = yield fetchPosts(userData.id);
+    return { user: userData, posts };
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// 辅助执行函数
+function runGenerator(gen) {
+  const iterator = gen();
+  
+  function iterate(val) {
+    const result = iterator.next(val);
+    if (!result.done) {
+      // 假设所有yield值都是Promise
+      result.value.then(iterate).catch(iterator.throw);
+    }
+  }
+  
+  iterate();
+}
+
+// 启动Generator
+runGenerator(asyncGenerator);</code></pre>"
+JavaScript: 使用Generator创建可迭代对象	"<pre><code class=""language-javascript"">// 为普通对象添加迭代器接口
+function* objectEntries(obj) {
+  // 获取对象所有自有属性（包括Symbol）
+  const keys = Reflect.ownKeys(obj);
+  
+  for (const key of keys) {
+    // 生成键值对数组
+    yield [key, obj[key]];
+  }
+}
+
+const person = {
+  name: 'Alice',
+  age: 30,
+  [Symbol('id')]: 12345
+};
+
+// 使用for...of遍历Generator
+for (const [key, value] of objectEntries(person)) {
+  console.log(`${String(key)}: ${value}`);
+}
+// 输出:
+// name: Alice
+// age: 30
+// Symbol(id): 12345</code></pre>"
+JavaScript: Generator与Promise结合实现竞速	"<pre><code class=""language-javascript"">function* raceGenerator(promises) {
+  // 为每个Promise包裹一层
+  const wrappedPromises = promises.map(p => 
+    new Promise((resolve, reject) => 
+      p.then(v => resolve(v), e => reject(e))
+    )
+  );
+  
+  // 使用Promise.race竞速
+  const result = yield Promise.race(wrappedPromises);
+  return result;
+}
+
+// 使用示例
+const gen = raceGenerator([
+  new Promise(r => setTimeout(() => r('Fast'), 100)),
+  new Promise(r => setTimeout(() => r('Slow'), 200))
+]);
+
+gen.next().value.then(result => {
+  console.log(result); // 输出: 'Fast'
+});</code></pre>"
+JavaScript: Generator在Redux Saga中的使用	"<pre><code class=""language-javascript"">import { call, put, takeEvery } from 'redux-saga/effects';
+import Api from './api';
+
+// Generator函数处理异步action
+function* fetchUser(action) {
+  try {
+    // 调用API（返回Promise）
+    const user = yield call(Api.fetchUser, action.payload.userId);
+    
+    // 派发成功action
+    yield put({ type: 'USER_FETCH_SUCCEEDED', user });
+  } catch (e) {
+    // 派发错误action
+    yield put({ type: 'USER_FETCH_FAILED', message: e.message });
+  }
+}
+
+// 监听特定action的Generator
+function* watchFetchUser() {
+  // 每次派发USER_FETCH_REQUESTED时执行fetchUser
+  yield takeEvery('USER_FETCH_REQUESTED', fetchUser);
+}</code></pre>"
+概念题: Generator与async/await的区别	"<pre><code class=""language-javascript"">/* Generator与async/await核心区别：
+ * 
+ * 1. 语法差异:
+ *    - Generator使用function*和yield
+ *    - async/await使用async function和await
+ * 
+ * 2. 执行控制:
+ *    - Generator需要外部执行器（手动调用next）
+ *    - async函数自动执行，返回Promise
+ * 
+ * 3. 错误处理:
+ *    - Generator内部可用try/catch捕获错误
+ *    - async函数更自然的Promise错误处理
+ * 
+ * 4. 使用场景:
+ *    - Generator更灵活，支持迭代、状态机等
+ *    - async/await专为异步设计，语法更简洁
+ * 
+ * 5. 返回值:
+ *    - Generator返回遍历器对象
+ *    - async函数返回Promise
+ * 
+ * 示例：
+ * 
+ * // Generator实现
+ * function* fetchData() {
+ *   const data = yield fetch(url);
+ *   return data.json();
+ * }
+ * 
+ * // async/await实现
+ * async function fetchData() {
+ *   const response = await fetch(url);
+ *   return response.json();
+ * }
+ */</code></pre>"
+概念题: Generator的核心使用场景	"<pre><code class=""language-javascript"">/* Generator的主要应用场景：
+ * 
+ * 1. 异步流程控制：
+ *    - 以同步方式编写异步代码
+ *    - 与Promise结合管理复杂异步流程
+ * 
+ * 2. 实现迭代器：
+ *    - 为自定义对象部署Iterator接口
+ *    - 支持for...of遍历
+ * 
+ * 3. 状态机：
+ *    - 通过yield管理多状态切换
+ *    - 比传统状态机更简洁
+ * 
+ * 4. 惰性计算：
+ *    - 按需生成序列值（如斐波那契数列）
+ *    - 节省内存，提高性能
+ * 
+ * 5. 数据处理管道：
+ *    - 多个Generator组合形成处理链
+ *    - 每个yield作为一个处理阶段
+ * 
+ * 6. 中间件模式：
+ *    - Redux-saga等库的核心
+ *    - 控制异步action的执行流程
+ * 
+ * 7. 协程实现：
+ *    - 实现用户级线程
+ *    - 协作式多任务处理
+ */</code></pre>"

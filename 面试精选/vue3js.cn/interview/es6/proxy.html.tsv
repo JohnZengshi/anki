@@ -1,0 +1,130 @@
+#separator:tab
+#html:true
+JavaScript: Proxy的基本语法	"<pre><code class=""language-javascript"">// 创建Proxy实例
+const target = { name: ""张三"" };
+const handler = {
+  get: function(target, prop) {
+    console.log(`读取属性: ${prop}`);
+    return target[prop];
+  }
+};
+
+const proxy = new Proxy(target, handler);
+console.log(proxy.name); // ""张三"" 并输出日志</code></pre>"
+JavaScript: 用Proxy拦截数组负索引	"<pre><code class=""language-javascript"">function createArray(...elements) {
+  return new Proxy([...elements], {
+    get(target, prop) {
+      const index = Number(prop);
+      return index < 0 
+        ? target[target.length + index] // 负索引转换
+        : Reflect.get(...arguments);   // 默认行为
+    }
+  });
+}
+
+const arr = createArray(""a"", ""b"", ""c"");
+console.log(arr[-1]); // ""c""</code></pre>"
+JavaScript: 用Proxy验证数据格式	"<pre><code class=""language-javascript"">const validator = {
+  set(obj, prop, value) {
+    if (prop === 'age') {
+      if (!Number.isInteger(value)) throw TypeError('年龄需为整数');
+      if (value > 200) throw RangeError('无效年龄');
+    }
+    return Reflect.set(...arguments); // 验证通过后设置值
+  }
+};
+
+const person = new Proxy({}, validator);
+person.age = 30; // 成功
+person.age = 300; // 抛出RangeError</code></pre>"
+JavaScript: 用Proxy保护私有属性	"<pre><code class=""language-javascript"">const api = new Proxy({ 
+  _apiKey: '123abc',
+  publicMethod() { return 'OK'; }
+}, {
+  get(target, prop) {
+    if (prop.startsWith('_')) 
+      throw Error(`禁止访问私有属性 ${prop}`);
+    return Reflect.get(...arguments);
+  },
+  set(target, prop) {
+    if (prop.startsWith('_')) 
+      throw Error(`禁止修改私有属性 ${prop}`);
+    return Reflect.set(...arguments);
+  }
+});
+
+console.log(api.publicMethod()); // ""OK""
+api._apiKey; // 抛出错误</code></pre>"
+JavaScript: 用Proxy实现观察者模式	"<pre><code class=""language-javascript"">const observers = new Set();
+
+const observable = obj => new Proxy(obj, {
+  set(target, key, value) {
+    const success = Reflect.set(...arguments);
+    if (success) observers.forEach(fn => fn()); // 触发所有观察者
+    return success;
+  }
+});
+
+// 添加观察者
+observers.add(() => console.log('数据已更新'));
+
+const data = observable({ count: 0 });
+data.count = 1; // 触发日志输出</code></pre>"
+JavaScript: Proxy删除属性拦截	"<pre><code class=""language-javascript"">const protectedObj = new Proxy({ 
+  _secret: 'confidential',
+  publicData: 'info' 
+}, {
+  deleteProperty(target, prop) {
+    if (prop.startsWith('_')) 
+      throw Error(`禁止删除私有属性 ${prop}`);
+    return Reflect.deleteProperty(...arguments);
+  }
+});
+
+delete protectedObj.publicData; // 成功
+delete protectedObj._secret;    // 抛出错误</code></pre>"
+JavaScript: Proxy.revocable的使用	"<pre><code class=""language-javascript"">const { proxy, revoke } = Proxy.revocable({}, {
+  get(target, prop) {
+    return `访问: ${prop}`;
+  }
+});
+
+console.log(proxy.test); // ""访问: test""
+revoke(); // 取消代理
+console.log(proxy.test); // 抛出TypeError</code></pre>"
+JavaScript: Reflect与Proxy结合使用	"<pre><code class=""language-javascript"">const logger = new Proxy({}, {
+  get(target, prop, receiver) {
+    console.log(`读取属性: ${prop}`);
+    // 使用Reflect执行默认操作
+    return Reflect.get(target, prop, receiver); 
+  },
+  set(target, prop, value) {
+    console.log(`设置属性: ${prop} = ${value}`);
+    // 使用Reflect执行默认操作
+    return Reflect.set(...arguments); 
+  }
+});
+
+logger.name = ""监控"";
+console.log(logger.name);</code></pre>"
+概念题: Proxy的元编程特性	"<pre><code class=""language-markdown"">**元编程核心概念**
+1. 操作程序自身作为数据
+2. 运行时修改默认行为
+3. 提升开发灵活性和效率
+
+**Proxy体现的元编程特性**
+✓ 拦截并重定义对象基本操作
+✓ 运行时动态改变对象行为
+✓ 无需修改源码即可扩展功能</code></pre>"
+概念题: Proxy的使用限制	"<pre><code class=""language-markdown"">**Proxy不可用场景**
+1. 不可配置属性: 
+   - 属性设为{configurable: false}时
+   - Proxy无法修改属性行为
+
+2. 严格模式约束:
+   - set()必须返回true
+   - 否则抛出TypeError
+
+3. 原型链操作:
+   - 代理无法完全拦截__proto__访问
+   - 建议使用Object.setPrototypeOf</code></pre>"

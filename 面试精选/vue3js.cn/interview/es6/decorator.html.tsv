@@ -1,0 +1,112 @@
+#separator:tab
+#html:true
+ES6 Decorator的本质是什么？	"<pre><code class=""language-javascript"">// 本质是普通函数，用于扩展类或类方法
+function decorator(target) {
+  target.property = '扩展的属性'
+}
+
+@decorator
+class MyClass {}
+console.log(MyClass.property) // ""扩展的属性""</code></pre>"
+ES6中如何给类添加静态属性？	"<pre><code class=""language-javascript"">// 类装饰器接收类本身作为参数
+function addVersion(version) {
+  return function(target) {
+    target.version = version
+  }
+}
+
+@addVersion('1.0.0')
+class API {}
+console.log(API.version) // ""1.0.0""</code></pre>"
+如何实现类属性的只读装饰器？	"<pre><code class=""language-javascript"">// 修改属性描述符的writable特性
+function readonly(target, name, descriptor) {
+  descriptor.writable = false
+  return descriptor
+}
+
+class Document {
+  @readonly
+  title = '初始标题'
+}
+
+const doc = new Document()
+doc.title = '新标题' // 报错：无法赋值</code></pre>"
+多层装饰器的执行顺序是怎样的？	"<pre><code class=""language-javascript"">// 执行顺序：由外到内进入，由内到外执行
+function decorator(id) {
+  console.log(`装饰器${id}初始化`)
+  return (target, prop, desc) => console.log(`装饰器${id}执行`)
+}
+
+class Example {
+  @decorator(1)
+  @decorator(2)
+  method() {}
+}
+
+// 输出顺序：
+// 装饰器1初始化
+// 装饰器2初始化
+// 装饰器2执行
+// 装饰器1执行</code></pre>"
+为什么不能使用Decorator修饰函数？	"<pre><code class=""language-javascript"">// 函数提升导致行为异常
+let count = 0
+
+@(() => count++)
+function myFunc() {}
+
+console.log(count) // 预期1，实际0
+// 编译后等效于：
+// function myFunc() {}
+// myFunc = decorator(myFunc) || myFunc
+// count = 0</code></pre>"
+如何在React-Redux中使用Decorator？	"<pre><code class=""language-javascript"">// 传统方式
+class MyComponent extends React.Component {}
+export default connect(mapState, mapDispatch)(MyComponent)
+
+// Decorator简化写法
+@connect(mapState, mapDispatch)
+export default class MyComponent extends React.Component {}</code></pre>"
+如何用Decorator实现mixins模式？	"<pre><code class=""language-javascript"">// 定义mixin装饰器
+function mixins(...mixins) {
+  return target => {
+    Object.assign(target.prototype, ...mixins)
+  }
+}
+
+const Logger = {
+  log(msg) { console.log(`[LOG] ${msg}`) }
+}
+
+@mixins(Logger)
+class Service {
+  execute() {
+    this.log('执行中') // 调用mixin方法
+  }
+}
+
+new Service().execute() // 输出""[LOG] 执行中""</code></pre>"
+如何使用core-decorators的@autobind？	"<pre><code class=""language-javascript"">import { autobind } from 'core-decorators'
+
+class Person {
+  @autobind
+  getName() {
+    return this // 自动绑定原始实例
+  }
+}
+
+const person = new Person()
+const getName = person.getName
+console.log(getName() === person) // true</code></pre>"
+如何使用core-decorators的@deprecate？	"<pre><code class=""language-javascript"">import { deprecate } from 'core-decorators'
+
+class Payment {
+  @deprecate('请使用processPayment方法')
+  pay() { /* 旧逻辑 */ }
+  
+  @deprecate
+  oldMethod() {}
+}
+
+const p = new Payment()
+p.pay() // 警告: Payment#pay: 请使用processPayment方法
+p.oldMethod() // 警告: Payment#oldMethod: This function will be removed</code></pre>"

@@ -1,0 +1,88 @@
+#separator:tab
+#html:true
+Golang实现TCP三次握手状态机	"<pre><code class=""language-go"">// TCP三次握手状态机模拟
+package main
+
+// 客户端状态转换
+func clientHandshake() {
+    fmt.Println(""CLIENT: SYN_SENT (发送SYN)"")
+    // 阻塞等待SYN-ACK
+    fmt.Println(""CLIENT: 收到SYN-ACK"")
+    fmt.Println(""CLIENT: 发送ACK"")
+    fmt.Println(""CLIENT: ESTABLISHED"")
+}
+
+// 服务端状态转换
+func serverHandshake() {
+    fmt.Println(""SERVER: 监听中..."")
+    // 收到SYN
+    fmt.Println(""SERVER: SYN_RCVD (发送SYN-ACK)"")
+    // 阻塞等待ACK
+    fmt.Println(""SERVER: 收到ACK"")
+    fmt.Println(""SERVER: ESTABLISHED"")
+}</code></pre>"
+JavaScript模拟TCP四次挥手过程	"<pre><code class=""language-javascript"">// TCP四次挥手状态机
+function tcpFourWayHandshake() {
+    // 客户端发起关闭
+    console.log(""CLIENT: FIN_WAIT1 (发送FIN)"")
+    
+    // 服务端响应
+    console.log(""SERVER: CLOSE_WAIT (发送ACK)"")
+    // 服务端处理剩余数据...
+    console.log(""SERVER: LAST_ACK (发送FIN)"")
+    
+    // 客户端最终确认
+    console.log(""CLIENT: 收到FIN → TIME_WAIT"")
+    console.log(""CLIENT: 发送ACK后等待2MSL"")
+    console.log(""CLIENT/SERVER: CLOSED"")
+    
+    // 注意：TIME_WAIT确保：
+    // 1. 重传丢失的ACK
+    // 2. 清除网络中残留报文
+}</code></pre>"
+Go实现序列号交换逻辑	"<pre><code class=""language-go"">// TCP握手时的序列号交换
+func synExchange() {
+    clientISN := generateISN() // 客户端初始序列号
+    serverISN := generateISN() // 服务端初始序列号
+    
+    // 第一次握手：客户端发送SYN(seq=clientISN)
+    fmt.Printf(""CLIENT → SERVER: SYN(seq=%d)\n"", clientISN)
+    
+    // 第二次握手：服务端响应SYN-ACK
+    fmt.Printf(""SERVER → CLIENT: SYN(seq=%d), ACK(ack=%d)\n"", 
+        serverISN, clientISN+1)
+    
+    // 第三次握手：客户端确认
+    fmt.Printf(""CLIENT → SERVER: ACK(ack=%d)\n"", serverISN+1)
+}</code></pre>"
+为什么需要三次握手（文字说明）	"<pre><code class=""language-plaintext"">两次握手的问题：
+1. 无法可靠确认双向通信能力
+   - 服务端无法确认客户端接收能力
+2. 网络延迟导致重复连接
+   - 旧的SYN包可能突然到达
+   - 导致服务端创建无用连接
+
+三次握手解决：
+1. 双向能力验证：
+   - 第三次握手证明客户端能收+服务端能发
+2. 序列号同步：
+   - 保证后续传输顺序
+3. 防止历史连接：
+   - 通过序列号识别过期请求</code></pre>"
+Golang模拟TIME_WAIT状态	"<pre><code class=""language-go"">// TIME_WAIT状态实现
+func handleTimeWait() {
+    fmt.Println(""进入TIME_WAIT状态(2MSL等待)"")
+    timer := time.NewTimer(2 * MSL)
+    
+    select {
+    case <-timer.C:
+        fmt.Println(""2MSL超时 → 连接关闭"")
+    case resendFIN := <-finChan: // 模拟FIN重传
+        fmt.Println(""收到重传的FIN"")
+        resendACK()
+        timer.Reset(2 * MSL) // 重新计时
+    }
+}
+
+// MSL通常设置为30秒-2分钟
+const MSL = 30 * time.Second</code></pre>"

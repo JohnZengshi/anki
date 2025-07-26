@@ -1,0 +1,128 @@
+#separator:tab
+#html:true
+JavaScript中Promise的基本声明	"<pre><code class=""language-javascript"">// 创建Promise对象
+const promise = new Promise((resolve, reject) => {
+  // 异步操作
+  const success = true;
+  
+  if (success) {
+    resolve(""操作成功""); // 状态变为fulfilled
+  } else {
+    reject(new Error(""操作失败"")); // 状态变为rejected
+  }
+});</code></pre>"
+Promise的then方法链式调用	"<pre><code class=""language-javascript"">// 链式调用示例
+fetchData()
+  .then(response => {
+    console.log(""第一步成功:"", response);
+    return processData(response); // 返回新Promise
+  })
+  .then(processed => {
+    console.log(""第二步成功:"", processed);
+    return saveData(processed);
+  })
+  .catch(error => {
+    console.error(""链中任何步骤出错:"", error);
+  });</code></pre>"
+Promise的catch错误处理	"<pre><code class=""language-javascript"">// 错误捕获和冒泡
+loadConfig()
+  .then(config => {
+    if (!config.valid) throw new Error(""无效配置"");
+    return initApp(config);
+  })
+  .then(app => {
+    app.run();
+  })
+  .catch(error => {
+    // 捕获前面所有步骤的错误
+    console.error(""启动失败:"", error);
+    showErrorScreen(error);
+  });</code></pre>"
+Promise.all的批量操作	"<pre><code class=""language-javascript"">// 并行执行多个异步操作
+const fetchUser = fetch(""/api/user"");
+const fetchPosts = fetch(""/api/posts"");
+const fetchComments = fetch(""/api/comments"");
+
+Promise.all([fetchUser, fetchPosts, fetchComments])
+  .then(([user, posts, comments]) => {
+    // 所有请求都成功时执行
+    renderDashboard(user, posts, comments);
+  })
+  .catch(error => {
+    // 任一请求失败时执行
+    console.error(""数据加载失败:"", error);
+  });</code></pre>"
+Promise.race超时控制	"<pre><code class=""language-javascript"">// 接口请求超时处理
+const fetchWithTimeout = (url, timeout = 5000) => {
+  const fetchPromise = fetch(url);
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(""请求超时"")), timeout);
+  });
+
+  return Promise.race([fetchPromise, timeoutPromise]);
+};
+
+// 使用示例
+fetchWithTimeout(""/api/data"")
+  .then(data => console.log(data))
+  .catch(err => console.error(err));</code></pre>"
+Promise图片加载封装	"<pre><code class=""language-javascript"">// Promise化图片加载
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = src;
+  });
+}
+
+// 使用示例
+loadImage(""banner.jpg"")
+  .then(img => document.body.appendChild(img))
+  .catch(() => console.log(""图片加载失败""));</code></pre>"
+Promise.allSettled全场景处理	"<pre><code class=""language-javascript"">// 处理多个请求无论成功失败
+const apis = [
+  fetch(""/api/users""),
+  fetch(""/api/products""),
+  fetch(""/invalid-api"") // 故意失败
+];
+
+Promise.allSettled(apis)
+  .then(results => {
+    results.forEach((result, index) => {
+      if (result.status === ""fulfilled"") {
+        console.log(`请求${index}成功:`, result.value);
+      } else {
+        console.error(`请求${index}失败:`, result.reason);
+      }
+    });
+  });</code></pre>"
+Promise.finally清理操作	"<pre><code class=""language-javascript"">// 无论成功失败都执行的清理
+let isLoading = true;
+
+fetchData()
+  .then(data => process(data))
+  .catch(err => logError(err))
+  .finally(() => {
+    isLoading = false; // 总是关闭加载状态
+    cleanupResources(); // 释放资源
+  });</code></pre>"
+Promise.resolve快捷方法	"<pre><code class=""language-javascript"">// 创建已解决的Promise
+// 等价于 new Promise(resolve => resolve(42))
+Promise.resolve(42)
+  .then(value => console.log(value)); // 42
+
+// 转换thenable对象
+const thenable = {
+  then: (resolve) => resolve(""从thenable解析"")
+};
+
+Promise.resolve(thenable)
+  .then(val => console.log(val));</code></pre>"
+Promise.reject错误创建	"<pre><code class=""language-javascript"">// 创建已拒绝的Promise
+Promise.reject(new Error(""操作失败""))
+  .catch(err => console.error(err.message));
+
+// 等价写法
+new Promise((_, reject) => reject(""直接拒绝""))
+  .catch(reason => console.log(reason));</code></pre>"
