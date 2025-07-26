@@ -1,0 +1,144 @@
+#separator:tab
+#html:true
+React reconciler运作流程的四个主要阶段	"<pre><code class=""language-markdown"">1. 输入: 调用scheduleUpdateOnFiber API
+2. 注册调度: 通过ensureRootIsScheduled与调度中心交互
+3. 任务执行: 构造fiber树(performSyncWorkOnRoot/performConcurrentWorkOnRoot)
+4. 输出: 提交fiber树到渲染器(commitRootImpl)</code></pre>"
+JavaScript表示scheduleUpdateOnFiber函数逻辑	"<pre><code class=""language-javascript"">function scheduleUpdateOnFiber(fiber, lane) {
+  const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+  
+  // 判断是否直接执行同步任务
+  if (lane === SyncLane) {
+    if ((executionContext & LegacyUnbatchedContext) !== NoContext &&
+        (executionContext & (RenderContext | CommitContext)) === NoContext) {
+      performSyncWorkOnRoot(root); // 直接构造fiber树
+    } else {
+      ensureRootIsScheduled(root, now()); // 注册调度任务
+    }
+  } else {
+    ensureRootIsScheduled(root, now()); // 注册调度任务
+  }
+}</code></pre>"
+JavaScript表示ensureRootIsScheduled函数逻辑	"<pre><code class=""language-javascript"">function ensureRootIsScheduled(root, currentTime) {
+  const existingCallbackNode = root.callbackNode;
+  const nextLanes = getNextLanes(root);
+  
+  if (existingCallbackNode !== null) {
+    // 比较优先级决定是否取消旧任务
+    if (existingCallbackPriority === newCallbackPriority) {
+      return; // 无需重新调度
+    }
+    cancelCallback(existingCallbackNode); // 取消现有任务
+  }
+  
+  // 根据优先级注册新任务
+  let newCallbackNode;
+  if (newCallbackPriority === SyncLanePriority) {
+    newCallbackNode = scheduleSyncCallback(
+      performSyncWorkOnRoot.bind(null, root)
+    );
+  } else {
+    const schedulerPriority = lanePriorityToSchedulerPriority(newCallbackPriority);
+    newCallbackNode = scheduleCallback(
+      schedulerPriority,
+      performConcurrentWorkOnRoot.bind(null, root)
+    );
+  }
+  
+  root.callbackNode = newCallbackNode;
+  root.callbackPriority = newCallbackPriority;
+}</code></pre>"
+JavaScript表示performSyncWorkOnRoot函数逻辑	"<pre><code class=""language-javascript"">function performSyncWorkOnRoot(root) {
+  const lanes = getNextLanes(root);
+  
+  // 1. 同步模式构造fiber树
+  let exitStatus;
+  try {
+    exitStatus = renderRootSync(root, lanes);
+  } catch (error) {
+    // 2. 异常处理
+    handleError(root, error);
+    exitStatus = RootErrored;
+  }
+  
+  // 3. 提交渲染结果
+  if (exitStatus === RootCompleted) {
+    const finishedWork = root.current.alternate;
+    root.finishedWork = finishedWork;
+    root.finishedLanes = lanes;
+    commitRoot(root);
+  }
+  
+  // 4. 检查后续更新
+  ensureRootIsScheduled(root, now());
+}</code></pre>"
+JavaScript表示commitRootImpl的三个阶段	"<pre><code class=""language-javascript"">function commitRootImpl(root) {
+  const finishedWork = root.finishedWork;
+  
+  // 阶段1: DOM变更前（Snapshot）
+  nextEffect = finishedWork.firstEffect;
+  while (nextEffect !== null) {
+    try {
+      commitBeforeMutationEffects();
+    } catch (error) {
+      captureCommitPhaseError(nextEffect, error);
+    }
+    nextEffect = nextEffect.nextEffect;
+  }
+  
+  // 阶段2: DOM变更（Mutation）
+  nextEffect = finishedWork.firstEffect;
+  while (nextEffect !== null) {
+    try {
+      commitMutationEffects(root);
+    } catch (error) {
+      captureCommitPhaseError(nextEffect, error);
+    }
+    nextEffect = nextEffect.nextEffect;
+  }
+  
+  root.current = finishedWork; // 切换当前fiber树
+  
+  // 阶段3: Layout阶段
+  nextEffect = finishedWork.firstEffect;
+  while (nextEffect !== null) {
+    try {
+      commitLayoutEffects(root, lanes);
+    } catch (error) {
+      captureCommitPhaseError(nextEffect, error);
+    }
+    nextEffect = nextEffect.nextEffect;
+  }
+  
+  // 清理并调度后续更新
+  root.finishedWork = null;
+  ensureRootIsScheduled(root, now());
+}</code></pre>"
+JavaScript表示beginWork函数作用	"<pre><code class=""language-javascript"">function beginWork(current, workInProgress, renderLanes) {
+  // 1. 比较current和workInProgress树
+  if (current !== null) {
+    // 2. 复用或创建fiber节点
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+    
+    if (oldProps !== newProps || hasLegacyContextChanged()) {
+      // 标记需要更新
+      workInProgress.flags |= Update;
+    }
+  }
+  
+  // 3. 根据fiber类型执行具体工作
+  switch (workInProgress.tag) {
+    case FunctionComponent:
+      return updateFunctionComponent(current, workInProgress, ...);
+    case ClassComponent:
+      return updateClassComponent(current, workInProgress, ...);
+    case HostComponent:
+      return updateHostComponent(current, workInProgress, ...);
+    case HostText:
+      return updateHostText(current, workInProgress);
+    // ...其他组件类型处理
+    default:
+      throw new Error(""Unknown component type"");
+  }
+}</code></pre>"

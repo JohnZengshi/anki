@@ -1,0 +1,134 @@
+#separator:tab
+#html:true
+React函数组件的基本结构是什么？	"<pre><code class=""language-javascript"">// 组件必须导出且函数名首字母大写
+export default function ComponentName() {
+  // 返回JSX标记（单行可直接返回，多行需括号包裹）
+  return (
+    &lt;div&gt;
+      &lt;!-- 组件内容 --&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+如何创建可复用的Profile组件？	"<pre><code class=""language-javascript"">// 定义独立组件（注意首字母大写）
+function Profile() {
+  return (
+    &lt;img
+      src=&quot;https://example.com/avatar.jpg&quot;
+      alt=&quot;用户头像&quot;
+    /&gt;
+  );
+}
+
+// 在父组件中多次复用
+export default function Gallery() {
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;用户列表&lt;/h1&gt;
+      &lt;Profile /&gt;
+      &lt;Profile /&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>"
+React组件命名有哪些强制规范？	"<pre><code class=""language-javascript"">// ✅ 正确：首字母大写的函数名
+function CorrectComponent() { 
+  return &lt;div&gt;有效组件&lt;/div&gt;;
+}
+
+// ❌ 错误：小写开头不会被识别为组件
+function invalidComponent() {
+  return &lt;span&gt;无效组件&lt;/span&gt;;
+}
+
+// ✅ 正确使用（作为标签需自闭合）
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;CorrectComponent /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+JSX多行返回的正确写法是什么？	"<pre><code class=""language-javascript"">// ✅ 正确：用括号包裹多行JSX
+function ComponentA() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;多行内容&lt;/h1&gt;
+      &lt;p&gt;需要括号包裹&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// ❌ 错误：缺少括号会导致后续代码被忽略
+function ComponentB() {
+  return
+    &lt;div&gt;此行不会渲染！&lt;/div&gt;;
+}
+
+// ✅ 单行可省略括号
+function ComponentC() {
+  return &lt;div&gt;单行内容&lt;/div&gt;;
+}</code></pre>"
+为什么禁止在组件内部嵌套定义组件？	"<pre><code class=""language-javascript"">// ❌ 错误做法：内部嵌套定义
+export default function Parent() {
+  // 每次渲染都会重新创建Child函数
+  function Child() {
+    return &lt;div&gt;子组件&lt;/div&gt;;
+  }
+  
+  return &lt;Child /&gt;;
+}
+
+// ✅ 正确做法：顶层独立定义
+function Child() { 
+  return &lt;div&gt;子组件&lt;/div&gt;;
+}
+
+export default function Parent() {
+  return &lt;Child /&gt;; // 性能正常
+}</code></pre>"
+如何导出React组件供其他文件使用？	"<pre><code class=""language-javascript"">// Profile.js
+// 默认导出（主组件）
+export default function Profile() {
+  return &lt;img src=&quot;avatar.jpg&quot; /&gt;;
+}
+
+// 具名导出（辅助组件）
+export function ProfileCaption() {
+  return &lt;p&gt;用户说明&lt;/p&gt;;
+}
+
+// -----------------------------------
+// App.js
+import Profile, { ProfileCaption } from './Profile.js';
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Profile /&gt;
+      &lt;ProfileCaption /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React组件树的典型结构是怎样的？	"<pre><code class=""language-javascript"">// 根组件（通常是App.js）
+function App() {
+  return (
+    &lt;PageLayout&gt;
+      &lt;Header /&gt;
+      &lt;Content /&gt; &lt;!-- 内容区组件 --&gt;
+    &lt;/PageLayout&gt;
+  );
+}
+
+// 内容区组件（父组件）
+function Content() {
+  return (
+    &lt;section&gt;
+      &lt;Gallery /&gt; &lt;!-- 嵌套子组件 --&gt;
+      &lt;Footer /&gt;
+    &lt;/section&gt;
+  );
+}
+
+// 叶组件（无子组件）
+function Gallery() {
+  return &lt;Profile /&gt;;
+}</code></pre>"

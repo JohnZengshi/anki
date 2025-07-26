@@ -1,0 +1,153 @@
+#separator:tab
+#html:true
+如何用React实现组件拆分（静态版本）	"<pre><code class=""language-javascript"">// 1. 商品类别行组件
+function ProductCategoryRow({ category }) {
+  return (
+    &lt;tr&gt;
+      &lt;th colSpan=""2""&gt;{category}&lt;/th&gt;
+    &lt;/tr&gt;
+  );
+}
+
+// 2. 商品行组件
+function ProductRow({ product }) {
+  // 库存状态处理
+  const name = product.stocked ? product.name : 
+    &lt;span style={{ color: 'red' }}&gt;{product.name}&lt;/span&gt;;
+  
+  return (
+    &lt;tr&gt;
+      &lt;td&gt;{name}&lt;/td&gt;
+      &lt;td&gt;{product.price}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+}
+
+// 3. 商品表格组件（组合子组件）
+function ProductTable({ products }) {
+  const rows = [];
+  let lastCategory = null;
+  
+  products.forEach((product) =&gt; {
+    if (product.category !== lastCategory) {
+      rows.push(
+        &lt;ProductCategoryRow 
+          category={product.category} 
+          key={product.category} 
+        /&gt;
+      );
+    }
+    rows.push(
+      &lt;ProductRow 
+        product={product} 
+        key={product.name} 
+      /&gt;
+    );
+    lastCategory = product.category;
+  });
+  
+  return (
+    &lt;table&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;Name&lt;/th&gt;
+          &lt;th&gt;Price&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;{rows}&lt;/tbody&gt;
+    &lt;/table&gt;
+  );
+}</code></pre>"
+React状态提升的代码实现	"<pre><code class=""language-javascript"">function FilterableProductTable({ products }) {
+  // 状态提升到共同父组件
+  const [filterText, setFilterText] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  return (
+    &lt;div&gt;
+      &lt;SearchBar 
+        filterText={filterText} 
+        inStockOnly={inStockOnly}
+        onFilterTextChange={setFilterText}  // 传递setter函数
+        onInStockOnlyChange={setInStockOnly}
+      /&gt;
+      
+      &lt;ProductTable 
+        products={products}
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+如何在React中实现反向数据流	"<pre><code class=""language-javascript"">function SearchBar({ 
+  filterText, 
+  inStockOnly,
+  onFilterTextChange,  // 接收父组件的setter
+  onInStockOnlyChange 
+}) {
+  return (
+    &lt;form&gt;
+      &lt;input 
+        type=""text""
+        value={filterText}
+        placeholder=""Search...""
+        onChange={(e) =&gt; onFilterTextChange(e.target.value)}
+      /&gt;
+      
+      &lt;label&gt;
+        &lt;input 
+          type=""checkbox""
+          checked={inStockOnly}
+          onChange={(e) =&gt; onInStockOnlyChange(e.target.checked)}
+        /&gt;
+        {' '}Only show products in stock
+      &lt;/label&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>"
+如何识别React中的最小状态集	"<pre><code class=""language-javascript"">function ProductTable({ products, filterText, inStockOnly }) {
+  const rows = [];
+  
+  products.forEach((product) =&gt; {
+    // 条件1：根据搜索文本过滤
+    if (product.name.toLowerCase().indexOf(filterText.toLowerCase()) === -1) {
+      return; // 跳过不匹配项
+    }
+    
+    // 条件2：根据库存状态过滤
+    if (inStockOnly &amp;&amp; !product.stocked) {
+      return; // 跳过无库存项
+    }
+    
+    // ...渲染逻辑
+  });
+  
+  return &lt;table&gt;{...rows}&lt;/table&gt;;
+}</code></pre>"
+React组件化设计原则	"<pre><code class=""language-markdown"">1. **单一职责原则**
+   - 每个组件只负责一个功能
+   - 示例：SearchBar只处理搜索输入，ProductRow只渲染单行数据
+
+2. **数据模型映射**
+   - UI结构应与JSON数据结构匹配
+   - 示例：商品类别 → ProductCategoryRow, 商品项 → ProductRow
+
+3. **状态最小化**
+   - 只存储必要状态（如filterText/inStockOnly）
+   - 派生数据实时计算（如过滤后的商品列表）
+
+4. **单向数据流**
+   - 数据通过props从父组件流向子组件
+   - 交互通过回调函数从子组件传回父组件</code></pre>"
+React中props与state的核心区别	"<pre><code class=""language-markdown"">| **特性**       | **Props**                              | **State**                              |
+|----------------|----------------------------------------|----------------------------------------|
+| **数据方向**   | 父组件 → 子组件（只读）                | 组件内部维护（可变）                   |
+| **更新机制**   | 父组件重渲染时更新                     | 调用setState()触发更新                |
+| **使用场景**   | 组件配置/数据传递                     | 记录交互状态/UI变化                   |
+| **是否可计算** | 静态数据                               | 最小化存储，派生数据实时计算          |
+
+// 典型用例：
+function Component({ data }) { // 来自props
+  const [value, setValue] = useState(); // 内部state
+}</code></pre>"

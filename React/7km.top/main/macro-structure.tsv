@@ -1,0 +1,155 @@
+#separator:tab
+#html:true
+React的4个核心包及其主要职责是什么？	"<pre><code class=""language-markdown"">1. react: 提供定义React组件的基础API
+2. react-dom: React与Web平台的桥梁，负责渲染输出
+3. react-reconciler: 协调器，管理状态输入和输出
+4. scheduler: 调度器，控制任务执行时机</code></pre>"
+React架构中接口层(API层)的核心职责是什么？	"<pre><code class=""language-javascript"">// 接口层暴露的主要API：
+class MyComponent extends React.Component {
+  state = { count: 0 };
+  
+  // 1. setState
+  increment = () => this.setState({ count: this.state.count + 1 });
+  
+  // 2. hooks
+  const [state, setState] = React.useState(0);
+  
+  // 3. context
+  const value = React.useContext(MyContext);
+  
+  render() {
+    return &lt;div&gt;{this.state.count}&lt;/div&gt;;
+  }
+}</code></pre>"
+React架构中内核层包含哪三个部分？	"<pre><code class=""language-markdown"">内核层三部分：
+1. 调度器（scheduler包）
+2. 构造器（react-reconciler包）
+3. 渲染器（react-dom包）</code></pre>"
+用伪代码表示调度器(scheduler)的核心工作流程	"<pre><code class=""language-javascript"">// scheduler伪代码实现
+function scheduler(callback) {
+  // 1. 创建任务对象
+  const task = {
+    callback, // 来自react-reconciler的回调
+    priority: determinePriority() // 计算优先级
+  };
+  
+  // 2. 加入任务队列（按优先级排序）
+  taskQueue.push(task);
+  taskQueue.sort((a, b) => b.priority - a.priority);
+  
+  // 3. 循环消费任务队列
+  while (taskQueue.length > 0) {
+    const currentTask = taskQueue.shift();
+    
+    // 4. 执行回调（可能中断）
+    const shouldContinue = currentTask.callback();
+    
+    // 5. 在并发模式下检查是否应中断
+    if (!shouldContinue && isConcurrentMode) {
+      break; // 中断执行
+    }
+  }
+}</code></pre>"
+react-reconciler包的三个核心职责是什么？	"<pre><code class=""language-javascript"">// react-reconciler的核心职责：
+function reconcile() {
+  // 1. 装载渲染器（实现HostConfig协议）
+  const hostConfig = {
+    createInstance: (type) => document.createElement(type),
+    appendChild: (parent, child) => parent.appendChild(child)
+    // ...其他DOM操作方法
+  };
+  
+  // 2. 接收更新请求（来自react/react-dom）
+  function scheduleUpdateOnFiber(fiber) {
+    // ...处理更新逻辑
+  }
+  
+  // 3. 构造Fiber树并包装回调
+  function performSyncWorkOnRoot(root) {
+    // ...构建Fiber树逻辑
+    return buildFiberTree(root);
+  }
+}</code></pre>"
+react-dom包的两个核心职责是什么？	"<pre><code class=""language-javascript"">// react-dom的核心职责：
+// 1. 引导React应用启动
+ReactDOM.render(&lt;App /&gt;, document.getElementById('root'));
+
+// 2. 实现HostConfig协议
+const HostConfig = {
+  createTextInstance: (text) => document.createTextNode(text),
+  createInstance: (type, props) => {
+    const el = document.createElement(type);
+    Object.keys(props).forEach(prop => {
+      if (prop !== 'children') el[prop] = props[prop];
+    });
+    return el;
+  },
+  appendInitialChild: (parent, child) => parent.appendChild(child),
+  // ...其他DOM操作方法
+};</code></pre>"
+用伪代码表示React内核层各包的协作流程	"<pre><code class=""language-javascript"">// React内核协作流程伪代码
+function startReactApp() {
+  // 1. react-dom初始化
+  const container = document.getElementById('root');
+  
+  // 2. react-reconciler创建根节点
+  const root = createFiberRoot(container);
+  
+  // 3. 首次渲染
+  scheduleUpdateOnFiber(root);
+}
+
+function scheduleUpdateOnFiber(fiberRoot) {
+  // 4. react-reconciler封装工作回调
+  const callback = () => {
+    const newFiberTree = performSyncWorkOnRoot(fiberRoot);
+    return newFiberTree;
+  };
+  
+  // 5. 将回调送入scheduler
+  scheduler.scheduleCallback(callback);
+  
+  // 6. scheduler执行回调后
+  const finishedWork = callback();
+  
+  // 7. react-dom提交更新
+  commitRoot(fiberRoot, finishedWork);
+}
+
+function commitRoot(root, finishedWork) {
+  // 8. 应用DOM变更
+  applyDOMUpdates(root.container, finishedWork);
+}</code></pre>"
+HostConfig协议的主要作用是什么？	"<pre><code class=""language-markdown"">HostConfig协议：
+- 提供渲染器实现的接口规范
+- 包含DOM操作的方法（如createElement, appendChild等）
+- 解耦核心逻辑与平台具体实现
+- 支持多平台渲染（Web/Native/SSR）</code></pre>"
+React中同步模式与并发模式的核心区别是什么？	"<pre><code class=""language-javascript"">// 同步模式
+function performSyncWorkOnRoot(root) {
+  // 不可中断的完整渲染
+  while (workInProgress !== null) {
+    performUnitOfWork(workInProgress);
+  }
+  commitRoot(root);
+}
+
+// 并发模式
+function performConcurrentWorkOnRoot(root) {
+  // 可中断的分片渲染
+  while (workInProgress !== null && !shouldYield()) {
+    performUnitOfWork(workInProgress);
+  }
+  
+  // 如果有剩余工作，返回继续执行的函数
+  if (workInProgress !== null) {
+    return performConcurrentWorkOnRoot.bind(null, root);
+  }
+  commitRoot(root);
+}</code></pre>"
+React架构分层的设计优势是什么？	"<pre><code class=""language-markdown"">分层设计的优势：
+1. 关注点分离：接口层/内核层职责清晰
+2. 平台无关：HostConfig协议支持多平台
+3. 性能优化：调度器独立控制渲染时机
+4. 可维护性：各包独立版本和迭代
+5. 开发者友好：隐藏复杂实现，简化API</code></pre>"

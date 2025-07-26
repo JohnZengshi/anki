@@ -1,0 +1,154 @@
+#separator:tab
+#html:true
+React任务调度循环的入口函数	"<pre><code class=""language-javascript"">function scheduleUpdateOnFiber(fiber) {
+  // 1. 标记更新优先级
+  const priority = getCurrentPriorityLevel();
+  
+  // 2. 创建调度任务
+  const task = {
+    callback: performConcurrentWorkOnRoot.bind(null, fiber),
+    priority,
+    // ...其他任务属性
+  };
+  
+  // 3. 将任务加入调度队列
+  Scheduler_scheduleCallback(priority, task);
+}</code></pre>"
+Fiber构造循环的核心流程	"<pre><code class=""language-javascript"">function workLoopConcurrent() {
+  // 1. 循环执行工作单元
+  while (workInProgress !== null && !shouldYield()) {
+    // 2. 处理当前Fiber节点
+    performUnitOfWork(workInProgress);
+  }
+  
+  // 3. 检查是否完成
+  if (workInProgress !== null) {
+    // 需要中断后继续
+    return Scheduler_scheduleCallback(...);
+  }
+  
+  // 4. 完成整个渲染流程
+  finishConcurrentRender();
+}</code></pre>"
+React中beginWork函数的伪代码实现	"<pre><code class=""language-javascript"">function beginWork(current, workInProgress) {
+  // 1. 根据组件类型选择处理逻辑
+  switch (workInProgress.tag) {
+    case FunctionComponent:
+      return updateFunctionComponent(current, workInProgress);
+    case ClassComponent:
+      return updateClassComponent(current, workInProgress);
+    case HostComponent:
+      return updateHostComponent(current, workInProgress);
+    // ...其他组件类型
+  }
+  
+  // 2. 调和算法(Diffing)
+  reconcileChildren(current, workInProgress, nextChildren);
+  
+  // 3. 返回第一个子Fiber
+  return workInProgress.child;
+}</code></pre>"
+React调度中心添加任务的示例	"<pre><code class=""language-javascript"">// 添加高优先级任务（用户交互）
+Scheduler_scheduleCallback(
+  UserBlockingPriority,
+  () => {
+    // 执行高优先级更新
+    performConcurrentWorkOnRoot(root);
+  }
+);
+
+// 添加低优先级任务（数据更新）
+Scheduler_scheduleCallback(
+  NormalPriority,
+  () => {
+    // 执行常规更新
+    performConcurrentWorkOnRoot(root);
+  }
+);</code></pre>"
+Fiber节点遍历的完整过程	"<pre><code class=""language-javascript"">function performUnitOfWork(unitOfWork) {
+  // 1. 开始处理当前节点
+  const current = unitOfWork.alternate;
+  const next = beginWork(current, unitOfWork);
+  
+  // 2. 检查是否有子节点
+  if (next === null) {
+    // 没有子节点时完成当前节点
+    completeUnitOfWork(unitOfWork);
+  } else {
+    // 继续处理子节点
+    workInProgress = next;
+  }
+}
+
+function completeUnitOfWork(unitOfWork) {
+  let completedWork = unitOfWork;
+  do {
+    // 1. 完成当前节点工作
+    const current = completedWork.alternate;
+    const next = completeWork(current, completedWork);
+    
+    // 2. 检查是否有兄弟节点
+    const sibling = completedWork.sibling;
+    if (sibling !== null) {
+      workInProgress = sibling;
+      return;
+    }
+    
+    // 3. 回溯到父节点
+    completedWork = completedWork.return;
+    workInProgress = completedWork;
+  } while (completedWork !== null);
+}</code></pre>"
+React任务中断和恢复机制	"<pre><code class=""language-javascript"">function shouldYield() {
+  // 1. 检查是否超过时间片限制
+  if (currentTime >= deadline) {
+    return true;
+  }
+  
+  // 2. 检查是否有更高优先级任务
+  if (hasHigherPriorityTask()) {
+    return true;
+  }
+  
+  // 3. 允许继续执行当前任务
+  return false;
+}
+
+// 任务恢复流程
+function resumeTask(task) {
+  // 1. 保存当前中断的Fiber节点
+  const interruptedFiber = task.interruptedFiber;
+  
+  // 2. 恢复工作循环
+  workInProgress = interruptedFiber;
+  workLoopConcurrent();
+}</code></pre>"
+React双缓存Fiber树切换实现	"<pre><code class=""language-javascript"">function commitRoot(root) {
+  // 1. 准备提交阶段
+  const finishedWork = root.finishedWork;
+  
+  // 2. 切换当前使用的Fiber树
+  root.current = finishedWork;
+  
+  // 3. 提交所有副作用到DOM
+  commitMutationEffects(finishedWork);
+  
+  // 4. 清理并准备下一次更新
+  root.finishedWork = null;
+}</code></pre>"
+React优先级调度示例	"<pre><code class=""language-javascript"">// React内置优先级级别
+const ImmediatePriority = 1;   // 最高优先级
+const UserBlockingPriority = 2;
+const NormalPriority = 3;
+const LowPriority = 4;
+const IdlePriority = 5;        // 最低优先级
+
+// 根据事件类型设置优先级
+function getCurrentPriorityLevel() {
+  if (currentEventType === 'click') {
+    return UserBlockingPriority;
+  } else if (currentEventType === 'dataLoad') {
+    return LowPriority;
+  }
+  return NormalPriority;
+}</code></pre>"

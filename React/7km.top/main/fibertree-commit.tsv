@@ -1,0 +1,163 @@
+#separator:tab
+#html:true
+React Fiber树渲染的核心入口函数是什么？	"<pre><code class=""language-javascript"">function commitRoot(root) {
+  const renderPriorityLevel = getCurrentPriorityLevel();
+  runWithPriority(
+    ImmediateSchedulerPriority,
+    commitRootImpl.bind(null, root, renderPriorityLevel)
+  );
+  return null;
+}</code></pre>"
+commitRoot渲染前的准备工作有哪些？	"<pre><code class=""language-javascript"">function commitRootImpl(root, renderPriorityLevel) {
+  // 获取已完成工作的fiber树
+  const finishedWork = root.finishedWork;
+  
+  // 清空FiberRoot上的完成标记
+  root.finishedWork = null;
+  root.finishedLanes = NoLanes;
+  
+  // 重置全局工作变量
+  if (root === workInProgressRoot) {
+    workInProgressRoot = null;
+    workInProgress = null;
+    workInProgressRootRenderLanes = NoLanes;
+  }
+  
+  // 更新副作用队列：如果根节点有副作用，将其加入队列
+  let firstEffect;
+  if (finishedWork.flags > PerformedWork) {
+    if (finishedWork.lastEffect !== null) {
+      finishedWork.lastEffect.nextEffect = finishedWork;
+      firstEffect = finishedWork.firstEffect;
+    } else {
+      firstEffect = finishedWork;
+    }
+  } else {
+    firstEffect = finishedWork.firstEffect;
+  }
+  
+  // ...后续阶段代码
+}</code></pre>"
+BeforeMutation阶段如何处理ClassComponent节点？	"<pre><code class=""language-javascript"">function commitBeforeMutationLifeCycles(current, finishedWork) {
+  if (finishedWork.tag === ClassComponent) {
+    if (finishedWork.flags & Snapshot) {
+      const instance = finishedWork.stateNode;
+      if (current !== null) {
+        // 调用getSnapshotBeforeUpdate生命周期
+        const prevProps = current.memoizedProps;
+        const prevState = current.memoizedState;
+        const snapshot = instance.getSnapshotBeforeUpdate(prevProps, prevState);
+        instance.__reactInternalSnapshotBeforeUpdate = snapshot;
+      }
+    }
+  }
+}</code></pre>"
+Mutation阶段如何执行DOM操作？	"<pre><code class=""language-javascript"">function commitMutationEffects() {
+  while (nextEffect !== null) {
+    const flags = nextEffect.flags;
+    
+    // Placement: 新增节点
+    if (flags & Placement) {
+      commitPlacement(nextEffect);
+      nextEffect.flags &= ~Placement;
+    }
+    
+    // Update: 更新节点
+    if (flags & Update) {
+      const current = nextEffect.alternate;
+      commitWork(current, nextEffect);
+    }
+    
+    // Deletion: 删除节点
+    if (flags & Deletion) {
+      commitDeletion(root, nextEffect, renderPriorityLevel);
+    }
+    
+    nextEffect = nextEffect.nextEffect;
+  }
+}</code></pre>"
+Layout阶段如何处理ClassComponent的生命周期？	"<pre><code class=""language-javascript"">function commitLifeCycles(finishedRoot, current, finishedWork) {
+  if (finishedWork.tag === ClassComponent) {
+    const instance = finishedWork.stateNode;
+    
+    // 调用生命周期方法
+    if (finishedWork.flags & Update) {
+      if (current === null) {
+        // 挂载阶段
+        instance.componentDidMount();
+      } else {
+        // 更新阶段
+        const prevProps = current.memoizedProps;
+        const prevState = current.memoizedState;
+        instance.componentDidUpdate(
+          prevProps, 
+          prevState,
+          instance.__reactInternalSnapshotBeforeUpdate
+        );
+      }
+    }
+    
+    // 处理setState回调
+    const updateQueue = finishedWork.updateQueue;
+    if (updateQueue !== null) {
+      commitUpdateQueue(finishedWork, updateQueue, instance);
+    }
+  }
+}</code></pre>"
+commitRoot如何清理副作用队列？	"<pre><code class=""language-javascript"">function commitRootImpl(root) {
+  // ...渲染阶段代码
+  
+  // 清理阶段
+  if (!rootDoesHavePassiveEffects) {
+    nextEffect = firstEffect;
+    while (nextEffect !== null) {
+      const nextNextEffect = nextEffect.nextEffect;
+      nextEffect.nextEffect = null;
+      
+      // 删除标记的节点完全移除
+      if (nextEffect.flags & Deletion) {
+        detachFiberAfterEffects(nextEffect);
+      }
+      
+      nextEffect = nextNextEffect;
+    }
+  }
+  
+  // 检测新任务
+  ensureRootIsScheduled(root, now()); // 异步任务
+  flushSyncCallbackQueue(); // 同步任务
+}</code></pre>"
+React如何检测渲染后的新更新任务？	"<pre><code class=""language-javascript"">// 在commitRootImpl的清理阶段
+// 1. 检测常规(异步)任务
+ensureRootIsScheduled(root, now());
+
+// 2. 检测同步任务
+flushSyncCallbackQueue();
+
+function ensureRootIsScheduled(root, currentTime) {
+  // 检查是否有待处理的更新
+  const existingCallbackNode = root.callbackNode;
+  
+  // 确定下一个任务的过期时间和优先级
+  const nextLanes = getNextLanes();
+  
+  if (nextLanes === NoLanes) {
+    // 没有待处理任务
+    return;
+  }
+  
+  // 调度新任务
+  let newCallbackNode;
+  if (newCallbackPriority === SyncLanePriority) {
+    // 同步任务特殊处理
+    scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
+  } else {
+    // 调度异步任务
+    newCallbackNode = scheduleCallback(
+      schedulerPriorityLevel,
+      performConcurrentWorkOnRoot.bind(null, root)
+    );
+  }
+  
+  root.callbackNode = newCallbackNode;
+}</code></pre>"

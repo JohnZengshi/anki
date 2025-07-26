@@ -1,0 +1,224 @@
+#separator:tab
+#html:true
+React组件如何声明状态？	"<pre><code class=""language-javascript"">import { useState } from 'react';
+
+function Counter() {
+  // 声明状态变量count和更新函数setCount
+  const [count, setCount] = useState(0);
+  
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count: {count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+        增加
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+如何正确更新React数组状态？	"<pre><code class=""language-javascript"">function TodoList() {
+  const [items, setItems] = useState([]);
+  
+  // ✅ 正确做法：创建新数组再更新
+  const addItem = () => {
+    const newItem = { id: Date.now(), text: '新项目' };
+    setItems([...items, newItem]);  // 使用展开运算符创建新数组
+  };
+  
+  // ❌ 错误做法：直接修改原数组
+  const badAddItem = () => {
+    items.push({ id: Date.now(), text: '新项目' });
+    setItems(items);  // 不会触发重新渲染
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;button onClick={addItem}&gt;添加项目&lt;/button&gt;
+      {items.map(item =&gt; (
+        &lt;div key={item.id}&gt;{item.text}&lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React中如何实现父子组件通信？	"<pre><code class=""language-javascript"">// 父组件
+function Parent() {
+  const [message, setMessage] = useState('初始消息');
+  
+  // 处理子组件传回的数据
+  const handleChildData = (data) => {
+    alert(`收到子组件数据: ${data}`);
+  };
+  
+  return (
+    &lt;Child 
+      parentMessage={message} 
+      sendToParent={handleChildData} 
+    /&gt;
+  );
+}
+
+// 子组件
+function Child({ parentMessage, sendToParent }) {
+  return (
+    &lt;div&gt;
+      &lt;p&gt;父组件消息: {parentMessage}&lt;/p&gt;
+      &lt;button onClick={() =&gt; sendToParent('来自子组件')}&gt;
+        发送数据给父组件
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React中为什么需要key属性？	"<pre><code class=""language-javascript"">function UserList({ users }) {
+  // ✅ 正确做法：使用唯一ID作为key
+  return (
+    &lt;ul&gt;
+      {users.map(user =&gt; (
+        &lt;li key={user.id}&gt;{user.name}&lt;/li&gt;  // 使用唯一ID
+      ))}
+    &lt;/ul&gt;
+  );
+  
+  // ❌ 错误做法：使用索引作为key
+  function BadUserList({ users }) {
+    return (
+      &lt;ul&gt;
+        {users.map((user, index) =&gt; (
+          &lt;li key={index}&gt;{user.name}&lt;/li&gt;  // 可能导致渲染问题
+        ))}
+      &lt;/ul&gt;
+    );
+  }
+}</code></pre>"
+如何实现React状态提升？	"<pre><code class=""language-javascript"">// 子组件 - 无状态，通过props接收数据和回调
+function TemperatureInput({ temperature, onTemperatureChange }) {
+  return (
+    &lt;input
+      type=""text""
+      value={temperature}
+      onChange={(e) =&gt; onTemperatureChange(e.target.value)}
+    /&gt;
+  );
+}
+
+// 父组件 - 管理共享状态
+function Calculator() {
+  const [celsius, setCelsius] = useState('');
+  
+  // 处理温度变化
+  const handleCelsiusChange = (value) => {
+    setCelsius(value);
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;TemperatureInput
+        temperature={celsius}
+        onTemperatureChange={handleCelsiusChange}
+      /&gt;
+      &lt;p&gt;华氏度: {(celsius * 9/5) + 32}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React中如何实现时间旅行功能？	"<pre><code class=""language-javascript"">function Game() {
+  const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
+  const [currentMove, setCurrentMove] = useState(0);
+  
+  // 处理游戏移动
+  const handlePlay = (nextSquares) => {
+    const nextHistory = [
+      ...history.slice(0, currentMove + 1),
+      { squares: nextSquares }
+    ];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  };
+  
+  // 跳转到历史步骤
+  const jumpTo = (move) => {
+    setCurrentMove(move);
+  };
+  
+  // 渲染历史记录按钮
+  const moves = history.map((squares, move) => {
+    const desc = move ? `转到第 #${move} 步` : '游戏开始';
+    return (
+      &lt;li key={move}&gt;
+        &lt;button onClick={() =&gt; jumpTo(move)}&gt;{desc}&lt;/button&gt;
+      &lt;/li&gt;
+    );
+  });
+  
+  return (
+    &lt;div className=""game""&gt;
+      &lt;Board 
+        squares={history[currentMove].squares} 
+        onPlay={handlePlay} 
+      /&gt;
+      &lt;div className=""game-info""&gt;
+        &lt;ol&gt;{moves}&lt;/ol&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React中如何避免直接修改状态？	"<pre><code class=""language-javascript"">function TodoApp() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: '学习React', completed: false }
+  ]);
+  
+  // ✅ 正确：创建新数组/对象
+  const addTodo = (text) => {
+    const newTodo = { id: Date.now(), text, completed: false };
+    setTodos([...todos, newTodo]);  // 使用展开运算符
+  };
+  
+  // ✅ 正确：使用map创建新数组
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo =&gt; 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+  
+  // ❌ 错误：直接修改状态
+  const badToggleTodo = (id) => {
+    const todo = todos.find(t =&gt; t.id === id);
+    todo.completed = !todo.completed;  // 直接修改对象
+    setTodos(todos);  // 不会触发重新渲染
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;button onClick={() =&gt; addTodo('新任务')}&gt;添加&lt;/button&gt;
+      {todos.map(todo =&gt; (
+        &lt;div key={todo.id}&gt;
+          {todo.text} - {todo.completed ? '完成' : '未完成'}
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React中如何实现条件渲染？	"<pre><code class=""language-javascript"">function UserGreeting({ isLoggedIn, user }) {
+  // 方法1: if/else语句
+  if (isLoggedIn) {
+    return &lt;h1&gt;欢迎回来, {user.name}!&lt;/h1&gt;;
+  } else {
+    return &lt;h1&gt;请先登录&lt;/h1&gt;;
+  }
+  
+  // 方法2: 三元运算符
+  return (
+    &lt;div&gt;
+      {isLoggedIn ? (
+        &lt;button&gt;退出&lt;/button&gt;
+      ) : (
+        &lt;button&gt;登录&lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+  
+  // 方法3: 逻辑与运算符
+  return (
+    &lt;div&gt;
+      {isLoggedIn && &lt;Profile user={user} /&gt;}
+      {!isLoggedIn && &lt;LoginForm /&gt;}
+    &lt;/div&gt;
+  );
+}</code></pre>"

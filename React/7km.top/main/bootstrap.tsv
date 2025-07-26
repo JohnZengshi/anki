@@ -1,0 +1,188 @@
+#separator:tab
+#html:true
+React三种启动模式的区别	"<pre><code class=""language-javascript"">// Legacy模式（当前稳定版默认）
+ReactDOM.render(&lt;App /&gt;, document.getElementById('root'));
+
+// Blocking模式（实验性）
+const blockingRoot = ReactDOM.createBlockingRoot(rootNode);
+blockingRoot.render(&lt;App /&gt;);
+
+// Concurrent模式（实验性，未来默认）
+const concurrentRoot = ReactDOM.createRoot(rootNode);
+concurrentRoot.render(&lt;App /&gt;);
+
+/*
+核心区别：
+1. 可中断渲染：只有Concurrent/Blocking模式支持
+2. HostRootFiber.mode：
+   - Legacy → NoMode
+   - Blocking → BlockingMode | StrictMode
+   - Concurrent → ConcurrentMode | BlockingMode | StrictMode
+3. API设计：Legacy直接render，其他需先创建Root对象
+*/</code></pre>"
+创建ReactDOMRoot对象(Concurrent模式)	"<pre><code class=""language-javascript"">function ReactDOMRoot(container, options) {
+  // 创建fiberRoot对象并挂载到内部属性
+  this._internalRoot = createRootImpl(container, ConcurrentRoot, options);
+  
+  // 原型方法
+  ReactDOMRoot.prototype.render = function(children) {
+    const root = this._internalRoot;
+    updateContainer(children, root, null, null);
+  };
+}
+
+/*
+执行流程：
+1. 调用ReactDOM.createRoot(container)
+2. 实例化ReactDOMRoot
+3. 内部调用createRootImpl创建fiberRoot
+4. 返回的实例具有render方法
+*/</code></pre>"
+创建ReactDOMBlockingRoot对象(Blocking模式)	"<pre><code class=""language-javascript"">function ReactDOMBlockingRoot(container, tag, options) {
+  // 固定传入BlockingRoot标记
+  this._internalRoot = createRootImpl(container, BlockingRoot, options);
+  
+  // 原型方法
+  ReactDOMBlockingRoot.prototype.render = function(children) {
+    const root = this._internalRoot;
+    updateContainer(children, root, null, null);
+  };
+}
+
+/*
+特点：
+1. 作为迁移到Concurrent模式的过渡
+2. 仅支持部分Concurrent特性
+3. HostRootFiber.mode设置为BlockingMode
+*/</code></pre>"
+Legacy模式下的ReactDOMBlockingRoot创建	"<pre><code class=""language-javascript"">function legacyRenderSubtreeIntoContainer(parentComponent, children, container) {
+  if (!container._reactRootContainer) {
+    // 首次渲染：创建ReactDOMBlockingRoot实例
+    container._reactRootContainer = legacyCreateRootFromDOMContainer(container);
+  }
+  
+  // 获取fiberRoot并更新
+  const fiberRoot = container._reactRootContainer._internalRoot;
+  unbatchedUpdates(() => {
+    updateContainer(children, fiberRoot, parentComponent);
+  });
+}
+
+function legacyCreateRootFromDOMContainer(container) {
+  return new ReactDOMBlockingRoot(container, LegacyRoot);
+}
+
+/*
+特别说明：
+1. 虽然是Legacy模式，但内部仍使用ReactDOMBlockingRoot
+2. 但传入的RootTag是LegacyRoot
+3. 通过container._reactRootContainer关联DOM和React对象
+*/</code></pre>"
+createRootImpl函数创建fiberRoot	"<pre><code class=""language-javascript"">function createRootImpl(container, tag, options) {
+  // 1. 创建fiberRoot（reconciler全局上下文）
+  const root = createContainer(container, tag);
+  
+  // 2. 标记DOM容器
+  markContainerAsRoot(root.current, container);
+  
+  return root;
+}
+
+// createContainer内部调用
+function createContainer(containerInfo, tag) {
+  return createFiberRoot(containerInfo, tag);
+}
+
+/*
+关键作用：
+1. 衔接react-dom和react-reconciler
+2. 创建fiberRoot对象：
+   - 存储fiber构造过程的全局状态
+   - 作为reconciler运行时的上下文
+3. 关联DOM容器和fiber树
+*/</code></pre>"
+createFiberRoot创建HostRootFiber	"<pre><code class=""language-javascript"">export function createFiberRoot(containerInfo, tag) {
+  // 创建fiberRoot实例
+  const root = new FiberRootNode(containerInfo, tag);
+  
+  // 创建HostRootFiber（首个Fiber节点）
+  const uninitializedFiber = createHostRootFiber(tag);
+  
+  // 互相关联
+  root.current = uninitializedFiber;
+  uninitializedFiber.stateNode = root;
+  
+  // 初始化更新队列
+  initializeUpdateQueue(uninitializedFiber);
+  
+  return root;
+}
+
+function createHostRootFiber(tag) {
+  // 根据RootTag决定mode
+  let mode;
+  if (tag === ConcurrentRoot) {
+    mode = ConcurrentMode | BlockingMode | StrictMode;
+  } else if (tag === BlockingRoot) {
+    mode = BlockingMode | StrictMode;
+  } else {
+    mode = NoMode; // Legacy模式
+  }
+  
+  return createFiber(HostRoot, null, null, mode);
+}
+
+/*
+核心要点：
+1. HostRootFiber是Fiber树的根节点
+2. fiber.mode由RootTag决定
+3. 所有子Fiber的mode继承自HostRootFiber
+*/</code></pre>"
+updateContainer启动更新流程	"<pre><code class=""language-javascript"">function updateContainer(element, container, parentComponent) {
+  const current = container.current; // HostRootFiber
+  const eventTime = requestEventTime();
+  
+  // 1. 获取更新优先级
+  const lane = requestUpdateLane(current);
+  
+  // 2. 创建更新对象
+  const update = createUpdate(eventTime, lane);
+  update.payload = { element };
+  
+  // 3. 加入更新队列
+  enqueueUpdate(current, update);
+  
+  // 4. 进入reconciler流程
+  scheduleUpdateOnFiber(current, lane, eventTime);
+}
+
+/*
+执行路径：
+Legacy → unbatchedUpdates(() => updateContainer(...))
+Concurrent/Blocking → root.render()直接调用updateContainer
+
+关键作用：
+1. 创建更新对象
+2. 计算更新优先级
+3. 进入reconciler工作流
+*/</code></pre>"
+可中断渲染的实现条件	"<pre><code class=""language-javascript"">// 检查是否支持可中断渲染
+function canSuspendRendering(fiber) {
+  // 只有HostRootFiber.mode包含特定标记时才支持
+  return (fiber.mode & ConcurrentMode) !== NoMode;
+}
+
+/*
+必要条件：
+1. HostRootFiber.mode必须包含：
+   - ConcurrentMode 或
+   - BlockingMode
+   
+2. Legacy模式(HostRootFiber.mode=NoMode)：
+   - 同步执行不可中断
+   - 生命周期函数只执行一次
+
+实验性说明：
+1. 稳定版(v17.0.2)仅Legacy模式可用
+2. 需安装alpha版体验可中断渲染
+*/</code></pre>"

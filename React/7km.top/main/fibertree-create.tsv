@@ -1,0 +1,95 @@
+#separator:tab
+#html:true
+React中updateContainer函数的作用	"<pre><code class=""language-javascript"">// 初始化渲染时创建更新对象
+function updateContainer(element, container) {
+  const lane = requestUpdateLane(); // 1. 获取更新优先级
+  const update = createUpdate(); // 2. 创建update对象
+  update.payload = { element }; // 3. 挂载ReactElement
+  enqueueUpdate(current, update); // 4. 加入更新队列
+  scheduleUpdateOnFiber(current); // 5. 启动调度
+}</code></pre>"
+performSyncWorkOnRoot函数在初次渲染时的核心流程	"<pre><code class=""language-javascript"">function performSyncWorkOnRoot(root) {
+  const lanes = getNextLanes(root); // 1. 获取渲染优先级
+  const exitStatus = renderRootSync(root, lanes); // 2. 同步渲染
+  
+  // 3. 挂载完成的fiber树
+  root.finishedWork = root.current.alternate; 
+  root.finishedLanes = lanes;
+  
+  commitRoot(root); // 4. 提交到DOM
+}</code></pre>"
+React中beginWork阶段的三个关键步骤	"<pre><code class=""language-javascript"">function beginWork(current, workInProgress) {
+  // 1. 状态计算（不同fiber类型处理不同）
+  let nextState;
+  switch(workInProgress.tag) {
+    case ClassComponent: 
+      nextState = processClassState(workInProgress);
+      break;
+    case HostRoot:
+      nextState = processHostRootState(workInProgress);
+  }
+  
+  // 2. 获取子ReactElement
+  const nextChildren = getNextChildren(workInProgress);
+  
+  // 3. 调和子节点（生成/更新子fiber）
+  reconcileChildren(current, workInProgress, nextChildren);
+  
+  return workInProgress.child; // 返回第一个子fiber
+}</code></pre>"
+completeWork阶段如何处理HostComponent节点	"<pre><code class=""language-javascript"">function completeWork(current, workInProgress) {
+  if (workInProgress.tag === HostComponent) {
+    // 1. 创建DOM实例
+    const domInstance = createInstance(
+      workInProgress.type,
+      workInProgress.pendingProps
+    );
+    
+    // 2. 关联DOM与fiber
+    workInProgress.stateNode = domInstance;
+    
+    // 3. 附加子DOM节点
+    appendAllChildren(domInstance, workInProgress);
+    
+    // 4. 初始化DOM属性
+    finalizeInitialChildren(domInstance, workInProgress.type, workInProgress.pendingProps);
+  }
+  
+  // 5. 收集副作用
+  bubbleEffects(workInProgress);
+}</code></pre>"
+fiber树构造中副作用队列的收集原理	"<pre><code class=""language-javascript"">function completeUnitOfWork(unitOfWork) {
+  do {
+    // 1. 完成当前节点工作
+    completeWork(current, completedWork);
+    
+    // 2. 获取兄弟节点
+    const siblingFiber = completedWork.sibling;
+    
+    // 3. 合并副作用队列
+    if (returnFiber.firstEffect === null) {
+      returnFiber.firstEffect = completedWork.firstEffect;
+    }
+    if (completedWork.lastEffect !== null) {
+      returnFiber.lastEffect = completedWork.lastEffect;
+    }
+    
+    // 4. 添加当前节点的副作用
+    if (completedWork.flags > PerformedWork) {
+      returnFiber.lastEffect.nextEffect = completedWork;
+      returnFiber.lastEffect = completedWork;
+    }
+  } while (completedWork !== null);
+}</code></pre>"
+React初次渲染后fiber树的内存结构	"<pre><code class=""language-javascript"">/*
+FiberRoot
+  ├─ current: HostRootFiber (当前页面树)
+  ├─ finishedWork: HostRootFiber.alternate (新构造的树)
+  │    ├─ child: App fiber
+  │    │    ├─ child: div fiber
+  │    │    │    ├─ child: header fiber
+  │    │    │    └─ sibling: Content fiber
+  │    │    └─ firstEffect: → div → header → Content
+  │    └─ stateNode: FiberRoot (循环引用)
+  └─ containerInfo: div#root (DOM容器)
+*/</code></pre>"

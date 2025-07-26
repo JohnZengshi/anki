@@ -1,0 +1,163 @@
+#separator:tab
+#html:true
+React中Lane模型的核心优势是什么	"<pre><code class=""language-javascript"">// 1. 位运算高效性：单变量可表示多个任务
+const batchOfTasks = 0b0000; // 初始任务组
+const taskA = 0b0001;
+const taskB = 0b0010;
+
+// 添加任务（位或操作）
+batchOfTasks |= taskA; // 0b0001
+batchOfTasks |= taskB; // 0b0011
+
+// 删除任务（位与+位非操作）
+batchOfTasks &= ~taskA; // 0b0010
+
+// 检查任务存在（位与操作）
+const hasTaskA = (batchOfTasks & taskA) !== 0; // false
+
+// 2. 优先级判定简捷：低位比特=高优先级
+const SyncLane = 0b0000000000000000000000000000001; // 最高优先级
+const OffscreenLane = 0b1000000000000000000000000000000; // 最低优先级</code></pre>"
+如何实现SchedulerPriority到ReactPriorityLevel的转换	"<pre><code class=""language-javascript"">// SchedulerPriority → ReactPriorityLevel
+export function getCurrentPriorityLevel() {
+  switch(Scheduler_getCurrentPriorityLevel()) {
+    case Scheduler_ImmediatePriority:   // 1
+      return ImmediatePriority;          // 99
+    case Scheduler_UserBlockingPriority: // 2
+      return UserBlockingPriority;       // 98
+    case Scheduler_NormalPriority:       // 3
+      return NormalPriority;             // 97
+    case Scheduler_LowPriority:          // 4
+      return LowPriority;                // 96
+    case Scheduler_IdlePriority:         // 5
+      return IdlePriority;               // 95
+    default:
+      invariant(false, 'Unknown priority level.');
+  }
+}</code></pre>"
+如何实现ReactPriorityLevel到SchedulerPriority的转换	"<pre><code class=""language-javascript"">// ReactPriorityLevel → SchedulerPriority
+function reactPriorityToSchedulerPriority(reactPriorityLevel) {
+  switch(reactPriorityLevel) {
+    case ImmediatePriority:        // 99
+      return Scheduler_ImmediatePriority;    // 1
+    case UserBlockingPriority:     // 98
+      return Scheduler_UserBlockingPriority; // 2
+    case NormalPriority:            // 97
+      return Scheduler_NormalPriority;       // 3
+    case LowPriority:               // 96
+      return Scheduler_LowPriority;          // 4
+    case IdlePriority:              // 95
+      return Scheduler_IdlePriority;         // 5
+    default:
+      invariant(false, 'Unknown priority level.');
+  }
+}</code></pre>"
+在React中如何分离CPU和IO任务	"<pre><code class=""language-javascript"">// 初始任务组（A:CPU, B:IO, C:CPU）
+const allTasks = taskA | taskB | taskC; 
+
+// 定义CPU任务掩码
+const cpuMask = taskA | taskC;
+
+// 定义IO任务掩码
+const ioMask = taskB;
+
+// 分离任务
+const cpuTasks = allTasks & cpuMask; // 提取CPU任务
+const ioTasks = allTasks & ioMask;   // 提取IO任务
+
+// 调度：优先执行CPU任务
+scheduleTask(cpuTasks, highPriority);
+scheduleTask(ioTasks, lowPriority);</code></pre>"
+如何使用Lane模型获取最高优先级任务	"<pre><code class=""language-javascript"">// 从任务组中提取最高优先级任务
+function getHighestPriorityTask(lanes) {
+  // 31位中从右向左（低位到高位）查找第一个1的位置
+  const index = 31 - Math.clz32(lanes & -lanes);
+  return 1 << index; // 返回单个任务Lane
+}
+
+// 示例：任务组 0b0110（包含优先级2和4）
+const highest = getHighestPriorityTask(0b0110); // 返回 0b0010（优先级2）</code></pre>"
+React中三种优先级类型的关系是什么	"<pre><code class=""language-markdown"">## React优先级体系关系图
+1. **调度中心** 
+   - 使用 `SchedulerPriority` (1-5)
+   - 控制任务进入顺序
+
+2. **转换层**
+   - `ReactPriorityLevel` (90-99)
+   - 桥梁作用：转换调度 ↔ fiber优先级
+
+3. **Fiber构造**
+   - 使用 `LanePriority` (0-15)
+   - 基于位运算的车道模型
+
+## 核心转换流程：
+调度任务 → SchedulerPriority → ReactPriorityLevel → LanePriority → Fiber更新</code></pre>"
+LanePriority如何映射到ReactPriorityLevel	"<pre><code class=""language-javascript"">// LanePriority → ReactPriorityLevel
+export function lanePriorityToSchedulerPriority(lanePriority) {
+  switch(lanePriority) {
+    case SyncLanePriority:         // 15
+    case SyncBatchedLanePriority:   // 14
+      return ImmediateSchedulerPriority;  // 99
+      
+    case InputDiscreteLanePriority: // 12
+      return UserBlockingPriority;        // 98
+      
+    case DefaultLanePriority:       // 10
+      return NormalPriority;              // 97
+      
+    case IdleLanePriority:          // 2
+      return IdlePriority;                // 95
+      
+    default:
+      return NoPriority;                  // 90
+  }
+}</code></pre>"
+React中如何比较两个任务的优先级	"<pre><code class=""language-javascript"">// 任务优先级比较
+function isHigherPriority(a, b) {
+  // 在Lane模型中：低位比特位优先级更高
+  return a < b; 
+}
+
+// 示例
+const syncTask = 0b0001;   // 优先级1 (最高)
+const defaultTask = 0b1000; // 优先级8
+
+console.log(isHigherPriority(syncTask, defaultTask)); // true</code></pre>"
+React优先级如何驱动时间切片特性	"<pre><code class=""language-javascript"">// 时间切片实现伪代码
+function workLoopConcurrent() {
+  while (workInProgress !== null && !shouldYield()) {
+    // 获取当前时间切片到期时间（5ms）
+    const frameTime = 5; 
+    const startTime = performance.now();
+    
+    // 执行一个任务单元
+    performUnitOfWork(workInProgress);
+    
+    // 检查是否超时
+    if (performance.now() - startTime > frameTime) {
+      // 通过SchedulerPriority调度让步
+      requestYield(NormalPriority);
+      break;
+    }
+  }
+}</code></pre>"
+在Fiber架构中如何存储Lane优先级	"<pre><code class=""language-javascript"">// Fiber节点中的优先级字段
+const fiber = {
+  // 当前节点的更新优先级
+  lanes: NoLanes, // 初始值：0
+  
+  // 子树中的最高优先级
+  childLanes: NoLanes,
+  
+  // 待处理的更新优先级
+  pendingLanes: NoLanes,
+  
+  // 过期时间（旧版兼容）
+  expirationTime: NoWork
+};
+
+// 设置优先级
+function markUpdateLaneFromPriority(fiber, priority) {
+  const lane = priorityToLane(priority);
+  fiber.lanes = mergeLanes(fiber.lanes, lane);
+}</code></pre>"

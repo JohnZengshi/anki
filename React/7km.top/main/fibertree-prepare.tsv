@@ -1,0 +1,116 @@
+#separator:tab
+#html:true
+React Fiber树构造流程定位	"<pre><code class=""language-javascript"">function reconcile(update) {
+  // 1. 输入阶段：接收更新请求
+  const lanes = requestUpdateLanes(fiber); // 计算更新优先级
+  scheduleUpdateOnFiber(root, lanes);     // 进入调度
+  
+  // 2. 调度注册：与scheduler交互
+  ensureRootIsScheduled(root, eventTime); // 注册调度任务
+  
+  // 3. Fiber树构造阶段 ← 当前重点
+  performSyncWorkOnRoot(root);  // Legacy模式
+  // 或 performConcurrentWorkOnRoot(root) // Concurrent模式
+  
+  // 4. 输出阶段：渲染DOM
+  commitRoot(root);
+}</code></pre>"
+双缓冲技术实现原理	"<pre><code class=""language-javascript"">// 当前界面树 ← 显示中
+let currentTree = fiberRoot.current;
+
+// 构造新树 ← 内存中
+let workInProgress = createWorkInProgress(currentTree, null);
+
+function completeWork() {
+  // 构造完成后切换指针
+  if (workInProgress !== null) {
+    fiberRoot.current = workInProgress; // 切换当前树
+    currentTree = workInProgress;      // 更新引用
+    
+    // 原当前树变为内存树
+    oldTree = workInProgress.alternate;
+  }
+}</code></pre>"
+全局变量executionContext作用	"<pre><code class=""language-javascript"">const executionContext = {
+  NoContext: 0b0000000,      // 无上下文
+  BatchedContext: 0b0000001,  // 批处理
+  RenderContext: 0b0010000,   // 渲染中
+  CommitContext: 0b0100000    // 提交中
+};
+
+// 检查当前是否在渲染阶段
+function isRendering() {
+  return (executionContext & RenderContext) !== NoContext;
+}
+
+// 进入渲染前设置标记
+function renderRoot() {
+  executionContext |= RenderContext; // 添加渲染标记
+  // ...构造逻辑
+  executionContext &= ~RenderContext; // 清除标记
+}</code></pre>"
+Lane优先级模型应用	"<pre><code class=""language-javascript"">// 更新优先级（update.lane）
+function requestUpdateLane(fiber) {
+  if (legacyMode) return SyncLane;
+  
+  // Concurrent模式动态计算
+  const schedulerPriority = getCurrentPriorityLevel();
+  return schedulerPriorityToLane(schedulerPriority);
+}
+
+// 渲染优先级（renderLanes）
+function getRenderPriority(root) {
+  // 检查过期任务
+  if (root.expiredLanes !== NoLanes) {
+    return SyncLanePriority; // 最高优先级
+  }
+  // 动态计算渲染车道
+  return computeNextLanes(root);
+}
+
+// Fiber节点优先级检查
+function shouldProcessUpdate(fiber, renderLanes) {
+  // 检查fiber.lanes是否在渲染车道中
+  return (fiber.lanes & renderLanes) !== NoLanes;
+}</code></pre>"
+栈帧管理实现	"<pre><code class=""language-javascript"">function prepareFreshStack(root, lanes) {
+  // 重置FiberRoot状态
+  root.finishedWork = null;
+  root.finishedLanes = NoLanes;
+  
+  // 创建workInProgress树
+  workInProgress = createWorkInProgress(
+    root.current, // 当前树根节点
+    null          // 初始props
+  );
+  
+  // 设置全局渲染车道
+  workInProgressRootRenderLanes = lanes;
+  subtreeRenderLanes = lanes;
+  
+  // 重置错误状态
+  workInProgressRootFatalError = null;
+}</code></pre>"
+Fiber节点复用逻辑	"<pre><code class=""language-javascript"">function beginWork(current, workInProgress, renderLanes) {
+  // 检查是否可复用
+  if (current !== null) {
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+    
+    // 检查属性变化和优先级
+    if (oldProps === newProps && 
+        !includesSomeLane(renderLanes, workInProgress.lanes)) {
+      // 满足复用条件 → 跳过处理
+      return bailoutOnAlreadyFinishedWork(
+        current, workInProgress, renderLanes
+      );
+    }
+  }
+  
+  // 需要更新 → 创建新Fiber
+  switch (workInProgress.tag) {
+    case FunctionComponent: // 处理函数组件
+    case ClassComponent:    // 处理类组件
+    // ...其他类型
+  }
+}</code></pre>"

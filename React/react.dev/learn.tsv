@@ -1,0 +1,126 @@
+#separator:tab
+#html:true
+React: 如何创建基本按钮组件	"<pre><code class=""language-jsx"">function MyButton() {
+  return (
+    &lt;button&gt;
+      I'm a button
+    &lt;/button&gt;
+  );
+}</code></pre>"
+React: 如何嵌套组件	"<pre><code class=""language-jsx"">export default function MyApp() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Welcome&lt;/h1&gt;
+      {""/* 嵌套组件以大写字母开头 */""}
+      &lt;MyButton /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>"
+React: JSX中如何添加CSS类名	"<pre><code class=""language-jsx"">// 使用className代替class
+&lt;img className=""avatar"" src=""..."" /&gt;
+
+// CSS文件
+"".avatar { border-radius: 50%; }""</code></pre>"
+React: 如何在JSX中显示动态数据	"<pre><code class=""language-jsx"">function Profile({ user }) {
+  return (
+    &lt;&gt;
+      &lt;h1&gt;{user.name}&lt;/h1&gt;
+      {""// 在属性中使用JS表达式""}
+      &lt;img src={user.imageUrl} /&gt;
+    &lt;&gt;
+  );
+}</code></pre>"
+React: 三种条件渲染方法	"<pre><code class=""language-jsx"">// 1. if-else语句
+let content;
+if (isLoggedIn) {
+  content = &lt;AdminPanel /&gt;;
+} else {
+  content = &lt;LoginForm /&gt;;
+}
+
+// 2. 三元表达式
+&lt;div&gt;{isLoggedIn ? &lt;AdminPanel /&gt; : &lt;LoginForm /&gt;}&lt;/div&gt;
+
+// 3. 逻辑与短路
+&lt;div&gt;{isLoggedIn && &lt;AdminPanel /&gt;}&lt;/div&gt;</code></pre>"
+React: 如何安全渲染列表	"<pre><code class=""language-jsx"">function ProductList({ products }) {
+  return (
+    &lt;ul&gt;
+      {products.map(product =&gt; (
+        // 必须提供唯一key标识
+        &lt;li key={product.id}&gt;
+          {product.title}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>"
+React: 如何处理点击事件	"<pre><code class=""language-jsx"">function ClickButton() {
+  // 定义事件处理器
+  function handleClick() {
+    alert('Clicked!');
+  }
+  
+  // 传递函数引用(无括号)
+  return (
+    &lt;button onClick={handleClick}&gt;
+      Click me
+    &lt;/button&gt;
+  );
+}</code></pre>"
+React: 如何使用useState管理状态	"<pre><code class=""language-jsx"">import { useState } from 'react';
+
+function Counter() {
+  // 声明状态变量和更新函数
+  const [count, setCount] = useState(0);
+  
+  function increment() {
+    // 使用更新函数修改状态
+    setCount(count + 1);
+  }
+  
+  return (
+    &lt;button onClick={increment}&gt;
+      Clicked {count} times
+    &lt;/button&gt;
+  );
+}</code></pre>"
+React: 如何实现状态提升	"<pre><code class=""language-jsx"">// 父组件管理共享状态
+export default function ParentComponent() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    &lt;div&gt;
+      &lt;Child count={count} onClick={() =&gt; setCount(c =&gt; c + 1)} /&gt;
+      &lt;Child count={count} onClick={() =&gt; setCount(c =&gt; c + 1)} /&gt;
+    &lt;/div&gt;
+  );
+}
+
+// 子组件通过props接收状态
+function Child({ count, onClick }) {
+  return (
+    &lt;button onClick={onClick}&gt;
+      {count}
+    &lt;/button&gt;
+  );
+}</code></pre>"
+React: 组件命名规则是什么	"<pre><code class=""language-markdown"">1. 组件名必须**大写字母开头**
+   - ✅ &lt;MyComponent /&gt;
+   - ❌ &lt;myComponent /&gt;
+
+2. HTML标签必须**小写字母**
+   - ✅ &lt;div&gt;
+   - ❌ &lt;Div&gt;</code></pre>"
+React: JSX使用基本规则	"<pre><code class=""language-jsx"">// 1. 必须闭合所有标签
+&lt;br /&gt;   // 自闭合标签
+
+// 2. 多个标签需要包装器
+function FragmentExample() {
+  return (
+    &lt;&gt;
+      &lt;h1&gt;标题&lt;/h1&gt;
+      &lt;p&gt;内容&lt;/p&gt;
+    &lt;/&gt;
+  );
+}</code></pre>"

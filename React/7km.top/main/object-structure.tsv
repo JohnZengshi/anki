@@ -1,0 +1,187 @@
+#separator:tab
+#html:true
+ReactElement对象的完整数据结构	"<pre><code class=""language-typescript"">type ReactElement = {
+  $$typeof: symbol;      // React元素标识符
+  type: string | Function | Class; // 组件类型
+  key: string | null;     // 同级节点唯一标识
+  ref: any;               // 引用对象
+  props: any;             // 组件属性
+  _owner: Fiber | null;   // 创建该元素的Fiber引用
+  // 开发环境专用字段
+  _store: { validated: boolean };
+  _self: ReactElement;
+  _source: Source;
+};</code></pre>"
+Fiber节点的核心属性结构	"<pre><code class=""language-typescript"">type Fiber = {
+  tag: WorkTag;           // 25种节点类型
+  type: any;              // 与ReactElement.type相同
+  key: string | null;      // 与ReactElement.key相同
+  stateNode: any;         // 关联的DOM节点或类实例
+  
+  // 树结构指针
+  return: Fiber | null;   // 父节点
+  child: Fiber | null;    // 第一个子节点
+  sibling: Fiber | null;  // 下一个兄弟节点
+  
+  // 状态管理
+  memoizedState: any;     // 当前状态（类组件state/函数组件hooks）
+  memoizedProps: any;     // 上次渲染使用的props
+  pendingProps: any;      // 等待处理的props
+  
+  // 更新队列
+  updateQueue: UpdateQueue | null;
+  
+  // 副作用标记
+  flags: Flags;           // 本节点副作用
+  subtreeFlags: Flags;    // 子树副作用（新Reconciler）
+  deletions: Fiber[] | null; // 待删除节点（新Reconciler）
+  
+  // 优先级调度
+  lanes: Lanes;           // 本节点优先级
+  childLanes: Lanes;      // 子节点优先级
+  
+  // 双缓存技术
+  alternate: Fiber | null; // 另一棵树中的对应节点
+};</code></pre>"
+Update对象的数据结构	"<pre><code class=""language-typescript"">type Update&lt;State&gt; = {
+  lane: Lane;             // 更新优先级
+  tag: 0 | 1 | 2 | 3;     // 更新类型
+  payload: any;           // 更新内容
+  callback: (() => void) | null; // 回调函数
+  next: Update&lt;State&gt; | null; // 下一个更新（环形链表）
+};</code></pre>"
+UpdateQueue队列的数据结构	"<pre><code class=""language-typescript"">type UpdateQueue&lt;State&gt; = {
+  baseState: State;        // 当前基础状态
+  firstBaseUpdate: Update&lt;State&gt; | null; // 基础队列头
+  lastBaseUpdate: Update&lt;State&gt; | null;  // 基础队列尾
+  shared: {
+    pending: Update&lt;State&gt; | null; // 待处理更新
+  };
+  effects: Array&lt;Update&lt;State&gt;&gt; | null; // 含回调的更新
+};</code></pre>"
+Hook对象的数据结构	"<pre><code class=""language-typescript"">type Hook = {
+  memoizedState: any;     // 当前状态值
+  baseState: any;        // 基础状态
+  baseQueue: Update | null; // 基础队列
+  queue: UpdateQueue | null; // 更新队列
+  next: Hook | null;       // 下一个Hook（链表结构）
+};
+
+// Update对象（Hook专用）
+type Update = {
+  lane: Lane;             // 优先级
+  action: any;            // 更新动作
+  eagerReducer: Function | null;
+  eagerState: any | null;
+  next: Update | null;    // 下一个更新
+};
+
+// UpdateQueue（Hook专用）
+type UpdateQueue = {
+  pending: Update | null;  // 待处理更新
+  dispatch: Function | null;
+  lastRenderedReducer: Function | null;
+  lastRenderedState: any | null;
+};</code></pre>"
+调度器中的Task对象结构	"<pre><code class=""language-javascript"">const task = {
+  id: number,              // 唯一标识
+  callback: Function,      // 要执行的回调
+  priorityLevel: number,   // 优先级级别
+  startTime: number,       // 开始时间戳
+  expirationTime: number,  // 过期时间
+  sortIndex: number,       // 排序索引（小顶堆）
+};</code></pre>"
+ReactElement树与Fiber树的差异对比	"<pre><code class=""language-javascript"">// ReactElement树（JSX转换结果）
+const elementTree = {
+  type: 'div',
+  props: {
+    children: [
+      { type: Header, props: { /* ... */ } },
+      { type: Content, props: { /* ... */ } } // React.Fragment会被保留
+    ]
+  }
+};
+
+// Fiber树（运行时结构）
+const fiberTree = {
+  tag: HostRoot,
+  child: {
+    tag: HostComponent, // 对应div
+    child: {
+      tag: ClassComponent, // 对应Header组件
+      sibling: {
+        tag: FunctionComponent, // 对应Content组件
+        child: { // React.Fragment不会生成独立Fiber
+          tag: HostComponent, // 直接指向第一个p标签
+          sibling: { /* 下一个p标签 */ }
+        }
+      }
+    }
+  }
+};</code></pre>"
+UpdateQueue如何存储状态更新	"<pre><code class=""language-javascript"">// 创建初始队列
+const queue = {
+  baseState: { count: 0 },
+  shared: { pending: null },
+};
+
+// 添加更新（setState({count: 1})）
+const update1 = {
+  payload: { count: 1 },
+  next: null
+};
+update1.next = update1; // 自引用形成环形
+queue.shared.pending = update1;
+
+// 添加第二个更新（setState(c => ({count: c.count + 2}))）
+const update2 = {
+  payload: c => ({ count: c.count + 2 }),
+  next: queue.shared.pending.next // 插入环形链
+};
+queue.shared.pending.next = update2;
+queue.shared.pending = update2; // 更新入口指针
+
+// 最终结构：
+// update2 → update1 → update2（环形）</code></pre>"
+函数组件中Hook链表的结构	"<pre><code class=""language-javascript"">function MyComponent() {
+  // Hook链表在fiber.memoizedState中
+  const [state, setState] = useState(0); // Hook1
+  useEffect(() => {});                   // Hook2
+  const memo = useMemo(() => {}, []);    // Hook3
+  
+  return /* ... */;
+}
+
+// 对应fiber的memoizedState：
+const hookLinkedList = {
+  // Hook1 (useState)
+  memoizedState: 0,
+  queue: { /* 更新队列 */ },
+  next: {
+    // Hook2 (useEffect)
+    memoizedState: { 
+      create: () => {}, 
+      deps: []
+    },
+    queue: null,
+    next: {
+      // Hook3 (useMemo)
+      memoizedState: [/* 缓存值 */, /* 依赖 */],
+      queue: null,
+      next: null
+    }
+  }
+};</code></pre>"
+调度器任务队列的小顶堆结构	"<pre><code class=""language-javascript"">// 任务队列（小顶堆数组）
+const taskQueue = [
+  { sortIndex: 1, expirationTime: 1000, /* ... */ }, // 最高优先级
+  { sortIndex: 2, expirationTime: 2000, /* ... */ },
+  { sortIndex: 3, expirationTime: 3000, /* ... */ },
+  // ...
+];
+
+// 堆排序规则：
+// 1. 父节点i的左子节点在2*i+1
+// 2. 父节点i的右子节点在2*i+2
+// 3. 子节点j的父节点在floor((j-1)/2)
+// 4. 始终保证父节点的sortIndex <= 子节点</code></pre>"

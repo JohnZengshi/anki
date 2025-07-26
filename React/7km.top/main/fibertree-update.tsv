@@ -1,0 +1,228 @@
+#separator:tab
+#html:true
+React中如何实现双缓冲技术？	"<pre><code class=""language-javascript"">// 切换当前渲染树
+function commitRoot(root) {
+  const finishedWork = root.finishedWork;
+  
+  // 更新root.current指向新树
+  root.current = finishedWork;
+  
+  // 新树变为当前树，旧树变为备用树
+  finishedWork.alternate = root.current.alternate;
+  root.current.alternate = finishedWork;
+}</code></pre>"
+如何标记fiber更新路径的优先级？	"<pre><code class=""language-javascript"">function markUpdateLaneFromFiberToRoot(sourceFiber, lane) {
+  // 1. 设置源fiber的优先级
+  sourceFiber.lanes = mergeLanes(sourceFiber.lanes, lane);
+  
+  // 2. 向上遍历父节点设置childLanes
+  let node = sourceFiber;
+  let parent = sourceFiber.return;
+  while (parent !== null) {
+    parent.childLanes = mergeLanes(parent.childLanes, lane);
+    node = parent;
+    parent = parent.return;
+  }
+  
+  return node; // 返回HostRoot
+}</code></pre>"
+React中bailout优化如何实现？	"<pre><code class=""language-javascript"">function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes) {
+  // 检查子节点是否需要更新
+  if (!includesSomeLane(renderLanes, workInProgress.childLanes)) {
+    // 整个子树都不需要更新
+    return null;
+  }
+  
+  // 克隆子节点继续更新
+  cloneChildFibers(current, workInProgress);
+  return workInProgress.child;
+}</code></pre>"
+Class组件更新时如何判断是否渲染？	"<pre><code class=""language-javascript"">function updateClassComponent(current, workInProgress, Component, nextProps, renderLanes) {
+  const instance = workInProgress.stateNode;
+  
+  // 检查是否需要更新
+  if (current === null) {
+    // 挂载逻辑
+  } else {
+    // 更新逻辑
+    const oldProps = workInProgress.memoizedProps;
+    const hasNewProps = oldProps !== nextProps;
+    
+    // 调用shouldComponentUpdate
+    if (!hasNewProps && !checkHasForceUpdateAfterProcessing()) {
+      const shouldUpdate = instance.shouldComponentUpdate(nextProps, nextState);
+      
+      // 不需要更新则跳过
+      if (!shouldUpdate) {
+        return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
+      }
+    }
+  }
+  
+  // 需要更新，继续渲染
+  return reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+}</code></pre>"
+HostComponent在completeWork阶段如何处理更新？	"<pre><code class=""language-javascript"">function completeWork(current, workInProgress) {
+  const newProps = workInProgress.pendingProps;
+  
+  switch (workInProgress.tag) {
+    case HostComponent: {
+      if (current !== null && workInProgress.stateNode != null) {
+        // 对比属性变化
+        updateHostComponent(
+          current,
+          workInProgress,
+          workInProgress.type,
+          newProps
+        );
+      }
+      break;
+    }
+  }
+}</code></pre>"
+React如何优化PureComponent组件？	"<pre><code class=""language-javascript"">class Header extends React.PureComponent {
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;{this.props.title}&lt;/h1&gt;
+        &lt;h2&gt;Subtitle&lt;/h2&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+// 使用：当props.title不变时，不会重新渲染
+&lt;Header title=""My App"" /&gt;</code></pre>"
+React如何收集副作用队列？	"<pre><code class=""language-javascript"">function completeUnitOfWork(unitOfWork) {
+  let completedWork = unitOfWork;
+  
+  do {
+    const current = completedWork.alternate;
+    const returnFiber = completedWork.return;
+    
+    // 1. 完成当前节点工作
+    completeWork(current, completedWork);
+    
+    // 2. 将当前节点的副作用链添加到父节点
+    if (returnFiber !== null) {
+      if (returnFiber.firstEffect === null) {
+        returnFiber.firstEffect = completedWork.firstEffect;
+      }
+      if (completedWork.lastEffect !== null) {
+        if (returnFiber.lastEffect !== null) {
+          returnFiber.lastEffect.nextEffect = completedWork.firstEffect;
+        }
+        returnFiber.lastEffect = completedWork.lastEffect;
+      }
+    }
+    
+    // 3. 处理兄弟节点或返回父节点
+    const siblingFiber = completedWork.sibling;
+    if (siblingFiber !== null) {
+      workInProgress = siblingFiber;
+      return;
+    }
+    
+    completedWork = returnFiber;
+    workInProgress = completedWork;
+  } while (completedWork !== null);
+}</code></pre>"
+React Fiber节点的核心数据结构是什么？	"<pre><code class=""language-typescript"">interface Fiber {
+  // 基础属性
+  tag: WorkTag;
+  key: null | string;
+  elementType: any;
+  type: any;
+  stateNode: any;
+  
+  // 树结构
+  return: Fiber | null;
+  child: Fiber | null;
+  sibling: Fiber | null;
+  index: number;
+  
+  // 状态与属性
+  ref: any;
+  pendingProps: any;
+  memoizedProps: any;
+  memoizedState: any;
+  
+  // 更新相关
+  updateQueue: mixed;
+  lanes: Lanes;
+  childLanes: Lanes;
+  
+  // 双缓冲
+  alternate: Fiber | null;
+  
+  // 副作用
+  flags: Flags;
+  subtreeFlags: Flags;
+  deletions: Array<Fiber> | null;
+}</code></pre>"
+React列表更新时如何复用节点？	"<pre><code class=""language-javascript"">function ListComponent() {
+  const [items, setItems] = React.useState(['A', 'B', 'C']);
+  
+  return (
+    &lt;div&gt;
+      {items.map(item =&gt; (
+        // key确保节点复用
+        &lt;Item key={item} value={item} /&gt;
+      ))}
+      &lt;button onClick={() =&gt; setItems(['C', 'A', 'X'])}&gt;
+        更新列表
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// 更新后：
+// - key='A'和'C'的节点被复用
+// - key='X'的新节点被创建
+// - key='B'的节点被删除</code></pre>"
+React Fiber更新循环的核心流程是什么？	"<pre><code class=""language-javascript"">function workLoopSync() {
+  while (workInProgress !== null) {
+    performUnitOfWork(workInProgress);
+  }
+}
+
+function performUnitOfWork(unitOfWork) {
+  const current = unitOfWork.alternate;
+  
+  // 1. beginWork阶段
+  const next = beginWork(current, unitOfWork, subtreeRenderLanes);
+  
+  unitOfWork.memoizedProps = unitOfWork.pendingProps;
+  
+  if (next === null) {
+    // 2. completeWork阶段
+    completeUnitOfWork(unitOfWork);
+  } else {
+    workInProgress = next;
+  }
+}
+
+function beginWork(current, workInProgress, renderLanes) {
+  // 对比更新逻辑
+  if (current !== null) {
+    // 检查是否需要更新
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+    
+    if (oldProps !== newProps) {
+      didReceiveUpdate = true;
+    } else if (!includesSomeLane(renderLanes, updateLanes)) {
+      // 执行bailout优化
+      return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
+    }
+  }
+  
+  // 根据组件类型处理更新
+  switch (workInProgress.tag) {
+    case ClassComponent: 
+      return updateClassComponent(current, workInProgress, ...);
+    case HostComponent:
+      return updateHostComponent(current, workInProgress, ...);
+    // 其他类型...
+  }
+}</code></pre>"

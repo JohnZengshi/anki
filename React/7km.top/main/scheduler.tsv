@@ -1,0 +1,130 @@
+#separator:tab
+#html:true
+MessageChannel调度核心实现	"<pre><code class=""language-javascript"">const channel = new MessageChannel();
+channel.port1.onmessage = performWorkUntilDeadline;
+
+requestHostCallback = callback => {
+  scheduledHostCallback = callback;
+  if (!isMessageLoopRunning) {
+    isMessageLoopRunning = true;
+    channel.port2.postMessage(null); // 触发宏任务调度
+  }
+};</code></pre>"
+时间切片检查机制	"<pre><code class=""language-javascript"">let deadline = 0;
+const yieldInterval = 5; // 5ms切片周期
+
+function shouldYieldToHost() {
+  const currentTime = getCurrentTime();
+  // 当前时间超过deadline时让出主线程
+  return currentTime >= deadline;
+}
+
+function performWorkUntilDeadline() {
+  if (scheduledHostCallback !== null) {
+    const currentTime = getCurrentTime();
+    deadline = currentTime + yieldInterval; // 重置deadline
+    scheduledHostCallback(currentTime); // 执行回调
+    // ...后续检查是否需要继续调度
+  }
+}</code></pre>"
+任务队列管理（小顶堆实现）	"<pre><code class=""language-javascript"">const taskQueue = []; // 小顶堆结构
+
+function unstable_scheduleCallback(priority, callback) {
+  const currentTime = getCurrentTime();
+  const expirationTime = currentTime + getTimeoutByPriority(priority);
+  
+  // 创建任务对象
+  const task = {
+    id: taskIdCounter++,
+    callback,
+    priorityLevel: priority,
+    startTime: currentTime,
+    expirationTime,
+    sortIndex: expirationTime // 按过期时间排序
+  };
+  
+  push(taskQueue, task); // 加入小顶堆队列
+  requestHostCallback(flushWork); // 请求调度
+}</code></pre>"
+任务消费主循环	"<pre><code class=""language-javascript"">function workLoop(hasTimeRemaining, initialTime) {
+  let currentTime = initialTime;
+  currentTask = peek(taskQueue); // 取出优先级最高任务
+  
+  while (currentTask !== null) {
+    // 检查是否需要让出主线程
+    if (currentTask.expirationTime > currentTime && 
+        shouldYieldToHost()) {
+      break;
+    }
+    
+    const callback = currentTask.callback;
+    if (typeof callback === 'function') {
+      // 执行任务回调
+      const continuationCallback = callback();
+      currentTime = getCurrentTime();
+      
+      if (typeof continuationCallback === 'function') {
+        // 返回新函数表示任务需要中断恢复
+        currentTask.callback = continuationCallback;
+      } else {
+        // 任务完成，移出队列
+        pop(taskQueue);
+      }
+    } else {
+      pop(taskQueue); // 无效任务移出
+    }
+    currentTask = peek(taskQueue); // 取下一个任务
+  }
+  
+  return currentTask !== null; // 返回是否还有剩余任务
+}</code></pre>"
+节流防抖优化机制	"<pre><code class=""language-javascript"">function ensureRootIsScheduled(root) {
+  const existingCallbackNode = root.callbackNode;
+  const newCallbackPriority = getNextPriority();
+  
+  // 节流：相同优先级任务跳过
+  if (existingCallbackNode !== null && 
+      existingCallbackPriority === newCallbackPriority) {
+    return;
+  }
+  
+  // 防抖：取消旧任务
+  if (existingCallbackNode !== null) {
+    cancelCallback(existingCallbackNode);
+  }
+  
+  // 注册新任务
+  root.callbackNode = scheduleCallback(
+    newCallbackPriority,
+    performConcurrentWorkOnRoot.bind(null, root)
+  );
+}</code></pre>"
+优先级映射机制	"<pre><code class=""language-javascript"">// React优先级到Scheduler优先级的映射
+export function reactPriorityToSchedulerPriority(reactPriorityLevel) {
+  switch (reactPriorityLevel) {
+    case ImmediatePriority:
+      return Scheduler_ImmediatePriority;
+    case UserBlockingPriority:
+      return Scheduler_UserBlockingPriority;
+    case NormalPriority:
+      return Scheduler_NormalPriority;
+    case LowPriority:
+      return Scheduler_LowPriority;
+    case IdlePriority:
+      return Scheduler_IdlePriority;
+    default:
+      return Scheduler_NormalPriority;
+  }
+}
+
+// 不同优先级对应的超时时间
+function getTimeoutByPriority(priority) {
+  switch (priority) {
+    case ImmediatePriority: return -1; // 立即执行
+    case UserBlockingPriority: return 250;
+    case NormalPriority: return 5000;
+    case LowPriority: return 10000;
+    case IdlePriority: return maxSigned31BitInt;
+    default: return 5000;
+  }
+}</code></pre>"
