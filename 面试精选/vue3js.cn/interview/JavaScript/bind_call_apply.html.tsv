@@ -1,0 +1,148 @@
+#separator:tab
+#html:true
+JavaScript中bind/call/apply的核心区别	"<pre><code class=""language-javascript"">/* 三者在改变this指向时的关键差异 */
+const obj = { name: ""测试对象"" };
+
+function demo(a, b) {
+  console.log(this.name, a + b);
+}
+
+// 1. call - 立即执行，参数列表
+demo.call(obj, 1, 2); // 输出：测试对象 3
+
+// 2. apply - 立即执行，参数数组
+demo.apply(obj, [3, 4]); // 输出：测试对象 7
+
+// 3. bind - 返回新函数，延迟执行
+const boundFn = demo.bind(obj, 5);
+boundFn(6); // 输出：测试对象 11</code></pre>"
+JavaScript中实现bind方法的核心逻辑	"<pre><code class=""language-javascript"">Function.prototype.myBind = function(context) {
+  // 1. 确保调用者是函数
+  if (typeof this !== ""function"") {
+    throw new TypeError(""绑定的目标必须是函数"");
+  }
+  
+  // 2. 保存原函数和预绑参数
+  const fn = this;
+  const preArgs = Array.prototype.slice.call(arguments, 1);
+  
+  // 3. 返回绑定后的新函数
+  return function boundFn() {
+    // 4. 合并预绑参数和调用时参数
+    const callArgs = preArgs.concat(Array.from(arguments));
+    
+    // 5. 处理new调用场景：若通过new调用，this指向新实例
+    const isNewCall = this instanceof boundFn;
+    
+    return fn.apply(
+      isNewCall ? this : context,
+      callArgs
+    );
+  };
+};
+
+// 使用示例
+const bound = demo.myBind(obj, 10);
+bound(20); // 输出：测试对象 30</code></pre>"
+bind方法如何兼容new运算符的实现	"<pre><code class=""language-javascript"">// 重点：检测构造函数调用场景
+return function Fn() {
+  // 关键判断：是否通过new调用
+  if (this instanceof Fn) {
+    // 构造函数调用时：忽略绑定的context
+    // 使用新创建的实例作为this
+    return fn.apply(this, arguments);
+  }
+  
+  // 普通调用：使用绑定的context
+  return fn.apply(context, args.concat(...arguments));
+};
+
+// 测试用例
+function Person(name) {
+  this.name = name;
+}
+const BoundPerson = Person.bind({});
+const p = new BoundPerson(""Alice"");
+console.log(p.name); // ""Alice"" 而非绑定对象</code></pre>"
+不通过bind解决setTimeout的this问题	"<pre><code class=""language-javascript"">const obj = {
+  name: ""测试对象"",
+  logName() {
+    console.log(this.name);
+  }
+};
+
+// 方案1：箭头函数（词法作用域）
+setTimeout(() => obj.logName(), 0);
+
+// 方案2：闭包保存this引用
+setTimeout(function() {
+  obj.logName();
+}, 0);
+
+// 方案3：直接包装调用
+setTimeout(function() {
+  obj.logName.call(obj);
+}, 0);</code></pre>"
+箭头函数的this特性及限制	"<pre><code class=""language-javascript"">const obj = {
+  name: ""测试对象"",
+  
+  // 传统方法：this动态绑定
+  traditionalMethod: function() {
+    console.log(this.name);
+  },
+  
+  // 箭头函数：this静态绑定（定义时确定）
+  arrowMethod: () => {
+    console.log(this.name); // 指向外层作用域
+  }
+};
+
+obj.traditionalMethod(); // ""测试对象""
+obj.arrowMethod(); // 浏览器中输出undefined（严格模式）
+
+// 无法修改箭头函数的this
+const forced = obj.arrowMethod.bind({name: ""新对象""});
+forced(); // 仍然输出undefined</code></pre>"
+严格模式对this绑定的影响	"<pre><code class=""language-javascript"">""use strict"";
+
+function test() {
+  console.log(this);
+}
+
+// 非严格模式：指向window
+test(); // 输出undefined（严格模式）
+
+// 显式绑定null/undefined
+test.call(null); // null（严格模式）
+test.apply(undefined); // undefined（严格模式）
+
+// 对比非严格模式
+function nonStrict() {
+  console.log(this === window); // 浏览器中true
+}
+nonStrict.call(null); // true（非严格模式）</code></pre>"
+this绑定的优先级顺序	"<pre><code class=""language-javascript"">/* 四种绑定方式的优先级测试 */
+const obj1 = { name: ""对象1"" };
+const obj2 = { name: ""对象2"" };
+
+// 1. 默认绑定（最低）
+function show() {
+  console.log(this.name);
+}
+show(); // undefined（严格模式）
+
+// 2. 隐式绑定（对象调用）
+obj1.show = show;
+obj1.show(); // ""对象1""
+
+// 3. 显式绑定（call/bind）
+show.call(obj2); // ""对象2""
+const bound = show.bind(obj2);
+bound(); // ""对象2""
+
+// 4. new绑定（最高）
+function Person(name) {
+  this.name = name;
+}
+const p = new Person(""实例"");
+console.log(p.name); // ""实例""</code></pre>"

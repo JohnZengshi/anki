@@ -1,0 +1,101 @@
+#separator:tab
+#html:true
+JavaScript中concat方法的使用示例	"<pre><code class=""language-javascript"">// 创建新字符串而不修改原始值
+let greeting = ""Hello "";
+let fullGreeting = greeting.concat(""World""); 
+
+console.log(fullGreeting);  // ""Hello World""
+console.log(greeting);       // ""Hello "" (原字符串不变)</code></pre>"
+slice、substring和substr的区别	"<pre><code class=""language-javascript"">let text = ""javascript"";
+
+// slice：支持负索引，参数(开始索引, 结束索引)
+console.log(text.slice(4,7));    // ""scr"" (第4-6个字符)
+console.log(text.slice(-3));     // ""ipt"" (最后3个字符)
+
+// substring：负索引视为0，自动交换参数
+console.log(text.substring(4,7));// ""scr""
+console.log(text.substring(7,4));// ""scr"" (自动交换参数)
+
+// substr：第二个参数是长度
+console.log(text.substr(4,3));   // ""scr"" (从索引4开始取3个字符)</code></pre>"
+trim方法去除字符串两端空格	"<pre><code class=""language-javascript"">let input = ""   user@example.com   "";
+let cleanInput = input.trim();
+
+console.log(`原始: |${input}|`);      // |   user@example.com   |
+console.log(`处理后: |${cleanInput}|`); // |user@example.com|</code></pre>"
+padStart方法前导填充字符串	"<pre><code class=""language-javascript"">// 银行卡号格式化：不足16位前面补0
+let cardNumber = ""123456"";
+let fullCard = cardNumber.padStart(16, ""0"");
+
+console.log(fullCard); // ""0000000000123456""
+console.log(cardNumber.padEnd(20, ""X"")); // ""123456XXXXXXXXXXXX""</code></pre>"
+大小写转换方法使用	"<pre><code class=""language-javascript"">let city = ""londoN"";
+
+// 转全大写
+console.log(city.toUpperCase());  // ""LONDON""
+
+// 转全小写
+console.log(city.toLowerCase());   // ""london""
+
+// 首字母大写
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+console.log(capitalize(city));     // ""London""</code></pre>"
+charAt和indexOf方法使用	"<pre><code class=""language-javascript"">let phrase = ""JavaScript is awesome"";
+
+// 获取特定位置字符
+console.log(phrase.charAt(4));    // ""S"" (索引从0开始)
+
+// 查找子串位置
+console.log(phrase.indexOf(""is""));    // 11
+console.log(phrase.indexOf(""Python""));// -1 (未找到)
+
+// 安全获取字符：避免undefined
+console.log(phrase.charAt(100) || ""*""); // ""*""</code></pre>"
+includes和startsWith方法使用	"<pre><code class=""language-javascript"">let url = ""https://example.com/api"";
+
+// 检查协议
+console.log(url.startsWith(""https:"")); // true
+
+// 检查路径
+console.log(url.includes(""/api""));     // true
+
+// 检查域名
+console.log(url.includes(""example""));  // true
+console.log(url.includes(""localhost"")); // false</code></pre>"
+split方法分割字符串	"<pre><code class=""language-javascript"">// CSV数据处理示例
+let csvData = ""name,age,email\nJohn,30,j@ex.com\nJane,25,jane@ex.com"";
+let rows = csvData.split(""\n"");
+
+rows.forEach((row, i) => {
+  let columns = row.split("","");
+  console.log(`行${i}: `, columns);
+});
+
+// 输出:
+// 行0: [""name"", ""age"", ""email""]
+// 行1: [""John"", ""30"", ""j@ex.com""]</code></pre>"
+正则匹配方法使用(match/search/replace)	"<pre><code class=""language-javascript"">let text = ""订单号: ABC-123 总价: $99.50"";
+
+// 匹配所有数字
+console.log(text.match(/\d+/g)); // [""123"", ""99"", ""50""]
+
+// 搜索美元符号位置
+console.log(text.search(/\$/)); // 15
+
+// 替换敏感信息
+let securedText = text.replace(/\$\d+\.\d+/, ""[价格隐藏]"");
+console.log(securedText); // ""订单号: ABC-123 总价: [价格隐藏]""</code></pre>"
+字符串不可变性验证	"<pre><code class=""language-javascript"">// 证明字符串创建后不可修改
+let immutable = ""原始值"";
+
+// 所有""修改""操作都返回新字符串
+let newString = immutable.replace(""原始"", ""新"");
+
+console.log(immutable);   // ""原始值"" (未改变)
+console.log(newString);   // ""新值""
+
+// 尝试直接修改会失败
+immutable[0] = ""X"";
+console.log(immutable);   // ""原始值"" (未被修改)</code></pre>"

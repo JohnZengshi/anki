@@ -1,0 +1,128 @@
+#separator:tab
+#html:true
+JavaScript中Number()的转换规则示例	"<pre><code class=""language-javascript"">// 数值：直接转换
+console.log(Number(324)) // 324
+
+// 字符串：可解析数值
+console.log(Number('324')) // 324
+
+// 字符串：包含非数字字符
+console.log(Number('324abc')) // NaN
+
+// 空字符串
+console.log(Number('')) // 0
+
+// 布尔值
+console.log(Number(true)) // 1
+console.log(Number(false)) // 0
+
+// undefined
+console.log(Number(undefined)) // NaN
+
+// null
+console.log(Number(null)) // 0
+
+// 对象（非数组）
+console.log(Number({a:1})) // NaN
+
+// 数组（多元素）
+console.log(Number([1,2,3])) // NaN
+
+// 数组（单元素）
+console.log(Number([5])) // 5</code></pre>"
+parseInt()与Number()的区别示例	"<pre><code class=""language-javascript"">// parseInt逐个解析字符
+console.log(parseInt('32a3')) // 32
+
+// Number遇到非数字字符直接NaN
+console.log(Number('32a3')) // NaN
+
+// parseInt忽略开头空白
+console.log(parseInt('  42px')) // 42
+
+// Number严格转换
+console.log(Number('  42px')) // NaN</code></pre>"
+JavaScript中String()的转换规则示例	"<pre><code class=""language-javascript"">// 数值转字符串
+console.log(String(1)) // ""1""
+
+// 字符串保持不变
+console.log(String('a')) // ""a""
+
+// 布尔值转字符串
+console.log(String(true)) // ""true""
+
+// undefined
+console.log(String(undefined)) // ""undefined""
+
+// null
+console.log(String(null)) // ""null""
+
+// 对象
+console.log(String({a:1})) // ""[object Object]""
+
+// 数组
+console.log(String([1,2,3])) // ""1,2,3""</code></pre>"
+JavaScript中Boolean()的假值规则示例	"<pre><code class=""language-javascript"">// 假值(false)列表
+console.log(Boolean(undefined)) // false
+console.log(Boolean(null)) // false
+console.log(Boolean(0)) // false
+console.log(Boolean(NaN)) // false
+console.log(Boolean('')) // false
+
+// 真值(true)示例
+console.log(Boolean({})) // true
+console.log(Boolean([])) // true
+console.log(Boolean(' ')) // true
+console.log(Boolean(42)) // true
+console.log(Boolean(new Boolean(false))) // true</code></pre>"
+JavaScript中+运算符的隐式转换规则	"<pre><code class=""language-javascript"">// 字符串拼接（存在字符串时）
+console.log('5' + 1) // ""51""
+console.log('5' + true) // ""5true""
+console.log('5' + {}) // ""5[object Object]""
+console.log('5' + []) // ""5""
+console.log('5' + null) // ""5null""
+
+// 数值运算（无字符串时）
+console.log('5' - '2') // 3
+console.log('5' * '2') // 10
+console.log(true - 1) // 0
+console.log(false - 1) // -1
+console.log('5' * []) // 0
+console.log(null + 1) // 1
+
+// 特殊值
+console.log(undefined + 1) // NaN
+console.log('abc' - 1) // NaN</code></pre>"
+JavaScript中==与===的类型转换差异	"<pre><code class=""language-javascript"">// == 触发隐式类型转换
+console.log(1 == '1') // true
+console.log(0 == false) // true
+console.log('' == false) // true
+console.log(null == undefined) // true
+
+// === 严格相等（不转换类型）
+console.log(1 === '1') // false
+console.log(0 === false) // false
+console.log('' === false) // false
+console.log(null === undefined) // false
+
+// 特殊案例
+console.log([] == false) // true（[]→""→0, false→0）
+console.log([] === false) // false
+console.log({} == {}) // false（比较引用）</code></pre>"
+对象到原始值的转换机制	"<pre><code class=""language-javascript"">const obj = {
+  valueOf: () => 42,
+  toString: () => ""object""
+};
+
+// 数值上下文（优先valueOf）
+console.log(Number(obj)) // 42
+console.log(obj + 10) // 52
+
+// 字符串上下文（优先toString）
+console.log(String(obj)) // ""object""
+console.log(`Value: ${obj}`) // ""Value: object""
+
+// Date对象特殊处理
+const date = new Date();
+console.log(date.valueOf()) // 时间戳（数值）
+console.log(date.toString()) // 可读日期字符串
+console.log(`Today is ${date}`) // 使用toString()结果</code></pre>"

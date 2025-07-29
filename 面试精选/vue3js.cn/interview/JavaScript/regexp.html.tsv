@@ -1,0 +1,75 @@
+#separator:tab
+#html:true
+JavaScript正则字面量创建	"<pre><code class=""language-javascript"">// 匹配一个或多个数字（全局模式）
+const digitPattern = /\d+/g;</code></pre>"
+JavaScript正则构造函数创建	"<pre><code class=""language-javascript"">// 匹配邮箱地址（忽略大小写）
+const emailPattern = new RegExp(""^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$"", ""i"");</code></pre>"
+正则贪婪模式示例	"<pre><code class=""language-javascript"">// 贪婪匹配：尽可能多地捕获数字
+const greedy = /(\d+)(\d+)/;
+""12345"".match(greedy); 
+// 结果：[""12345"", ""123"", ""45""]</code></pre>"
+正则懒惰模式示例	"<pre><code class=""language-javascript"">// 懒惰匹配：尽可能少地捕获第一个数字组
+const lazy = /(\d+?)(\d+)/;
+""12345"".match(lazy);
+// 结果：[""1234"", ""1"", ""234""]</code></pre>"
+正则分组与反向引用	"<pre><code class=""language-javascript"">// 交换姓名顺序（捕获分组+反向引用）
+const nameSwap = /(\w+)\s+(\w+)/;
+""John Smith"".replace(nameSwap, '$2, $1'); 
+// 结果：""Smith, John""</code></pre>"
+正则先行断言示例	"<pre><code class=""language-javascript"">// 匹配后面跟着%的数字（不包含%）
+const lookahead = /\d+(?=%)/;
+""折扣15% off"".match(lookahead); 
+// 结果：[""15""]</code></pre>"
+正则后行断言示例	"<pre><code class=""language-javascript"">// 匹配前面是$的数字（不包含$）
+const lookbehind = /(?<=\$)\d+/;
+""价格$100美元"".match(lookbehind);
+// 结果：[""100""]</code></pre>"
+str.match方法使用	"<pre><code class=""language-javascript"">// 无g标志：返回完整匹配和分组
+const matchResult = ""CSS3"".match(/CS(S)(\d)/);
+// 结果：[""CSS3"", ""S"", ""3""]</code></pre>"
+str.matchAll方法使用	"<pre><code class=""language-javascript"">// 迭代所有匹配（需要g标志）
+const matches = [...""a1 b2 c3"".matchAll(/(\w)(\d)/g)];
+// 结果：三次匹配的数组，包含分组细节</code></pre>"
+str.replace方法使用	"<pre><code class=""language-javascript"">// 全局替换日期格式（年-月-日 → 月/日/年）
+const dateFormat = /(\d{4})-(\d{2})-(\d{2})/g;
+""2023-07-15"".replace(dateFormat, ""$2/$3/$1"");
+// 结果：""07/15/2023""</code></pre>"
+str.split方法使用	"<pre><code class=""language-javascript"">// 按多种分隔符拆分字符串
+const separators = /[,;\s]\s*/;
+""apple, banana;  cherry"".split(separators);
+// 结果：[""apple"", ""banana"", ""cherry""]</code></pre>"
+reg.exec迭代匹配	"<pre><code class=""language-javascript"">// 逐步匹配所有数字（更新lastIndex）
+const numPattern = /\d+/g;
+let match;
+while ((match = numPattern.exec(""1a23b456""))) {
+  console.log(`找到 ${match[0]} 在位置 ${match.index}`);
+}
+// 输出三次匹配结果</code></pre>"
+reg.test方法使用	"<pre><code class=""language-javascript"">// 验证密码强度（至少8位，含大小写和数字）
+const strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+strongPass.test(""Password123""); // true
+strongPass.test(""weak"");        // false</code></pre>"
+QQ号正则验证	"<pre><code class=""language-javascript"">// 验证合法QQ号（5-15位数字，非0开头）
+const qqPattern = /^[1-9]\d{4,14}$/;
+qqPattern.test(""123456"");   // true
+qqPattern.test(""01234"");    // false</code></pre>"
+URL参数解析正则	"<pre><code class=""language-javascript"">// 解析URL查询参数为对象
+function parseParams(str) {
+  const paramPattern = /([^&=]+)=?([^&]*)/g;
+  const params = {};
+  let match;
+  while ((match = paramPattern.exec(str))) {
+    params[match[1]] = match[2];
+  }
+  return params;
+}
+parseParams(""name=John&age=30""); 
+// 结果：{name: ""John"", age: ""30""}</code></pre>"
+用户名正则验证	"<pre><code class=""language-javascript"">// 验证用户名（字母开头，5-20位，可含._）
+const usernamePattern = /^[a-zA-Z][\w.]{4,19}$/;
+usernamePattern.test(""john_doe""); // true
+usernamePattern.test(""3invalid""); // false</code></pre>"
+URL结构解析正则	"<pre><code class=""language-javascript"">// 解析完整URL各组件
+const urlPattern = /^(?<protocol>https?:)\/\/(?<host>[^\/]+)(?<pathname>\/[^?#]*)?(?<search>\?[^#]*)?/;
+const urlResult = urlPattern.exec(""https://example.com/path?query=1"");
+// 结果：包含protocol/host/pathname/search的分组对象</code></pre>"

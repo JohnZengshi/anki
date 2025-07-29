@@ -1,0 +1,83 @@
+#separator:tab
+#html:true
+JavaScript中如何手写实现new操作符？	"<pre><code class=""language-javascript"">function myNew(Func, ...args) {
+  // 1. 创建空对象
+  const obj = {};
+  
+  // 2. 关联原型链
+  obj.__proto__ = Func.prototype;
+  
+  // 3. 绑定this并执行构造函数
+  const result = Func.apply(obj, args);
+  
+  // 4. 处理返回值：构造函数返回对象则使用它，否则返回新对象
+  return result instanceof Object ? result : obj;
+}
+
+// 使用示例
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+const p = myNew(Person, ""小明"", 25);
+console.log(p); // { name: ""小明"", age: 25 }</code></pre>"
+JavaScript中new操作符如何处理构造函数返回值？	"<pre><code class=""language-javascript"">// 返回原始值 - 被忽略
+function Case1() {
+  this.value = 10;
+  return 100; // 原始值返回值无效
+}
+const obj1 = new Case1();
+console.log(obj1.value); // 10
+
+// 返回对象 - 替换实例
+function Case2() {
+  this.value = 20;
+  return { custom: 30 }; // 对象返回值有效
+}
+const obj2 = new Case2();
+console.log(obj2.custom); // 30
+console.log(obj2.value);  // undefined</code></pre>"
+JavaScript中new操作符的执行流程是什么？	"<pre><code class=""language-javascript"">function newOperation(Constructor, ...args) {
+  // 1. 创建空对象
+  const obj = {};
+  
+  // 2. 链接原型链
+  Object.setPrototypeOf(obj, Constructor.prototype);
+  
+  // 3. 绑定this执行构造函数
+  const result = Constructor.apply(obj, args);
+  
+  // 4. 处理返回值
+  //   - 返回对象则使用它
+  //   - 否则返回新创建的对象
+  return result instanceof Object ? result : obj;
+}</code></pre>"
+JavaScript中new操作符如何实现原型链继承？	"<pre><code class=""language-javascript"">// 基础构造函数
+function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function() {
+  console.log(`${this.name} makes a noise`);
+};
+
+// 使用new创建实例
+const dog = new Animal(""Rex"");
+dog.speak(); // ""Rex makes a noise""
+
+// 原型链验证
+console.log(dog instanceof Animal);      // true
+console.log(dog.__proto__ === Animal.prototype); // true</code></pre>"
+JavaScript中构造函数如何通过new绑定this？	"<pre><code class=""language-javascript"">function Car(brand) {
+  // new操作符将this绑定到新对象
+  this.brand = brand;
+  
+  // 普通函数调用时this指向全局对象
+  console.log(""this指向:"", this);
+}
+
+// 1. 普通函数调用（错误方式）
+Car(""Toyota""); // this指向全局对象（如window）
+
+// 2. 使用new调用（正确方式）
+const myCar = new Car(""BMW""); // this指向新创建的Car实例</code></pre>"

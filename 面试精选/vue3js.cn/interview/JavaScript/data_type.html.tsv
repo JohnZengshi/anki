@@ -1,0 +1,125 @@
+#separator:tab
+#html:true
+JavaScript中基本数据类型有哪些？	"<pre><code class=""language-javascript"">// 6种基本类型(原始类型)
+const num = 42;        // Number
+const str = ""text"";    // String (双引号需转义)
+const bool = true;     // Boolean
+let undef;             // Undefined (未赋值的变量)
+const empty = null;    // Null
+const sym = Symbol();   // Symbol</code></pre>"
+如何用不同进制表示Number类型？	"<pre><code class=""language-javascript"">const decimal = 55;    // 十进制
+const octal = 0o70;     // 八进制(新语法)
+const hex = 0xA;        // 十六进制
+const binary = 0b1101;  // 二进制(ES6)
+const sci = 3.125e7;    // 科学计数法 → 31250000</code></pre>"
+Undefined与未定义变量有何区别？	"<pre><code class=""language-javascript"">let declared;  // 声明未赋值 → undefined
+console.log(declared); // ""undefined"" (正常输出)
+
+// console.log(undeclared); // 报错:未定义变量
+// 安全检测方式:
+typeof undeclared === ""undefined""; // true</code></pre>"
+演示String的不可变性	"<pre><code class=""language-javascript"">let lang = ""Java"";
+lang = lang + ""Script"";  // 实际过程:
+// 1. 创建新字符串""JavaScript""
+// 2. 销毁原字符串""Java""
+// 3. 变量指向新内存地址
+console.log(lang[0]); // ""J"" (可读但不可直接修改)</code></pre>"
+typeof null的结果及原因	"<pre><code class=""language-javascript"">const objRef = null;
+console.log(typeof objRef); // ""object""
+
+// 原因:历史遗留设计
+// null表示空对象指针(逻辑上非对象)</code></pre>"
+Boolean类型转换规则	"<pre><code class=""language-javascript"">// 显式转换
+console.log(Boolean(""text""));   // true (非空字符串)
+console.log(Boolean("""")));        // false (空字符串)
+console.log(Boolean(10));        // true (非零)
+console.log(Boolean(0));         // false
+console.log(Boolean({}));        // true (对象)
+console.log(Boolean(null));      // false
+console.log(Boolean(undefined)); // false
+
+// 隐式转换(if/while等自动应用)</code></pre>"
+Symbol的唯一性如何体现？	"<pre><code class=""language-javascript"">const sym1 = Symbol(""id"");
+const sym2 = Symbol(""id"");
+
+console.log(sym1 === sym2); // false
+
+// 典型用途:避免属性冲突
+const user = {
+  [sym1]: ""admin"",   // 唯一属性键
+  name: ""John""
+};</code></pre>"
+创建Object的三种方式	"<pre><code class=""language-javascript"">// 1. 字面量(最常用)
+const person = { 
+  name: ""Nicholas"", 
+  ""age"": 29  // 引号包裹的特殊键名
+};
+
+// 2. new构造函数
+const car = new Object();
+car.model = ""Tesla"";
+
+// 3. Object.create()
+const protoObj = { log: console.log };
+const newObj = Object.create(protoObj);</code></pre>"
+Array如何存储异构数据？	"<pre><code class=""language-javascript"">// 同一数组可存不同类型
+const heteroArray = [
+  ""text"",           // String
+  42,                // Number
+  { id: 1 },         // Object
+  [1, 2],            // Array
+  function() {},     // Function
+  Symbol()           // Symbol
+];
+
+// 动态扩容
+heteroArray.push(true);  // 添加Boolean类型
+console.log(heteroArray.length); // 7</code></pre>"
+函数的三种定义方式	"<pre><code class=""language-javascript"">// 1. 函数声明
+function add(a, b) {
+  return a + b;
+}
+
+// 2. 函数表达式
+const multiply = function(a, b) {
+  return a * b;
+};
+
+// 3. 箭头函数(ES6)
+const divide = (a, b) => a / b;
+
+// 函数本质是对象
+console.log(add instanceof Object); // true</code></pre>"
+基本类型与引用类型存储差异	"<pre><code class=""language-javascript"">// 基本类型(栈存储)
+let a = 10;  
+let b = a;   // 值拷贝
+b = 20;
+console.log(a); // 10 (不变)
+
+// 引用类型(堆存储+栈指针)
+const obj1 = {};
+const obj2 = obj1;   // 引用拷贝
+obj2.name = ""test"";
+console.log(obj1.name); // ""test"" (同步变化)</code></pre>"
+基本类型赋值的内存示意图	"<pre><code class=""language-text"">栈内存示意图:
+┌───────┐      ┌───────┐
+│  a=10 │  →   │  b=10 │   // 初始状态
+└───────┘      └───────┘
+
+赋值后修改:
+┌───────┐      ┌───────┐
+│  a=10 │      │  b=20 │   // 独立修改
+└───────┘      └───────┘</code></pre>"
+引用类型赋值的内存示意图	"<pre><code class=""language-text"">栈内存            堆内存
+┌─────────────┐     ┌───────────┐
+│ obj1 → #001 │ →   │ 对象数据   │
+├─────────────┤     └───────────┘
+│ obj2 → #001 │
+└─────────────┘
+
+修改后:
+                      ┌───────────┐
+                      │ name:""test""│
+                      └───────────┘
+                      ↑
+栈内存保持不变 → #001</code></pre>"

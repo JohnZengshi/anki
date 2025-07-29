@@ -1,0 +1,50 @@
+#separator:tab
+#html:true
+JavaScript中如何获取函数的原型对象？	"<pre><code class=""language-javascript"">function Person() {} 
+console.log(Person.prototype); 
+// 输出: { constructor: Person, __proto__: Object }</code></pre>"
+如何验证实例对象的原型链关系？	"<pre><code class=""language-javascript"">function Animal() {}
+const cat = new Animal();
+
+// 验证原型链关系
+console.log(cat.__proto__ === Animal.prototype); // true
+console.log(Animal.prototype.__proto__ === Object.prototype); // true
+console.log(Object.prototype.__proto__ === null); // true</code></pre>"
+JavaScript中如何实现原型继承？	"<pre><code class=""language-javascript"">function Parent() {
+  this.name = ""Parent"";
+}
+
+Parent.prototype.sayHello = function() {
+  console.log(""Hello from "" + this.name);
+};
+
+function Child() {
+  this.name = ""Child"";
+}
+
+// 实现原型继承
+Child.prototype = Object.create(Parent.prototype);
+Child.prototype.constructor = Child;
+
+const child = new Child();
+child.sayHello(); // 输出: Hello from Child</code></pre>"
+如何解释Object和Function的原型关系？	"<pre><code class=""language-javascript"">// Object是函数对象
+console.log(Object.__proto__ === Function.prototype); // true
+
+// Function的原型是普通对象
+console.log(Function.prototype.__proto__ === Object.prototype); // true
+
+// 原型链终点
+console.log(Object.prototype.__proto__ === null); // true</code></pre>"
+JavaScript中constructor属性有什么作用？	"<pre><code class=""language-javascript"">function Car(model) {
+  this.model = model;
+}
+
+const myCar = new Car(""Tesla"");
+
+// constructor指向创建实例的构造函数
+console.log(myCar.constructor === Car); // true
+
+// 通过constructor创建新实例
+const anotherCar = new myCar.constructor(""BMW"");
+console.log(anotherCar.model); // 输出: BMW</code></pre>"

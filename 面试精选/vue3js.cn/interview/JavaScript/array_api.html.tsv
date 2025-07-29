@@ -1,0 +1,148 @@
+#separator:tab
+#html:true
+JS数组的push()方法使用示例	"<pre><code class=""language-javascript"">// 向数组末尾添加元素
+let fruits = [""apple"", ""banana""];
+let newLength = fruits.push(""orange"", ""mango"");
+
+console.log(fruits); // [""apple"", ""banana"", ""orange"", ""mango""]
+console.log(newLength); // 4</code></pre>"
+JS数组的unshift()方法使用示例	"<pre><code class=""language-javascript"">// 向数组开头添加元素
+let colors = [""blue"", ""green""];
+let newLength = colors.unshift(""red"", ""yellow"");
+
+console.log(colors); // [""red"", ""yellow"", ""blue"", ""green""]
+console.log(newLength); // 4</code></pre>"
+JS数组的splice()插入元素示例	"<pre><code class=""language-javascript"">// 在指定位置插入元素
+let numbers = [1, 2, 5, 6];
+// 从索引2开始，删除0个元素，插入3和4
+numbers.splice(2, 0, 3, 4);
+
+console.log(numbers); // [1, 2, 3, 4, 5, 6]</code></pre>"
+JS数组的concat()方法使用示例	"<pre><code class=""language-javascript"">// 合并数组创建新数组
+let arr1 = [""a"", ""b""];
+let arr2 = [""c"", ""d""];
+let combined = arr1.concat(arr2, ""e"");
+
+console.log(arr1); // [""a"", ""b""] 原数组不变
+console.log(combined); // [""a"", ""b"", ""c"", ""d"", ""e""]</code></pre>"
+JS数组的pop()方法使用示例	"<pre><code class=""language-javascript"">// 删除并返回最后一个元素
+let stack = [10, 20, 30];
+let lastItem = stack.pop();
+
+console.log(stack); // [10, 20]
+console.log(lastItem); // 30</code></pre>"
+JS数组的shift()方法使用示例	"<pre><code class=""language-javascript"">// 删除并返回第一个元素
+let queue = [""first"", ""second"", ""third""];
+let firstItem = queue.shift();
+
+console.log(queue); // [""second"", ""third""]
+console.log(firstItem); // ""first""</code></pre>"
+JS数组的splice()删除元素示例	"<pre><code class=""language-javascript"">// 删除指定位置的元素
+let letters = [""a"", ""b"", ""c"", ""d"", ""e""];
+// 从索引1开始删除2个元素
+let removed = letters.splice(1, 2);
+
+console.log(letters); // [""a"", ""d"", ""e""]
+console.log(removed); // [""b"", ""c""]</code></pre>"
+JS数组的slice()方法使用示例	"<pre><code class=""language-javascript"">// 创建数组的子集副本
+let numbers = [1, 2, 3, 4, 5];
+let sub1 = numbers.slice(1, 4); // 索引1到3
+let sub2 = numbers.slice(2); // 索引2到末尾
+
+console.log(sub1); // [2, 3, 4]
+console.log(sub2); // [3, 4, 5]
+console.log(numbers); // [1, 2, 3, 4, 5] 原数组不变</code></pre>"
+JS数组的splice()修改元素示例	"<pre><code class=""language-javascript"">// 替换数组中的元素
+let data = [""A"", ""B"", ""C"", ""D""];
+// 从索引1开始，删除2个元素，插入""X""和""Y""
+let replaced = data.splice(1, 2, ""X"", ""Y"");
+
+console.log(data); // [""A"", ""X"", ""Y"", ""D""]
+console.log(replaced); // [""B"", ""C""]</code></pre>"
+JS数组的indexOf()方法使用示例	"<pre><code class=""language-javascript"">// 查找元素首次出现的位置
+let values = [10, 20, 30, 20, 40];
+let index1 = values.indexOf(20); // 1
+let index2 = values.indexOf(50); // -1 (未找到)
+
+console.log(index1);
+console.log(index2);</code></pre>"
+JS数组的includes()方法使用示例	"<pre><code class=""language-javascript"">// 检查数组是否包含元素
+let languages = [""JavaScript"", ""Python"", ""Java""];
+let hasPython = languages.includes(""Python""); // true
+let hasRuby = languages.includes(""Ruby""); // false
+
+console.log(hasPython);
+console.log(hasRuby);</code></pre>"
+JS数组的find()方法使用示例	"<pre><code class=""language-javascript"">// 查找满足条件的第一个元素
+let users = [
+  { id: 1, name: ""Alice"", age: 25 },
+  { id: 2, name: ""Bob"", age: 30 },
+  { id: 3, name: ""Charlie"", age: 28 }
+];
+
+let result = users.find(user => user.age > 25);
+console.log(result); // {id: 2, name: ""Bob"", age: 30}</code></pre>"
+JS数组的reverse()方法使用示例	"<pre><code class=""language-javascript"">// 反转数组元素的顺序
+let sequence = [1, 2, 3, 4, 5];
+sequence.reverse();
+
+console.log(sequence); // [5, 4, 3, 2, 1]</code></pre>"
+JS数组的sort()方法使用示例	"<pre><code class=""language-javascript"">// 对数组进行排序（带比较函数）
+let scores = [88, 95, 70, 100, 60];
+// 数字升序排序
+scores.sort((a, b) => a - b);
+
+console.log(scores); // [60, 70, 88, 95, 100]</code></pre>"
+JS数组的join()方法使用示例	"<pre><code class=""language-javascript"">// 将数组元素连接成字符串
+let dateParts = [2023, 8, 15];
+let dashedDate = dateParts.join(""-"");
+let spacedDate = dateParts.join("" "");
+
+console.log(dashedDate); // ""2023-8-15""
+console.log(spacedDate); // ""2023 8 15""</code></pre>"
+JS数组的some()方法使用示例	"<pre><code class=""language-javascript"">// 检查是否至少有一个元素满足条件
+let temperatures = [22, 25, 18, 30, 15];
+let hasHotDay = temperatures.some(temp => temp > 28);
+
+console.log(hasHotDay); // true</code></pre>"
+JS数组的every()方法使用示例	"<pre><code class=""language-javascript"">// 检查所有元素是否满足条件
+let ages = [18, 22, 25, 30];
+let allAdults = ages.every(age => age >= 18);
+
+console.log(allAdults); // true</code></pre>"
+JS数组的forEach()方法使用示例	"<pre><code class=""language-javascript"">// 遍历数组执行操作
+let products = [""Phone"", ""Laptop"", ""Tablet""];
+products.forEach((product, index) => {
+  console.log(`产品 #${index + 1}: ${product}`);
+});
+
+// 输出:
+// 产品 #1: Phone
+// 产品 #2: Laptop
+// 产品 #3: Tablet</code></pre>"
+JS数组的filter()方法使用示例	"<pre><code class=""language-javascript"">// 过滤满足条件的元素
+let numbers = [1, 2, 3, 4, 5, 6];
+let evenNumbers = numbers.filter(num => num % 2 === 0);
+
+console.log(evenNumbers); // [2, 4, 6]</code></pre>"
+JS数组的map()方法使用示例	"<pre><code class=""language-javascript"">// 对每个元素执行转换
+let prices = [100, 200, 300];
+let discounted = prices.map(price => price * 0.8);
+
+console.log(discounted); // [80, 160, 240]</code></pre>"
+JS数组方法哪些会改变原数组？	"<pre><code class=""language-markdown"">**会改变原数组的方法:**
+- push()、pop()
+- unshift()、shift()
+- splice()
+- reverse()
+- sort()
+
+**不会改变原数组的方法:**
+- concat()
+- slice()
+- indexOf()、includes()
+- find()、findIndex()
+- join()
+- some()、every()
+- forEach()
+- filter()、map()</code></pre>"

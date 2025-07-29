@@ -1,0 +1,142 @@
+#separator:tab
+#html:true
+JavaScript中三种执行上下文类型是什么？	"<pre><code class=""language-javascript"">// 1. 全局执行上下文
+console.log(this === window); // true，浏览器环境中this指向window
+
+// 2. 函数执行上下文
+function createContext() {
+  console.log(""函数执行上下文被创建"");
+}
+createContext(); // 每次调用都会创建新的执行上下文
+
+// 3. Eval执行上下文 (不推荐使用)
+eval('const evalContext = ""eval环境"";');
+console.log(evalContext); // 仅在eval内部有效</code></pre>"
+JavaScript执行上下文的生命周期包含哪些阶段？	"<pre><code class=""language-javascript"">function demoLifecycle() {
+  // 创建阶段: 确定this/创建词法环境/创建变量环境
+  // (引擎内部操作，不可直接观察)
+  
+  // 执行阶段: 变量赋值和代码执行
+  const value = ""执行阶段赋值"";
+  console.log(value);
+  
+  // 回收阶段: 函数执行完毕后出栈
+}
+demoLifecycle(); // 函数调用触发完整生命周期</code></pre>"
+JavaScript词法环境和变量环境有什么区别？	"<pre><code class=""language-javascript"">// 创建阶段伪代码演示
+const ExecutionContext = {
+  LexicalEnvironment: {
+    EnvironmentRecord: {
+      a: &lt;uninitialized&gt;,   // let/const声明
+      b: &lt;uninitialized&gt;,
+      func: &lt;function&gt;     // 函数声明
+    },
+    outer: &lt;null&gt;           // 外部引用
+  },
+  VariableEnvironment: {
+    EnvironmentRecord: {
+      c: undefined          // var声明
+    },
+    outer: &lt;null&gt;
+  }
+};
+
+// 实际执行效果
+function demoEnvironments() {
+  console.log(c); // undefined (变量环境)
+  console.log(a); // ReferenceError (词法环境未初始化)
+  
+  var c = ""var变量"";
+  let a = ""let变量"";
+}</code></pre>"
+JavaScript执行栈如何工作？用代码说明	"<pre><code class=""language-javascript"">function first() {
+  console.log(""进入first函数上下文"");
+  second(); // 调用second函数
+  console.log(""返回first函数上下文"");
+}
+
+function second() {
+  console.log(""进入second函数上下文"");
+  console.log(""退出second函数上下文"");
+}
+
+console.log(""进入全局上下文"");
+first();
+console.log(""退出全局上下文"");
+
+/* 执行栈变化：
+1. 全局上下文入栈
+2. first()入栈
+3. second()入栈
+4. second()出栈
+5. first()出栈
+6. 全局上下文出栈
+*/</code></pre>"
+JavaScript变量提升的本质是什么？	"<pre><code class=""language-javascript"">// 创建阶段处理
+console.log(a); // undefined (变量环境初始化)
+console.log(b); // ReferenceError (词法环境未初始化)
+
+var a = ""var变量"";
+let b = ""let变量"";
+
+// 函数声明提升
+hoistedFunc(); // 正常执行
+
+function hoistedFunc() {
+  console.log(""函数声明在创建阶段完全初始化"");
+}</code></pre>"
+JavaScript中let/const的暂时性死区如何表现？	"<pre><code class=""language-javascript"">function temporalDeadZone() {
+  // 暂时性死区开始
+  console.log(typeof value); // ReferenceError
+  let value = ""初始化"";
+  
+  // 初始化后
+  console.log(value); // ""初始化""
+}
+temporalDeadZone();
+
+// 比较var声明
+console.log(typeof varValue); // undefined (不会报错)
+var varValue = ""var变量"";</code></pre>"
+JavaScript全局执行上下文的伪代码结构	"<pre><code class=""language-javascript"">GlobalExectionContext = {
+  ThisBinding: &lt;Global Object&gt;,
+  LexicalEnvironment: {
+    EnvironmentRecord: {
+      Type: ""Object"",
+      // 标识符绑定 (let/const/函数)
+      a: &lt;uninitialized&gt;,
+      multiply: &lt;func&gt;
+    },
+    outer: &lt;null&gt;
+  },
+  VariableEnvironment: {
+    EnvironmentRecord: {
+      Type: ""Object"",
+      // 标识符绑定 (var)
+      c: undefined
+    },
+    outer: &lt;null&gt;
+  }
+};</code></pre>"
+JavaScript函数执行上下文的伪代码结构	"<pre><code class=""language-javascript"">FunctionExectionContext = {
+  ThisBinding: &lt;Global Object or undefined&gt;,
+  LexicalEnvironment: {
+    EnvironmentRecord: {
+      Type: ""Declarative"",
+      // 函数参数和局部变量
+      Arguments: {0: 20, 1: 30, length: 2},
+      e: 20,
+      f: 30,
+      g: &lt;uninitialized&gt;
+    },
+    outer: &lt;GlobalLexicalEnvironment&gt;
+  },
+  VariableEnvironment: {
+    EnvironmentRecord: {
+      Type: ""Declarative"",
+      // var声明
+      h: undefined
+    },
+    outer: &lt;GlobalLexicalEnvironment&gt;
+  }
+};</code></pre>"

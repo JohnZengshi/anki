@@ -1,0 +1,98 @@
+#separator:tab
+#html:true
+JavaScript作用域基本概念演示	"<pre><code class=""language-javascript"">// 作用域决定变量可见性范围
+function demoScope() {
+  var localVar = ""函数内部变量"";
+  console.log(localVar); // 可访问
+}
+demoScope();
+console.log(localVar); // ReferenceError: 外部不可访问</code></pre>"
+JavaScript全局作用域示例	"<pre><code class=""language-javascript"">// 全局作用域变量
+const GLOBAL_CONST = ""全局常量"";
+var globalVar = ""全局变量"";
+
+function accessGlobal() {
+  console.log(GLOBAL_CONST); // 可访问
+  console.log(globalVar);    // 可访问
+}
+accessGlobal();</code></pre>"
+JavaScript函数作用域示例	"<pre><code class=""language-javascript"">// 函数作用域(局部作用域)
+function createLocal() {
+  var localVar = ""局部变量"";
+  
+  function innerFunc() {
+    console.log(localVar); // 可访问(闭包)
+  }
+  innerFunc();
+  
+  return localVar;
+}
+console.log(createLocal()); // 通过返回值访问
+// console.log(localVar); // ReferenceError</code></pre>"
+JavaScript块级作用域示例	"<pre><code class=""language-javascript"">// ES6块级作用域
+{
+  let blockScoped = ""块级变量"";
+  const BLOCK_CONST = ""块级常量"";
+  var functionScoped = ""函数作用域变量"";
+
+  console.log(blockScoped);  // 块内可访问
+  console.log(BLOCK_CONST);  // 块内可访问
+}
+
+console.log(functionScoped); // var可跨块访问
+// console.log(blockScoped); // ReferenceError
+// console.log(BLOCK_CONST); // ReferenceError</code></pre>"
+JavaScript词法作用域演示	"<pre><code class=""language-javascript"">// 词法作用域(静态作用域)
+var x = 10;
+
+function outer() {
+  var x = 20;
+  
+  function inner() {
+    // 使用定义时的作用域(全局x)
+    console.log(x); // 输出10而不是20
+  }
+  
+  return inner;
+}
+const myInner = outer();
+myInner();</code></pre>"
+JavaScript作用域链查找过程	"<pre><code class=""language-javascript"">// 作用域链查找
+const globalVal = ""全局"";
+
+function outer() {
+  const outerVal = ""外部"";
+
+  function inner() {
+    const innerVal = ""内部"";
+    
+    console.log(innerVal);  // 当前作用域找到
+    console.log(outerVal);  // 上层作用域找到
+    console.log(globalVal); // 全局作用域找到
+    // console.log(missing); // ReferenceError
+  }
+  
+  inner();
+}
+outer();</code></pre>"
+JavaScript作用域错误类型示例	"<pre><code class=""language-javascript"">// 作用域相关的ReferenceError
+function testErrors() {
+  let validVar = ""可访问"";
+  
+  {
+    let blockVar = ""块内变量"";
+    console.log(validVar); // 正常
+  }
+  
+  // console.log(blockVar); // ReferenceError
+}
+// console.log(validVar); // ReferenceError</code></pre>"
+ES6作用域特性对比表	"<pre><code class=""language-javascript"">/* ES6作用域特性对比
++----------------+----------------+----------------+
+|     特性       |       var      | let/const      |
++----------------+----------------+----------------+
+|  作用域类型    | 函数作用域     | 块级作用域     |
+|  变量提升      | 是             | 暂时性死区     |
+|  重复声明      | 允许           | 禁止           |
+|  全局属性      | 是             | 不是           |
++----------------+----------------+----------------+ */</code></pre>"

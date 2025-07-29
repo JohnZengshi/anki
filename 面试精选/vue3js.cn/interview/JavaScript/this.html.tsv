@@ -1,0 +1,78 @@
+#separator:tab
+#html:true
+JavaScript默认绑定示例（非严格模式）	"<pre><code class=""language-javascript"">// 默认绑定：独立函数调用指向全局对象
+var name = ""Jenny"";
+function showName() {
+  console.log(this.name);  // this指向window
+}
+showName();  // 输出 ""Jenny""</code></pre>"
+JavaScript隐式绑定示例	"<pre><code class=""language-javascript"">// 隐式绑定：方法调用指向调用对象
+const obj = {
+  value: 42,
+  getValue: function() {
+    return this.value;  // this指向obj
+  }
+};
+console.log(obj.getValue());  // 输出 42</code></pre>"
+JavaScript new绑定示例	"<pre><code class=""language-javascript"">// new绑定：构造函数指向新实例
+function Person(name) {
+  this.name = name;  // this指向新创建的实例
+}
+const p = new Person(""Alex"");
+console.log(p.name);  // 输出 ""Alex""</code></pre>"
+JavaScript显式绑定(call)示例	"<pre><code class=""language-javascript"">// 显式绑定：call强制指定this
+function greet() {
+  return `Hello, ${this.name}!`;
+}
+const user = { name: ""Bob"" };
+console.log(greet.call(user));  // 输出 ""Hello, Bob!""</code></pre>"
+JavaScript箭头函数特性示例	"<pre><code class=""language-javascript"">// 箭头函数：this继承定义时的上下文
+const timer = {
+  start() {
+    setTimeout(() => {
+      console.log(this);  // 指向timer对象（而非window）
+    }, 100);
+  }
+};
+timer.start();</code></pre>"
+JavaScript绑定优先级示例	"<pre><code class=""language-javascript"">// 优先级：new绑定 > 显式绑定
+function Car(brand) {
+  this.brand = brand;
+}
+const obj = {};
+const BoundCar = Car.bind(obj);
+const bmw = new BoundCar(""BMW"");
+console.log(bmw.brand);  // 输出 ""BMW""（new覆盖bind）
+console.log(obj.brand);  // 输出 undefined</code></pre>"
+严格模式下的this行为	"<pre><code class=""language-javascript"">// 严格模式：默认绑定指向undefined
+function strictTest() {
+  ""use strict"";
+  console.log(this);  // 输出 undefined
+}
+strictTest();</code></pre>"
+隐式绑定丢失问题	"<pre><code class=""language-javascript"">// 隐式绑定丢失的常见场景
+const counter = {
+  count: 0,
+  increment() {
+    this.count++;
+  }
+};
+const fn = counter.increment;
+fn();  // this指向全局（严格模式报错）
+console.log(window.count);  // 输出 NaN（非严格模式）</code></pre>"
+构造函数返回值的this影响	"<pre><code class=""language-javascript"">// 构造函数返回对象时的this指向
+function Test() {
+  this.value = 10;
+  return { value: 20 };  // 返回对象覆盖this
+}
+const t = new Test();
+console.log(t.value);  // 输出 20（而非10）</code></pre>"
+箭头函数在原型方法中的陷阱	"<pre><code class=""language-javascript"">// 箭头函数不适合作为对象方法
+function Dog(name) {
+  this.name = name;
+}
+Dog.prototype.bark = () => {
+  console.log(this.name);  // 指向全局（非实例）
+};
+const dog = new Dog(""Buddy"");
+dog.bark();  // 输出 undefined</code></pre>"

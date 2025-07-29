@@ -1,0 +1,109 @@
+#separator:tab
+#html:true
+JavaScript事件代理的基本实现代码	"<pre><code class=""language-javascript"">// 事件委托处理点击事件
+document.getElementById('parent').addEventListener('click', function(event) {
+  const target = event.target;
+  
+  // 检查事件源是否为目标元素
+  if (target.matches('.item')) {
+    console.log('点击的项:', target.textContent);
+  }
+});</code></pre>"
+JavaScript事件代理处理动态添加元素的代码	"<pre><code class=""language-javascript"">// 父容器绑定事件处理函数
+const container = document.getElementById('container');
+container.onclick = function(e) {
+  const target = e.target;
+  
+  // 匹配动态添加的按钮元素
+  if (target.classList.contains('dynamic-btn')) {
+    console.log('点击了动态按钮:', target.dataset.id);
+  }
+};
+
+// 动态添加新元素
+document.getElementById('addBtn').addEventListener('click', function() {
+  const newBtn = document.createElement('button');
+  newBtn.className = 'dynamic-btn';
+  newBtn.dataset.id = Date.now();
+  newBtn.textContent = '新按钮';
+  container.appendChild(newBtn);
+});</code></pre>"
+JavaScript事件代理中精确匹配目标元素的代码	"<pre><code class=""language-javascript"">// 使用data属性精确匹配目标元素
+document.querySelector('.menu').addEventListener('click', (e) => {
+  const target = e.target;
+  
+  // 检查是否匹配特定数据属性的元素
+  if (target.dataset.role === 'menu-item') {
+    console.log('选择的菜单项:', target.dataset.id);
+  }
+});</code></pre>"
+JavaScript事件代理不适用场景说明	"<pre><code class=""language-text"">不适用事件代理的场景：
+1. focus/blur事件：无冒泡机制
+2. mousemove/mouseout事件：高频触发性能差
+3. Media事件（play/pause）：特定媒体元素
+4. 需要精确控制事件阶段的情况</code></pre>"
+JavaScript事件代理与直接绑定的性能对比代码	"<pre><code class=""language-javascript"">// 直接绑定（性能差）
+const items = document.querySelectorAll('.item');
+items.forEach(item => {
+  item.addEventListener('click', handleClick);
+});
+
+// 事件代理（性能优）
+document.querySelector('.list').addEventListener('click', e => {
+  if (e.target.matches('.item')) {
+    handleClick(e);
+  }
+});
+
+function handleClick(e) {
+  // 处理点击逻辑
+}</code></pre>"
+JavaScript事件代理中处理事件冒泡的代码	"<pre><code class=""language-javascript"">// 阻止事件冒泡到父元素
+document.getElementById('dialog').addEventListener('click', e => {
+  if (e.target.classList.contains('close-btn')) {
+    e.stopPropagation();  // 阻止冒泡
+    closeDialog();
+  }
+});
+
+// 父容器绑定点击关闭功能
+document.body.addEventListener('click', () => {
+  closeDialog();
+});</code></pre>"
+事件代理在Golang中的类比实现伪代码	"<pre><code class=""language-go"">// 事件处理器注册中心（类似JS的父元素）
+type EventBus struct {
+  handlers map[string]func(Event)
+}
+
+// 事件分发（类似事件冒泡处理）
+func (eb *EventBus) Dispatch(e Event) {
+  for _, handler := range eb.handlers {
+    if matchesTarget(e, handler) {  // 匹配目标处理器
+      handler(e)
+    }
+  }
+}
+
+// 添加事件处理器（类似动态元素绑定）
+func (eb *EventBus) Subscribe(eventType string, handler func(Event)) {
+  eb.handlers[eventType] = handler
+}</code></pre>"
+JavaScript事件代理兼容IE的代码	"<pre><code class=""language-javascript"">// 兼容IE的事件委托实现
+function delegateEvent(parent, selector, eventName, handler) {
+  const element = document.querySelector(parent);
+  
+  element.attachEvent('on' + eventName, function(e) {
+    e = e || window.event;
+    const target = e.target || e.srcElement;
+    
+    // 检查目标元素是否匹配选择器
+    if (target.matches(selector)) {
+      handler.call(target, e);
+    }
+  });
+}
+
+// 使用示例
+delegateEvent('#list', 'li.item', 'click', function() {
+  console.log('IE兼容的事件代理');
+});</code></pre>"

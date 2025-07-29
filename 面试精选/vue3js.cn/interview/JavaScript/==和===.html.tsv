@@ -1,0 +1,102 @@
+#separator:tab
+#html:true
+JavaScript中==操作符的隐式转换规则	"<pre><code class=""language-javascript"">// 布尔值转数值
+console.log(true == 1);   // true (1 == 1)
+console.log(false == 0);  // true (0 == 0)
+
+// 字符串转数值
+console.log(""55"" == 55); // true (55 == 55)
+console.log(""hello"" == 0); // true (NaN == 0 → false)
+
+// null/undefined特殊处理
+console.log(null == undefined); // true
+console.log(null == 0);         // false
+
+// 对象调用valueOf()
+const obj = {
+  valueOf: () => 100
+};
+console.log(obj == 100); // true</code></pre>"
+JavaScript严格相等(===)的类型检查	"<pre><code class=""language-javascript"">// 类型不同立即返回false
+console.log(""55"" === 55);  // false (string vs number)
+console.log(true === 1);   // false (boolean vs number)
+
+// 类型相同才比较值
+console.log(55 === 55);    // true
+console.log(""hi"" === ""hi""); // true
+
+// 特殊值处理
+console.log(null === null);       // true
+console.log(undefined === undefined); // true
+console.log(NaN === NaN);         // false</code></pre>"
+== vs ===在null/undefined比较中的区别	"<pre><code class=""language-javascript"">// 宽松相等(==)的特殊处理
+console.log(null == undefined);  // true
+
+// 严格相等(===)的类型检查
+console.log(null === undefined); // false (不同数据类型)
+
+// 实用技巧：检测null或undefined
+function checkValue(val) {
+  // 等同于 val === null || val === undefined
+  return val == null; 
+}
+console.log(checkValue(null));      // true
+console.log(checkValue(undefined)); // true
+console.log(checkValue(0));         // false</code></pre>"
+对象在相等比较中的行为	"<pre><code class=""language-javascript"">const obj1 = { id: 1 };
+const obj2 = { id: 1 };
+const obj3 = obj1;
+
+// 引用比较（内存地址）
+console.log(obj1 == obj2);   // false (不同实例)
+console.log(obj1 == obj3);   // true (相同引用)
+
+// 严格相等同样检查引用
+console.log(obj1 === obj2);  // false
+console.log(obj1 === obj3);  // true
+
+// 重写valueOf()影响比较
+obj2.valueOf = () => 1;
+console.log(obj2 == 1);      // true</code></pre>"
+NaN在相等比较中的特殊规则	"<pre><code class=""language-javascript"">// NaN与任何值比较（包括自身）都返回false
+console.log(NaN == NaN);   // false
+console.log(NaN === NaN);  // false
+console.log(NaN == 0);     // false
+console.log(NaN == ""NaN""); // false
+
+// 检测NaN的正确方法
+console.log(isNaN(NaN));         // true
+console.log(Number.isNaN(NaN));  // true
+console.log(Object.is(NaN, NaN)); // true</code></pre>"
+==操作符的隐式转换陷阱示例	"<pre><code class=""language-javascript"">// 违反直觉的结果
+console.log("" "" == 0);          // true (空字符串→0)
+console.log(""0"" == false);       // true (false→0, ""0""→0)
+console.log([] == false);        // true ([]→"""", """"→0)
+
+// 特殊字符转换
+console.log(""\t\r\n"" == 0);     // true (空白符→0)
+
+// 对象与原始值比较
+console.log([1] == ""1"");        // true ([1]→""1"")
+console.log([1,2] == ""1,2"");    // true</code></pre>"
+何时使用== vs ===的最佳实践	"<pre><code class=""language-javascript"">// 1. 绝大多数情况使用===
+const userInput = document.getElementById(""input"").value;
+if (userInput === ""100"") { 
+  // 精确匹配字符串
+}
+
+// 2. 唯一例外：检测null/undefined
+function getConfig(config) {
+  // 同时检测null和undefined
+  if (config.option == null) {
+    return ""default"";
+  }
+  return config.option;
+}
+
+// 3. 避免的类型转换陷阱
+const count = 0;
+if (count == false) {
+  // 会执行（0 == false → true）
+  // 应该用：if (!count) 或 if (count === 0)
+}</code></pre>"

@@ -1,0 +1,124 @@
+#separator:tab
+#html:true
+JavaScript闭包基础结构示例	"<pre><code class=""language-javascript"">// 闭包 = 函数 + 词法环境引用
+function outer() {
+  const outerVar = ""外部变量""; // 将被闭包捕获的变量
+  
+  // 内部函数(闭包)
+  function inner() {
+    console.log(outerVar); // 访问外部作用域变量
+  }
+  
+  return inner;
+}
+
+const closure = outer();
+closure(); // 即使outer执行完毕，仍能访问outerVar</code></pre>"
+JavaScript闭包实现私有变量	"<pre><code class=""language-javascript"">const counter = (() => {
+  let privateCount = 0; // 私有变量
+  
+  return {
+    increment: () => privateCount++,
+    decrement: () => privateCount--,
+    getValue: () => privateCount
+  };
+})();
+
+counter.increment();
+console.log(counter.getValue()); // 1
+// privateCount 无法直接访问，实现私有化</code></pre>"
+JavaScript闭包延长变量生命周期	"<pre><code class=""language-javascript"">function createTimer(duration) {
+  let startTime = Date.now(); // 被闭包捕获的变量
+  
+  return function() {
+    const elapsed = Date.now() - startTime;
+    return `已运行: ${elapsed}ms (预设: ${duration}ms)`;
+  };
+}
+
+const timer = createTimer(5000);
+setTimeout(() => console.log(timer()), 3000);
+// 5秒后startTime仍存在内存中</code></pre>"
+JavaScript闭包实现函数柯里化	"<pre><code class=""language-javascript"">// 通用柯里化函数
+function curry(fn) {
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn.apply(this, args);
+    } else {
+      return (...args2) => curried.apply(this, args.concat(args2));
+    }
+  };
+}
+
+// 使用示例
+const sum = (a, b, c) => a + b + c;
+const curriedSum = curry(sum);
+const addFive = curriedSum(5);
+
+console.log(addFive(10)(15)); // 30</code></pre>"
+JavaScript避免不必要的闭包（性能优化）	"<pre><code class=""language-javascript"">// 反例：在构造函数中创建方法（每个实例都创建新闭包）
+function Person(name) {
+  this.name = name;
+  this.getName = function() { return this.name; }; // 不必要的闭包
+}
+
+// 正例：使用原型链共享方法
+function Person(name) {
+  this.name = name;
+}
+
+Person.prototype.getName = function() {
+  return this.name; // 无闭包开销
+};
+
+const p1 = new Person(""Alice"");
+const p2 = new Person(""Bob"");</code></pre>"
+JavaScript闭包内存管理注意事项	"<pre><code class=""language-javascript"">function createHeavyObject() {
+  const largeData = new Array(1000000).fill('*'); // 大数据
+  
+  return {
+    getSize: () => largeData.length,
+    cleanup: () => { 
+      // 重要：不再需要时手动解除引用
+      largeData.length = 0;
+    }
+  };
+}
+
+const obj = createHeavyObject();
+// 使用后主动释放内存
+obj.cleanup();</code></pre>"
+闭包作用域链访问顺序	"<pre><code class=""language-javascript"">const globalVar = ""全局变量"";
+
+function outer() {
+  const outerVar = ""外部变量"";
+  
+  function inner() {
+    const innerVar = ""内部变量"";
+    console.log(innerVar); // 1. 当前作用域
+    console.log(outerVar); // 2. 闭包作用域
+    console.log(globalVar); // 3. 全局作用域
+  }
+  
+  return inner;
+}</code></pre>"
+JavaScript模块模式实现	"<pre><code class=""language-javascript"">const myModule = (() => {
+  // 私有变量和方法
+  let privateCounter = 0;
+  
+  function privateIncrement() {
+    privateCounter++;
+  }
+  
+  // 暴露公共接口
+  return {
+    increment: () => {
+      privateIncrement();
+      console.log(""计数增加"");
+    },
+    getCount: () => privateCounter
+  };
+})();
+
+myModule.increment();
+console.log(myModule.getCount()); // 1</code></pre>"

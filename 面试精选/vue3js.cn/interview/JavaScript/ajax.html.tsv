@@ -1,0 +1,100 @@
+#separator:tab
+#html:true
+如何用JavaScript创建XMLHttpRequest对象	"<pre><code class=""language-javascript"">// 创建XHR核心对象
+const xhr = new XMLHttpRequest();</code></pre>"
+JavaScript中如何建立XHR服务器连接	"<pre><code class=""language-javascript"">// 配置请求方法和URL（GET示例）
+xhr.open('GET', 'https://api.example.com/data', true);
+
+// POST请求示例
+xhr.open('POST', '/submit-form', true);</code></pre>"
+JavaScript中如何发送XHR GET请求	"<pre><code class=""language-javascript"">// 数据拼接在URL中
+const params = new URLSearchParams({ id: 123, type: 'test' });
+xhr.open('GET', `https://api.example.com?${params}`, true);
+xhr.send(null);  // GET请求send()参数必须为null</code></pre>"
+JavaScript中如何发送XHR POST请求	"<pre><code class=""language-javascript"">xhr.open('POST', '/api/submit', true);
+// 设置请求头并发送JSON数据
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.send(JSON.stringify({ username: 'john', age: 30 }));</code></pre>"
+如何监听XHR的状态变化	"<pre><code class=""language-javascript"">xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4) {  // 请求完成
+    if (xhr.status >= 200 && xhr.status < 300) {
+      console.log(xhr.responseText);
+    } else {
+      console.error('请求失败:', xhr.status);
+    }
+  }
+};</code></pre>"
+如何封装基础AJAX函数	"<pre><code class=""language-javascript"">function ajax(options) {
+  const xhr = new XMLHttpRequest();
+  options.method = (options.method || 'GET').toUpperCase();
+  
+  if (options.method === 'GET') {
+    const params = new URLSearchParams(options.data);
+    xhr.open('GET', `${options.url}?${params}`, true);
+    xhr.send(null);
+  } else if (options.method === 'POST') {
+    xhr.open('POST', options.url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(options.data));
+  }
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        options.success?.(JSON.parse(xhr.responseText));
+      } else {
+        options.error?.(xhr.status);
+      }
+    }
+  };
+}</code></pre>"
+如何使用封装的AJAX函数	"<pre><code class=""language-javascript"">ajax({
+  method: 'POST',
+  url: '/api/users',
+  data: { name: 'Alice', role: 'admin' },
+  success: (response) => {
+    console.log('创建成功:', response);
+    document.getElementById('result').innerHTML = response.message;
+  },
+  error: (status) => {
+    console.error(`错误 ${status}: 请求失败`);
+  }
+});</code></pre>"
+XHR的readyState有哪些状态值	"<pre><code class=""language-javascript"">/*
+0: UNSENT       - 未调用open()
+1: OPENED       - 已调用open()
+2: HEADERS_RECEIVED - 收到响应头
+3: LOADING      - 响应体加载中
+4: DONE         - 请求完成（关键状态）
+*/</code></pre>"
+如何处理XHR的HTTP错误状态	"<pre><code class=""language-javascript"">xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4) {
+    if (xhr.status >= 400) {  // 客户端/服务端错误
+      handleError(xhr.status);
+    }
+  }
+};
+
+function handleError(status) {
+  const errors = {
+    400: '请求参数错误',
+    401: '身份验证失败',
+    403: '访问被禁止',
+    404: '资源不存在',
+    500: '服务器内部错误'
+  };
+  alert(errors[status] || `未知错误: ${status}`);
+}</code></pre>"
+GET和POST请求在XHR中的区别	"<pre><code class=""language-javascript"">/*
+GET请求：
+  - 数据通过URL参数传递
+  - 使用xhr.send(null)
+  - 有URL长度限制
+  - 适合数据查询
+
+POST请求：
+  - 数据通过send()方法体发送
+  - 需要设置Content-Type
+  - 无数据大小限制
+  - 适合数据提交
+*/</code></pre>"

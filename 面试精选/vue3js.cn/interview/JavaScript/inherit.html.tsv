@@ -1,0 +1,214 @@
+#separator:tab
+#html:true
+JavaScript原型链继承的实现代码示例	"<pre><code class=""language-javascript"">// 父类构造函数
+function Animal(name) {
+  this.name = name || 'Animal';
+  this.colors = ['red', 'blue']; // 引用类型属性
+}
+
+// 父类原型方法
+Animal.prototype.sayName = function() {
+  console.log('My name is ' + this.name);
+};
+
+// 子类构造函数
+function Cat() {
+  this.type = 'cat';
+}
+
+// 关键步骤：将父类实例作为子类原型
+Cat.prototype = new Animal(); // 建立原型链
+
+// 创建实例
+const cat1 = new Cat();
+const cat2 = new Cat();
+
+// 问题：修改引用属性会影响所有实例
+cat1.colors.push('green');
+console.log(cat2.colors); // ['red', 'blue', 'green']</code></pre>"
+JavaScript构造函数继承的实现代码	"<pre><code class=""language-javascript"">// 父类
+function Vehicle(wheels) {
+  this.wheels = wheels || 4;
+  this.start = function() {
+    console.log('Engine started');
+  };
+}
+
+// 父类原型方法（子类无法继承）
+Vehicle.prototype.stop = function() {
+  console.log('Engine stopped');
+};
+
+// 子类
+function Car(brand) {
+  // 关键：在子类上下文中调用父类构造函数
+  Vehicle.call(this, 4); // 继承实例属性
+  this.brand = brand;
+}
+
+// 测试实例
+const myCar = new Car('Toyota');
+console.log(myCar.wheels); // 4 (继承成功)
+console.log(myCar.start); // function (继承成功)
+console.log(myCar.stop); // undefined (原型方法未继承)</code></pre>"
+JavaScript组合继承的实现代码	"<pre><code class=""language-javascript"">// 父类
+function Person(name) {
+  this.name = name;
+  this.hobbies = ['reading', 'coding'];
+}
+
+// 父类原型方法
+Person.prototype.introduce = function() {
+  console.log(`Hi, I'm ${this.name}`);
+};
+
+// 子类
+function Developer(name, language) {
+  // 1. 构造函数继承（实例属性）
+  Person.call(this, name); 
+  this.language = language;
+}
+
+// 2. 原型链继承（原型方法）
+Developer.prototype = new Person();
+// 修复构造函数指向
+Developer.prototype.constructor = Developer;
+
+// 测试
+const dev1 = new Developer('Alice', 'JavaScript');
+const dev2 = new Developer('Bob', 'Python');
+
+dev1.hobbies.push('gaming');
+console.log(dev1.hobbies); // ['reading','coding','gaming']
+console.log(dev2.hobbies); // ['reading','coding'] (引用独立)
+dev2.introduce(); // ""Hi, I'm Bob"" (原型方法继承)</code></pre>"
+JavaScript寄生组合式继承实现（最优方案）	"<pre><code class=""language-javascript"">// 继承工具函数
+function inherit(child, parent) {
+  // 1. 创建父类原型的副本
+  const prototype = Object.create(parent.prototype);
+  // 2. 修复构造函数指向
+  prototype.constructor = child;
+  // 3. 设置子类原型
+  child.prototype = prototype;
+}
+
+// 父类
+function Shape(color) {
+  this.color = color;
+}
+Shape.prototype.draw = function() {
+  console.log(`Drawing ${this.color} shape`);
+};
+
+// 子类
+function Circle(radius, color) {
+  // 继承实例属性
+  Shape.call(this, color);
+  this.radius = radius;
+}
+
+// 关键：应用寄生组合继承
+inherit(Circle, Shape);
+
+// 添加子类特有方法
+Circle.prototype.calcArea = function() {
+  return Math.PI * this.radius ** 2;
+};
+
+// 测试
+const redCircle = new Circle(10, 'red');
+redCircle.draw(); // ""Drawing red shape""
+console.log(redCircle.calcArea()); // 314.159...</code></pre>"
+ES6 class继承实现代码示例	"<pre><code class=""language-javascript"">class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  // 原型方法
+  speak() {
+    console.log(`${this.name} makes a noise`);
+  }
+  
+  // 静态方法（也可被继承）
+  static info() {
+    console.log('Animal class');
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    // 必须先调用super()才能使用this
+    super(name); 
+    this.breed = breed;
+  }
+  
+  // 方法覆盖
+  speak() {
+    console.log(`${this.name} barks!`);
+  }
+  
+  // 新增方法
+  fetch() {
+    console.log(`${this.name} fetches the ball`);
+  }
+}
+
+// 测试
+const rex = new Dog('Rex', 'Labrador');
+rex.speak(); // ""Rex barks!"" (覆盖父类方法)
+rex.fetch(); // ""Rex fetches the ball"" (新增方法)
+Dog.info(); // ""Animal class"" (继承静态方法)</code></pre>"
+Object.create实现原型式继承	"<pre><code class=""language-javascript"">// 基础对象
+const vehiclePrototype = {
+  init(make, model) {
+    this.make = make;
+    this.model = model;
+  },
+  getInfo() {
+    return `${this.make} ${this.model}`;
+  },
+  features: ['wheels', 'engine']
+};
+
+// 创建实例
+const car1 = Object.create(vehiclePrototype);
+car1.init('Toyota', 'Camry');
+
+const car2 = Object.create(vehiclePrototype);
+car2.init('Honda', 'Accord');
+
+// 问题：引用属性共享
+car1.features.push('navigation');
+console.log(car2.features); 
+// ['wheels','engine','navigation'] (共享污染)</code></pre>"
+寄生式继承实现代码示例	"<pre><code class=""language-javascript"">// 基础对象
+const person = {
+  name: 'Unknown',
+  friends: ['Alice', 'Bob']
+};
+
+// 工厂函数
+function createEmployee(base, name, position) {
+  // 1. 浅拷贝基础对象
+  const obj = Object.create(base);
+  
+  // 2. 增强对象
+  obj.name = name;
+  obj.position = position;
+  obj.getSalary = function() {
+    return this.position === 'manager' ? 10000 : 5000;
+  };
+  
+  return obj;
+}
+
+// 创建实例
+const emp1 = createEmployee(person, 'John', 'developer');
+const emp2 = createEmployee(person, 'Sarah', 'manager');
+
+console.log(emp1.getSalary()); // 5000
+console.log(emp2.getSalary()); // 10000
+
+// 引用属性共享问题仍然存在
+emp1.friends.push('Charlie');
+console.log(emp2.friends); // ['Alice','Bob','Charlie']</code></pre>"

@@ -1,0 +1,123 @@
+#separator:tab
+#html:true
+JavaScript中检测number类型使用什么方法?	"<pre><code class=""language-javascript"">// 使用typeof检测number类型
+let num = 42;
+console.log(typeof num);  // ""number""
+
+// 使用Object.prototype.toString检测
+console.log(Object.prototype.toString.call(num));  // ""[object Number]""</code></pre>"
+typeof null返回什么?为什么这是历史Bug?	"<pre><code class=""language-javascript"">console.log(typeof null);  // ""object""
+
+/* 历史Bug解释:
+   1. JavaScript初始版本使用32位存储值
+   2. 低3位表示类型标签：000=object
+   3. null的机器码是全0，因此被误判为object
+   4. 已无法修复（会破坏现有网站） */</code></pre>"
+如何安全检测变量是否存在?	"<pre><code class=""language-javascript"">// 正确方法（未声明变量不报错）
+if (typeof undeclaredVar !== 'undefined') {
+  console.log('变量存在');
+} else {
+  console.log('变量未定义');  // 实际输出
+}
+
+// 错误方法（直接使用会报错）
+try {
+  if (undeclaredVar) {}  // ReferenceError
+} catch(e) {
+  console.log('捕获错误:', e.message);
+}</code></pre>"
+实现instanceof的原型链检测机制	"<pre><code class=""language-javascript"">function myInstanceof(left, right) {
+  // 1. 排除基础类型
+  if (typeof left !== 'object' || left === null) return false;
+  
+  // 2. 获取原型链
+  let proto = Object.getPrototypeOf(left);
+  
+  // 3. 沿原型链向上查找
+  while (true) {
+    if (proto === null) return false;
+    if (proto === right.prototype) return true;  // 找到匹配
+    proto = Object.getPrototypeOf(proto);  // 向上移动
+  }
+}
+
+// 测试
+function Car() {}
+let benz = new Car();
+console.log(myInstanceof(benz, Car));  // true
+console.log(myInstanceof([], Array));  // true</code></pre>"
+检测数组类型的可靠方法有哪些?	"<pre><code class=""language-javascript"">const arr = [1, 2, 3];
+
+// 方法1：Array.isArray（ES6推荐）
+console.log(Array.isArray(arr));  // true
+
+// 方法2：Object.prototype.toString
+console.log(
+  Object.prototype.toString.call(arr) === '[object Array]'  // true
+);
+
+// 方法3：instanceof（注意iframe边界问题）
+console.log(arr instanceof Array);  // true
+
+// 方法4：constructor（可能被修改）
+console.log(arr.constructor === Array);  // true</code></pre>"
+实现通用类型检测函数getType()	"<pre><code class=""language-javascript"">function getType(obj) {
+  // 1. 先用typeof处理基础类型
+  const type = typeof obj;
+  if (type !== 'object') {
+    return type;  // string/number/boolean等
+  }
+  
+  // 2. 特殊处理null
+  if (obj === null) return 'null';
+  
+  // 3. 对象类型使用toString检测
+  return Object.prototype.toString.call(obj)
+    .replace(/^\[object (\S+)\]$/, '$1')
+    .toLowerCase();  // 统一小写
+}
+
+// 测试用例
+console.log(getType(123));        // ""number""
+console.log(getType(null));       // ""null""
+console.log(getType([]));         // ""array""
+console.log(getType(/test/));     // ""regexp""
+console.log(getType(new Date())); // ""date""</code></pre>"
+instanceof与typeof的主要区别是什么?	"<pre><code class=""language-javascript"">/* 核心区别总结：
+   | 特性         | typeof         | instanceof       |
+   |--------------|----------------|------------------|
+   | 返回值       | 类型字符串     | 布尔值           |
+   | null检测     | ""object""     | false            |
+   | 函数检测     | ""function""   | 可检测构造函数    |
+   | 基础类型     | 有效           | 无效(除Object()) |
+   | 原型链检测   | 不支持         | 支持             |
+   | 未声明变量   | 安全(undefined)| 报错             | */
+
+// 示例对比
+function Test() {}
+const obj = new Test();
+
+console.log(typeof obj);        // ""object""
+console.log(obj instanceof Test); // true
+
+console.log(typeof 123);       // ""number""
+console.log(123 instanceof Number); // false</code></pre>"
+检测函数类型的正确方法	"<pre><code class=""language-javascript"">function example() {}
+
+// 方法1：typeof（最直接）
+console.log(typeof example);  // ""function""
+
+// 方法2：instanceof
+console.log(example instanceof Function);  // true
+
+// 方法3：toString（最可靠）
+console.log(
+  Object.prototype.toString.call(example)  // ""[object Function]""
+);
+
+// 错误方法（无法识别箭头函数）
+try {
+  console.log(example.constructor);  // 可能被修改
+} catch(e) {
+  console.log('constructor不可靠');
+}</code></pre>"

@@ -1,0 +1,131 @@
+#separator:tab
+#html:true
+JavaScript事件循环的基本流程	"<pre><code class=""language-javascript"">// 事件循环核心流程
+while (true) {
+  // 1. 执行同步任务直到清空
+  executeSyncTasks();
+  
+  // 2. 检查微任务队列
+  while (microTaskQueue.length > 0) {
+    const microTask = microTaskQueue.shift();
+    executeTask(microTask);
+  }
+  
+  // 3. 执行一个宏任务
+  const macroTask = macroTaskQueue.dequeue();
+  executeTask(macroTask);
+}</code></pre>"
+JavaScript同步任务与异步任务示例	"<pre><code class=""language-javascript"">console.log('同步任务1'); // 立即执行
+
+setTimeout(() => {
+  console.log('异步任务 - setTimeout');
+}, 0);
+
+new Promise(resolve => {
+  console.log('同步任务2 - Promise构造器');
+  resolve();
+}).then(() => {
+  console.log('异步任务 - Promise.then');
+});
+
+console.log('同步任务3'); 
+
+// 输出顺序:
+// 同步任务1
+// 同步任务2 - Promise构造器
+// 同步任务3
+// 异步任务 - Promise.then
+// 异步任务 - setTimeout</code></pre>"
+宏任务与微任务的执行顺序示例	"<pre><code class=""language-javascript"">console.log('宏任务1: script开始');
+
+setTimeout(() => {
+  console.log('宏任务2: setTimeout');
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('微任务1: Promise.resolve');
+});
+
+queueMicrotask(() => {
+  console.log('微任务2: queueMicrotask');
+});
+
+console.log('宏任务1: script结束');
+
+// 输出顺序:
+// 宏任务1: script开始
+// 宏任务1: script结束
+// 微任务1: Promise.resolve
+// 微任务2: queueMicrotask
+// 宏任务2: setTimeout</code></pre>"
+async/await的执行机制	"<pre><code class=""language-javascript"">async function asyncFunc() {
+  console.log('async函数开始');
+  
+  await new Promise(resolve => {
+    console.log('await Promise构造器');
+    resolve();
+  });
+  
+  console.log('await之后代码');
+}
+
+console.log('外层同步开始');
+asyncFunc();
+console.log('外层同步结束');
+
+// 输出顺序:
+// 外层同步开始
+// async函数开始
+// await Promise构造器
+// 外层同步结束
+// await之后代码</code></pre>"
+复杂事件循环执行顺序分析	"<pre><code class=""language-javascript"">console.log('script start');
+
+setTimeout(() => {
+  console.log('setTimeout1');
+  Promise.resolve().then(() => console.log('promise in setTimeout'));
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('promise1');
+  setTimeout(() => console.log('setTimeout in promise'), 0);
+});
+
+queueMicrotask(() => console.log('microtask1'));
+
+Promise.resolve().then(() => console.log('promise2'));
+
+console.log('script end');
+
+/* 执行顺序:
+1. script start (同步)
+2. script end (同步)
+3. promise1 (微任务)
+4. promise2 (微任务)
+5. microtask1 (微任务)
+6. setTimeout1 (宏任务)
+7. promise in setTimeout (微任务)
+8. setTimeout in promise (宏任务) */
+</code></pre>"
+Node.js中process.nextTick的特殊性	"<pre><code class=""language-javascript"">console.log('start');
+
+setImmediate(() => console.log('setImmediate'));
+setTimeout(() => console.log('setTimeout'), 0);
+
+Promise.resolve().then(() => console.log('promise resolved'));
+
+process.nextTick(() => {
+  console.log('nextTick1');
+  process.nextTick(() => console.log('nextTick2'));
+});
+
+console.log('end');
+
+/* Node.js输出顺序:
+1. start (同步)
+2. end (同步)
+3. nextTick1 (nextTick队列)
+4. nextTick2 (nextTick队列)
+5. promise resolved (微任务)
+6. setTimeout/setImmediate (宏任务，顺序不确定) */
+</code></pre>"

@@ -1,0 +1,56 @@
+#separator:tab
+#html:true
+JavaScript事件流的三个阶段是什么？	"<pre><code class=""language-plaintext"">1. 捕获阶段（Capture Phase）: 事件从document向目标元素传播
+2. 目标阶段（Target Phase）: 事件到达目标元素
+3. 冒泡阶段（Bubbling Phase）: 事件从目标元素向document传播</code></pre>"
+DOM0级事件模型如何绑定点击事件？	"<pre><code class=""language-javascript"">// HTML内联绑定
+&lt;button onclick=""handleClick()"">Click&lt;/button&gt;
+
+// JS属性绑定
+const btn = document.getElementById('btn');
+btn.onclick = function() {
+  console.log('DOM0级事件触发');
+};</code></pre>"
+DOM0级事件模型如何移除事件监听？	"<pre><code class=""language-javascript"">// 将事件属性设为null
+btn.onclick = null;</code></pre>"
+DOM2级addEventListener的基本用法？	"<pre><code class=""language-javascript"">btn.addEventListener('click', function(event) {
+  console.log('事件类型:', event.type);
+  console.log('当前元素:', event.currentTarget.tagName);
+}, false); // 第三个参数决定捕获/冒泡阶段处理</code></pre>"
+如何用DOM2级模型同时绑定多个点击事件？	"<pre><code class=""language-javascript"">// 可绑定多个不冲突的事件处理器
+btn.addEventListener('click', () => console.log('处理器1'));
+btn.addEventListener('click', () => console.log('处理器2'));
+btn.addEventListener('click', () => console.log('处理器3'));</code></pre>"
+event.eventPhase返回值代表什么？	"<pre><code class=""language-javascript"">function handleEvent(e) {
+  // 事件阶段检测:
+  if (e.eventPhase === 1) console.log('捕获阶段');
+  if (e.eventPhase === 2) console.log('目标阶段');
+  if (e.eventPhase === 3) console.log('冒泡阶段');
+}</code></pre>"
+如何实现事件捕获阶段的处理？	"<pre><code class=""language-javascript"">// 第三个参数设为true启用捕获
+parent.addEventListener('click', e => {
+  console.log('捕获阶段触发:', e.currentTarget.tagName);
+}, true);</code></pre>"
+标准事件模型和IE事件模型的区别？	"<pre><code class=""language-plaintext"">标准模型(DOM2):
+  addEventListener/removeEventListener
+  支持三阶段(捕获/目标/冒泡)
+  
+IE模型(已弃用):
+  attachEvent/detachEvent
+  仅支持目标+冒泡两阶段
+  事件类型需加'on'(如'onclick')</code></pre>"
+事件冒泡的实际示例？	"<pre><code class=""language-javascript"">document.querySelector('div').addEventListener('click', () => {
+  console.log('div冒泡阶段触发');
+}, false);
+
+document.querySelector('button').addEventListener('click', () => {
+  console.log('按钮目标阶段触发');
+}, false);
+
+// 点击按钮将输出:
+// 按钮目标阶段触发
+// div冒泡阶段触发</code></pre>"
+如何阻止事件传播？	"<pre><code class=""language-javascript"">element.addEventListener('click', (event) => {
+  event.stopPropagation(); // 阻止继续传播
+  event.stopImmediatePropagation(); // 阻止当前元素后续处理器
+}, false);</code></pre>"
