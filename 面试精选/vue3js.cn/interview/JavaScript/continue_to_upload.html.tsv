@@ -1,0 +1,335 @@
+#separator:tab
+#html:true
+JavaScript实现大文件分片上传（10MB/片）	"<pre><code class=""language-javascript"">// 获取文件对象
+const input = document.querySelector('input');
+input.addEventListener('change', function() {
+  const file = this.files[0];
+  
+  // 创建文件阅读器
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  
+  reader.addEventListener('""load""', function(e) {
+    const chunkSize = 10 * 1024 * 1024; // 10MB分片
+    const totalChunks = Math.ceil(file.size / chunkSize);
+    
+    // 循环创建分片
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.slice(start, end);  // 关键分片切割
+      
+      uploadChunk(chunk, i, totalChunks, file.name);
+    }
+  });
+});
+
+// 上传分片函数
+function uploadChunk(chunk, index, total, filename) {
+  const formData = new FormData();
+  formData.append('""file""', chunk);
+  formData.append('""index""', index);
+  formData.append('""total""', total);
+  formData.append('""filename""', filename);
+  
+  // 发送分片请求
+  fetch('/upload', {
+    method: '""POST""',
+    body: formData
+  }).then(response => {
+    console.log(`分片 ${index+1}/${total} 上传成功`);
+  });
+}</code></pre>"
+JavaScript实现文件MD5唯一标识生成	"<pre><code class=""language-javascript"">// 使用SparkMD5库生成文件唯一标识
+async function generateFileMD5(file) {
+  return new Promise((resolve) => {
+    const chunkSize = 2 * 1024 * 1024; // 2MB/块
+    const chunks = Math.ceil(file.size / chunkSize);
+    const spark = new SparkMD5.ArrayBuffer();
+    let currentChunk = 0;
+    
+    // 分块处理文件
+    function loadNext() {
+      const start = currentChunk * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
+      const blob = file.slice(start, end);
+      
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(blob);
+      
+      reader.onload = function(e) {
+        spark.append(e.target.result);
+        currentChunk++;
+        
+        if (currentChunk < chunks) {
+          loadNext();
+        } else {
+          resolve(spark.end()); // 返回最终MD5值
+        }
+      };
+    }
+    
+    loadNext();
+  });
+}
+
+// 使用示例
+const fileInput = document.querySelector('input[type=""file""]');
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const fileHash = await generateFileMD5(file);
+  console.log('文件唯一标识:', fileHash);
+});</code></pre>"
+JavaScript实现文件类型二进制检测	"<pre><code class=""language-javascript"">// 通过二进制头检测文件类型
+function detectFileType(file, callback) {
+  const typeHeaders = {
+    'ffd8ffe0': 'jpg',      // JPEG头
+    '89504e47': 'png',      // PNG头
+    '00000020': 'mp4',      // MP4视频头
+    '52494646': 'avi',      // AVI视频头
+    '25504446': 'pdf'       // PDF头
+  };
+  
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file.slice(0, 8)); // 读取前8字节
+  
+  reader.onload = function(e) {
+    const buffer = new Uint8Array(e.target.result);
+    let hex = '';
+    
+    // 转换为十六进制字符串
+    for (let i = 0; i < buffer.length; i++) {
+      const char = buffer[i].toString(16).padStart(2, '0');
+      hex += char;
+    }
+    
+    // 匹配已知类型
+    const fileType = Object.keys(typeHeaders).find(header => 
+      hex.startsWith(header)
+    );
+    
+    callback(fileType ? typeHeaders[fileType] : 'unknown');
+  };
+}
+
+// 使用示例
+detectFileType(file, type => {
+  console.log('检测到的文件类型:', type);
+});</code></pre>"
+Golang实现服务端断点续传检查	"<pre><code class=""language-go"">// 断点续传检查端点
+func checkUploadStatus(w http.ResponseWriter, r *http.Request) {
+    params := r.URL.Query()
+    fileHash := params.Get(""hash"")  // 前端传的文件唯一标识
+    
+    // 检查已上传分片
+    uploadedChunks, err := getUploadedChunks(fileHash)
+    if err != nil {
+        http.Error(w, ""服务器错误"", http.StatusInternalServerError)
+        return
+    }
+    
+    // 返回缺失的分片索引
+    response := map[string]interface{}{
+        ""uploaded"": uploadedChunks,
+        ""missing"":  calculateMissingChunks(uploadedChunks),
+    }
+    
+    w.Header().Set(""Content-Type"", ""application/json"")
+    json.NewEncoder(w).Encode(response)
+}
+
+// 计算缺失分片示例
+func calculateMissingChunks(uploaded []int) []int {
+    maxChunk := 0
+    if len(uploaded) > 0 {
+        maxChunk = uploaded[len(uploaded)-1]
+    }
+    
+    missing := []int{}
+    // 简单实现：假设总片数未知，返回最后连续分片后的索引
+    if len(uploaded) > 0 {
+        nextChunk := uploaded[len(uploaded)-1] + 1
+        missing = []int{nextChunk}
+    } else {
+        missing = []int{0}
+    }
+    
+    return missing
+}</code></pre>"
+JavaScript实现上传进度监控	"<pre><code class=""language-javascript"">// 带进度监控的分片上传
+function uploadChunkWithProgress(chunk, chunkIndex, totalChunks) {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('""chunk""', chunk);
+    formData.append('""index""', chunkIndex);
+    
+    // 进度事件监听器
+    xhr.upload.addEventListener('""progress"", function(e) {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        updateChunkProgress(chunkIndex, percent);
+      }
+    });
+    
+    xhr.addEventListener('""load"", function() {
+      if (xhr.status === 200) {
+        resolve();
+      }
+    });
+    
+    xhr.open('""POST"", '/upload-chunk', true);
+    xhr.send(formData);
+  });
+}
+
+// 更新UI进度显示
+function updateChunkProgress(index, percent) {
+  const progressBar = document.getElementById(`progress-${index}`);
+  if (progressBar) {
+    progressBar.style.width = `${percent}%`;
+    progressBar.textContent = `${percent}%`;
+  }
+  
+  // 计算整体进度
+  const totalProgress = calculateTotalProgress();
+  document.getElementById('overall-progress').value = totalProgress;
+}</code></pre>"
+Golang实现分片合并	"<pre><code class=""language-go"">// 合并上传的分片文件
+func mergeChunks(fileHash string) error {
+    chunksDir := path.Join(""uploads"", fileHash, ""chunks"")
+    outputFile := path.Join(""uploads"", fileHash, ""full-file"")
+
+    // 获取所有分片文件
+    chunkFiles, err := ioutil.ReadDir(chunksDir)
+    if err != nil {
+        return err
+    }
+
+    // 按文件名排序 (chunk_0, chunk_1, ...)
+    sort.Slice(chunkFiles, func(i, j int) bool {
+        return chunkFiles[i].Name() < chunkFiles[j].Name()
+    })
+
+    // 创建最终文件
+    out, err := os.Create(outputFile)
+    if err != nil {
+        return err
+    }
+    defer out.Close()
+
+    // 按顺序写入分片
+    for _, chunkFile := range chunkFiles {
+        chunkPath := path.Join(chunksDir, chunkFile.Name())
+        data, err := ioutil.ReadFile(chunkPath)
+        if err != nil {
+            return err
+        }
+        
+        if _, err := out.Write(data); err != nil {
+            return err
+        }
+    }
+
+    // 删除临时分片
+    os.RemoveAll(chunksDir)
+    return nil
+}</code></pre>"
+JavaScript实现上传暂停/恢复	"<pre><code class=""language-javascript"">let activeXHRs = [];  // 存储活跃的XHR对象
+
+// 上传分片并存储XHR引用
+function uploadChunk(chunk) {
+  const xhr = new XMLHttpRequest();
+  activeXHRs.push(xhr);  // 添加到活跃列表
+  
+  // ...配置和发送请求...
+  
+  xhr.addEventListener('load', () => {
+    // 完成后从列表中移除
+    const index = activeXHRs.indexOf(xhr);
+    if (index !== -1) {
+      activeXHRs.splice(index, 1);
+    }
+  });
+}
+
+// 暂停所有上传
+function pauseUploads() {
+  activeXHRs.forEach(xhr => {
+    xhr.abort();  // 终止请求
+  });
+  activeXHRs = [];  // 清空列表
+}
+
+// 恢复上传
+function resumeUpload(file) {
+  // 获取上传状态（从服务端或本地存储）
+  getUploadStatus(file.hash).then(missingChunks => {
+    missingChunks.forEach(index => {
+      const chunk = file.slice(index * CHUNK_SIZE, (index + 1) * CHUNK_SIZE);
+      uploadChunk(chunk, index);
+    });
+  });
+}</code></pre>"
+Vue实现大文件上传组件	"<pre><code class=""language-html"">&lt;template&gt;
+  &lt;div&gt;
+    &lt;input type=""file"" @change=""handleFileChange"" /&gt;
+    &lt;button @click=""startUpload"" :disabled=""!file""&gt;开始上传&lt;/button&gt;
+    &lt;button @click=""pauseUpload"" :disabled=""!isUploading""&gt;暂停&lt;/button&gt;
+    
+    &lt;div v-if=""progress &gt; 0""&gt;
+      总进度: &lt;progress :value=""progress"" max=""100""&gt;{{ progress }}%&lt;/progress&gt;
+    &lt;/div&gt;
+    
+    &lt;div v-for=""(chunk, index) in chunks"" :key=""index""&gt;
+      分片 {{ index+1 }}: 
+      &lt;progress :value=""chunkProgress[index] || 0"" max=""100""&gt;&lt;/progress&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+  data() {
+    return {
+      file: null,
+      chunks: [],
+      chunkProgress: {},
+      isUploading: false,
+      progress: 0
+    };
+  },
+  methods: {
+    handleFileChange(e) {
+      this.file = e.target.files[0];
+      // 文件分片逻辑
+      this.chunks = this.splitFile(this.file);
+    },
+    
+    splitFile(file) {
+      const chunks = [];
+      const chunkSize = 10 * 1024 * 1024; // 10MB
+      
+      for (let i = 0; i &lt; Math.ceil(file.size / chunkSize); i++) {
+        chunks.push(file.slice(i * chunkSize, (i+1) * chunkSize));
+      }
+      
+      return chunks;
+    },
+    
+    startUpload() {
+      this.isUploading = true;
+      this.uploadNextChunk();
+    },
+    
+    uploadNextChunk() {
+      // 实现分片上传逻辑
+    },
+    
+    pauseUpload() {
+      this.isUploading = false;
+      // 实现暂停逻辑
+    }
+  }
+};
+&lt;/script&gt;</code></pre>"

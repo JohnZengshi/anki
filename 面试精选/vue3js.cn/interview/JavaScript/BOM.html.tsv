@@ -1,0 +1,128 @@
+#separator:tab
+#html:true
+BOM的核心定义是什么？	"<pre><code class=""language-javascript"">/*
+Browser Object Model (BOM) 是浏览器对象模型：
+1. 提供独立于网页内容的浏览器交互接口
+2. 用于窗口控制、导航、历史、屏幕信息获取
+3. 核心对象：window（全局对象和浏览器接口）
+4. 与DOM的关系：
+   - DOM 操作文档内容
+   - BOM 操作浏览器本身
+*/</code></pre>"
+JavaScript中如何访问window对象属性？	"<pre><code class=""language-javascript"">// 全局变量自动成为window属性
+var globalVar = 'JS每日一题';
+
+function showVar() {
+  console.log(window.globalVar); // 通过window访问
+}
+
+console.log(globalVar); // 直接访问
+window.showVar();       // 通过window调用函数</code></pre>"
+JavaScript中如何使用window控制浏览器窗口？	"<pre><code class=""language-javascript"">// 移动窗口
+window.moveBy(50, 50);    // 相对当前位置移动
+window.moveTo(100, 100);  // 移动到绝对位置
+
+// 调整窗口大小
+window.resizeBy(100, 50); // 增加100px宽/50px高
+window.resizeTo(800, 600);// 设置固定尺寸
+
+// 滚动控制
+window.scrollTo(0, 500);  // 滚动到具体位置
+window.scrollBy(0, 100);  // 向下滚动100px</code></pre>"
+JavaScript中如何操作浏览器窗口？	"<pre><code class=""language-javascript"">// 打开新窗口
+const newWindow = window.open(
+  'https://example.com', 
+  'exampleWindow',
+  'width=600,height=400'
+);
+
+// 检查新窗口是否成功打开
+if(newWindow) {
+  // 操作新窗口
+  newWindow.document.write('Hello from opener!');
+  
+  // 关闭新窗口（只能关闭自己打开的）
+  setTimeout(() => newWindow.close(), 3000);
+}
+
+// 新窗口中访问原始窗口
+console.log(window.opener); // 返回原始窗口对象</code></pre>"
+JavaScript中如何解析和操作URL？	"<pre><code class=""language-javascript"">console.log('完整URL:', location.href);
+console.log('协议:', location.protocol);
+console.log('主机:', location.host);
+console.log('路径:', location.pathname);
+console.log('查询参数:', location.search);
+console.log('哈希值:', location.hash);
+
+// 修改URL组成部分
+location.hash = '#section2'; // 仅修改哈希不会刷新页面
+
+// 以下操作会导致页面刷新
+location.pathname = '/new-path'; 
+location.search = '?q=javascript';
+location.href = 'https://newdomain.com'; 
+
+// 刷新当前页面
+location.reload();      // 可能从缓存加载
+location.reload(true);  // 强制从服务器加载</code></pre>"
+JavaScript中如何使用history对象导航？	"<pre><code class=""language-javascript"">// 导航方法
+history.back();     // 等同于浏览器后退按钮
+history.forward();  // 等同于浏览器前进按钮
+history.go(-2);     // 后退两页
+history.go(1);      // 前进一页
+history.go('example.com'); // 跳转到包含该字符串的历史记录
+
+// 获取历史记录信息
+console.log('历史记录数:', history.length);
+
+// 现代单页应用API（HTML5）
+history.pushState({page: 1}, 'Title 1', '/page1');
+history.replaceState({page: 2}, 'Title 2', '/page2');
+
+// 监听popstate事件处理导航
+window.addEventListener('popstate', (e) => {
+  console.log('导航变化:', e.state);
+});</code></pre>"
+JavaScript中如何检测浏览器信息？	"<pre><code class=""language-javascript"">// navigator对象包含浏览器信息
+console.log('用户代理:', navigator.userAgent);
+console.log('平台:', navigator.platform);
+console.log('语言:', navigator.language);
+console.log('是否在线:', navigator.onLine);
+console.log('Cookie是否启用:', navigator.cookieEnabled);
+
+// 推荐特性检测而不是UA解析
+if ('geolocation' in navigator) {
+  navigator.geolocation.getCurrentPosition(showPosition);
+} else {
+  console.log('Geolocation API不可用');
+}
+
+// screen对象包含屏幕信息
+console.log('屏幕尺寸:', screen.width, '×', screen.height);
+console.log('可用尺寸:', screen.availWidth, '×', screen.availHeight);
+console.log('色彩深度:', screen.colorDepth, '位');</code></pre>"
+BOM的核心对象有哪些？	"<pre><code class=""language-javascript"">/*
+1. window: 
+   - BOM顶层对象，浏览器窗口接口
+   - 全局作用域容器
+
+2. location: 
+   - 当前文档URL信息
+   - 提供导航和刷新能力
+
+3. history: 
+   - 会话历史记录管理
+   - 提供前进/后退方法
+
+4. navigator: 
+   - 浏览器软件信息
+   - 功能检测接口
+
+5. screen: 
+   - 用户物理屏幕信息
+   - 显示器尺寸和色彩能力
+
+6. document: 
+   - 实际是DOM根节点
+   - 通过window.document访问
+*/</code></pre>"

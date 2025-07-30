@@ -1,0 +1,180 @@
+#separator:tab
+#html:true
+JavaScript防抖函数基本实现（简单版）	"<pre><code class=""language-javascript"">// 防抖：事件触发后等待一段时间执行，若期间重复触发则重新计时
+function debounce(func, wait) {
+  let timeout;
+  return function() {
+    const context = this;  // 保存当前this指向
+    const args = arguments;  // 保存事件参数
+    
+    // 清除之前的定时器
+    clearTimeout(timeout);  
+    
+    // 设置新定时器
+    timeout = setTimeout(function() {
+      func.apply(context, args);  // 执行回调
+    }, wait);
+  };
+}</code></pre>"
+JavaScript节流函数时间戳实现	"<pre><code class=""language-javascript"">// 节流：固定时间间隔执行，时间戳实现（立即执行）
+function throttleTimestamp(fn, delay = 500) {
+  let lastTime = 0;  // 上次执行时间
+  return function(...args) {
+    const now = Date.now();  // 当前时间戳
+    
+    // 检查是否超过时间间隔
+    if (now - lastTime >= delay) {
+      fn.apply(this, args);  // 执行函数
+      lastTime = now;  // 更新最后执行时间
+    }
+  };
+}</code></pre>"
+JavaScript节流函数定时器实现	"<pre><code class=""language-javascript"">// 节流：定时器实现（延迟执行）
+function throttleTimer(fn, delay = 500) {
+  let timer = null;
+  return function(...args) {
+    const context = this;
+    
+    // 如果定时器不存在则创建
+    if (!timer) {
+      timer = setTimeout(() => {
+        fn.apply(context, args);  // 执行函数
+        timer = null;  // 重置定时器
+      }, delay);
+    }
+  };
+}</code></pre>"
+JavaScript高级节流实现（时间戳+定时器）	"<pre><code class=""language-javascript"">// 高级节流：结合时间戳和定时器实现精确控制
+function throttle(fn, delay) {
+  let timer = null;
+  let startTime = Date.now();
+  
+  return function() {
+    const curTime = Date.now();
+    const remaining = delay - (curTime - startTime);  // 剩余时间
+    const context = this;
+    const args = arguments;
+    
+    clearTimeout(timer);  // 清除现有定时器
+    
+    // 检查剩余时间
+    if (remaining <= 0) {
+      fn.apply(context, args);  // 立即执行
+      startTime = Date.now();  // 重置开始时间
+    } else {
+      // 设置剩余时间后执行
+      timer = setTimeout(() => {
+        fn.apply(context, args);
+        startTime = Date.now();  // 执行后重置时间
+      }, remaining);
+    }
+  };
+}</code></pre>"
+JavaScript防抖立即执行版实现	"<pre><code class=""language-javascript"">// 防抖（立即执行版）：首次触发立即执行，后续需等待
+function debounceImmediate(func, wait, immediate) {
+  let timeout;
+  
+  return function() {
+    const context = this;
+    const args = arguments;
+    
+    if (timeout) clearTimeout(timeout);
+    
+    if (immediate) {
+      const callNow = !timeout;  // 是否立即执行
+      
+      // 设置定时器重置标志
+      timeout = setTimeout(() => {
+        timeout = null;
+      }, wait);
+      
+      // 首次触发立即执行
+      if (callNow) func.apply(context, args);
+    } else {
+      // 标准防抖逻辑
+      timeout = setTimeout(() => {
+        func.apply(context, args);
+      }, wait);
+    }
+  };
+}</code></pre>"
+防抖与节流核心区别说明	"<pre><code class=""language-text"">【防抖】:
+- 关注事件结束状态
+- 连续触发时重新计时
+- 只在最后一次触发后执行
+- 比喻：电梯等人模式（有人进电梯就重新计时）
+
+【节流】:
+- 关注执行频率控制
+- 固定时间间隔执行
+- 无视期间触发次数
+- 比喻：定时发车模式（到点就走）</code></pre>"
+防抖应用场景示例	"<pre><code class=""language-javascript"">// 搜索框输入（等待用户停止输入）
+searchInput.addEventListener('input', debounce(function() {
+  fetchResults(this.value);  // 发送请求
+}, 300));
+
+// 窗口大小调整（结束后计算布局）
+window.addEventListener('resize', debounce(function() {
+  calculateLayout();  // 布局计算
+}, 250));</code></pre>"
+节流应用场景示例	"<pre><code class=""language-javascript"">// 滚动事件处理（固定间隔检测位置）
+window.addEventListener('scroll', throttle(function() {
+  checkPosition();  // 检测滚动位置
+  if (isBottom()) loadMore();  // 滚动到底部加载
+}, 200));
+
+// 鼠标移动追踪（降低事件频率）
+canvas.addEventListener('mousemove', throttle(function(e) {
+  drawPointer(e.clientX, e.clientY);  // 绘制鼠标位置
+}, 100));</code></pre>"
+Vue组件中使用防抖的示例	"<pre><code class=""language-html"">&lt;template&gt;
+  &lt;input v-model=""searchText"" @input=""handleInput"" /&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+import { debounce } from 'lodash';
+
+export default {
+  data() {
+    return {
+      searchText: """"
+    };
+  },
+  methods: {
+    // 使用防抖处理输入事件
+    handleInput: debounce(function() {
+      this.fetchResults();
+    }, 300),
+    
+    fetchResults() {
+      // API请求逻辑
+    }
+  }
+};
+&lt;/script&gt;</code></pre>"
+React中使用节流的Hook实现	"<pre><code class=""language-javascript"">import { useEffect, useRef } from 'react';
+
+// 自定义节流Hook
+function useThrottle(callback, delay) {
+  const lastRan = useRef(Date.now());
+  
+  return function(...args) {
+    const now = Date.now();
+    
+    // 检查时间间隔
+    if (now - lastRan.current >= delay) {
+      callback.apply(null, args);
+      lastRan.current = now;
+    }
+  };
+}
+
+// 组件使用示例
+function ScrollComponent() {
+  const handleScroll = useThrottle(() => {
+    console.log('处理滚动事件');
+  }, 200);
+
+  return &lt;div onScroll={handleScroll}&gt;滚动区域&lt;/div&gt;;
+}</code></pre>"

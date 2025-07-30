@@ -1,0 +1,258 @@
+#separator:tab
+#html:true
+Go语言实现SSO认证中心基础结构	"<pre><code class=""language-go"">package main
+
+// SSO 认证中心基础结构
+type SSOCenter struct {
+    // 存储全局会话信息
+    globalSessions map[string]*GlobalSession
+    // 已注册子系统列表
+    subsystems map[string]bool
+}
+
+// 全局会话结构
+type GlobalSession struct {
+    UserID     string
+    Token      string
+    Expiration time.Time
+}
+
+// 创建认证中心实例
+func NewSSOCenter() *SSOCenter {
+    return &SSOCenter{
+        globalSessions: make(map[string]*GlobalSession),
+        subsystems:     make(map[string]bool),
+    }
+}
+
+// 用户登录认证中心
+func (s *SSOCenter) Login(userID, password string) string {
+    // 1. 验证用户凭证(实际项目需数据库验证)
+    if !validateCredentials(userID, password) {
+        return """" // 登录失败
+    }
+    
+    // 2. 创建全局会话
+    token := generateSecureToken()
+    session := &GlobalSession{
+        UserID:     userID,
+        Token:      token,
+        Expiration: time.Now().Add(24 * time.Hour),
+    }
+    
+    // 3. 存储会话
+    s.globalSessions[token] = session
+    return token
+}
+
+// 验证令牌有效性
+func (s *SSOCenter) ValidateToken(token string) bool {
+    session, exists := s.globalSessions[token]
+    return exists && time.Now().Before(session.Expiration)
+}</code></pre>"
+JavaScript实现同域名SSO Cookie设置	"<pre><code class=""language-javascript"">// 在同域名的子系统间共享登录状态
+function setSSOCookie(token) {
+    // 获取当前域名
+    const domain = window.location.hostname;
+    
+    // 解析主域名 (如: app1.example.com -> .example.com)
+    const domainParts = domain.split('.');
+    const mainDomain = domainParts.slice(-2).join('.');
+    
+    // 设置父域Cookie (domain=.example.com)
+    document.cookie = `sso_token=${token}; 
+        domain=.${mainDomain}; 
+        path=/; 
+        max-age=${24 * 60 * 60}; 
+        secure; samesite=lax`;
+}
+
+// 在子系统登录页面调用示例
+function handleLogin() {
+    const userToken = ""user_auth_token_123""; // 实际从认证中心获取
+    
+    // 设置跨子域共享的Cookie
+    setSSOCookie(userToken);
+    
+    // 创建局部会话
+    localStorage.setItem('local_session', 'active');
+    
+    // 重定向到目标页面
+    window.location.href = '/dashboard';
+}</code></pre>"
+Go语言实现SSO令牌验证端点	"<pre><code class=""language-go"">// 子系统令牌验证端点
+func TokenValidationHandler(w http.ResponseWriter, r *http.Request) {
+    // 1. 从请求中获取令牌
+    token := r.URL.Query().Get(""token"")
+    if token == """" {
+        http.Error(w, ""Token missing"", http.StatusBadRequest)
+        return
+    }
+    
+    // 2. 向认证中心验证令牌
+    isValid := ssoCenter.ValidateToken(token)
+    if !isValid {
+        http.Error(w, ""Invalid token"", http.StatusUnauthorized)
+        return
+    }
+    
+    // 3. 注册子系统(实际项目需添加更多安全验证)
+    systemID := r.URL.Query().Get(""system_id"")
+    ssoCenter.RegisterSystem(systemID)
+    
+    // 4. 返回成功响应
+    w.Header().Set(""Content-Type"", ""application/json"")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        ""status"":  ""success"",
+        ""user_id"": ssoCenter.GetUserID(token),
+    })
+}
+
+// 注册子系统到认证中心
+func (s *SSOCenter) RegisterSystem(systemID string) {
+    s.subsystems[systemID] = true
+}</code></pre>"
+JavaScript实现前端跨域SSO(LocalStorage)	"<pre><code class=""language-javascript"">// 使用postMessage实现跨域LocalStorage共享
+function distributeTokenToSubsystems(token) {
+    // 需要共享token的子系统列表
+    const subsystems = [
+        'https://app1.example.com',
+        'https://app2.example.net',
+        'https://app3.example.org'
+    ];
+
+    subsystems.forEach(domain => {
+        // 创建隐藏iframe
+        const iframe = document.createElement('iframe');
+        iframe.src = `${domain}/sso-receiver.html`;
+        iframe.style.display = 'none';
+        
+        document.body.appendChild(iframe);
+        
+        // 发送token到iframe
+        iframe.onload = () => {
+            iframe.contentWindow.postMessage({
+                type: 'SET_SSO_TOKEN',
+                token: token
+            }, domain);
+            
+            // 清理iframe
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 5000);
+        };
+    });
+}
+
+// 在接收方域名的sso-receiver.html中
+window.addEventListener('message', event => {
+    if (event.origin.startsWith('https://sso-center.com') && 
+        event.data.type === 'SET_SSO_TOKEN') {
+        
+        // 将token存入LocalStorage
+        localStorage.setItem('sso_token', event.data.token);
+        
+        // 创建局部会话
+        sessionStorage.setItem('session_active', 'true');
+    }
+});</code></pre>"
+SSO全局会话与局部会话约束关系	"<pre><code class=""language-markdown""># SSO会话约束关系
+
+## 全局会话
+- 用户与认证中心建立的会话
+- 生命周期由认证中心控制
+- 包含核心用户身份信息
+
+## 局部会话
+- 用户与各子系统建立的会话
+- 生命周期较短(通常30分钟)
+- 依赖全局会话存在
+
+## 关键约束
+1. 局部会话存在 ⇒ 全局会话必然存在
+2. 全局会话存在 ⇏ 局部会话存在(可能过期)
+3. 全局会话销毁 ⇒ 所有局部会话必须销毁
+4. 局部会话销毁 ⇏ 全局会话销毁
+
+## 实际应用
+- 用户退出时：认证中心销毁全局会话 → 通知所有子系统销毁局部会话
+- 令牌刷新：局部会话到期后，通过全局会话刷新令牌重建局部会话</code></pre>"
+Go实现SSO全局会话销毁	"<pre><code class=""language-go"">// 用户注销处理(销毁全局会话)
+func (s *SSOCenter) Logout(token string) {
+    // 1. 获取全局会话
+    session, exists := s.globalSessions[token]
+    if !exists {
+        return // 会话不存在
+    }
+    
+    // 2. 通知所有子系统销毁局部会话
+    for system := range s.subsystems {
+        go notifySystemLogout(system, session.UserID)
+    }
+    
+    // 3. 删除全局会话
+    delete(s.globalSessions, token)
+}
+
+// 通知子系统注销用户
+func notifySystemLogout(systemURL, userID string) {
+    // 构建注销请求(实际项目需添加安全认证)
+    reqURL := fmt.Sprintf(""%s/api/logout?user_id=%s"", systemURL, userID)
+    
+    // 发送HTTP请求
+    client := &http.Client{Timeout: 5 * time.Second}
+    req, _ := http.NewRequest(""POST"", reqURL, nil)
+    resp, err := client.Do(req)
+    
+    // 处理响应
+    if err == nil && resp.StatusCode == http.StatusOK {
+        log.Printf(""System %s logged out user %s"", systemURL, userID)
+    }
+}</code></pre>"
+JavaScript实现子系统受保护资源访问	"<pre><code class=""language-javascript"">// 在子系统中访问受保护资源
+async function fetchProtectedResource() {
+    // 1. 检查局部会话是否存在
+    const sessionActive = sessionStorage.getItem('session_active');
+    const ssoToken = localStorage.getItem('sso_token');
+    
+    if (!sessionActive && ssoToken) {
+        // 2. 局部会话过期但SSO令牌存在 ⇒ 刷新局部会话
+        const refreshed = await refreshLocalSession(ssoToken);
+        if (!refreshed) {
+            redirectToLogin();
+            return;
+        }
+    } else if (!ssoToken) {
+        // 3. 无SSO令牌 ⇒ 重定向到登录
+        redirectToLogin();
+        return;
+    }
+    
+    // 4. 携带令牌访问API
+    const response = await fetch('/api/protected-data', {
+        headers: {
+            'Authorization': `Bearer ${ssoToken}`
+        }
+    });
+    
+    // 处理响应...
+}
+
+// 刷新局部会话
+async function refreshLocalSession(token) {
+    try {
+        const response = await fetch('https://sso-center.com/validate', {
+            method: 'POST',
+            body: JSON.stringify({ token }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+            sessionStorage.setItem('session_active', 'true');
+            return true;
+        }
+    } catch (error) {
+        console.error('Session refresh failed:', error);
+    }
+    return false;
+}</code></pre>"

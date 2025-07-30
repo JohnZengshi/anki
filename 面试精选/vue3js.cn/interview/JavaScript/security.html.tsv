@@ -1,0 +1,167 @@
+#separator:tab
+#html:true
+如何用JavaScript防御XSS攻击	"<pre><code class=""language-javascript"">// 防御XSS的核心方法
+function sanitizeInput(input) {
+  // 1. 转义HTML特殊字符
+  return input.replace(/[&<>""']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '""': '&quot;',
+    ""'"": '&#39;'
+  })[char]);
+}
+
+// 2. 安全插入内容到DOM
+function safeTextInsert(element, content) {
+  element.textContent = content; // 使用textContent而非innerHTML
+}
+
+// 3. Vue安全实践示例
+Vue.component('safe-component', {
+  template: `&lt;div&gt;
+    &lt;!-- 禁止使用v-html --&gt;
+    &lt;p&gt;{{ sanitizedText }}&lt;/p&gt;
+  &lt;/div&gt;`,
+  props: ['rawText'],
+  computed: {
+    sanitizedText() {
+      return this.rawText.replace(/</g, '&lt;'); // 手动转义
+    }
+  }
+});</code></pre>"
+如何用Golang实现CSRF防护	"<pre><code class=""language-go"">package main
+
+import (
+	""crypto/rand""
+	""encoding/base64""
+	""net/http""
+)
+
+// 生成CSRF Token
+func generateCSRFToken() string {
+	b := make([]byte, 32)
+	rand.Read(b)
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+// 中间件：验证CSRF Token
+func CSRFMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 1. 排除安全方法
+		if r.Method == ""GET"" || r.Method == ""HEAD"" || r.Method == ""OPTIONS"" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		
+		// 2. 验证Token
+		token := r.FormValue(""csrf_token"")
+		cookieToken, err := r.Cookie(""csrf_token"")
+		
+		if err != nil || token != cookieToken.Value {
+			http.Error(w, ""Invalid CSRF Token"", http.StatusForbidden)
+			return
+		}
+		
+		next.ServeHTTP(w, r)
+	})
+}
+
+// 在HTML表单中嵌入Token
+func formHandler(w http.ResponseWriter, r *http.Request) {
+	token := generateCSRFToken()
+	http.SetCookie(w, &http.Cookie{Name: ""csrf_token"", Value: token})
+	
+	// 安全表单模板
+	html := fmt.Sprintf(`&lt;form method=""POST""&gt;
+		&lt;input type=""hidden"" name=""csrf_token"" value=""%s""&gt;
+		&lt;!-- 表单内容 --&gt;
+	&lt;/form&gt;`, token)
+	w.Write([]byte(html))
+}</code></pre>"
+如何用Golang防止SQL注入	"<pre><code class=""language-go"">package main
+
+import (
+	""database/sql""
+	""fmt""
+	_ ""github.com/lib/pq""
+)
+
+// 不安全方式：字符串拼接（易受SQL注入）
+func unsafeQuery(db *sql.DB, userInput string) {
+	query := fmt.Sprintf(""SELECT * FROM users WHERE name = '%s'"", userInput)
+	rows, err := db.Query(query) // 高危操作！
+}
+
+// 安全方式：参数化查询
+func safeQuery(db *sql.DB, userInput string) {
+	// 1. 使用参数占位符
+	rows, err := db.Query(""SELECT * FROM users WHERE name = $1"", userInput)
+	
+	// 2. 预编译语句
+	stmt, err := db.Prepare(""INSERT INTO products(name, price) VALUES($1, $2)"")
+	_, err = stmt.Exec(""Laptop"", 999.99)
+	
+	// 3. 白名单过滤
+	if !isValidInput(userInput) {
+		// 拒绝非法输入
+	}
+}
+
+// 辅助函数：输入验证
+func isValidInput(input string) bool {
+	// 示例：仅允许字母数字和空格
+	for _, char := range input {
+		if !(char >= 'a' && char <= 'z') &&
+		   !(char >= 'A' && char <= 'Z') &&
+		   !(char >= '0' && char <= '9') &&
+		   char != ' ' {
+			return false
+		}
+	}
+	return true
+}</code></pre>"
+如何用JavaScript防御CSRF攻击	"<pre><code class=""language-javascript"">// 前端获取CSRF Token
+function getCSRFToken() {
+  // 从Cookie中获取Token
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; csrf_token=`);
+  return parts.length === 2 ? parts.pop().split(';').shift() : null;
+}
+
+// 自动添加到所有请求
+axios.interceptors.request.use(config => {
+  if (['post', 'put', 'delete'].includes(config.method)) {
+    config.headers['X-CSRF-Token'] = getCSRFToken();
+  }
+  return config;
+});
+
+// 安全表单示例
+function renderSecureForm() {
+  const token = getCSRFToken();
+  return `&lt;form&gt;
+    &lt;input type=""hidden"" name=""csrf_token"" value=""${token}""&gt;
+    &lt;input type=""text"" name=""amount""&gt;
+    &lt;button&gt;Submit&lt;/button&gt;
+  &lt;/form&gt;`;
+}</code></pre>"
+DOM型XSS攻击演示	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;script&gt;
+// 危险操作：直接使用location.hash
+function vulnerableFunction() {
+  // 攻击者可构造：https://example.com#&lt;img src=x onerror=stealCookie()&gt;
+  document.getElementById(""output"").innerHTML = location.hash.slice(1);
+}
+
+// 防御方法：使用textContent
+function safeHandler() {
+  document.getElementById(""output"").textContent = location.hash.slice(1);
+}
+&lt;/script&gt;
+
+&lt;body&gt;
+  &lt;button onclick=""vulnerableFunction()"">危险示例&lt;/button&gt;
+  &lt;button onclick=""safeHandler()"">安全方法&lt;/button&gt;
+  &lt;div id=""output"">&lt;/div&gt;
+&lt;/body&gt;</code></pre>"

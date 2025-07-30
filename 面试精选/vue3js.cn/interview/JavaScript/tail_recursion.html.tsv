@@ -1,0 +1,119 @@
+#separator:tab
+#html:true
+递归的定义与核心思想	"<pre><code class=""language-javascript"">// 递归：函数调用自身解决问题
+// 核心：将大问题分解为相似小问题
+function pow(x, n) {
+  // 边界条件：递归终止点
+  if (n == 1) return x;
+  
+  // 递归前进：问题规模缩小
+  return x * pow(x, n - 1);
+}
+// 示例：pow(2,3)→2*pow(2,2)→2 * 2*pow(2,1)→8</code></pre>"
+尾递归的特征与优化原理	"<pre><code class=""language-javascript"">// 尾递归：尾部直接调用自身
+function factorial(n, total = 1) {
+  if (n === 1) return total;
+  
+  // 尾调用特征：无后续操作
+  // 优化原理：复用栈帧，O(1)空间
+  return factorial(n - 1, n * total);
+}
+// 对比普通递归：每次调用需保存上下文</code></pre>"
+尾递归优化阶乘实现	"<pre><code class=""language-javascript"">// 普通递归（易栈溢出）
+function factNormal(n) {
+  if (n === 1) return 1;
+  return n * factNormal(n - 1); // 非尾部调用
+}
+
+// 尾递归优化版（安全）
+function factTail(n, total = 1) {
+  if (n === 1) return total;
+  return factTail(n - 1, n * total); // 尾部调用
+}
+// 调用：factTail(5,1)→120</code></pre>"
+尾递归实现数组求和	"<pre><code class=""language-javascript"">// 尾递归数组求和
+function sumArray(arr, total = 0) {
+  // 边界条件：数组空时返回累加值
+  if (arr.length === 0) return total;
+  
+  // 尾部调用 + 累加器传值
+  return sumArray(arr.slice(1), total + arr[0]);
+}
+// 示例：sumArray([1,2,3])→6
+// 注意：避免用pop()修改原数组</code></pre>"
+尾递归优化斐波那契数列	"<pre><code class=""language-javascript"">// 普通递归：O(2^n)指数级复杂度
+function fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+
+// 尾递归优化：O(n)线性复杂度
+function fibTail(n, a = 0, b = 1) {
+  if (n === 0) return a;
+  return fibTail(n - 1, b, a + b); // 尾部调用
+}
+// 调用：fibTail(5)→5 (0,1,1,2,3,5)</code></pre>"
+递归实现数组扁平化	"<pre><code class=""language-javascript"">// 深度优先递归扁平化
+function flatten(arr) {
+  return arr.reduce((result, item) => {
+    // 递归处理嵌套数组
+    return result.concat(
+      Array.isArray(item) 
+        ? flatten(item)   // 递归前进
+        : item            // 边界条件
+    );
+  }, []);
+}
+// 示例：flatten([1,[2,[3]]])→[1,2,3]</code></pre>"
+递归实现对象键格式化	"<pre><code class=""language-javascript"">// 递归转换对象键为小写
+function keysToLower(obj) {
+  Object.keys(obj).forEach(key => {
+    const newKey = key.toLowerCase();
+    if (newKey !== key) {
+      obj[newKey] = obj[key];
+      delete obj[key]; // 删除原键
+    }
+    
+    // 递归处理嵌套对象
+    if (typeof obj[newKey] === 'object') {
+      keysToLower(obj[newKey]); // 递归前进
+    }
+  });
+  return obj; // 边界条件：无嵌套时返回
+}</code></pre>"
+尾递归与普通递归的对比	"<pre><code class=""language-text"">| 特性         | 普通递归           | 尾递归              |
+|--------------|---------------------|---------------------|
+| 空间复杂度   | O(n)                | O(1) (优化后)       |
+| 栈溢出风险   | 高风险              | 无风险              |
+| 实现方式     | 需保存上下文        | 用累加器传值        |
+| 调用位置     | 可在任意位置        | 必须函数尾部        |
+| 优化支持     | 无特殊优化          | 支持TCO优化         |</code></pre>"
+递归边界条件的定义	"<pre><code class=""language-javascript"">// 边界条件三要素：
+function recursiveFunc(params) {
+  // 1. 终止递归的条件判断
+  if (/* 最小问题 */) {
+    // 2. 直接返回简单结果
+    return baseCaseValue;
+  }
+  
+  // 3. 确保问题规模递减
+  return recursiveFunc(smallerParams);
+}
+// 错误示例：缺少边界条件→无限递归→栈溢出</code></pre>"
+尾递归优化的语言支持	"<pre><code class=""language-javascript"">// JavaScript尾调用优化(TCO)要求：
+// 1. 严格模式：""use strict""
+// 2. 尾部必须是纯函数调用
+// 3. 无后续操作
+
+// 兼容性检查函数：
+function isTailCallOptimized() {
+  try {
+    ""use strict"";
+    return (function f(n) { 
+      return n > 0 ? f(n - 1) : 0 
+    })(1e6) === 0;
+  } catch (e) {
+    return false;
+  }
+}
+// 注意：Node.js默认关闭TCO</code></pre>"

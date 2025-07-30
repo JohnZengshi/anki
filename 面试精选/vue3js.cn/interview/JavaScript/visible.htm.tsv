@@ -1,0 +1,158 @@
+#separator:tab
+#html:true
+JavaScript: 使用offsetTop和scrollTop判断元素是否在可视区域	"<pre><code class=""language-javascript"">function isInViewPortOfOne(el) {
+  // 获取视口高度（兼容所有浏览器）
+  const viewPortHeight = window.innerHeight || 
+    document.documentElement.clientHeight || 
+    document.body.clientHeight;
+  
+  // 获取元素相对文档顶部的偏移量
+  const offsetTop = el.offsetTop;
+  
+  // 获取文档垂直滚动距离
+  const scrollTop = document.documentElement.scrollTop;
+  
+  // 计算元素顶部到视口顶部的距离
+  const top = offsetTop - scrollTop;
+  
+  // 判断元素顶部是否在视口内
+  return top <= viewPortHeight;
+}</code></pre>"
+JavaScript: 使用getBoundingClientRect判断元素是否完全在可视区域内	"<pre><code class=""language-javascript"">function isInViewPort(element) {
+  // 获取视口尺寸（兼容写法）
+  const viewWidth = window.innerWidth || document.documentElement.clientWidth;
+  const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+  
+  // 获取元素边界矩形
+  const rect = element.getBoundingClientRect();
+  const { top, right, bottom, left } = rect;
+  
+  // 判断元素是否完全在视口内
+  return (
+    top >= 0 &&
+    left >= 0 &&
+    right <= viewWidth &&
+    bottom <= viewHeight
+  );
+}</code></pre>"
+JavaScript: 使用Intersection Observer实现图片懒加载	"<pre><code class=""language-javascript"">// 1. 创建观察者
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    // 当图片进入视口时加载
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src; // 从data-src加载实际图片
+      observer.unobserve(img); // 加载后停止观察
+    }
+  });
+}, {
+  threshold: 0.5, // 当50%的图片可见时触发
+  rootMargin: ""0px 0px 100px 0px"" // 提前100px触发加载
+});
+
+// 2. 观察所有懒加载图片
+document.querySelectorAll(""img.lazy"").forEach(img => {
+  observer.observe(img);
+});</code></pre>"
+JavaScript: 使用Intersection Observer实现无限滚动	"<pre><code class=""language-javascript"">// 创建观察者监控滚动锚点元素
+const observer = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    // 加载更多内容
+    loadMoreItems().then(() => {
+      // 重新观察新的锚点元素
+      observer.observe(getLastItem());
+    });
+  }
+});
+
+// 初始观察最后一个列表项
+observer.observe(document.querySelector("".list-item:last-child""));
+
+// 加载更多内容的示例函数
+async function loadMoreItems() {
+  // 模拟API请求
+  const response = await fetch(""/api/items"");
+  const newItems = await response.json();
+  
+  // 将新项目添加到列表
+  const list = document.querySelector("".item-list"");
+  newItems.forEach(item => {
+    const itemElement = document.createElement(""div"");
+    itemElement.className = ""list-item"";
+    itemElement.textContent = item.name;
+    list.appendChild(itemElement);
+  });
+}</code></pre>"
+JavaScript: 计算clientHeight, offsetHeight和scrollHeight	"<pre><code class=""language-javascript"">// 获取元素的各种高度
+function getElementHeights(element) {
+  return {
+    clientHeight: element.clientHeight, // 内容+内边距
+    offsetHeight: element.offsetHeight, // 内容+内边距+边框
+    scrollHeight: element.scrollHeight // 包括滚动隐藏内容的总高度
+  };
+}
+
+// 示例用法
+const element = document.getElementById(""example"");
+console.log(getElementHeights(element));</code></pre>"
+JavaScript: 使用Intersection Observer跟踪广告曝光	"<pre><code class=""language-javascript"">const adObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      // 广告进入视口
+      trackAdImpression(entry.target.dataset.adId);
+      
+      // 记录曝光时间
+      const viewTime = setInterval(() => {
+        if (!entry.isIntersecting) {
+          clearInterval(viewTime);
+        } else {
+          trackAdViewTime(entry.target.dataset.adId, 1);
+        }
+      }, 1000);
+    }
+  });
+}, { threshold: 0.75 }); // 75%可见视为曝光
+
+// 观察页面中的所有广告
+document.querySelectorAll("".ad-banner"").forEach(ad => {
+  adObserver.observe(ad);
+});</code></pre>"
+JavaScript: 兼容方法获取视口尺寸	"<pre><code class=""language-javascript"">// 获取视口宽高的兼容性写法
+function getViewportSize() {
+  return {
+    width: window.innerWidth || 
+          document.documentElement.clientWidth || 
+          document.body.clientWidth,
+    height: window.innerHeight || 
+           document.documentElement.clientHeight || 
+           document.body.clientHeight
+  };
+}
+
+// 使用示例
+const viewport = getViewportSize();
+console.log(`视口宽度: ${viewport.width}, 高度: ${viewport.height}`);</code></pre>"
+DOM: clientWidth和clientHeight的含义	"<pre><code class=""language-markdown"">clientWidth = 内容宽度(content) + 左右内边距(padding)
+clientHeight = 内容高度(content) + 上下内边距(padding)
+
+注意：
+- 不包含边框(border)
+- 不包含外边距(margin)
+- 不包含滚动条宽度</code></pre>"
+DOM: scrollTop和scrollLeft的用法	"<pre><code class=""language-javascript"">// 获取滚动位置
+function getScrollPosition() {
+  return {
+    scrollTop: document.documentElement.scrollTop || document.body.scrollTop,
+    scrollLeft: document.documentElement.scrollLeft || document.body.scrollLeft
+  };
+}
+
+// 滚动到页面顶部
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: ""smooth"" });
+}
+
+// 滚动到特定元素
+function scrollToElement(element) {
+  element.scrollIntoView({ behavior: ""smooth"" });
+}</code></pre>"

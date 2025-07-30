@@ -1,0 +1,160 @@
+#separator:tab
+#html:true
+JavaScript触底加载公式实现	"<pre><code class=""language-javascript"">// 获取关键滚动属性
+const clientHeight = document.documentElement.clientHeight;
+const scrollHeight = document.body.scrollHeight;
+const scrollTop = document.documentElement.scrollTop;
+const distance = 50; // 缓冲距离
+
+// 触底检测逻辑
+if ((scrollTop + clientHeight) >= (scrollHeight - distance)) {
+  console.log(""开始加载数据"");
+  // 实际业务中这里执行数据加载逻辑
+  // loadMoreData();
+}</code></pre>"
+JavaScript下拉刷新touchstart事件处理	"<pre><code class=""language-javascript"">const container = document.getElementById('refreshContainer');
+let startPos = 0;
+
+container.addEventListener('touchstart', function(e) {
+  startPos = e.touches[0].pageY;  // 记录初始触摸位置
+  container.style.position = 'relative';
+  container.style.transition = 'transform 0s';  // 禁用过渡动画
+}, false);</code></pre>"
+JavaScript下拉刷新touchmove事件处理	"<pre><code class=""language-javascript"">const refreshText = document.querySelector('.refreshText');
+let transitionHeight = 0;
+
+container.addEventListener('touchmove', function(e) {
+  transitionHeight = e.touches[0].pageY - startPos;
+  
+  if (transitionHeight > 0 && transitionHeight < 60) {
+    refreshText.innerText = '下拉刷新';
+    container.style.transform = `translateY(${transitionHeight}px)`;
+    
+    if (transitionHeight > 55) {
+      refreshText.innerText = '释放更新';
+    }
+  }
+}, false);</code></pre>"
+JavaScript下拉刷新touchend事件处理	"<pre><code class=""language-javascript"">container.addEventListener('touchend', function() {
+  container.style.transition = 'transform 0.5s ease';
+  container.style.transform = 'translateY(0px)';
+  refreshText.innerText = '更新中...';
+  
+  // 实际业务中这里执行数据刷新逻辑
+  // refreshData();
+}, false);</code></pre>"
+BetterScroll初始化配置	"<pre><code class=""language-javascript"">import BScroll from '@better-scroll/core';
+import PullDown from '@better-scroll/pull-down';
+import PullUp from '@better-scroll/pull-up';
+
+// 注册插件
+BScroll.use(PullDown);
+BScroll.use(PullUp);
+
+// 初始化实例
+const scroll = new BScroll('#position-wrapper', {
+  scrollY: true,
+  click: true,  // 启用点击事件
+  pullUpLoad: true,  // 启用上拉加载
+  pullDownRefresh: {
+    threshold: 50,  // 触发下拉刷新位置
+    stop: 0         // 回弹停留位置
+  }
+});</code></pre>"
+BetterScroll下拉刷新处理	"<pre><code class=""language-javascript"">let pageNo = 1;
+const pageSize = 10;
+let dataList = [];
+let isMore = true;
+
+// 下拉刷新回调
+scroll.on('pullingDown', async () => {
+  dataList = [];
+  pageNo = 1;
+  isMore = true;
+  document.querySelector('.more').textContent = '查看更多';
+  
+  await getData();  // 获取数据
+  
+  scroll.finishPullDown();  // 必须调用以重置状态
+  scroll.refresh();          // 刷新滚动区域
+});</code></pre>"
+BetterScroll上拉加载处理	"<pre><code class=""language-javascript"">scroll.on('pullingUp', async () => {
+  if (!isMore) {
+    document.querySelector('.more').textContent = '没有更多数据了';
+    scroll.finishPullUp();
+    return;
+  }
+  
+  pageNo++;
+  await getData();  // 获取下一页数据
+  
+  scroll.finishPullUp();  // 必须调用以重置状态
+  scroll.refresh();       // 刷新滚动区域
+});
+
+// 模拟数据获取
+async function getData() {
+  const result = await fetchData(pageNo, pageSize);
+  dataList = dataList.concat(result);
+  
+  // 更新DOM显示数据...
+  
+  if (result.length < pageSize) {
+    isMore = false;  // 数据已加载完毕
+  }
+}</code></pre>"
+BetterScroll滚动位置监听	"<pre><code class=""language-javascript"">scroll.on('scroll', (position) => {
+  const refreshEl = document.querySelector('.refresh');
+  
+  if (position.y > 50) {
+    refreshEl.textContent = '松手开始加载';
+  } else {
+    refreshEl.textContent = '下拉刷新';
+  }
+});</code></pre>"
+BetterScroll使用注意事项	"<pre><code class=""language-text"">1. DOM结构要求：
+   - wrapper容器必须有且仅有一个直接子元素
+   - 子元素高度必须大于wrapper高度
+
+2. 初始化时机：
+   - 必须在DOM渲染完成后初始化
+   - 错误：在DOM加载前初始化
+   - 正确：在mounted/DOMContentLoaded回调中初始化
+
+3. 必须调用的API：
+   - 数据变化后：scroll.refresh()
+   - 下拉结束后：scroll.finishPullDown()
+   - 上拉结束后：scroll.finishPullUp()
+
+4. 点击事件处理：
+   - 默认阻止原生click事件
+   - 启用需设置：click: true</code></pre>"
+原生实现与BetterScroll对比	"<pre><code class=""language-text"">| 特性                | 原生实现                          | BetterScroll                |
+|---------------------|-----------------------------------|-----------------------------|
+| 开发复杂度          | 高(需处理所有细节)                | 低(插件化)                  |
+| 兼容性              | 需自行处理浏览器差异              | 内置兼容方案                |
+| 性能优化            | 需手动节流/防抖                   | 内置动画优化                |
+| 功能扩展            | 自行实现                          | 丰富插件生态               |
+| 维护成本            | 高                                | 低                          |
+| 适合场景            | 简单需求/学习目的                 | 复杂交互/生产环境          |</code></pre>"
+移动端滚动性能优化要点	"<pre><code class=""language-javascript"">// 1. 事件节流
+let isThrottling = false;
+container.addEventListener('scroll', () => {
+  if (isThrottling) return;
+  isThrottling = true;
+  
+  // 实际检测逻辑
+  checkScrollPosition();
+  
+  setTimeout(() => { isThrottling = false }, 100);
+});
+
+// 2. 使用transform代替top/left
+element.style.transform = 'translateY(50px)'; 
+
+// 3. 避免频繁DOM操作
+// 错误：逐条添加列表项
+// 正确：使用DocumentFragment批量添加
+
+// 4. 硬件加速
+element.style.willChange = 'transform';</code></pre>"

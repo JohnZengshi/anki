@@ -1,0 +1,88 @@
+#separator:tab
+#html:true
+JavaScript中意外的全局变量如何导致内存泄漏？	"<pre><code class=""language-javascript"">// 未声明变量 → 成为全局变量
+function leakGlobal() {
+  leakedVar = ""本应局部的变量"";  // 缺少var/let/const
+}
+
+// this指向全局对象
+function leakThis() {
+  this.accidentalGlobal = ""意外全局"";
+}
+leakThis();  // this指向window</code></pre>"
+JavaScript中如何用标记清除机制回收内存？	"<pre><code class=""language-javascript"">function processData() {
+  const data = getHugeData();  // 进入环境 → 标记
+  
+  // 处理数据...
+  return result;
+}  // 函数结束 → data离开环境 → 等待回收
+
+// 垃圾回收过程：
+// 1. 标记所有变量
+// 2. 清除环境中的变量标记
+// 3. 销毁仍带标记的变量</code></pre>"
+JavaScript中引用计数导致的内存泄漏如何解决？	"<pre><code class=""language-javascript"">// 循环引用案例
+let objA = { name: ""A"" };
+let objB = { name: ""B"" };
+
+objA.ref = objB;  // objB引用计数+1
+objB.ref = objA;  // objA引用计数+1
+
+// 手动解除引用
+objA = null;      // 断开引用
+objB = null;      // 引用计数归零 → 内存回收</code></pre>"
+JavaScript中未清除的定时器如何引起内存泄漏？	"<pre><code class=""language-javascript"">// 定时器持有外部资源
+const bigData = fetchHugeData();
+
+const timerId = setInterval(() => {
+  const node = document.getElementById('target');
+  if(node) {
+    node.textContent = bigData.summary;  // 持有bigData引用
+  } else {
+    clearInterval(timerId);  // 必须清除定时器!
+    bigData = null;          // 解除引用
+  }
+}, 1000);</code></pre>"
+JavaScript中残留的DOM引用如何解决？	"<pre><code class=""language-javascript"">// 移除DOM后仍保留引用
+const domElement = document.getElementById('content');
+document.body.removeChild(domElement);
+
+console.log(domElement);  // 仍可访问 → 内存未释放
+
+// 正确做法:
+domElement = null;        // 解除引用 → 允许GC回收</code></pre>"
+JavaScript中闭包导致的内存泄漏如何避免？	"<pre><code class=""language-javascript"">function createClosure() {
+  const largeObj = loadLargeData();  // 占用大内存
+  
+  return function() {
+    console.log(largeObj.name);      // 闭包持有引用
+  };
+}
+
+// 解决方案:
+const closure = createClosure();
+closure();      // 执行后解除引用
+closure = null; // 手动释放闭包</code></pre>"
+JavaScript中事件监听器如何正确移除？	"<pre><code class=""language-javascript"">// 事件监听内存泄漏
+const button = document.getElementById('submit');
+
+function handleClick() {
+  /* 事件处理逻辑 */
+}
+
+button.addEventListener('click', handleClick);
+
+// 移除元素前必须解绑!
+button.removeEventListener('click', handleClick);
+button = null;  // 解除DOM引用</code></pre>"
+JavaScript严格模式如何防止意外全局变量？	"<pre><code class=""language-javascript"">'use strict';  // 启用严格模式
+
+function preventLeak() {
+  // 尝试创建未声明变量 → 抛出错误
+  accidentalGlobal = ""会被阻止"";
+  
+  // this不再指向全局
+  console.log(this);  // undefined
+}
+
+preventLeak();  // ReferenceError: accidentalGlobal未定义</code></pre>"

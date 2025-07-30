@@ -1,0 +1,114 @@
+#separator:tab
+#html:true
+JavaScript: 如何创建新的div元素？	"<pre><code class=""language-javascript"">// 创建新元素节点
+const newDiv = document.createElement(""div"");
+
+// 设置元素属性
+newDiv.id = ""container"";
+newDiv.className = ""main-section"";
+
+// 添加文本内容
+const textNode = document.createTextNode(""动态创建的元素"");
+newDiv.appendChild(textNode);</code></pre>"
+JavaScript: 如何使用querySelector选择元素？	"<pre><code class=""language-javascript"">// 选择第一个匹配元素
+const firstBtn = document.querySelector('button');
+
+// 选择特定ID元素
+const header = document.querySelector(""#main-header"");
+
+// 选择类名元素
+const activeItem = document.querySelector(''.active'');
+
+// 选择复杂结构
+const formInput = document.querySelector(''form > input[type="text"]'');</code></pre>"
+JavaScript: 如何更新元素的文本内容？	"<pre><code class=""language-javascript"">const element = document.getElementById(""title"");
+
+// 方法1：innerText (忽略隐藏元素)
+element.innerText = ""新标题内容"";
+
+// 方法2：textContent (包含所有文本)
+element.textContent = ""<strong>安全文本</strong>不会解析标签"";
+
+// 方法3：innerHTML (会解析HTML标签)
+element.innerHTML = ""<em>强调文本</em>"";</code></pre>"
+JavaScript: 如何使用appendChild添加节点？	"<pre><code class=""language-javascript"">const list = document.getElementById(""myList"");
+
+// 创建新列表项
+const newItem = document.createElement(""li"");
+newItem.textContent = ""新项目"";
+
+// 添加到列表末尾
+list.appendChild(newItem);
+
+// 移动现有节点
+const firstItem = list.querySelector(''li:first-child'');
+list.appendChild(firstItem); // 将第一个项移动到最后</code></pre>"
+JavaScript: 如何使用insertBefore插入节点？	"<pre><code class=""language-javascript"">const list = document.getElementById(""myList"");
+const referenceItem = document.getElementById(""item2"");
+
+// 创建新项
+const newItem = document.createElement(""li"");
+newItem.textContent = ""插入项"";
+
+// 在参考节点前插入
+list.insertBefore(newItem, referenceItem);</code></pre>"
+JavaScript: 如何使用setAttribute设置属性？	"<pre><code class=""language-javascript"">const image = document.querySelector(""img"");
+
+// 设置标准属性
+image.setAttribute(""src"", ""new-image.jpg"");
+image.setAttribute(""alt"", ""描述文字"");
+
+// 设置自定义属性
+image.setAttribute(""data-loading"", ""lazy"");
+
+// 设置多个样式类
+image.setAttribute(""class"", ""responsive bordered"");</code></pre>"
+JavaScript: 如何安全删除DOM节点？	"<pre><code class=""language-javascript"">// 获取要删除的节点及其父节点
+const target = document.getElementById(""old-element"");
+const parent = target.parentNode;
+
+// 删除节点
+const removedNode = parent.removeChild(target);
+
+// 被删除的节点仍在内存中可用
+removedNode.id = ""new-id"";
+document.body.appendChild(removedNode); // 重新插入到其他位置</code></pre>"
+JavaScript: 如何使用文档片段优化性能？	"<pre><code class=""language-javascript"">// 创建文档片段
+const fragment = document.createDocumentFragment();
+
+// 批量创建元素添加到片段
+for (let i = 0; i < 100; i++) {
+  const item = document.createElement(""div"");
+  item.textContent = `项目 ${i}`;
+  fragment.appendChild(item);
+}
+
+// 一次性添加到DOM
+document.getElementById(""container"").appendChild(fragment);</code></pre>"
+JavaScript: 如何操作元素样式？	"<pre><code class=""language-javascript"">const box = document.getElementById(""color-box"");
+
+// 设置单个样式属性
+box.style.backgroundColor = ""#3498db"";
+box.style.paddingTop = ""20px""; // 注意驼峰命名
+
+// 批量设置样式
+Object.assign(box.style, {
+  borderRadius: ""8px"",
+  boxShadow: ""0 2px 10px rgba(0,0,0,0.1)"",
+  transition: ""all 0.3s ease""
+});</code></pre>"
+JavaScript: 如何遍历DOM节点关系？	"<pre><code class=""language-javascript"">const startElement = document.getElementById(""start"");
+
+// 获取父节点
+const parent = startElement.parentNode;
+
+// 获取子节点集合
+const children = startElement.childNodes;
+
+// 获取第一个和最后一个子节点
+const firstChild = startElement.firstChild;
+const lastChild = startElement.lastChild;
+
+// 获取相邻兄弟节点
+const nextSibling = startElement.nextElementSibling;
+const prevSibling = startElement.previousElementSibling;</code></pre>"

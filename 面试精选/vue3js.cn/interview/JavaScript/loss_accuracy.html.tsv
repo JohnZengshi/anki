@@ -1,0 +1,76 @@
+#separator:tab
+#html:true
+JavaScript 经典精度问题演示	"<pre><code class=""language-javascript"">// 经典浮点数精度丢失问题
+console.log(0.1 + 0.2 === 0.3);  // false
+console.log(0.1 + 0.2);           // 0.30000000000000004</code></pre>"
+IEEE 754 双精度浮点数结构说明	"<pre><code class=""language-javascript"">/*
+64位双精度浮点数结构：
+[1位符号位][11位指数位][52位尾数位]
+↓ 示例：27.5 的存储格式
+符号位: 0 (正数)
+指数位: 10000000011 (1027 - 1023偏移量 = 实际指数4)
+尾数位: 0111000000000000000000000000000000000000000000000000
+*/</code></pre>"
+使用toPrecision控制显示精度	"<pre><code class=""language-javascript"">// 控制显示精度（12位有效数字）
+function strip(num, precision = 12) {
+    return +parseFloat(num.toPrecision(precision));
+}
+
+console.log(strip(1.4000000000000001));  // 1.4</code></pre>"
+精确加法函数实现	"<pre><code class=""language-javascript"">// 精确加法（避免浮点误差）
+function add(num1, num2) {
+    const num1Digits = (num1.toString().split('.')[1] || '').length;
+    const num2Digits = (num2.toString().split('.')[1] || '').length;
+    const baseNum = Math.pow(10, Math.max(num1Digits, num2Digits));
+    return (num1 * baseNum + num2 * baseNum) / baseNum;
+}
+
+console.log(add(0.1, 0.2));  // 0.3</code></pre>"
+BigInt处理大整数运算	"<pre><code class=""language-javascript"">// 使用BigInt处理超过安全整数的运算
+const maxSafe = Number.MAX_SAFE_INTEGER; // 9007199254740991
+
+// 普通运算（精度丢失）
+console.log(maxSafe + 2);  // 9007199254740992 ❌
+
+// BigInt运算（精确）
+console.log(BigInt(maxSafe) + BigInt(2));  // 9007199254740993n ✅</code></pre>"
+不同数值范围的精度问题演示	"<pre><code class=""language-javascript"">// 不同范围的精度表现
+console.log(2**53 === 2**53 + 1);         // true (2^53到2^54范围)
+console.log(2**54 === 2**54 + 2);         // true (2^54到2^55范围)
+console.log(2**55 === 2**55 + 4);         // true (精度间隔递增)</code></pre>"
+浮点数转二进制科学计数法	"<pre><code class=""language-javascript"">// 十进制转二进制科学计数法
+function toBinaryScientific(num) {
+    // 获取IEEE 754二进制表示
+    const view = new DataView(new ArrayBuffer(8));
+    view.setFloat64(0, num);
+    const binary = view.getBigUint64(0).toString(2).padStart(64, '0');
+    
+    // 提取各部分
+    const sign = binary[0];
+    const exponent = binary.substring(1, 12);
+    const fraction = binary.substring(12);
+    
+    return `符号位:${sign} 指数位:${exponent} 尾数位:${fraction}`;
+}
+
+console.log(toBinaryScientific(27.5));</code></pre>"
+第三方精度处理库使用示例	"<pre><code class=""language-javascript"">// 使用bignumber.js处理高精度运算
+import BigNumber from 'bignumber.js';
+
+const result = new BigNumber(0.1)
+    .plus(0.2)
+    .toString();
+
+console.log(result);  // ""0.3"" (精确结果)</code></pre>"
+最大数值边界测试	"<pre><code class=""language-javascript"">// JavaScript数值边界测试
+console.log(Number.MAX_SAFE_INTEGER);  // 9007199254740991
+console.log(Number.MAX_VALUE);         // 1.7976931348623157e+308
+console.log(Math.pow(2, 1023));        // 8.98846567431158e+307
+console.log(Math.pow(2, 1024));        // Infinity (超出表示范围)</code></pre>"
+精度问题根本原因总结	"<pre><code class=""language-javascript"">/*
+精度问题根本原因：
+1. 十进制转二进制时出现无限循环（如0.1→0.000110011...）
+2. 尾数位限制（52位）导致舍入误差
+3. 浮点数存储结构：符号位+指数位+尾数位
+4. 超过安全整数范围(2^53)后的离散表示
+*/</code></pre>"

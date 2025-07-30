@@ -1,0 +1,74 @@
+#separator:tab
+#html:true
+JavaScript中如何设置带过期时间的Cookie？	"<pre><code class=""language-javascript"">// 设置cookie（有效期7天）
+document.cookie = ""username=john_doe; expires="" + 
+  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString() + 
+  ""; path=/; secure"";</code></pre>"
+JavaScript如何读取localStorage中的对象数据？	"<pre><code class=""language-javascript"">// 读取并解析对象数据
+const userData = JSON.parse(localStorage.getItem('userProfile'));
+
+// 使用示例
+console.log(userData.name); // ""John""
+console.log(userData.prefersDarkMode); // true</code></pre>"
+JavaScript中sessionStorage的正确使用方式	"<pre><code class=""language-javascript"">// 存储会话数据
+sessionStorage.setItem('authToken', 'TEMP_8X7H2K9L');
+
+// 页面跳转后仍可获取
+const token = sessionStorage.getItem('authToken'); 
+// 关闭浏览器后自动清除</code></pre>"
+JavaScript如何安全删除Cookie？	"<pre><code class=""language-javascript"">// 通过设置过期时间删除cookie
+document.cookie = ""username=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; secure"";</code></pre>"
+localStorage和sessionStorage有哪些核心区别？	"<pre><code class=""language-javascript"">/*
+| 特性        | localStorage      | sessionStorage    |
+|-------------|-------------------|-------------------|
+| 生命周期    | 永久(需手动删除)  | 会话结束自动清除  |
+| 作用域      | 同源所有标签页    | 仅当前标签页      |
+| 存储限制    | ~5MB              | ~5MB              |
+| 服务器交互  | 不自动发送        | 不自动发送        |
+*/</code></pre>"
+如何在JavaScript中使用IndexedDB创建数据库？	"<pre><code class=""language-javascript"">// 打开/创建数据库
+const request = indexedDB.open('userDatabase', 1);
+
+request.onupgradeneeded = (event) => {
+  const db = event.target.result;
+  // 创建对象存储空间
+  if (!db.objectStoreNames.contains('users')) {
+    db.createObjectStore('users', { keyPath: 'id' });
+  }
+};</code></pre>"
+如何向IndexedDB添加数据？	"<pre><code class=""language-javascript"">const transaction = db.transaction(['users'], 'readwrite');
+const store = transaction.objectStore('users');
+
+// 添加数据
+store.add({
+  id: 1,
+  name: 'Alice',
+  lastLogin: new Date()
+});
+
+transaction.oncomplete = () => console.log('Data saved');</code></pre>"
+JavaScript中如何监听storage事件？	"<pre><code class=""language-javascript"">// 监听同源页面的storage变化
+window.addEventListener('storage', (event) => {
+  console.log('Key changed:', event.key);
+  console.log('New value:', event.newValue);
+  console.log('Origin:', event.url);
+});</code></pre>"
+如何安全存储敏感令牌？	"<pre><code class=""language-javascript"">// 敏感令牌应存于sessionStorage
+sessionStorage.setItem('accessToken', 'SECRET_12345');
+
+// 避免localStorage长期存储敏感数据
+// localStorage.setItem('accessToken', ...) // 不安全！</code></pre>"
+如何实现localStorage自动过期功能？	"<pre><code class=""language-javascript"">// 存储带时间戳的数据
+const data = {
+  value: { theme: 'dark' },
+  expires: Date.now() + 3600000 // 1小时后过期
+};
+localStorage.setItem('userSettings', JSON.stringify(data));
+
+// 读取时检查过期
+const stored = JSON.parse(localStorage.getItem('userSettings'));
+if (stored && stored.expires > Date.now()) {
+  console.log(stored.value); // 使用数据
+} else {
+  localStorage.removeItem('userSettings'); // 清除过期数据
+}</code></pre>"
