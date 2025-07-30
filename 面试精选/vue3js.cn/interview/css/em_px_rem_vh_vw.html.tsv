@@ -1,0 +1,95 @@
+#separator:tab
+#html:true
+CSS中px单位的特点是什么？	"<pre><code class=""language-css"">/* px是绝对单位，与父元素无关 */
+.element {
+  width: 200px; /* 固定尺寸 */
+  border: 1px solid #000; /* 精确控制 */
+  /* 优点：精确控制 | 缺点：非响应式 */
+}</code></pre>"
+如何设置CSS使1em=10px？	"<pre><code class=""language-css"">body {
+  font-size: 62.5%; /* 16px×62.5%=10px */
+  /* 此后 1em=10px, 1.2em=12px */
+}
+
+.container {
+  font-size: 1.6em; /* =16px */
+  padding: 1.2em;   /* =12px */
+}</code></pre>"
+rem与em的核心区别是什么？	"<pre><code class=""language-css"">html {
+  font-size: 20px; /* 基准 */
+}
+
+.parent {
+  font-size: 0.8rem; /* 16px */
+}
+
+.child {
+  /* rem: 始终基于根元素 */
+  font-size: 1rem;   /* 20px */
+  
+  /* em: 基于父元素 */
+  font-size: 1em;    /* 16px */
+}</code></pre>"
+如何使用vw/vh创建响应式布局？	"<pre><code class=""language-css"">.hero-section {
+  width: 100vw;   /* 满视口宽度 */
+  height: 50vh;   /* 视口高度50% */
+  padding: 5vw;   /* 随视口缩放 */
+}
+
+.modal {
+  /* 居中弹窗 */
+  width: 80vw;
+  left: 10vw;     /* (100vw-80vw)/2 */
+}</code></pre>"
+CSS单位转换公式（默认16px）	"<pre><code class=""language-css"">/* 转换基准 */
+1em = 父元素font-size
+1rem = 根元素font-size
+100vw = 视口宽度
+100vh = 视口高度
+
+/* 实用公式 */
+px→rem: px值/基准值
+目标尺寸: calc(1rem + 2vw)</code></pre>"
+如何在HTML中安全使用CSS单位？	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html lang=""en"" style=""font-size: 62.5%;""&gt;
+&lt;head&gt;
+  &lt;!-- 设置根字体 --&gt;
+  &lt;style&gt;
+    :root { --spacing: 2rem; }
+    .card {
+      padding: var(--spacing); /* rem */
+      margin-bottom: 5vh;      /* vh */
+      max-width: 90vw;        /* vw */
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=""card""&gt;响应式单位示例&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+CSS单位响应式应用场景对比	"<pre><code class=""language-css"">/* 固定元素 */
+.pixel-perfect {
+  width: 800px; /* px */
+}
+
+/* 字体系统 */
+.text-scale {
+  font-size: calc(1rem + 0.5vw); /* 动态缩放 */
+}
+
+/* 间距系统 */
+.spacing {
+  padding: 1em;   /* 相对字体 */
+  margin: 2rem;   /* 全局一致 */
+}
+
+/* 全屏元素 */
+.fullscreen {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* 媒体查询断点 */
+@media (max-width: 48rem) { /* 768px */
+  .responsive { padding: 1rem; }
+}</code></pre>"

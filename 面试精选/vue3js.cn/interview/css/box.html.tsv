@@ -1,0 +1,77 @@
+#separator:tab
+#html:true
+CSS盒子模型的核心组成部分	"<pre><code class=""language-plaintext"">1. content: 实际内容区域
+2. padding: 内容周围的内边距（透明）
+3. border: 围绕内边距的边框线
+4. margin: 元素外部的空白区域</code></pre>"
+标准盒子模型(content-box)的计算公式	"<pre><code class=""language-javascript"">// 总宽度计算
+const totalWidth = width + paddingLeft + paddingRight + borderLeft + borderRight + marginLeft + marginRight;
+
+// 总高度计算
+const totalHeight = height + paddingTop + paddingBottom + borderTop + borderBottom + marginTop + marginBottom;</code></pre>"
+IE怪异盒子模型(border-box)的计算公式	"<pre><code class=""language-javascript"">// 总宽度计算
+const totalWidth = width + marginLeft + marginRight;
+
+// 总高度计算
+const totalHeight = height + marginTop + marginBottom;
+
+// 注意：width已包含content+padding+border</code></pre>"
+CSS中设置标准盒子模型的代码示例	"<pre><code class=""language-css"">.standard-box {
+  box-sizing: content-box; /* 默认值 */
+  width: 200px;
+  height: 100px;
+  padding: 20px;
+  border: 5px solid #3498db;
+  margin: 10px;
+  background-color: #f1c40f;
+}</code></pre>"
+CSS中设置怪异盒子模型的代码示例	"<pre><code class=""language-css"">.border-box {
+  box-sizing: border-box; /* 启用怪异模型 */
+  width: 200px; /* 包含content+padding+border */
+  height: 100px;
+  padding: 20px;
+  border: 5px solid #e74c3c;
+  margin: 10px;
+  background-color: #2ecc71;
+}</code></pre>"
+box-sizing属性的语法及取值说明	"<pre><code class=""language-css"">/* 语法 */
+selector {
+  box-sizing: keyword; /* 关键字取值 */
+}
+
+/* 取值说明 */
+content-box: 标准盒子模型（默认）
+border-box: IE怪异盒子模型
+inherit: 继承父元素设置</code></pre>"
+全局启用border-box的最佳实践	"<pre><code class=""language-css"">/* 推荐全局设置 */
+*, *::before, *::after {
+  box-sizing: border-box; /* 统一使用怪异模型 */
+}
+
+/* 保留特定元素为标准模型 */
+input[type=""text""],
+textarea {
+  box-sizing: content-box;
+}</code></pre>"
+盒子模型在布局中的实际效果对比	"<pre><code class=""language-html"">&lt;div class=""container""&gt;
+  &lt;div class=""box content-box""&gt;标准盒子&lt;/div&gt;
+  &lt;div class=""box border-box""&gt;怪异盒子&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.container {
+  display: flex;
+  gap: 20px;
+}
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 5px solid;
+}
+.content-box {
+  box-sizing: content-box; /* 实际宽度=200+40+10=250px */
+}
+.border-box {
+  box-sizing: border-box; /* 实际宽度=200px */
+}
+&lt;/style&gt;</code></pre>"
