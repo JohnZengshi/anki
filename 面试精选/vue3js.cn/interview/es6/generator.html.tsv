@@ -188,3 +188,143 @@ function* watchFetchUser() {
  *    - 实现用户级线程
  *    - 协作式多任务处理
  */</code></pre>"
+
+JavaScript生成器在异步流程控制中的实现	"<pre><code class=""language-javascript"">function* asyncFlow() {
+  try {
+    const data1 = yield fetchData(""/api/data1"");
+    console.log(""获取数据1:"", data1);
+    
+    const data2 = yield fetchData(""/api/data2"");
+    console.log(""获取数据2:"", data2);
+    
+    return [data1, data2];
+  } catch (error) {
+    console.error(""流程出错:"", error);
+  }
+}
+
+// 执行器函数（自动处理Promise）
+function runGenerator(gen) {
+  const it = gen();
+  function handle(result) {
+    if (result.done) return result.value;
+    return result.value.then(
+      data => handle(it.next(data)),
+      err => handle(it.throw(err))
+    );
+  }
+  return handle(it.next());
+}
+
+runGenerator(asyncFlow);</code></pre>"
+JavaScript生成器实现自定义迭代器	"<pre><code class=""language-javascript"">const customIterable = {
+  *[Symbol.iterator]() {
+    yield ""第一步"";
+    yield ""第二步"";
+    yield ""第三步"";
+  }
+};
+
+// 支持for...of遍历
+for (const step of customIterable) {
+  console.log(step); 
+}
+
+// 手动调用迭代器
+const it = customIterable[Symbol.iterator]();
+console.log(it.next().value); // ""第一步""
+console.log(it.next().value); // ""第二步""</code></pre>"
+JavaScript生成器实现状态机	"<pre><code class=""language-javascript"">function* trafficLight() {
+  while (true) {
+    yield ""红灯: 停"";
+    yield ""黄灯: 准备"";
+    yield ""绿灯: 行"";
+  }
+}
+
+const light = trafficLight();
+console.log(light.next().value); // ""红灯: 停""
+console.log(light.next().value); // ""黄灯: 准备""
+console.log(light.next().value); // ""绿灯: 行""
+console.log(light.next().value); // ""红灯: 停"" (循环)</code></pre>"
+JavaScript生成器实现惰性计算(斐波那契)	"<pre><code class=""language-javascript"">function* fibonacci() {
+  let [prev, curr] = [0, 1];
+  while (true) {
+    yield curr;
+    [prev, curr] = [curr, prev + curr]; // 仅计算当前值
+  }
+}
+
+const fib = fibonacci();
+console.log(fib.next().value); // 1
+console.log(fib.next().value); // 1
+console.log(fib.next().value); // 2
+console.log(fib.next().value); // 3
+console.log(fib.next().value); // 5</code></pre>"
+JavaScript生成器组合数据处理管道	"<pre><code class=""language-javascript"">function* dataSource() {
+  yield 1; yield 2; yield 3; yield 4;
+}
+
+function* filterEven(iter) {
+  for (const num of iter) {
+    if (num % 2 === 0) yield num;
+  }
+}
+
+function* square(iter) {
+  for (const num of iter) {
+    yield num * num;
+  }
+}
+
+// 组合管道：数据源 → 过滤偶数 → 平方
+const pipeline = square(filterEven(dataSource()));
+
+for (const result of pipeline) {
+  console.log(result); // 输出: 4, 16
+}</code></pre>"
+Redux-saga中使用生成器管理异步流程	"<pre><code class=""language-javascript"">import { call, put, takeEvery } from ""redux-saga/effects"";
+import { fetchUserData } from ""../api"";
+
+// Generator处理异步action
+function* fetchUser(action) {
+  try {
+    const user = yield call(fetchUserData, action.payload.userId);
+    yield put({ type: ""USER_FETCH_SUCCEEDED"", user });
+  } catch (error) {
+    yield put({ type: ""USER_FETCH_FAILED"", error });
+  }
+}
+
+// 监听action类型
+function* watchFetchUser() {
+  yield takeEvery(""USER_FETCH_REQUESTED"", fetchUser);
+}
+
+export default watchFetchUser;</code></pre>"
+JavaScript生成器实现简单协程调度	"<pre><code class=""language-javascript"">function* taskA() {
+  for (let i = 1; i <= 3; i++) {
+    console.log(`任务A执行第${i}步`);
+    yield;
+  }
+}
+
+function* taskB() {
+  for (let i = 1; i <= 3; i++) {
+    console.log(`任务B执行第${i}步`);
+    yield;
+  }
+}
+
+// 简单调度器
+function scheduler(...tasks) {
+  const iterators = tasks.map(task => task());
+  while (iterators.length) {
+    const it = iterators.shift();
+    const { done } = it.next();
+    if (!done) iterators.push(it);
+  }
+}
+
+// 交替执行任务
+scheduler(taskA, taskB);</code></pre>"
