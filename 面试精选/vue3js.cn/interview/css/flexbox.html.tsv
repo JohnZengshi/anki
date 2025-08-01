@@ -1,0 +1,66 @@
+#separator:tab
+#html:true
+Flex容器基本结构示例	"<pre><code class=""language-css"">.container {
+  display: flex; /* 创建flex容器 */
+  flex-direction: row; /* 主轴方向：水平从左到右 */
+  flex-wrap: wrap; /* 超出换行 */
+}</code></pre>"
+flex-direction属性示例	"<pre><code class=""language-css"">.box {
+  /* 垂直排列，起点在底部 */
+  flex-direction: column-reverse;
+  /* 其他可选值: row | row-reverse | column */
+}</code></pre>"
+justify-content属性示例	"<pre><code class=""language-css"">.menu {
+  justify-content: space-around; /* 项目两侧间隔相等 */
+  /* 其他可选值: flex-start | center | space-between */
+}</code></pre>"
+align-items属性示例	"<pre><code class=""language-css"">.card-grid {
+  align-items: stretch; /* 默认值：拉伸填满容器高度 */
+  /* 其他可选值: flex-start | center | baseline */
+}</code></pre>"
+flex-grow属性示例	"<pre><code class=""language-css"">.sidebar {
+  flex-grow: 0; /* 不放大，固定宽度 */
+}
+.content {
+  flex-grow: 1; /* 占据剩余空间 */
+}</code></pre>"
+flex简写属性对比	"<pre><code class=""language-css"">.item-a {
+  flex: 1; /* 等价于 1 1 0% (绝对弹性) */
+}
+.item-b {
+  flex: auto; /* 等价于 1 1 auto (相对弹性) */
+}</code></pre>"
+align-self覆盖示例	"<pre><code class=""language-css"">.special-item {
+  align-self: flex-end; /* 单独设置底部对齐 */
+  /* 可覆盖父容器的align-items设置 */
+}</code></pre>"
+Flex水平垂直居中	"<pre><code class=""language-css"">.center-wrapper {
+  display: flex;
+  justify-content: center; /* 主轴居中 */
+  align-items: center; /* 交叉轴居中 */
+}</code></pre>"
+flex-shrink防止收缩	"<pre><code class=""language-css"">.fixed-column {
+  flex-shrink: 0; /* 空间不足时不缩小 */
+  width: 200px; /* 保持固定宽度 */
+}</code></pre>"
+Flex布局应用场景	"<pre><code class=""language-markdown"">1. 响应式导航栏
+2. 卡片网格布局
+3. 表单元素对齐
+4. 移动端页面结构
+5. 等高列布局
+6. 复杂内容居中</code></pre>"
+order排序控制	"<pre><code class=""language-css"">.item1 { order: 2; } /* 排在后面 */
+.item2 { order: 1; } /* 排在前面 */
+/* 数值越小排列越靠前 */</code></pre>"
+flex-basis初始尺寸	"<pre><code class=""language-css"">.panel {
+  flex-basis: 300px; /* 初始主轴尺寸 */
+  /* 优先级高于width属性 */
+}</code></pre>"
+align-content多行对齐	"<pre><code class=""language-css"">.gallery {
+  flex-wrap: wrap;
+  align-content: space-between; /* 多行间距均等 */
+}</code></pre>"
+flex-wrap换行控制	"<pre><code class=""language-css"">.responsive-grid {
+  flex-wrap: wrap-reverse; /* 换行且第一行在底部 */
+  /* 其他值: nowrap(默认) | wrap */
+}</code></pre>"

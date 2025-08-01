@@ -1,0 +1,141 @@
+#separator:tab
+#html:true
+CSS隐藏元素的7种方法	"<pre><code class=""language-css"">/* 1. display:none */
+.hide { display: none; }
+
+/* 2. visibility:hidden */
+.hidden { visibility: hidden; }
+
+/* 3. opacity:0 */
+.transparent { opacity: 0; }
+
+/* 4. 盒模型属性归零 */
+.hiddenBox {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* 5. position:absolute */
+.offscreen {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+
+/* 6. clip-path */
+.clipped {
+  clip-path: polygon(0px 0px, 0px 0px, 0px 0px, 0px 0px);
+}
+
+/* 7. transform:scale(0) */
+.scaled-zero {
+  transform: scale(0);
+}</code></pre>"
+display:none的特点	"<pre><code class=""language-css"">.element {
+  display: none; /* 
+  1. 元素从渲染树完全移除
+  2. 不占据文档空间 
+  3. 触发重排和重绘
+  4. 绑定事件不触发
+  5. 过渡动画不生效
+  6. 屏幕阅读器不可访问
+  */
+}</code></pre>"
+visibility:hidden的特点	"<pre><code class=""language-css"">.element {
+  visibility: hidden; /* 
+  1. 元素不可见但保留空间
+  2. 只触发重绘(不触发重排)
+  3. 自身事件不触发
+  4. 支持过渡动画
+  5. 子元素可通过visibility:visible显示
+  6. 屏幕阅读器不可访问
+  */
+}</code></pre>"
+opacity:0的特点	"<pre><code class=""language-css"">.element {
+  opacity: 0; /* 
+  1. 元素透明但保留空间
+  2. 不触发重排(可能触发重绘)
+  3. 自身事件仍可触发
+  4. 支持过渡动画
+  5. 需要配合pointer-events:none禁用事件
+  6. 屏幕阅读器可访问(需注意)
+  */
+  pointer-events: none; /* 禁用事件处理 */
+}</code></pre>"
+三种主要隐藏方式的区别对比	"<pre><code class=""language-html"">&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;特性&lt;/th&gt;&lt;th&gt;display:none&lt;/th&gt;&lt;th&gt;visibility:hidden&lt;/th&gt;&lt;th&gt;opacity:0&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;占据空间&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;触发重排&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;触发重绘&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;⚠️ 可能&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;自身事件触发&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;子元素恢复显示&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;过渡动画支持&lt;/td&gt;&lt;td&gt;❌ 否&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;td&gt;✅ 是&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>"
+CSS隐藏元素性能优化技巧	"<pre><code class=""language-css"">/* 最佳性能方案 */
+.optimized-hide {
+  opacity: 0;           /* 使用透明度变化 */
+  will-change: opacity; /* 提示浏览器优化 */
+  pointer-events: none; /* 禁用交互事件 */
+  
+  /* 替代方案：transform不会触发布局变化 */
+  /* transform: scale(0); */
+}
+
+/* 需保留空间时 */
+.optimized-invisible {
+  visibility: hidden;
+  transition: visibility 0.3s; /* 添加过渡效果 */
+}
+
+/* 需要完全移除时 */
+.optimized-remove {
+  display: none;
+  /* 注意：频繁切换时考虑使用visibility替代 */
+}</code></pre>"
+JavaScript切换CSS隐藏状态示例	"<pre><code class=""language-javascript"">// 切换display状态
+function toggleDisplay(element) {
+  if (window.getComputedStyle(element).display === 'none') {
+    element.style.display = 'block'; // 恢复显示
+  } else {
+    element.style.display = 'none'; // 隐藏元素
+  }
+}
+
+// 淡入淡出效果
+function fadeToggle(element) {
+  element.classList.toggle('fade-out');
+}
+
+// CSS配合类
+.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}</code></pre>"
+隐藏元素的可访问性处理	"<pre><code class=""language-html"">&lt;!-- 同时满足视觉和屏幕阅读器隐藏 --&gt;
+&lt;div class=""visually-hidden"" aria-hidden=""true""&gt;
+  对屏幕阅读器隐藏的内容
+&lt;/div&gt;
+
+&lt;style&gt;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+&lt;/style&gt;
+
+&lt;!-- 仅视觉隐藏但保留屏幕阅读器访问 --&gt;
+&lt;div class=""sr-only""&gt;
+  仅屏幕阅读器可访问的内容
+&lt;/div&gt;</code></pre>"

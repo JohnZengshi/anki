@@ -1,0 +1,184 @@
+#separator:tab
+#html:true
+什么是BFC？简述其核心特性	"<pre><code class=""language-css"">/* BFC（块级格式化上下文）是CSS渲染的独立区域 */
+核心特性：
+1. 内部元素垂直排列
+2. 相邻元素margin重叠（同一BFC内）
+3. 不会与浮动元素重叠
+4. 计算高度包含浮动元素
+5. 形成隔离容器（内外互不影响）</code></pre>"
+JavaScript中检测元素是否创建了BFC	"<pre><code class=""language-javascript"">function isBFC(element) {
+  const style = window.getComputedStyle(element);
+  
+  // 检查触发BFC的条件
+  return style.display.includes('flex') || 
+         style.display.includes('grid') ||
+         style.display.includes('table') ||
+         style.display.includes('inline-block') ||
+         style.float !== 'none' ||
+         style.position === 'absolute' ||
+         style.position === 'fixed' ||
+         style.overflow !== 'visible';
+}
+
+// 使用示例
+const el = document.getElementById('container');
+console.log('创建了BFC:', isBFC(el));</code></pre>"
+用CSS创建BFC的5种常见方法	"<pre><code class=""language-css"">/* 方法1: 使用overflow (最常用) */
+.container1 {
+  overflow: hidden; /* 或auto/scroll */
+}
+
+/* 方法2: 使用display属性 */
+.container2 {
+  display: inline-block;
+  /* 或: flex/inline-flex/grid/inline-grid/table等 */
+}
+
+/* 方法3: 使用浮动 */
+.container3 {
+  float: left; /* 或right */
+}
+
+/* 方法4: 使用定位 */
+.container4 {
+  position: absolute; /* 或fixed */
+}
+
+/* 方法5: 使用flow-root（现代推荐） */
+.container5 {
+  display: flow-root; /* 无副作用的最佳实践 */ 
+}</code></pre>"
+修复margin重叠问题的BFC解决方案	"<pre><code class=""language-html"">&lt;style&gt;
+  .bfc-container {
+    overflow: hidden; /* 触发BFC */
+  }
+  
+  p {
+    margin: 20px 0;
+    background: #eee;
+  }
+&lt;/style&gt;
+
+&lt;!-- 问题：两个p元素的margin会重叠 --&gt;
+&lt;p&gt;段落1&lt;/p&gt;
+&lt;p&gt;段落2&lt;/p&gt;
+
+&lt;!-- 解决方案：用BFC容器包裹 --&gt;
+&lt;p&gt;段落1&lt;/p&gt;
+&lt;div class=""bfc-container""&gt;
+  &lt;p&gt;段落2&lt;/p&gt; &lt;!-- 现在margin不会重叠 --&gt;
+&lt;/div&gt;</code></pre>"
+使用BFC解决浮动导致的高度塌陷	"<pre><code class=""language-html"">&lt;style&gt;
+  .parent {
+    border: 2px solid blue;
+    /* 添加以下任意属性解决高度塌陷 */
+    overflow: hidden; /* 方案1: 触发BFC */
+    display: flow-root; /* 方案2: 更优解 */
+  }
+  
+  .float-child {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background: red;
+  }
+&lt;/style&gt;
+
+&lt;div class=""parent""&gt;
+  &lt;div class=""float-child"">&lt;/div&gt;
+  &lt;div class=""float-child"">&lt;/div&gt;
+&lt;/div&gt;
+/* 
+未触发BFC时: 父元素高度为0
+触发BFC后: 父元素高度包含浮动子元素 
+*/</code></pre>"
+BFC实现两栏自适应布局的代码示例	"<pre><code class=""language-html"">&lt;style&gt;
+  .sidebar {
+    float: left;
+    width: 200px;
+    background: #f88;
+  }
+  
+  .main-content {
+    overflow: hidden; /* 触发BFC */
+    background: #8f8;
+    /* 自动填满剩余空间，不与浮动重叠 */
+  }
+&lt;/style&gt;
+
+&lt;div class=""sidebar"">侧边栏&lt;/div&gt;
+&lt;div class=""main-content"">主内容区域&lt;/div&gt;
+/* 
+原理：BFC区域不会与浮动元素重叠
+主内容区自动适应剩余宽度
+*/</code></pre>"
+所有触发BFC的CSS属性完整列表	"<pre><code class=""language-css"">/* 根元素 */
+html {} 
+
+/* 浮动元素 */
+.float-example {
+  float: left; /* 或right */
+}
+
+/* overflow非visible */
+.overflow-example {
+  overflow: hidden; /* 或auto/scroll */
+}
+
+/* display特定值 */
+.display-example {
+  display: inline-block;
+  /* 或: flex/inline-flex/grid/inline-grid/table/
+     inline-table/table-cell/table-caption/flow-root */
+}
+
+/* 定位元素 */
+.position-example {
+  position: absolute; /* 或fixed */
+}
+
+/* 新增CSS规范: contain值为layout/paint/strict/content */
+.contain-example {
+  contain: strict;
+}</code></pre>"
+BFC与IFC的主要区别对比	"<pre><code class=""language-css"">/* BFC (块级格式化上下文) */
+特性:
+- 块级盒子垂直排列
+- 控制margin重叠
+- 包含浮动元素
+- 不与浮动重叠
+
+/* IFC (行内格式化上下文) */
+特性:
+- 行内盒子水平排列
+- 垂直对齐使用vertical-align
+- 行框(line box)概念
+- 用于文本流布局
+
+触发条件对比:
+BFC: float, overflow, display等
+IFC: 包含行内元素的块容器</code></pre>"
+BFC在现代CSS布局中的替代方案	"<pre><code class=""language-css"">/* 传统BFC解决方案 */
+.old-solution {
+  overflow: hidden;
+}
+
+/* 现代替代方案 */
+.modern-alternatives {
+  /* 方案1: Flexbox布局 */
+  display: flex;
+  
+  /* 方案2: Grid布局 */
+  display: grid;
+  grid-template-columns: 1fr;
+  
+  /* 方案3: 专用BFC属性 */
+  display: flow-root; /* 最推荐方式 */
+  
+  /* 方案4: Containment API */
+  contain: layout; /* 新规范 */
+}
+
+/* 注意：Flex/Grid本身创建新格式上下文 */
+/* flow-root是专门为BFC设计的无副作用属性 */</code></pre>"

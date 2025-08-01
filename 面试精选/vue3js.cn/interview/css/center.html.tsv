@@ -1,0 +1,161 @@
+#separator:tab
+#html:true
+CSS实现固定宽高元素水平垂直居中：定位+margin:auto	"<pre><code class=""language-css"">/* 父容器设置相对定位 */
+.container {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+}
+
+/* 子元素设置绝对定位 + margin:auto */
+.child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 100px;  /* 固定宽度 */
+  height: 50px;   /* 固定高度 */
+  background: #f0a238;
+}</code></pre>"
+CSS实现固定宽高元素居中：定位+负margin	"<pre><code class=""language-css"">.parent {
+  position: relative;
+  width: 400px;
+  height: 300px;
+}
+
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 负margin值为宽高的一半 */
+  margin-left: -60px;  /* 宽度120px/2 */
+  margin-top: -40px;   /* 高度80px/2 */
+  width: 120px;
+  height: 80px;
+  background: #4a90e2;
+}</code></pre>"
+CSS实现不定宽高元素居中：定位+transform	"<pre><code class=""language-css"">.wrapper {
+  position: relative;
+  width: 80%;
+  min-height: 200px;
+}
+
+.content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 无需知道具体宽高 */
+  transform: translate(-50%, -50%);
+  background: #50e3c2;
+  padding: 20px;
+}</code></pre>"
+CSS实现元素居中：table布局方法	"<pre><code class=""language-css"">/* 父元素模拟表格单元格 */
+.parent {
+  display: table-cell;
+  width: 100vw;
+  height: 100vh;
+  vertical-align: middle;  /* 垂直居中 */
+  text-align: center;     /* 水平居中 */
+}
+
+/* 子元素设置为行内块 */
+.child {
+  display: inline-block;
+  background: #9013fe;
+  padding: 15px;
+}</code></pre>"
+CSS实现不定宽高元素居中：flex布局	"<pre><code class=""language-css"">/* 最简单现代的居中方案 */
+.container {
+  display: flex;
+  justify-content: center;  /* 水平居中 */
+  align-items: center;      /* 垂直居中 */
+  width: 100%;
+  min-height: 400px;
+}
+
+.item {
+  background: #ff6b6b;
+  padding: 30px;
+  /* 无需设置宽高 */
+}</code></pre>"
+CSS实现居中：grid布局方法	"<pre><code class=""language-css"">.grid-container {
+  display: grid;
+  place-items: center;  /* 单行代码实现居中 */
+  width: 100%;
+  height: 500px;
+  background: #f7f9fc;
+}
+
+.grid-item {
+  background: #7ed321;
+  padding: 40px;
+}</code></pre>"
+内联元素水平居中实现方法	"<pre><code class=""language-css"">/* 方法1：text-align */
+.text-parent {
+  text-align: center;
+  width: 100%;
+}
+
+/* 方法2：flex布局 */
+.flex-parent {
+  display: flex;
+  justify-content: center;
+}</code></pre>"
+内联元素垂直居中实现方案	"<pre><code class=""language-css"">/* 单行文本：line-height */
+.single-line {
+  height: 60px;
+  line-height: 60px; /* 与height相同 */
+}
+
+/* 多行文本：table-cell */
+.multi-line {
+  display: table-cell;
+  height: 200px;
+  vertical-align: middle;
+}</code></pre>"
+块级元素水平居中实现方案	"<pre><code class=""language-css"">/* 定宽元素：margin auto */
+.fixed-width {
+  width: 300px;
+  margin: 0 auto;
+}
+
+/* 不定宽元素：transform */
+.dynamic-width {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}</code></pre>"
+CSS居中方法选择指南	"<pre><code class=""language-text"">选择策略：
+1. 现代浏览器 → 优先flex/grid
+2. 需要兼容IE8+ → 定位+负margin
+3. 内联元素 → text-align/vertical-align
+4. 不定宽高 → transform/flex
+5. 简单场景 → table-cell
+
+注意事项：
+• 父容器需定义尺寸
+• 避免绝对定位破坏文档流
+• 移动端首选flex布局</code></pre>"
+CSS居中常见错误及调试	"<pre><code class=""language-css"">/* 错误1：忘记设置父元素position */
+.parent {
+  /* position: relative; 缺失 */
+}
+.child {
+  position: absolute;
+  top: 50%;
+}
+
+/* 错误2：flex容器未定义尺寸 */
+.flex-container {
+  display: flex;
+  /* height: 0 导致不可见 */
+}
+
+/* 错误3：transform冲突 */
+.conflict {
+  transform: translate(-50%, -50%) scale(0.8);
+  /* 多个transform需合并写 */
+}</code></pre>"

@@ -1,0 +1,167 @@
+#separator:tab
+#html:true
+CSS两栏布局：Float+Margin实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .bfc-container { overflow: hidden; }
+  .float-left { 
+    float: left;
+    width: 200px;
+    background: #f0f0f0;
+    height: 300px;
+  }
+  .margin-right { 
+    margin-left: 210px;
+    background: #e0e0e0;
+    height: 300px;
+  }
+&lt;/style&gt;
+&lt;div class=""bfc-container""&gt;
+  &lt;div class=""float-left""&gt;固定宽度&lt;/div&gt;
+  &lt;div class=""margin-right""&gt;自适应宽度&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS两栏布局：Flex实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .flex-container { 
+    display: flex; 
+    height: 300px;
+  }
+  .flex-fixed { 
+    width: 200px;
+    background: #f0f0f0;
+  }
+  .flex-auto { 
+    flex: 1;
+    background: #e0e0e0;
+  }
+&lt;/style&gt;
+&lt;div class=""flex-container""&gt;
+  &lt;div class=""flex-fixed""&gt;固定宽度&lt;/div&gt;
+  &lt;div class=""flex-auto""&gt;自适应宽度&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS三栏布局：Float实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .three-wrap { 
+    overflow: hidden; 
+    padding: 20px;
+    height: 300px;
+  }
+  .float-l { 
+    float: left;
+    width: 200px;
+    background: coral;
+    height: 100%;
+  }
+  .float-r { 
+    float: right;
+    width: 200px;
+    background: lightblue;
+    height: 100%;
+  }
+  .margin-mid { 
+    margin: 0 210px;
+    background: lightpink;
+    height: 100%;
+  }
+&lt;/style&gt;
+&lt;div class=""three-wrap""&gt;
+  &lt;div class=""float-l""&gt;左侧&lt;/div&gt;
+  &lt;div class=""float-r""&gt;右侧&lt;/div&gt;
+  &lt;div class=""margin-mid""&gt;中间自适应&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS三栏布局：绝对定位实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .pos-container { 
+    position: relative; 
+    height: 300px;
+  }
+  .abs-left { 
+    position: absolute;
+    left: 0;
+    width: 200px;
+    background: green;
+    height: 100%;
+  }
+  .abs-right { 
+    position: absolute;
+    right: 0;
+    width: 200px;
+    background: green;
+    height: 100%;
+  }
+  .margin-main { 
+    margin: 0 210px;
+    background: black;
+    color: white;
+    height: 100%;
+  }
+&lt;/style&gt;
+&lt;div class=""pos-container""&gt;
+  &lt;div class=""abs-left""&gt;左侧固定&lt;/div&gt;
+  &lt;div class=""abs-right""&gt;右侧固定&lt;/div&gt;
+  &lt;div class=""margin-main""&gt;中间自适应&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS三栏布局：Flex实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .three-flex { 
+    display: flex;
+    height: 300px;
+  }
+  .flex-l { 
+    width: 200px;
+    background: coral;
+  }
+  .flex-m { 
+    flex: 1;
+    background: lightpink;
+  }
+  .flex-r { 
+    width: 200px;
+    background: lightblue;
+  }
+&lt;/style&gt;
+&lt;div class=""three-flex""&gt;
+  &lt;div class=""flex-l""&gt;左侧固定&lt;/div&gt;
+  &lt;div class=""flex-m""&gt;中间自适应&lt;/div&gt;
+  &lt;div class=""flex-r""&gt;右侧固定&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS三栏布局：Grid实现	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;style&gt;
+  .grid-container { 
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    height: 300px;
+  }
+  .grid-left { background: coral; }
+  .grid-middle { background: lightpink; }
+  .grid-right { background: lightblue; }
+&lt;/style&gt;
+&lt;div class=""grid-container""&gt;
+  &lt;div class=""grid-left""&gt;左侧固定&lt;/div&gt;
+  &lt;div class=""grid-middle""&gt;中间自适应&lt;/div&gt;
+  &lt;div class=""grid-right""&gt;右侧固定&lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+CSS布局：BFC机制作用	"<pre><code class=""language-text"">BFC（Block Formatting Context）核心作用：
+1. 清除浮动：解决父容器高度塌陷问题
+2. 阻止外边距合并：相邻元素margin不合并
+3. 隔离元素：阻止浮动元素覆盖/被覆盖
+
+触发方式：
+• overflow: hidden | auto
+• float: left | right
+• position: absolute | fixed
+• display: inline-block | table-cell | flex</code></pre>"
+CSS：Flex容器默认对齐	"<pre><code class=""language-css"">/* Flex容器默认属性 */
+.container {
+  display: flex;
+  align-items: stretch; /* 默认值，导致子元素等高 */
+}
+
+/* 取消等高效果 */
+.container {
+  align-items: flex-start;
+}
+
+/* 垂直居中 */
+.container {
+  align-items: center;
+}</code></pre>"
