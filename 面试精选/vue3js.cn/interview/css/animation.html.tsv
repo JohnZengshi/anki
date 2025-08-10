@@ -1,0 +1,326 @@
+#separator:tab
+#html:true
+CSS3中实现一个鼠标悬停时宽度从100px变为200px的过渡动画	"<pre><code class=""language-css"">.box {
+  width: 100px;
+  height: 100px;
+  background-color: #0EA9FF;
+  /* 设置过渡属性：属性名 持续时间 速度曲线 延迟时间 */
+  transition: width 2s ease-in-out 0s;
+}
+
+/* 鼠标悬停时触发动画 */
+.box:hover {
+  width: 200px;
+}</code></pre>"
+CSS3 transition的四个核心属性分别是什么？	"<pre><code class=""language-css"">/* transition的四个核心属性 */
+.element {
+  /* property: 需要变化的CSS属性 */
+  transition-property: width, height, background-color;
+  
+  /* duration: 完成过渡效果需要的时间 */
+  transition-duration: 2s;
+  
+  /* timing-function: 完成效果的速度曲线 */
+  transition-timing-function: ease-in-out;
+  
+  /* delay: 动画效果的延迟触发时间 */
+  transition-delay: 500ms;
+  
+  /* 简写形式 */
+  /* transition: all 2s ease-in-out 500ms; */
+}</code></pre>"
+CSS3中实现一个元素同时进行旋转、缩放、平移、倾斜的transform动画	"<pre><code class=""language-css"">.transform-box {
+  width: 100px;
+  height: 100px;
+  background-color: #5daf34;
+  /* 初始状态 */
+  transform: none;
+  /* 配合transition实现平滑动画 */
+  transition: transform 1s ease-in-out;
+}
+
+.transform-box:hover {
+  /* 组合多个transform函数 */
+  transform: 
+    scale(1.5, 0.8)        /* 缩放：X轴1.5倍，Y轴0.8倍 */
+    rotate(45deg)          /* 旋转：顺时针45度 */
+    skew(10deg, 5deg)      /* 倾斜：X轴10度，Y轴5度 */
+    translate(50px, 30px); /* 平移：X轴50px，Y轴30px */
+}</code></pre>"
+transform不支持哪种类型的元素？如何解决？	"<pre><code class=""language-css"">/* transform不支持inline元素 */
+
+/* 错误示例 - inline元素无效 */
+span {
+  transform: rotate(45deg); /* 无效果 */
+}
+
+/* 解决方案1：改为block元素 */
+span {
+  display: block;
+  transform: rotate(45deg); /* 有效 */
+}
+
+/* 解决方案2：改为inline-block元素 */
+span {
+  display: inline-block;
+  transform: rotate(45deg); /* 有效 */
+}
+
+/* 解决方案3：改为flex元素 */
+span {
+  display: flex;
+  transform: rotate(45deg); /* 有效 */
+}</code></pre>"
+CSS3中使用@keyframes创建一个无限循环的旋转动画	"<pre><code class=""language-css"">/* 定义关键帧动画 */
+@keyframes rotate-infinite {
+  /* 起始状态 */
+  from {
+    transform: rotate(0deg);
+  }
+  
+  /* 结束状态 */
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 或者使用百分比定义 */
+@keyframes rotate-infinite-percent {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 应用动画 */
+.rotating-element {
+  width: 100px;
+  height: 100px;
+  background-color: #ff6b6b;
+  /* 动画名称 持续时间 速度曲线 延迟 次数 方向 填充模式 播放状态 */
+  animation: rotate-infinite 2s linear 0s infinite normal none running;
+}</code></pre>"
+CSS3 animation的8个属性分别是什么？请用代码展示	"<pre><code class=""language-css"">.animation-demo {
+  width: 100px;
+  height: 100px;
+  background-color: #4ecdc4;
+  
+  /* 1. animation-name: 指定@keyframes动画的名称 */
+  animation-name: slide-bounce;
+  
+  /* 2. animation-duration: 动画完成一个周期的时间 */
+  animation-duration: 3s;
+  
+  /* 3. animation-timing-function: 动画的速度曲线 */
+  animation-timing-function: ease-in-out;
+  
+  /* 4. animation-delay: 动画延迟时间 */
+  animation-delay: 1s;
+  
+  /* 5. animation-iteration-count: 动画播放次数 */
+  animation-iteration-count: infinite; /* 或具体数字如3 */
+  
+  /* 6. animation-direction: 动画播放方向 */
+  animation-direction: alternate; /* normal|reverse|alternate|alternate-reverse */
+  
+  /* 7. animation-fill-mode: 动画填充模式 */
+  animation-fill-mode: both; /* none|forwards|backwards|both */
+  
+  /* 8. animation-play-state: 动画播放状态 */
+  animation-play-state: running; /* running|paused */
+  
+  /* 简写形式 */
+  /* animation: slide-bounce 3s ease-in-out 1s infinite alternate both running; */
+}
+
+@keyframes slide-bounce {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(200px) scale(1.2); }
+  100% { transform: translateX(0px); }
+}</code></pre>"
+CSS3中哪些属性不支持transition过渡？请举例说明	"<pre><code class=""language-css"">/* 不支持transition的属性示例 */
+
+/* 1. display属性 - 无法过渡 */
+.display-demo {
+  display: none;
+  transition: display 1s ease; /* 无效 */
+}
+.display-demo:hover {
+  display: block; /* 瞬间切换，无过渡效果 */
+}
+
+/* 解决方案：使用opacity + visibility */
+.fade-demo {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.fade-demo:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 2. position属性 - 无法过渡 */
+.position-demo {
+  position: static;
+  transition: position 1s ease; /* 无效 */
+}
+.position-demo:hover {
+  position: absolute; /* 瞬间切换 */
+}
+
+/* 3. float属性 - 无法过渡 */
+.float-demo {
+  float: none;
+  transition: float 1s ease; /* 无效 */
+}
+.float-demo:hover {
+  float: left; /* 瞬间切换 */
+}</code></pre>"
+实现一个CSS3动画：元素从左到右移动，同时改变颜色和大小	"<pre><code class=""language-css"">/* 定义复合动画关键帧 */
+@keyframes move-color-size {
+  0% {
+    transform: translateX(0px) scale(1);
+    background-color: #ff6b6b;
+    border-radius: 0%;
+  }
+  
+  25% {
+    transform: translateX(100px) scale(1.2);
+    background-color: #4ecdc4;
+    border-radius: 25%;
+  }
+  
+  50% {
+    transform: translateX(200px) scale(1.5);
+    background-color: #45b7d1;
+    border-radius: 50%;
+  }
+  
+  75% {
+    transform: translateX(300px) scale(1.2);
+    background-color: #96ceb4;
+    border-radius: 25%;
+  }
+  
+  100% {
+    transform: translateX(400px) scale(1);
+    background-color: #feca57;
+    border-radius: 0%;
+  }
+}
+
+/* 应用动画的元素 */
+.moving-element {
+  width: 80px;
+  height: 80px;
+  background-color: #ff6b6b;
+  /* 动画配置：名称 时长 速度曲线 延迟 次数 方向 */
+  animation: move-color-size 4s ease-in-out 0s infinite alternate;
+}</code></pre>"
+CSS3中timing-function的所有可选值及其效果	"<pre><code class=""language-css"">/* timing-function所有可选值示例 */
+
+/* 1. linear - 匀速运动 */
+.linear-demo {
+  transition: transform 2s linear;
+}
+.linear-demo:hover {
+  transform: translateX(200px);
+}
+
+/* 2. ease - 默认值，慢-快-慢 */
+.ease-demo {
+  transition: transform 2s ease;
+}
+
+/* 3. ease-in - 慢慢变快 */
+.ease-in-demo {
+  transition: transform 2s ease-in;
+}
+
+/* 4. ease-out - 慢慢变慢 */
+.ease-out-demo {
+  transition: transform 2s ease-out;
+}
+
+/* 5. ease-in-out - 先变快再变慢 */
+.ease-in-out-demo {
+  transition: transform 2s ease-in-out;
+}
+
+/* 6. cubic-bezier - 自定义贝塞尔曲线 */
+.cubic-bezier-demo {
+  /* 弹性效果 */
+  transition: transform 2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 7. steps - 步进动画 */
+.steps-demo {
+  transition: transform 2s steps(5, end);
+}
+
+/* 对应的贝塞尔曲线值 */
+/*
+linear: cubic-bezier(0, 0, 1, 1)
+ease: cubic-bezier(0.25, 0.1, 0.25, 1)
+ease-in: cubic-bezier(0.42, 0, 1, 1)
+ease-out: cubic-bezier(0, 0, 0.58, 1)
+ease-in-out: cubic-bezier(0.42, 0, 0.58, 1)
+*/</code></pre>"
+创建一个CSS3动画实现打字机效果	"<pre><code class=""language-css"">/* 打字机效果动画 */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-cursor {
+  0%, 50% {
+    border-color: transparent;
+  }
+  51%, 100% {
+    border-color: #333;
+  }
+}
+
+.typewriter {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 3px solid #333;
+  
+  /* 打字动画：4秒完成，步进函数模拟打字效果 */
+  animation: 
+    typing 4s steps(40, end) 1s forwards,
+    blink-cursor 1s infinite;
+}
+
+/* HTML使用示例 */
+/*
+&lt;div class=""typewriter""&gt;
+  Hello, this is a typewriter effect!
+&lt;/div&gt;
+*/
+
+/* 多行打字机效果 */
+.typewriter-multiline {
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid #333;
+  
+  animation: 
+    typing 3s steps(30, end) forwards,
+    blink-cursor 1s infinite 3s;
+}</code></pre>"

@@ -1,0 +1,486 @@
+#separator:tab
+#html:true
+CSS预处理器的核心作用是什么？请用代码说明变量的使用	"<pre><code class=""language-scss"">// CSS预处理器解决CSS维护难题
+// 1. 变量定义和使用
+$primary-color: #3498db;
+$font-size-base: 16px;
+$border-radius: 4px;
+
+// 2. 样式应用
+.button {
+  background-color: $primary-color;
+  font-size: $font-size-base;
+  border-radius: $border-radius;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+// 编译后的CSS
+.button {
+  background-color: #3498db;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.button:hover {
+  background-color: #2980b9;
+}</code></pre>"
+Sass、Less、Stylus三种预处理器的变量声明语法有什么区别？	"<pre><code class=""language-scss"">// Sass/SCSS - 使用$符号
+$primary-color: #ff6b6b;
+$font-size: 14px;
+
+.header {
+  color: $primary-color;
+  font-size: $font-size;
+}
+
+// Less - 使用@符号
+@primary-color: #ff6b6b;
+@font-size: 14px;
+
+.header {
+  color: @primary-color;
+  font-size: @font-size;
+}
+
+// Stylus - 无符号限定
+primary-color = #ff6b6b
+font-size = 14px
+
+.header
+  color: primary-color
+  font-size: font-size</code></pre>"
+请实现一个CSS预处理器的混入(Mixin)功能，展示参数传递和默认值	"<pre><code class=""language-scss"">// Sass Mixin定义
+@mixin button-style($bg-color: #007bff, $text-color: white, $padding: 10px 20px) {
+  background-color: $bg-color;
+  color: $text-color;
+  padding: $padding;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: darken($bg-color, 10%);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 使用Mixin
+.primary-btn {
+  @include button-style(#007bff);
+}
+
+.danger-btn {
+  @include button-style(#dc3545, white, 12px 24px);
+}
+
+.success-btn {
+  @include button-style($bg-color: #28a745, $padding: 8px 16px);
+}</code></pre>"
+CSS预处理器中的嵌套语法如何使用？请展示复杂的嵌套结构	"<pre><code class=""language-scss"">// 复杂嵌套结构示例
+.navigation {
+  background-color: #333;
+  padding: 0;
+  
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    display: flex;
+    
+    .nav-item {
+      position: relative;
+      
+      .nav-link {
+        display: block;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+        
+        &:hover {
+          background-color: #555;
+        }
+        
+        &.active {
+          background-color: #007bff;
+          font-weight: bold;
+        }
+      }
+      
+      // 下拉菜单
+      .dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #444;
+        min-width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        
+        .dropdown-item {
+          padding: 10px 15px;
+          
+          &:hover {
+            background-color: #555;
+          }
+        }
+      }
+      
+      &:hover .dropdown {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+}</code></pre>"
+如何在CSS预处理器中实现函数功能？请展示颜色处理和数学计算	"<pre><code class=""language-scss"">// Sass函数定义
+@function calculate-rem($px-value, $base-font-size: 16px) {
+  @return #{$px-value / $base-font-size}rem;
+}
+
+@function lighten-color($color, $percentage) {
+  @return lighten($color, $percentage);
+}
+
+@function create-shadow($depth: 1) {
+  $shadow-values: ();
+  
+  @for $i from 1 through $depth {
+    $blur: $i * 2px;
+    $offset: $i * 1px;
+    $opacity: 0.15 - ($i * 0.02);
+    $shadow: 0 $offset $blur rgba(0, 0, 0, $opacity);
+    $shadow-values: append($shadow-values, $shadow, comma);
+  }
+  
+  @return $shadow-values;
+}
+
+// 使用函数
+.card {
+  font-size: calculate-rem(18px);        // 1.125rem
+  background: lighten-color(#333, 20%);  // #666666
+  box-shadow: create-shadow(3);          // 多层阴影效果
+  padding: calculate-rem(24px);          // 1.5rem
+  
+  .title {
+    font-size: calculate-rem(24px);      // 1.5rem
+    color: lighten-color(#000, 30%);
+  }
+}</code></pre>"
+CSS预处理器中的条件控制和循环如何实现？请展示实际应用场景	"<pre><code class=""language-scss"">// 条件控制 - 响应式断点Mixin
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: 767px) { @content; }
+  }
+  @else if $breakpoint == tablet {
+    @media (min-width: 768px) and (max-width: 1023px) { @content; }
+  }
+  @else if $breakpoint == desktop {
+    @media (min-width: 1024px) { @content; }
+  }
+  @else {
+    @warn ""未知的断点: #{$breakpoint}"";
+  }
+}
+
+// 循环生成工具类
+$spacing-values: (0, 5, 10, 15, 20, 25, 30);
+$spacing-properties: (margin, padding);
+$spacing-directions: (top, right, bottom, left);
+
+// 生成间距工具类
+@each $property in $spacing-properties {
+  @each $direction in $spacing-directions {
+    @each $value in $spacing-values {
+      .#{str-slice($property, 1, 1)}#{str-slice($direction, 1, 1)}-#{$value} {
+        #{$property}-#{$direction}: #{$value}px;
+      }
+    }
+  }
+}
+
+// 生成栅格系统
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    width: percentage($i / 12);
+    float: left;
+  }
+}
+
+// 使用示例
+.container {
+  @include respond-to(mobile) {
+    padding: 10px;
+  }
+  
+  @include respond-to(desktop) {
+    padding: 30px;
+  }
+}</code></pre>"
+Less预处理器的特色功能有哪些？请展示Less特有的语法特性	"<pre><code class=""language-less"">// Less特色功能展示
+
+// 1. 变量插值
+@prefix: ui;
+@property: color;
+
+.@{prefix}-button {
+  @{property}: red;
+}
+
+// 2. 混入守卫(Guards)
+.border-radius(@radius) when (@radius > 0) {
+  border-radius: @radius;
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+}
+
+.box-shadow(@style, @color) when (iscolor(@color)) {
+  box-shadow: @style @color;
+}
+
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+
+// 3. 模式匹配
+.triangle(up, @width: 10px, @color: #000) {
+  border-left: @width solid transparent;
+  border-right: @width solid transparent;
+  border-bottom: @width solid @color;
+}
+
+.triangle(down, @width: 10px, @color: #000) {
+  border-left: @width solid transparent;
+  border-right: @width solid transparent;
+  border-top: @width solid @color;
+}
+
+// 4. 使用示例
+.card {
+  .border-radius(8px);
+  .box-shadow(0 2px 4px, 20%);
+  
+  &::before {
+    content: '';
+    .triangle(up, 6px, #007bff);
+  }
+}</code></pre>"
+Stylus预处理器的灵活语法如何体现？请展示多种书写风格	"<pre><code class=""language-stylus"">// Stylus灵活语法展示
+
+// 1. 省略大括号和分号的写法
+base-font-size = 16px
+primary-color = #3498db
+secondary-color = #2ecc71
+
+// 2. 函数定义(无括号)
+rem-calc(px-value)
+  (px-value / base-font-size) * 1rem
+
+// 3. 混入定义
+border-radius(radius = 4px)
+  border-radius radius
+  -webkit-border-radius radius
+  -moz-border-radius radius
+
+// 4. 多种语法风格混用
+.button
+  padding rem-calc(12px) rem-calc(24px)
+  background-color primary-color
+  color white
+  border none
+  border-radius(6px)
+  cursor pointer
+  transition all 0.3s ease
+  
+  // CSS风格写法
+  &:hover {
+    background-color: darken(primary-color, 10%);
+    transform: translateY(-2px);
+  }
+  
+  // 省略冒号的写法
+  &:active
+    transform translateY(0)
+    
+  // 条件判断
+  &.large
+    if base-font-size > 14px
+      font-size rem-calc(18px)
+    else
+      font-size rem-calc(16px)
+
+// 5. 循环生成类
+for i in 1..5
+  .opacity-{i * 20}
+    opacity (i * 20) / 100</code></pre>"
+CSS预处理器中的继承(@extend)如何使用？请展示最佳实践	"<pre><code class=""language-scss"">// 基础样式定义
+%button-base {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+%message-base {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+// 继承并扩展
+.btn-primary {
+  @extend %button-base;
+  background-color: #007bff;
+  color: white;
+  
+  &:hover {
+    background-color: darken(#007bff, 10%);
+  }
+}
+
+.btn-secondary {
+  @extend %button-base;
+  background-color: #6c757d;
+  color: white;
+  
+  &:hover {
+    background-color: darken(#6c757d, 10%);
+  }
+}
+
+.alert-success {
+  @extend %message-base;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-error {
+  @extend %message-base;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+// 链式继承
+.btn-large {
+  @extend .btn-primary;
+  padding: 15px 30px;
+  font-size: 18px;
+}</code></pre>"
+如何在现代前端项目中配置CSS预处理器？请展示Webpack配置示例	"<pre><code class=""language-javascript"">// webpack.config.js - CSS预处理器配置
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  
+  module: {
+    rules: [
+      // Sass/SCSS配置
+      {
+        test: /\.(sass|scss)$/,
+        use: [
+          process.env.NODE_ENV === 'production' 
+            ? MiniCssExtractPlugin.loader 
+            : 'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              modules: {
+                localIdentName: '[name]__[local]--[hash:base64:5]'
+              }
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+              postcssOptions: {
+                plugins: [
+                  ['autoprefixer'],
+                  ['cssnano', { preset: 'default' }]
+                ]
+              }
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              sassOptions: {
+                includePaths: [path.resolve(__dirname, 'src/styles')]
+              }
+            }
+          }
+        ]
+      },
+      
+      // Less配置
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                modifyVars: {
+                  'primary-color': '#1890ff',
+                  'border-radius-base': '4px'
+                },
+                javascriptEnabled: true
+              }
+            }
+          }
+        ]
+      },
+      
+      // Stylus配置
+      {
+        test: /\.styl$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'stylus-loader',
+            options: {
+              stylusOptions: {
+                import: [path.resolve(__dirname, 'src/styles/variables.styl')]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+    })
+  ]
+};</code></pre>"

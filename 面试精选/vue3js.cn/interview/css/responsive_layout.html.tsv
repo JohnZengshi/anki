@@ -1,0 +1,1011 @@
+#separator:tab
+#html:true
+什么是响应式设计？请用代码演示基本概念	"<pre><code class=""language-html"">&lt;!-- 响应式设计基本概念演示 --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;!-- 响应式设计必备的viewport声明 --&gt;
+  &lt;meta name=""viewport"" content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no""&gt;
+  &lt;style&gt;
+    /* 响应式容器 - Content is like water */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* 移动端优先的媒体查询 */
+    @media screen and (min-width: 768px) {
+      .container {
+        padding: 40px;
+      }
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=""container""&gt;
+    &lt;h1&gt;响应式内容&lt;/h1&gt;
+    &lt;p&gt;内容像水一样适应容器&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+请编写CSS媒体查询实现不同屏幕尺寸的布局适配	"<pre><code class=""language-css"">/* 媒体查询实现响应式布局 */
+
+/* 基础样式 - 移动端优先 */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr; /* 单列布局 */
+  gap: 10px;
+  padding: 10px;
+}
+
+.card {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 平板设备 (768px及以上) */
+@media screen and (min-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .card {
+    font-size: 16px;
+    padding: 20px;
+  }
+}
+
+/* 桌面设备 (1024px及以上) */
+@media screen and (min-width: 1024px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr); /* 三列布局 */
+    gap: 30px;
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .card {
+    font-size: 18px;
+    padding: 25px;
+  }
+}
+
+/* 大屏设备 (1440px及以上) */
+@media screen and (min-width: 1440px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr); /* 四列布局 */
+  }
+}</code></pre>"
+请用JavaScript实现动态rem单位响应式方案	"<pre><code class=""language-javascript"">// 动态rem响应式解决方案
+
+class ResponsiveManager {
+  constructor() {
+    this.baseWidth = 375; // 设计稿基准宽度
+    this.baseFontSize = 16; // 基准字体大小
+    this.init();
+  }
+  
+  // 初始化响应式管理器
+  init() {
+    this.setRootFontSize();
+    this.bindEvents();
+    console.log('响应式管理器已初始化');
+  }
+  
+  // 设置根元素字体大小
+  setRootFontSize() {
+    // 获取当前视口宽度
+    const clientWidth = document.documentElement.clientWidth;
+    
+    // 计算缩放比例
+    const scale = clientWidth / this.baseWidth;
+    
+    // 计算新的根字体大小 (限制最小和最大值)
+    let fontSize = this.baseFontSize * scale;
+    fontSize = Math.max(12, Math.min(fontSize, 24));
+    
+    // 设置根元素字体大小
+    document.documentElement.style.fontSize = fontSize + 'px';
+    
+    console.log(`视口宽度: ${clientWidth}px, 根字体大小: ${fontSize}px`);
+  }
+  
+  // 绑定事件监听器
+  bindEvents() {
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.debounce(() => {
+      this.setRootFontSize();
+    }, 100));
+    
+    // 监听设备方向变化
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        this.setRootFontSize();
+      }, 300); // 延迟执行，等待方向变化完成
+    });
+  }
+  
+  // 防抖函数
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+  
+  // 获取当前rem值对应的px值
+  rem2px(remValue) {
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    return remValue * rootFontSize;
+  }
+  
+  // 获取px值对应的rem值
+  px2rem(pxValue) {
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    return pxValue / rootFontSize;
+  }
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', () => {
+  const responsiveManager = new ResponsiveManager();
+  
+  // 暴露到全局，方便调试
+  window.responsiveManager = responsiveManager;
+});</code></pre>"
+请实现基于vw/vh单位的响应式布局方案	"<pre><code class=""language-css"">/* 基于vw/vh的响应式布局方案 */
+
+/* 重置默认样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 全屏容器 - 使用vh单位 */
+.full-screen-container {
+  width: 100vw;  /* 视口宽度的100% */
+  height: 100vh; /* 视口高度的100% */
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 头部区域 - 固定高度使用vh */
+.header {
+  width: 100%;
+  height: 10vh; /* 视口高度的10% */
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4vw; /* 字体大小使用vw单位 */
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+/* 主内容区域 - 自适应剩余空间 */
+.main-content {
+  flex: 1;
+  padding: 2vw; /* 内边距使用vw单位 */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+  gap: 2vw;
+  overflow-y: auto;
+}
+
+/* 卡片组件 - 完全基于视口单位 */
+.responsive-card {
+  background: white;
+  border-radius: 1vw;
+  padding: 3vw;
+  box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.responsive-card:hover {
+  transform: translateY(-0.5vw);
+}
+
+.card-title {
+  font-size: 3vw;
+  margin-bottom: 2vw;
+  color: #333;
+  text-align: center;
+}
+
+.card-content {
+  font-size: 2vw;
+  color: #666;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 底部区域 */
+.footer {
+  width: 100%;
+  height: 8vh;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.5vw;
+}
+
+/* 响应式断点优化 - 防止在大屏幕上字体过大 */
+@media screen and (min-width: 1200px) {
+  .header {
+    font-size: 48px; /* 限制最大字体大小 */
+  }
+  
+  .card-title {
+    font-size: 36px;
+  }
+  
+  .card-content {
+    font-size: 24px;
+  }
+  
+  .footer {
+    font-size: 30px;
+  }
+}
+
+/* 小屏幕优化 - 防止字体过小 */
+@media screen and (max-width: 480px) {
+  .main-content {
+    grid-template-columns: 1fr; /* 单列布局 */
+  }
+  
+  .responsive-card {
+    min-height: 25vh; /* 增加最小高度 */
+  }
+}</code></pre>"
+请编写百分比布局的响应式网格系统	"<pre><code class=""language-css"">/* 基于百分比的响应式网格系统 */
+
+/* 容器基础样式 */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* 行容器 */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px; /* 负边距抵消列的内边距 */
+}
+
+/* 列基础样式 */
+.col {
+  position: relative;
+  width: 100%;
+  padding: 0 15px;
+  min-height: 1px;
+}
+
+/* 12列网格系统 - 百分比计算 */
+.col-1 { width: 8.333333%; }    /* 1/12 = 8.333% */
+.col-2 { width: 16.666667%; }   /* 2/12 = 16.667% */
+.col-3 { width: 25%; }          /* 3/12 = 25% */
+.col-4 { width: 33.333333%; }   /* 4/12 = 33.333% */
+.col-5 { width: 41.666667%; }   /* 5/12 = 41.667% */
+.col-6 { width: 50%; }          /* 6/12 = 50% */
+.col-7 { width: 58.333333%; }   /* 7/12 = 58.333% */
+.col-8 { width: 66.666667%; }   /* 8/12 = 66.667% */
+.col-9 { width: 75%; }          /* 9/12 = 75% */
+.col-10 { width: 83.333333%; }  /* 10/12 = 83.333% */
+.col-11 { width: 91.666667%; }  /* 11/12 = 91.667% */
+.col-12 { width: 100%; }        /* 12/12 = 100% */
+
+/* 偏移类 - 使用margin-left百分比 */
+.offset-1 { margin-left: 8.333333%; }
+.offset-2 { margin-left: 16.666667%; }
+.offset-3 { margin-left: 25%; }
+.offset-4 { margin-left: 33.333333%; }
+.offset-5 { margin-left: 41.666667%; }
+.offset-6 { margin-left: 50%; }
+.offset-7 { margin-left: 58.333333%; }
+.offset-8 { margin-left: 66.666667%; }
+.offset-9 { margin-left: 75%; }
+.offset-10 { margin-left: 83.333333%; }
+.offset-11 { margin-left: 91.666667%; }
+
+/* 小屏幕 (576px以下) - 移动端优先 */
+@media (max-width: 575.98px) {
+  .col-sm-1 { width: 8.333333%; }
+  .col-sm-2 { width: 16.666667%; }
+  .col-sm-3 { width: 25%; }
+  .col-sm-4 { width: 33.333333%; }
+  .col-sm-5 { width: 41.666667%; }
+  .col-sm-6 { width: 50%; }
+  .col-sm-7 { width: 58.333333%; }
+  .col-sm-8 { width: 66.666667%; }
+  .col-sm-9 { width: 75%; }
+  .col-sm-10 { width: 83.333333%; }
+  .col-sm-11 { width: 91.666667%; }
+  .col-sm-12 { width: 100%; }
+}
+
+/* 中等屏幕 (768px及以上) */
+@media (min-width: 768px) {
+  .col-md-1 { width: 8.333333%; }
+  .col-md-2 { width: 16.666667%; }
+  .col-md-3 { width: 25%; }
+  .col-md-4 { width: 33.333333%; }
+  .col-md-5 { width: 41.666667%; }
+  .col-md-6 { width: 50%; }
+  .col-md-7 { width: 58.333333%; }
+  .col-md-8 { width: 66.666667%; }
+  .col-md-9 { width: 75%; }
+  .col-md-10 { width: 83.333333%; }
+  .col-md-11 { width: 91.666667%; }
+  .col-md-12 { width: 100%; }
+}
+
+/* 大屏幕 (992px及以上) */
+@media (min-width: 992px) {
+  .col-lg-1 { width: 8.333333%; }
+  .col-lg-2 { width: 16.666667%; }
+  .col-lg-3 { width: 25%; }
+  .col-lg-4 { width: 33.333333%; }
+  .col-lg-5 { width: 41.666667%; }
+  .col-lg-6 { width: 50%; }
+  .col-lg-7 { width: 58.333333%; }
+  .col-lg-8 { width: 66.666667%; }
+  .col-lg-9 { width: 75%; }
+  .col-lg-10 { width: 83.333333%; }
+  .col-lg-11 { width: 91.666667%; }
+  .col-lg-12 { width: 100%; }
+}
+
+/* 超大屏幕 (1200px及以上) */
+@media (min-width: 1200px) {
+  .col-xl-1 { width: 8.333333%; }
+  .col-xl-2 { width: 16.666667%; }
+  .col-xl-3 { width: 25%; }
+  .col-xl-4 { width: 33.333333%; }
+  .col-xl-5 { width: 41.666667%; }
+  .col-xl-6 { width: 50%; }
+  .col-xl-7 { width: 58.333333%; }
+  .col-xl-8 { width: 66.666667%; }
+  .col-xl-9 { width: 75%; }
+  .col-xl-10 { width: 83.333333%; }
+  .col-xl-11 { width: 91.666667%; }
+  .col-xl-12 { width: 100%; }
+}</code></pre>"
+请用Go语言模拟响应式设计的断点检测逻辑	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""sort""
+)
+
+// 设备类型枚举
+type DeviceType int
+
+const (
+	Mobile DeviceType = iota
+	Tablet
+	Desktop
+	LargeDesktop
+)
+
+// 设备类型字符串映射
+func (d DeviceType) String() string {
+	switch d {
+	case Mobile:
+		return ""Mobile""
+	case Tablet:
+		return ""Tablet""
+	case Desktop:
+		return ""Desktop""
+	case LargeDesktop:
+		return ""LargeDesktop""
+	default:
+		return ""Unknown""
+	}
+}
+
+// 断点配置结构体
+type Breakpoint struct {
+	Name       string     // 断点名称
+	MinWidth   int        // 最小宽度
+	MaxWidth   int        // 最大宽度 (-1表示无限大)
+	DeviceType DeviceType // 设备类型
+	Columns    int        // 网格列数
+	Gutter     int        // 间距大小
+}
+
+// 响应式管理器
+type ResponsiveManager struct {
+	breakpoints []Breakpoint
+	currentBP   *Breakpoint
+}
+
+// 创建新的响应式管理器
+func NewResponsiveManager() *ResponsiveManager {
+	rm := &ResponsiveManager{
+		breakpoints: []Breakpoint{
+			{""xs"", 0, 575, Mobile, 1, 10},
+			{""sm"", 576, 767, Mobile, 2, 15},
+			{""md"", 768, 991, Tablet, 3, 20},
+			{""lg"", 992, 1199, Desktop, 4, 25},
+			{""xl"", 1200, -1, LargeDesktop, 6, 30},
+		},
+	}
+	
+	// 按最小宽度排序断点
+	sort.Slice(rm.breakpoints, func(i, j int) bool {
+		return rm.breakpoints[i].MinWidth < rm.breakpoints[j].MinWidth
+	})
+	
+	return rm
+}
+
+// 根据视口宽度检测当前断点
+func (rm *ResponsiveManager) DetectBreakpoint(viewportWidth int) *Breakpoint {
+	for i := len(rm.breakpoints) - 1; i >= 0; i-- {
+		bp := &rm.breakpoints[i]
+		
+		// 检查是否在当前断点范围内
+		if viewportWidth >= bp.MinWidth {
+			// 如果MaxWidth为-1，表示无上限
+			if bp.MaxWidth == -1 || viewportWidth <= bp.MaxWidth {
+				rm.currentBP = bp
+				return bp
+			}
+		}
+	}
+	
+	// 如果没有匹配的断点，返回最小的断点
+	rm.currentBP = &rm.breakpoints[0]
+	return rm.currentBP
+}
+
+// 获取当前断点信息
+func (rm *ResponsiveManager) GetCurrentBreakpoint() *Breakpoint {
+	return rm.currentBP
+}
+
+// 检查是否为移动设备
+func (rm *ResponsiveManager) IsMobile() bool {
+	if rm.currentBP == nil {
+		return false
+	}
+	return rm.currentBP.DeviceType == Mobile
+}
+
+// 检查是否为平板设备
+func (rm *ResponsiveManager) IsTablet() bool {
+	if rm.currentBP == nil {
+		return false
+	}
+	return rm.currentBP.DeviceType == Tablet
+}
+
+// 检查是否为桌面设备
+func (rm *ResponsiveManager) IsDesktop() bool {
+	if rm.currentBP == nil {
+		return false
+	}
+	return rm.currentBP.DeviceType == Desktop || rm.currentBP.DeviceType == LargeDesktop
+}
+
+// 获取推荐的网格列数
+func (rm *ResponsiveManager) GetRecommendedColumns() int {
+	if rm.currentBP == nil {
+		return 1
+	}
+	return rm.currentBP.Columns
+}
+
+// 获取推荐的间距大小
+func (rm *ResponsiveManager) GetRecommendedGutter() int {
+	if rm.currentBP == nil {
+		return 10
+	}
+	return rm.currentBP.Gutter
+}
+
+// 模拟视口变化的响应式测试
+func (rm *ResponsiveManager) SimulateViewportChanges() {
+	testWidths := []int{320, 480, 768, 1024, 1200, 1440, 1920}
+	
+	fmt.Println(""=== 响应式断点检测模拟 ==="")
+	fmt.Println()
+	
+	for _, width := range testWidths {
+		bp := rm.DetectBreakpoint(width)
+		
+		fmt.Printf(""视口宽度: %dpx\n"", width)
+		fmt.Printf(""  断点: %s (%d-%d)\n"", bp.Name, bp.MinWidth, bp.MaxWidth)
+		fmt.Printf(""  设备类型: %s\n"", bp.DeviceType)
+		fmt.Printf(""  推荐列数: %d\n"", bp.Columns)
+		fmt.Printf(""  推荐间距: %dpx\n"", bp.Gutter)
+		fmt.Printf(""  是否移动端: %t\n"", rm.IsMobile())
+		fmt.Println()
+	}
+}
+
+// 主函数演示
+func main() {
+	// 创建响应式管理器
+	rm := NewResponsiveManager()
+	
+	// 模拟不同视口宽度的响应式行为
+	rm.SimulateViewportChanges()
+	
+	// 实际使用示例
+	fmt.Println(""=== 实际使用示例 ==="")
+	currentWidth := 1024
+	bp := rm.DetectBreakpoint(currentWidth)
+	
+	fmt.Printf(""当前视口宽度: %dpx\n"", currentWidth)
+	fmt.Printf(""检测到的断点: %s\n"", bp.Name)
+	fmt.Printf(""设备类型: %s\n"", bp.DeviceType)
+	fmt.Printf(""建议使用 %d 列网格布局\n"", rm.GetRecommendedColumns())
+	fmt.Printf(""建议间距: %dpx\n"", rm.GetRecommendedGutter())
+}</code></pre>"
+响应式设计中viewport meta标签的作用和配置参数有哪些？	"<pre><code class=""language-html"">&lt;!-- 响应式设计viewport配置详解 --&gt;
+
+&lt;!-- 1. 标准响应式viewport配置 --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0""&gt;
+
+&lt;!-- 2. 完整参数配置示例 --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=0.5, user-scalable=yes""&gt;
+
+&lt;!-- 3. 禁止用户缩放的配置 --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no""&gt;
+
+&lt;!-- 4. 固定宽度viewport --&gt;
+&lt;meta name=""viewport"" content=""width=375, initial-scale=1.0""&gt;
+
+&lt;!-- 5. 高度控制viewport --&gt;
+&lt;meta name=""viewport"" content=""width=device-width, height=device-height, initial-scale=1.0""&gt;
+
+&lt;style&gt;
+/* viewport参数说明：
+
+1. width: 控制viewport的宽度
+   - device-width: 使用设备的宽度
+   - 具体数值: 如375px
+
+2. height: 控制viewport的高度
+   - device-height: 使用设备的高度
+   - 具体数值: 如667px
+
+3. initial-scale: 初始缩放比例
+   - 1.0: 不缩放（推荐）
+   - 0.5: 缩小到50%
+   - 2.0: 放大到200%
+
+4. maximum-scale: 最大缩放比例
+   - 1.0: 禁止放大
+   - 3.0: 最大放大3倍
+
+5. minimum-scale: 最小缩放比例
+   - 0.5: 最小缩小到50%
+   - 1.0: 禁止缩小
+
+6. user-scalable: 是否允许用户缩放
+   - yes: 允许缩放（默认）
+   - no: 禁止缩放
+
+7. viewport-fit: 适配刘海屏等异形屏幕
+   - auto: 自动（默认）
+   - contain: 完全包含在安全区域内
+   - cover: 覆盖整个屏幕
+*/
+
+/* 不同viewport配置的影响演示 */
+.demo-container {
+  width: 100%;
+  padding: 20px;
+  background: #f0f0f0;
+  border: 2px solid #333;
+}
+
+.demo-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* 媒体查询验证viewport是否生效 */
+@media screen and (max-width: 768px) {
+  .demo-container {
+    background: #e8f5e8;
+  }
+  
+  .demo-text::before {
+    content: ""移动端样式已生效 - "";
+    color: #4CAF50;
+    font-weight: bold;
+  }
+}
+&lt;/style&gt;
+
+&lt;!-- 测试内容 --&gt;
+&lt;div class=""demo-container""&gt;
+  &lt;p class=""demo-text""&gt;
+    这是用来测试viewport配置的内容。
+    如果viewport配置正确，在移动设备上应该能看到绿色背景和提示文字。
+  &lt;/p&gt;
+&lt;/div&gt;</code></pre>"
+什么是移动优先的响应式设计策略？请用代码演示	"<pre><code class=""language-css"">/* 移动优先响应式设计策略演示 */
+
+/* ===== 移动优先基础原则 ===== */
+/* 1. 基础样式针对最小屏幕设计（移动端） */
+/* 2. 使用min-width媒体查询向上扩展 */
+/* 3. 渐进增强而非优雅降级 */
+
+/* 基础样式 - 移动端优先（320px起） */
+.container {
+  width: 100%;
+  padding: 10px; /* 移动端较小的内边距 */
+  margin: 0 auto;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column; /* 移动端垂直导航 */
+  background: #333;
+  padding: 0;
+}
+
+.nav-item {
+  width: 100%;
+  padding: 15px;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid #555;
+  font-size: 16px; /* 移动端适中字体 */
+}
+
+.nav-item:hover {
+  background: #555;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* 移动端单列布局 */
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 14px; /* 移动端较小字体 */
+}
+
+.card-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.card-content {
+  line-height: 1.4;
+  color: #666;
+}
+
+/* 隐藏移动端不需要的元素 */
+.desktop-only {
+  display: none;
+}
+
+.mobile-menu-toggle {
+  display: block;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* ===== 小平板 (576px及以上) ===== */
+@media screen and (min-width: 576px) {
+  .container {
+    padding: 15px; /* 增加内边距 */
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
+    gap: 20px;
+  }
+  
+  .card {
+    padding: 20px;
+    font-size: 15px; /* 稍大的字体 */
+  }
+  
+  .card-title {
+    font-size: 20px;
+  }
+}
+
+/* ===== 平板 (768px及以上) ===== */
+@media screen and (min-width: 768px) {
+  .container {
+    max-width: 750px;
+    padding: 20px;
+  }
+  
+  .navigation {
+    flex-direction: row; /* 水平导航 */
+    justify-content: space-around;
+  }
+  
+  .nav-item {
+    width: auto;
+    border-bottom: none;
+    border-right: 1px solid #555;
+    font-size: 17px;
+  }
+  
+  .nav-item:last-child {
+    border-right: none;
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(3, 1fr); /* 三列布局 */
+    gap: 25px;
+  }
+  
+  .mobile-menu-toggle {
+    display: none; /* 隐藏移动端菜单按钮 */
+  }
+}
+
+/* ===== 桌面 (992px及以上) ===== */
+@media screen and (min-width: 992px) {
+  .container {
+    max-width: 970px;
+    padding: 30px;
+  }
+  
+  .navigation {
+    padding: 0 20px;
+  }
+  
+  .nav-item {
+    padding: 20px 25px;
+    font-size: 18px;
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(4, 1fr); /* 四列布局 */
+    gap: 30px;
+  }
+  
+  .card {
+    padding: 25px;
+    font-size: 16px;
+  }
+  
+  .card-title {
+    font-size: 22px;
+  }
+  
+  /* 显示桌面端专用元素 */
+  .desktop-only {
+    display: block;
+  }
+}
+
+/* ===== 大桌面 (1200px及以上) ===== */
+@media screen and (min-width: 1200px) {
+  .container {
+    max-width: 1170px;
+    padding: 40px;
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(5, 1fr); /* 五列布局 */
+    gap: 35px;
+  }
+  
+  .card {
+    padding: 30px;
+    font-size: 17px;
+  }
+  
+  .card-title {
+    font-size: 24px;
+  }
+  
+  .nav-item {
+    font-size: 19px;
+    padding: 25px 30px;
+  }
+}
+
+/* ===== 超大屏幕 (1400px及以上) ===== */
+@media screen and (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+  
+  .content-grid {
+    grid-template-columns: repeat(6, 1fr); /* 六列布局 */
+    gap: 40px;
+  }
+}
+
+/* 移动优先设计的关键原则：
+   1. 从最小屏幕开始设计
+   2. 使用min-width媒体查询
+   3. 渐进增强功能和样式
+   4. 优先考虑触摸交互
+   5. 内容优先，装饰其次
+   6. 性能优化，减少不必要的资源加载
+*/</code></pre>"
+请解释CSS中百分比单位在不同属性上的计算基准	"<pre><code class=""language-css"">/* CSS百分比单位计算基准详解 */
+
+/* ===== 演示容器设置 ===== */
+.parent-container {
+  width: 400px;  /* 父容器宽度 */
+  height: 300px; /* 父容器高度 */
+  background: #f0f0f0;
+  border: 2px solid #333;
+  position: relative; /* 为绝对定位子元素提供参考 */
+  padding: 20px;
+}
+
+/* ===== 1. width和height - 相对于父元素的对应尺寸 ===== */
+.width-height-demo {
+  width: 50%;   /* 相对于父容器width: 400px * 50% = 200px */
+  height: 60%;  /* 相对于父容器height: 300px * 60% = 180px */
+  background: #ffeb3b;
+  margin-bottom: 10px;
+}
+
+/* ===== 2. padding - 始终相对于父元素的width ===== */
+.padding-demo {
+  width: 200px;
+  height: 100px;
+  background: #4caf50;
+  /* 注意：所有padding都相对于父元素的width(400px) */
+  padding-top: 10%;    /* 400px * 10% = 40px */
+  padding-right: 5%;   /* 400px * 5% = 20px */
+  padding-bottom: 10%; /* 400px * 10% = 40px */
+  padding-left: 5%;    /* 400px * 5% = 20px */
+  margin-bottom: 10px;
+}
+
+/* ===== 3. margin - 始终相对于父元素的width ===== */
+.margin-demo {
+  width: 150px;
+  height: 80px;
+  background: #2196f3;
+  /* 注意：所有margin都相对于父元素的width(400px) */
+  margin-top: 5%;    /* 400px * 5% = 20px */
+  margin-right: 10%; /* 400px * 10% = 40px */
+  margin-bottom: 5%; /* 400px * 5% = 20px */
+  margin-left: 10%;  /* 400px * 10% = 40px */
+}
+
+/* ===== 4. border-radius - 相对于元素自身的尺寸 ===== */
+.border-radius-demo {
+  width: 100px;
+  height: 100px;
+  background: #ff5722;
+  /* border-radius百分比相对于自身的width和height */
+  border-radius: 50%; /* 创建圆形：50% of 100px = 50px */
+  margin-bottom: 10px;
+}
+
+.border-radius-ellipse {
+  width: 200px;
+  height: 100px;
+  background: #9c27b0;
+  /* 椭圆形：水平半径相对于width，垂直半径相对于height */
+  border-radius: 50%; /* 水平50% of 200px, 垂直50% of 100px */
+  margin-bottom: 10px;
+}
+
+/* ===== 5. 定位属性 - 相对于定位父元素的对应尺寸 ===== */
+.positioned-demo {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  background: #ff9800;
+  /* top/bottom相对于父元素height，left/right相对于父元素width */
+  top: 20%;    /* 相对于父容器height: 300px * 20% = 60px */
+  left: 25%;   /* 相对于父容器width: 400px * 25% = 100px */
+  right: 25%;  /* 相对于父容器width: 400px * 25% = 100px */
+  bottom: 30%; /* 相对于父容器height: 300px * 30% = 90px */
+}
+
+/* ===== 6. transform - 相对于元素自身尺寸 ===== */
+.transform-demo {
+  width: 100px;
+  height: 50px;
+  background: #607d8b;
+  /* transform百分比相对于自身尺寸 */
+  transform: translateX(50%); /* 向右移动自身width的50%: 100px * 50% = 50px */
+  margin-bottom: 10px;
+}
+
+.transform-demo-2 {
+  width: 80px;
+  height: 80px;
+  background: #795548;
+  /* 同时使用X和Y方向的百分比 */
+  transform: translate(25%, -50%); /* X: 80px * 25% = 20px, Y: 80px * -50% = -40px */
+}
+
+/* ===== 7. font-size - 相对于父元素的font-size ===== */
+.font-size-parent {
+  font-size: 20px; /* 父元素字体大小 */
+  background: #e1f5fe;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.font-size-demo {
+  font-size: 150%; /* 相对于父元素font-size: 20px * 150% = 30px */
+  color: #0277bd;
+}
+
+/* ===== 8. line-height - 相对于当前元素的font-size ===== */
+.line-height-demo {
+  font-size: 16px;
+  line-height: 200%; /* 相对于自身font-size: 16px * 200% = 32px */
+  background: #f3e5f5;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+/* ===== 复杂示例：百分比计算的层级关系 ===== */
+.nested-container {
+  width: 80%; /* 相对于.parent-container: 400px * 80% = 320px */
+  height: 70%; /* 相对于.parent-container: 300px * 70% = 210px */
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  position: relative;
+}
+
+.nested-child {
+  width: 50%; /* 相对于.nested-container: 320px * 50% = 160px */
+  height: 40%; /* 相对于.nested-container: 210px * 40% = 84px */
+  background: #ffcc02;
+  padding: 5%; /* 相对于.nested-container的width: 320px * 5% = 16px */
+  margin: 10%; /* 相对于.nested-container的width: 320px * 10% = 32px */
+}
+
+/* 总结：
+   - width/height: 相对于父元素的对应尺寸
+   - padding/margin: 始终相对于父元素的width
+   - border-radius: 相对于自身尺寸
+   - top/bottom: 相对于定位父元素的height
+   - left/right: 相对于定位父元素的width
+   - transform: 相对于自身尺寸
+   - font-size: 相对于父元素的font-size
+   - line-height: 相对于自身的font-size
+*/</code></pre>"

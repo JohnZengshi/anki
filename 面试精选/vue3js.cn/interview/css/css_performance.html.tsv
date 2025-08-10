@@ -1,0 +1,688 @@
+#separator:tab
+#html:true
+请编写代码演示CSS回流和重绘的区别	"<pre><code class=""language-javascript"">// CSS回流和重绘演示
+function demonstrateReflowAndRepaint() {
+  const element = document.getElementById('demo');
+  
+  // 1. 触发回流的操作（改变几何属性）
+  console.log('触发回流：');
+  element.style.width = '200px';     // 改变宽度
+  element.style.height = '100px';    // 改变高度
+  element.style.padding = '10px';    // 改变内边距
+  element.style.margin = '20px';     // 改变外边距
+  
+  // 2. 触发重绘的操作（改变视觉样式）
+  console.log('仅触发重绘：');
+  element.style.color = 'red';       // 改变文字颜色
+  element.style.backgroundColor = 'blue'; // 改变背景色
+  element.style.boxShadow = '2px 2px 4px rgba(0,0,0,0.3)'; // 改变阴影
+  
+  // 注意：回流一定会触发重绘，但重绘不一定触发回流
+}</code></pre>"
+CSS性能优化中哪些操作会强制触发回流	"<pre><code class=""language-javascript"">// 强制触发回流的操作演示
+function demonstrateForcedReflow() {
+  const element = document.getElementById('test');
+  
+  console.log('以下操作会强制触发回流：');
+  
+  // 1. 访问offset系列属性
+  console.log('1. 访问offset属性：');
+  const offsetTop = element.offsetTop;       // 强制回流
+  const offsetLeft = element.offsetLeft;     // 强制回流
+  const offsetWidth = element.offsetWidth;   // 强制回流
+  const offsetHeight = element.offsetHeight; // 强制回流
+  
+  // 2. 访问scroll系列属性
+  console.log('2. 访问scroll属性：');
+  const scrollTop = element.scrollTop;       // 强制回流
+  const scrollLeft = element.scrollLeft;     // 强制回流
+  const scrollWidth = element.scrollWidth;   // 强制回流
+  const scrollHeight = element.scrollHeight; // 强制回流
+  
+  // 3. 访问client系列属性
+  console.log('3. 访问client属性：');
+  const clientTop = element.clientTop;       // 强制回流
+  const clientLeft = element.clientLeft;     // 强制回流
+  const clientWidth = element.clientWidth;   // 强制回流
+  const clientHeight = element.clientHeight; // 强制回流
+  
+  // 4. 调用getComputedStyle方法
+  console.log('4. 调用getComputedStyle：');
+  const computedStyle = window.getComputedStyle(element); // 强制回流
+}</code></pre>"
+请编写代码实现CSS性能优化的最佳实践	"<pre><code class=""language-javascript"">// CSS性能优化最佳实践
+class PerformanceOptimizer {
+  
+  // ❌ 错误做法：频繁访问布局属性
+  badPractice() {
+    const element = document.getElementById('target');
+    
+    // 每次循环都会触发回流
+    for(let i = 0; i < 10; i++) {
+      element.style.top = element.offsetTop + 10 + 'px';   // 强制回流
+      element.style.left = element.offsetLeft + 10 + 'px'; // 强制回流
+    }
+  }
+  
+  // ✅ 正确做法：缓存布局信息
+  goodPractice() {
+    const element = document.getElementById('target');
+    
+    // 缓存初始值，避免重复访问
+    let offsetTop = element.offsetTop;
+    let offsetLeft = element.offsetLeft;
+    
+    // 在JS中计算
+    for(let i = 0; i < 10; i++) {
+      offsetTop += 10;
+      offsetLeft += 10;
+    }
+    
+    // 一次性应用所有修改
+    element.style.top = offsetTop + 'px';
+    element.style.left = offsetLeft + 'px';
+  }
+  
+  // ✅ 使用DocumentFragment批量操作
+  batchDOMOperations() {
+    const fragment = document.createDocumentFragment();
+    
+    // 在内存中构建DOM结构
+    for(let i = 0; i < 100; i++) {
+      const div = document.createElement('div');
+      div.textContent = `Item ${i}`;
+      fragment.appendChild(div); // 不会触发回流
+    }
+    
+    // 一次性插入到文档中
+    document.body.appendChild(fragment); // 只触发一次回流
+  }
+}</code></pre>"
+请编写代码演示CSS硬件加速避免回流重绘	"<pre><code class=""language-javascript"">// CSS硬件加速避免回流重绘的实现
+class HardwareAcceleration {
+  
+  // 启用硬件加速的CSS属性
+  enableHardwareAcceleration(element) {
+    // 这些属性会触发硬件加速，避免回流重绘
+    const acceleratedProperties = {
+      // transform相关（不会触发回流）
+      transform: 'translateZ(0)',     // 强制开启硬件加速
+      // opacity（不会触发回流）
+      opacity: '1',
+      // filter（不会触发回流）
+      filter: 'blur(0px)',
+      // will-change提示浏览器优化
+      willChange: 'transform, opacity'
+    };
+    
+    Object.assign(element.style, acceleratedProperties);
+    console.log('已启用硬件加速');
+  }
+  
+  // ❌ 会触发回流的动画实现
+  animationWithReflow() {
+    const element = document.getElementById('box');
+    let position = 0;
+    
+    function moveWithReflow() {
+      position += 2;
+      
+      // 这些属性会触发回流
+      element.style.left = position + 'px';    // 触发回流
+      element.style.top = position + 'px';     // 触发回流
+      element.style.width = (100 + position/10) + 'px'; // 触发回流
+      
+      if (position < 300) {
+        requestAnimationFrame(moveWithReflow);
+      }
+    }
+    
+    moveWithReflow();
+    console.log('使用left/top/width动画 - 会触发回流');
+  }
+  
+  // ✅ 使用硬件加速的动画实现
+  animationWithHardwareAcceleration() {
+    const element = document.getElementById('box');
+    let position = 0;
+    let scale = 1;
+    let opacity = 1;
+    
+    // 预先启用硬件加速
+    this.enableHardwareAcceleration(element);
+    
+    function moveWithAcceleration() {
+      position += 2;
+      scale = 1 + position / 1000;
+      opacity = Math.max(0.3, 1 - position / 500);
+      
+      // 这些属性使用GPU处理，不会触发回流
+      element.style.transform = `translate3d(${position}px, ${position}px, 0) scale(${scale})`;
+      element.style.opacity = opacity;
+      element.style.filter = `blur(${position/100}px)`;
+      
+      if (position < 300) {
+        requestAnimationFrame(moveWithAcceleration);
+      }
+    }
+    
+    moveWithAcceleration();
+    console.log('使用transform/opacity/filter动画 - 使用GPU，避免回流');
+  }
+}</code></pre>"
+请编写代码演示浏览器渲染队列优化机制	"<pre><code class=""language-javascript"">// 浏览器渲染队列优化机制演示
+class RenderQueueDemo {
+  
+  // 演示浏览器的批处理优化
+  demonstrateBatchOptimization() {
+    const element = document.getElementById('demo');
+    
+    console.log('浏览器会将以下操作放入队列批处理：');
+    
+    // 这些操作会被浏览器放入队列
+    element.style.width = '100px';     // 加入队列
+    element.style.height = '100px';    // 加入队列
+    element.style.backgroundColor = 'red'; // 加入队列
+    element.style.color = 'white';     // 加入队列
+    
+    console.log('以上操作被批处理，只触发一次回流重绘');
+  }
+  
+  // 演示强制刷新队列的情况
+  demonstrateForceFlush() {
+    const element = document.getElementById('demo');
+    
+    console.log('强制刷新队列的操作：');
+    
+    // 修改样式（加入队列）
+    element.style.width = '200px';
+    element.style.height = '150px';
+    
+    // 访问布局属性会强制刷新队列
+    const width = element.offsetWidth;  // 强制刷新队列，触发回流
+    console.log('访问offsetWidth强制刷新了队列');
+    
+    // 继续修改样式（重新加入队列）
+    element.style.backgroundColor = 'blue';
+    element.style.padding = '10px';
+    
+    // 再次访问布局属性
+    const height = element.offsetHeight; // 再次强制刷新队列
+    console.log('访问offsetHeight再次强制刷新了队列');
+  }
+  
+  // 演示队列优化的最佳实践
+  optimizedQueueUsage() {
+    const element = document.getElementById('demo');
+    
+    console.log('优化的队列使用方式：');
+    
+    // 1. 先进行所有的读取操作
+    const originalWidth = element.offsetWidth;
+    const originalHeight = element.offsetHeight;
+    const originalTop = element.offsetTop;
+    
+    // 2. 然后进行所有的写入操作
+    element.style.width = (originalWidth + 50) + 'px';
+    element.style.height = (originalHeight + 30) + 'px';
+    element.style.top = (originalTop + 20) + 'px';
+    element.style.backgroundColor = 'green';
+    
+    console.log('读写分离，减少队列刷新次数');
+  }
+}</code></pre>"
+请编写CSS代码实现高性能的过渡动画	"<pre><code class=""language-css"">/* CSS高性能过渡动画实现 */
+
+/* ❌ 低性能：会触发回流的过渡 */
+.bad-transition {
+  width: 100px;
+  height: 100px;
+  background-color: #3498db;
+  transition: width 0.3s ease, height 0.3s ease, left 0.3s ease;
+}
+
+.bad-transition:hover {
+  width: 200px;  /* 触发回流 */
+  height: 150px; /* 触发回流 */
+  left: 50px;    /* 触发回流 */
+}
+
+/* ✅ 高性能：使用硬件加速的过渡 */
+.good-transition {
+  width: 100px;
+  height: 100px;
+  background-color: #3498db;
+  /* 只对transform和opacity进行过渡 */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* 启用硬件加速 */
+  will-change: transform, opacity;
+}
+
+.good-transition:hover {
+  /* 使用transform代替width/height/position */
+  transform: scale(1.5) translateX(50px); /* GPU处理 */
+  opacity: 0.8; /* GPU处理 */
+}
+
+/* 复杂动画优化 */
+.optimized-animation {
+  /* 预先启用硬件加速 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  
+  /* 只对GPU友好的属性进行过渡 */
+  transition: 
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+
+.optimized-animation:hover {
+  transform: translate3d(100px, 50px, 0) rotate(45deg) scale(1.2);
+  opacity: 0.9;
+  filter: blur(1px) brightness(1.1);
+}</code></pre>"
+请编写CSS代码实现高性能的关键帧动画	"<pre><code class=""language-css"">/* CSS高性能关键帧动画 */
+
+/* ❌ 低性能动画：频繁触发回流 */
+@keyframes bad-animation {
+  0% {
+    width: 100px;
+    height: 100px;
+    left: 0px;
+    top: 0px;
+  }
+  50% {
+    width: 150px;  /* 触发回流 */
+    height: 150px; /* 触发回流 */
+    left: 100px;   /* 触发回流 */
+    top: 50px;     /* 触发回流 */
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    left: 200px;
+    top: 100px;
+  }
+}
+
+/* ✅ 高性能动画：只使用GPU友好属性 */
+@keyframes good-animation {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  50% {
+    transform: translate3d(100px, 50px, 0) scale(1.5) rotate(180deg);
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+  100% {
+    transform: translate3d(200px, 100px, 0) scale(2) rotate(360deg);
+    opacity: 0.6;
+    filter: blur(0px);
+  }
+}
+
+/* 应用高性能动画 */
+.performance-element {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  
+  /* 预先启用硬件加速 */
+  will-change: transform, opacity, filter;
+  transform: translateZ(0);
+  
+  /* 应用动画 */
+  animation: good-animation 3s ease-in-out infinite alternate;
+}
+
+/* 复杂粒子动画优化 */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: translate3d(50px, -30px, 0) rotate(90deg) scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(100px, 0, 0) rotate(180deg) scale(1.2);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translate3d(50px, 30px, 0) rotate(270deg) scale(0.9);
+    opacity: 0.8;
+  }
+}
+
+.particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #fff, #0ff);
+  border-radius: 50%;
+  
+  /* 硬件加速优化 */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  
+  animation: particle-float 4s ease-in-out infinite;
+}</code></pre>"
+请编写代码实现CSS性能监控和检测	"<pre><code class=""language-javascript"">// CSS性能监控和检测工具
+class CSSPerformanceMonitor {
+  
+  constructor() {
+    this.performanceData = [];
+    this.observer = null;
+  }
+  
+  // 检测硬件加速支持
+  detectHardwareAcceleration() {
+    const testElement = document.createElement('div');
+    testElement.style.transform = 'translateZ(0)';
+    document.body.appendChild(testElement);
+    
+    const computedStyle = window.getComputedStyle(testElement);
+    const hasHardwareAcceleration = computedStyle.transform !== 'none';
+    
+    document.body.removeChild(testElement);
+    
+    console.log('硬件加速支持:', hasHardwareAcceleration);
+    return hasHardwareAcceleration;
+  }
+  
+  // 监控动画性能
+  monitorAnimationPerformance() {
+    this.observer = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      entries.forEach((entry) => {
+        if (entry.entryType === 'measure') {
+          console.log(`${entry.name}: ${entry.duration.toFixed(2)}ms`);
+          this.performanceData.push({
+            name: entry.name,
+            duration: entry.duration,
+            timestamp: entry.startTime
+          });
+        }
+      });
+    });
+    
+    this.observer.observe({ entryTypes: ['measure'] });
+  }
+  
+  // 测量回流重绘性能
+  measureReflowPerformance() {
+    const element = document.getElementById('test-element');
+    
+    // 测量回流操作
+    performance.mark('reflow-start');
+    
+    // 触发回流的操作
+    element.style.width = '200px';
+    element.style.height = '150px';
+    const width = element.offsetWidth; // 强制回流
+    
+    performance.mark('reflow-end');
+    performance.measure('reflow-duration', 'reflow-start', 'reflow-end');
+    
+    // 测量重绘操作
+    performance.mark('repaint-start');
+    
+    // 只触发重绘的操作
+    element.style.backgroundColor = 'red';
+    element.style.color = 'white';
+    
+    performance.mark('repaint-end');
+    performance.measure('repaint-duration', 'repaint-start', 'repaint-end');
+  }
+  
+  // 测量硬件加速动画性能
+  measureHardwareAcceleration() {
+    const element = document.getElementById('animated-element');
+    
+    performance.mark('gpu-animation-start');
+    
+    // 使用GPU加速的动画
+    element.style.transform = 'translate3d(100px, 100px, 0) scale(1.5)';
+    element.style.opacity = '0.8';
+    element.style.filter = 'blur(2px)';
+    
+    requestAnimationFrame(() => {
+      performance.mark('gpu-animation-end');
+      performance.measure('gpu-animation-duration', 'gpu-animation-start', 'gpu-animation-end');
+    });
+  }
+  
+  // 获取性能报告
+  getPerformanceReport() {
+    const report = {
+      hardwareAcceleration: this.detectHardwareAcceleration(),
+      measurements: this.performanceData,
+      recommendations: this.generateRecommendations()
+    };
+    
+    console.log('CSS性能报告:', report);
+    return report;
+  }
+  
+  // 生成性能优化建议
+  generateRecommendations() {
+    const recommendations = [];
+    
+    // 检查是否使用了硬件加速
+    if (!this.detectHardwareAcceleration()) {
+      recommendations.push('建议启用硬件加速：使用transform: translateZ(0)或will-change属性');
+    }
+    
+    // 检查动画性能
+    const slowAnimations = this.performanceData.filter(item => item.duration > 16.67);
+    if (slowAnimations.length > 0) {
+      recommendations.push('检测到慢动画，建议使用transform和opacity代替其他属性');
+    }
+    
+    recommendations.push('避免在动画中使用width、height、left、top等触发回流的属性');
+    recommendations.push('使用requestAnimationFrame进行动画优化');
+    recommendations.push('合理使用will-change属性提示浏览器优化');
+    
+    return recommendations;
+  }
+}</code></pre>"
+CSS中哪些属性不会触发回流和重绘	"<pre><code class=""language-css"">/* 不会触发回流和重绘的CSS属性（GPU处理） */
+
+.gpu-optimized {
+  /* transform属性 - 只触发合成层更新 */
+  transform: translateX(100px);     /* 位移 */
+  transform: translateY(50px);      /* 位移 */
+  transform: translate3d(100px, 50px, 0); /* 3D位移 */
+  transform: scale(1.5);            /* 缩放 */
+  transform: rotate(45deg);         /* 旋转 */
+  transform: skew(30deg);           /* 倾斜 */
+  
+  /* opacity属性 - 只触发合成层更新 */
+  opacity: 0.8;
+  
+  /* filter属性 - 只触发合成层更新 */
+  filter: blur(5px);
+  filter: brightness(1.2);
+  filter: contrast(1.1);
+  filter: saturate(1.3);
+  filter: hue-rotate(90deg);
+  
+  /* 启用硬件加速的提示属性 */
+  will-change: transform, opacity, filter;
+  
+  /* 强制创建合成层 */
+  transform: translateZ(0); /* 或 translate3d(0,0,0) */
+  backface-visibility: hidden;
+}
+
+/* 组合使用示例 */
+.performance-animation {
+  /* 预设硬件加速 */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  
+  /* 过渡动画只使用GPU友好属性 */
+  transition: 
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+
+.performance-animation:hover {
+  /* 所有变换都在GPU上处理，不会触发回流重绘 */
+  transform: translate3d(50px, 30px, 0) scale(1.2) rotate(15deg);
+  opacity: 0.9;
+  filter: blur(1px) brightness(1.1);
+}</code></pre>"
+请编写代码实现CSS动画的性能优化策略	"<pre><code class=""language-javascript"">// CSS动画性能优化策略实现
+class AnimationOptimizer {
+  
+  constructor() {
+    this.animatedElements = new Set();
+    this.rafId = null;
+  }
+  
+  // 优化策略1：使用requestAnimationFrame批量更新
+  batchAnimationUpdates() {
+    const updates = [];
+    
+    // 收集所有需要更新的动画
+    this.animatedElements.forEach(element => {
+      const update = this.calculateNextFrame(element);
+      updates.push({ element, update });
+    });
+    
+    // 在一个帧内批量应用所有更新
+    this.rafId = requestAnimationFrame(() => {
+      updates.forEach(({ element, update }) => {
+        // 只使用GPU友好的属性
+        element.style.transform = `translate3d(${update.x}px, ${update.y}px, 0) scale(${update.scale}) rotate(${update.rotation}deg)`;
+        element.style.opacity = update.opacity;
+        element.style.filter = `blur(${update.blur}px)`;
+      });
+      
+      // 继续下一帧
+      this.batchAnimationUpdates();
+    });
+  }
+  
+  // 优化策略2：动态启用/禁用will-change
+  optimizeWillChange(element, isAnimating) {
+    if (isAnimating) {
+      // 动画开始时启用will-change
+      element.style.willChange = 'transform, opacity, filter';
+    } else {
+      // 动画结束时移除will-change，释放GPU资源
+      element.style.willChange = 'auto';
+    }
+  }
+  
+  // 优化策略3：使用CSS变量减少重绘
+  useCSSVariables(element, animationData) {
+    // 设置CSS变量
+    element.style.setProperty('--x', animationData.x + 'px');
+    element.style.setProperty('--y', animationData.y + 'px');
+    element.style.setProperty('--scale', animationData.scale);
+    element.style.setProperty('--rotation', animationData.rotation + 'deg');
+    element.style.setProperty('--opacity', animationData.opacity);
+    
+    // CSS中使用变量（只需设置一次）
+    // transform: translate3d(var(--x), var(--y), 0) scale(var(--scale)) rotate(var(--rotation));
+    // opacity: var(--opacity);
+  }
+  
+  // 优化策略4：视口外元素暂停动画
+  pauseOffscreenAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const element = entry.target;
+        
+        if (entry.isIntersecting) {
+          // 元素进入视口，恢复动画
+          element.style.animationPlayState = 'running';
+          this.optimizeWillChange(element, true);
+        } else {
+          // 元素离开视口，暂停动画
+          element.style.animationPlayState = 'paused';
+          this.optimizeWillChange(element, false);
+        }
+      });
+    });
+    
+    // 观察所有动画元素
+    this.animatedElements.forEach(element => {
+      observer.observe(element);
+    });
+  }
+  
+  // 优化策略5：减少动画复杂度
+  simplifyAnimation(element, complexity) {
+    if (complexity === 'low') {
+      // 低端设备使用简化动画
+      element.style.animation = 'simple-fade 1s ease';
+    } else if (complexity === 'medium') {
+      // 中端设备使用中等复杂度动画
+      element.style.animation = 'medium-transform 1s ease';
+    } else {
+      // 高端设备使用完整动画
+      element.style.animation = 'complex-animation 1s ease';
+    }
+  }
+  
+  // 检测设备性能并调整动画策略
+  detectPerformanceAndOptimize() {
+    // 检测设备性能
+    const isLowEndDevice = this.detectLowEndDevice();
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    this.animatedElements.forEach(element => {
+      if (prefersReducedMotion) {
+        // 用户偏好减少动画
+        element.style.animation = 'none';
+        element.style.transition = 'none';
+      } else if (isLowEndDevice) {
+        // 低端设备优化
+        this.simplifyAnimation(element, 'low');
+        element.style.animationDuration = '0.5s'; // 缩短动画时间
+      } else {
+        // 高端设备完整体验
+        this.simplifyAnimation(element, 'high');
+      }
+    });
+  }
+  
+  // 检测低端设备
+  detectLowEndDevice() {
+    // 检测硬件并发数
+    const hardwareConcurrency = navigator.hardwareConcurrency || 2;
+    
+    // 检测内存（如果支持）
+    const deviceMemory = navigator.deviceMemory || 2;
+    
+    // 检测连接速度
+    const connection = navigator.connection;
+    const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
+    
+    // 综合判断是否为低端设备
+    return hardwareConcurrency <= 2 || deviceMemory <= 2 || isSlowConnection;
+  }
+  
+  // 计算下一帧的动画数据
+  calculateNextFrame(element) {
+    // 这里实现具体的动画计算逻辑
+    return {
+      x: Math.sin(Date.now() * 0.001) * 100,
+      y: Math.cos(Date.now() * 0.001) * 50,
+      scale: 1 + Math.sin(Date.now() * 0.002) * 0.2,
+      rotation: Date.now() * 0.1,
+      opacity: 0.8 + Math.sin(Date.now() * 0.003) * 0.2,
+      blur: Math.abs(Math.sin(Date.now() * 0.001)) * 2
+    };
+  }
+}</code></pre>"

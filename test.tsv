@@ -1,205 +1,671 @@
 #separator:tab
 #html:true
-Go net.Dial网络参数示例	"<pre><code class=""language-go"">func main() {
-    // 9种网络类型
-    networks := []string{
-        ""tcp"", ""tcp4"", ""tcp6"", 
-        ""udp"", ""udp4"", ""udp6"",
-        ""unix"", ""unixgram"", ""unixpacket""
-    }
+Flutter中StatelessWidget和StatefulWidget的区别及实现	"<pre><code class=""language-dart"">// StatelessWidget示例 - 不可变组件
+class MyStatelessWidget extends StatelessWidget {
+  final String title;
+  
+  const MyStatelessWidget({Key? key, required this.title}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    // 构建方法只会在创建时调用一次
+    return Text(title);
+  }
+}
+
+// StatefulWidget示例 - 可变组件
+class MyStatefulWidget extends StatefulWidget {
+  @override
+  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+}
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  int counter = 0; // 可变状态
+  
+  @override
+  Widget build(BuildContext context) {
+    // 可以通过setState重新构建
+    return Column(
+      children: [
+        Text('计数器: $counter'),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              counter++; // 状态改变触发重建
+            });
+          },
+          child: Text('增加'),
+        ),
+      ],
+    );
+  }
+}</code></pre>"
+Flutter StatefulWidget生命周期方法的完整实现	"<pre><code class=""language-dart"">class LifecycleDemo extends StatefulWidget {
+  @override
+  _LifecycleDemoState createState() {
+    print('1. createState() - 创建State对象');
+    return _LifecycleDemoState();
+  }
+}
+
+class _LifecycleDemoState extends State<LifecycleDemo> {
+  @override
+  void initState() {
+    super.initState();
+    print('3. initState() - 初始化状态，只调用一次');
+    // 初始化操作：订阅、动画控制器等
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('4. didChangeDependencies() - 依赖改变时调用');
+    // 处理InheritedWidget变化
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    print('5. build() - 构建UI');
+    return Container(
+      child: Text('生命周期演示'),
+    );
+  }
+  
+  @override
+  void didUpdateWidget(LifecycleDemo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('6. didUpdateWidget() - 父组件重建时调用');
+  }
+  
+  @override
+  void deactivate() {
+    print('7. deactivate() - 组件从树中移除');
+    super.deactivate();
+  }
+  
+  @override
+  void dispose() {
+    print('8. dispose() - 永久销毁，清理资源');
+    // 清理：取消订阅、释放控制器等
+    super.dispose();
+  }
+}</code></pre>"
+Flutter Tree Shaking优化原理及配置	"<pre><code class=""language-dart"">// pubspec.yaml配置
+// flutter:
+//   assets:
+//     - images/
+//   fonts:
+//     - family: CustomFont
+//       fonts:
+//         - asset: fonts/custom.ttf
+
+// main.dart - Tree Shaking示例
+import 'package:flutter/material.dart';
+// 只导入需要的组件，未使用的会被tree shaking移除
+
+// 这个类会被保留（被使用）
+class UsedWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('我被使用了');
+  }
+}
+
+// 这个类会被tree shaking移除（未使用）
+class UnusedWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('我没被使用');
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: UsedWidget(), // 只使用了UsedWidget
+      ),
+    );
+  }
+}
+
+// 构建时dart2js编译器会自动移除UnusedWidget
+// 减少最终bundle大小</code></pre>"
+Flutter Spacer组件的使用场景和实现	"<pre><code class=""language-dart"">class SpacerDemo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          // 示例1：均匀分布空间
+          Row(
+            children: [
+              Container(width: 50, height: 50, color: Colors.red),
+              Spacer(), // 占据剩余空间
+              Container(width: 50, height: 50, color: Colors.blue),
+              Spacer(), // 占据剩余空间
+              Container(width: 50, height: 50, color: Colors.green),
+            ],
+          ),
+          
+          SizedBox(height: 20),
+          
+          // 示例2：按比例分配空间
+          Row(
+            children: [
+              Text('左侧'),
+              Spacer(flex: 2), // 占据2倍空间
+              Text('中间'),
+              Spacer(flex: 1), // 占据1倍空间
+              Text('右侧'),
+            ],
+          ),
+          
+          SizedBox(height: 20),
+          
+          // 示例3：垂直方向使用Spacer
+          Expanded(
+            child: Column(
+              children: [
+                Text('顶部'),
+                Spacer(), // 推到底部
+                Text('底部'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}</code></pre>"
+Flutter Hot Reload和Hot Restart的区别及原理	"<pre><code class=""language-dart"">class HotReloadDemo extends StatefulWidget {
+  @override
+  _HotReloadDemoState createState() => _HotReloadDemoState();
+}
+
+class _HotReloadDemoState extends State<HotReloadDemo> {
+  int counter = 0;
+  String message = '初始消息';
+  
+  @override
+  void initState() {
+    super.initState();
+    print('initState被调用 - 只在Hot Restart时重新执行');
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Hot Reload vs Hot Restart')),
+      body: Column(
+        children: [
+          Text('计数器: $counter'), // Hot Reload保持状态
+          Text('消息: $message'),   // Hot Reload保持状态
+          
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                counter++;
+                message = '更新于 ${DateTime.now()}';
+              });
+            },
+            child: Text('增加计数器'),
+          ),
+          
+          // 修改这里的文本并保存
+          // Hot Reload: 界面更新，counter和message保持当前值
+          // Hot Restart: 界面更新，counter重置为0，message重置为初始值
+          Text('修改这行文本测试Hot Reload'),
+        ],
+      ),
+    );
+  }
+}
+
+// Hot Reload原理：
+// 1. 保持应用状态
+// 2. 只重新构建修改的widget
+// 3. 快速更新UI
+
+// Hot Restart原理：
+// 1. 重新启动应用
+// 2. 重置所有状态
+// 3. 重新执行main()函数</code></pre>"
+Flutter InheritedWidget的实现和使用	"<pre><code class=""language-dart"">// 1. 创建InheritedWidget
+class ThemeInheritedWidget extends InheritedWidget {
+  final Color primaryColor;
+  final double fontSize;
+  
+  const ThemeInheritedWidget({
+    Key? key,
+    required this.primaryColor,
+    required this.fontSize,
+    required Widget child,
+  }) : super(key: key, child: child);
+  
+  // 静态方法获取最近的InheritedWidget
+  static ThemeInheritedWidget? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ThemeInheritedWidget>();
+  }
+  
+  // 决定是否通知依赖的widget重建
+  @override
+  bool updateShouldNotify(ThemeInheritedWidget oldWidget) {
+    return primaryColor != oldWidget.primaryColor ||
+           fontSize != oldWidget.fontSize;
+  }
+}
+
+// 2. 使用InheritedWidget
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ThemeInheritedWidget(
+      primaryColor: Colors.blue,
+      fontSize: 16.0,
+      child: MaterialApp(
+        home: HomePage(),
+      ),
+    );
+  }
+}
+
+// 3. 子组件访问InheritedWidget数据
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 获取InheritedWidget数据
+    final theme = ThemeInheritedWidget.of(context);
     
-    for _, net := range networks {
-        conn, err := net.Dial(net, ""example.com:80"")
-        if err == nil {
-            fmt.Println(""连接成功:"", net)
-            conn.Close()
+    return Scaffold(
+      body: Center(
+        child: Text(
+          '主题颜色文本',
+          style: TextStyle(
+            color: theme?.primaryColor ?? Colors.black,
+            fontSize: theme?.fontSize ?? 14.0,
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>"
+Flutter为什么build方法在State而不是StatefulWidget中	"<pre><code class=""language-dart"">// 错误的设计（假设build在StatefulWidget中）
+class BadDesign extends StatefulWidget {
+  int counter = 0; // 这样设计会有问题
+  
+  // 如果build在这里，每次重建都会创建新的StatefulWidget实例
+  // Widget build(BuildContext context) { ... }
+  
+  @override
+  _BadDesignState createState() => _BadDesignState();
+}
+
+// 正确的设计（build在State中）
+class GoodDesign extends StatefulWidget {
+  final String title; // StatefulWidget只存储不可变配置
+  
+  const GoodDesign({Key? key, required this.title}) : super(key: key);
+  
+  @override
+  _GoodDesignState createState() => _GoodDesignState();
+}
+
+class _GoodDesignState extends State<GoodDesign> {
+  int counter = 0; // 可变状态存储在State中
+  
+  @override
+  Widget build(BuildContext context) {
+    // build方法在State中的优势：
+    // 1. State对象在widget重建时保持不变
+    // 2. 可以访问widget.title（配置）和counter（状态）
+    // 3. 状态管理更清晰
+    
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)), // 访问widget配置
+      body: Column(
+        children: [
+          Text('计数器: $counter'), // 访问状态
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                counter++; // 修改状态触发重建
+              });
+            },
+            child: Text('增加'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 原理说明：
+// StatefulWidget：不可变配置容器，每次重建都会创建新实例
+// State：可变状态容器，在widget生命周期内保持不变
+// 这种分离设计确保了状态的持久性和配置的灵活性</code></pre>"
+Flutter pubspec.yaml文件的配置和管理	"<pre><code class=""language-yaml"">name: flutter_demo
+description: Flutter应用示例项目
+
+# 版本号：主版本.次版本.修订号+构建号
+version: 1.0.0+1
+
+# 环境约束
+environment:
+  sdk: "">=2.17.0 <4.0.0""
+  flutter: "">=3.0.0""
+
+# 依赖包管理
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI组件库
+  cupertino_icons: ^1.0.2
+  
+  # 状态管理
+  provider: ^6.0.3
+  bloc: ^8.1.0
+  
+  # 网络请求
+  http: ^0.13.5
+  dio: ^4.0.6
+  
+  # 本地存储
+  shared_preferences: ^2.0.15
+  sqflite: ^2.2.8
+  
+  # 路径依赖（本地包）
+  my_local_package:
+    path: ../my_local_package
+  
+  # Git依赖
+  my_git_package:
+    git:
+      url: https://github.com/user/repo.git
+      ref: main
+
+# 开发依赖（仅开发时使用）
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # 代码分析
+  flutter_lints: ^2.0.0
+  
+  # 代码生成
+  build_runner: ^2.2.0
+  json_annotation: ^4.6.0
+
+# Flutter配置
+flutter:
+  uses-material-design: true
+  
+  # 资源文件
+  assets:
+    - images/
+    - icons/
+    - data/config.json
+  
+  # 字体配置
+  fonts:
+    - family: CustomFont
+      fonts:
+        - asset: fonts/CustomFont-Regular.ttf
+        - asset: fonts/CustomFont-Bold.ttf
+          weight: 700
+    
+    - family: IconFont
+      fonts:
+        - asset: fonts/iconfont.ttf</code></pre>"
+Flutter原生渲染性能优势的实现原理	"<pre><code class=""language-dart"">// Flutter渲染架构演示
+class FlutterRenderingDemo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomPaint(
+        painter: RenderingArchitecturePainter(),
+        child: Container(),
+      ),
+    );
+  }
+}
+
+// 自定义绘制演示Flutter直接绘制原理
+class RenderingArchitecturePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+    
+    // Flutter直接使用Skia引擎绘制
+    // 不依赖平台原生组件
+    canvas.drawRect(
+      Rect.fromLTWH(50, 50, 200, 100),
+      paint,
+    );
+    
+    // 绘制文本
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: 'Flutter直接绘制',
+        style: TextStyle(color: Colors.black, fontSize: 16),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset(60, 70));
+  }
+  
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Flutter渲染流程
+class RenderingPipeline {
+  void demonstrateRenderingSteps() {
+    // 1. Widget树构建
+    buildWidgetTree();
+    
+    // 2. Element树创建/更新
+    updateElementTree();
+    
+    // 3. RenderObject树布局
+    layoutRenderObjects();
+    
+    // 4. 绘制到Canvas
+    paintToCanvas();
+    
+    // 5. 合成图层
+    compositeLayers();
+  }
+  
+  void buildWidgetTree() {
+    // Widget是不可变的配置描述
+    print('构建Widget树 - 描述UI结构');
+  }
+  
+  void updateElementTree() {
+    // Element管理Widget生命周期
+    print('更新Element树 - 管理组件状态');
+  }
+  
+  void layoutRenderObjects() {
+    // RenderObject执行实际布局计算
+    print('布局RenderObject - 计算位置尺寸');
+  }
+  
+  void paintToCanvas() {
+    // 直接绘制到Skia Canvas
+    print('绘制到Canvas - 使用Skia引擎');
+  }
+  
+  void compositeLayers() {
+    // GPU合成最终画面
+    print('合成图层 - GPU加速渲染');
+  }
+}
+
+// 性能优势：
+// 1. 跳过平台UI组件，直接绘制
+// 2. 统一的渲染引擎（Skia）
+// 3. 60fps流畅动画
+// 4. 像素级控制</code></pre>"
+Flutter Navigator和Routes导航系统实现	"<pre><code class=""language-dart"">// 1. 基础导航实现
+class NavigationDemo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // 命名路由配置
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(),
+        '/second': (context) => SecondPage(),
+        '/third': (context) => ThirdPage(),
+      },
+      
+      // 动态路由生成
+      onGenerateRoute: (settings) {
+        if (settings.name == '/profile') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => ProfilePage(userId: args['userId']),
+          );
         }
-    }
-}</code></pre>"
-Go net.DialTimeout超时含义	"<pre><code class=""language-go"">func main() {
-    // 总超时时间（含DNS解析）
-    conn, err := net.DialTimeout(""tcp"", ""example.com:80"", 3*time.Second)
-    
-    if err != nil {
-        if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-            fmt.Println(""连接超时（含DNS解析）"")
-        }
-    } else {
-        conn.Close()
-    }
-}</code></pre>"
-Go http.Transport作用	"<pre><code class=""language-go"">func main() {
-    // 自定义Transport复用连接
-    transport := &http.Transport{
-        MaxIdleConns:        100,
-        IdleConnTimeout:     90 * time.Second,
-        TLSHandshakeTimeout: 10 * time.Second,
-    }
-    
-    client := &http.Client{Transport: transport}
-    
-    // 复用相同连接
-    for i := 0; i < 5; i++ {
-        resp, _ := client.Get(""https://example.com"")
-        io.Copy(io.Discard, resp.Body)
-        resp.Body.Close()
-    }
-}</code></pre>"
-Go http.Transport连接池参数	"<pre><code class=""language-go"">func main() {
-    transport := &http.Transport{
-        // 全局最大空闲连接
-        MaxIdleConns: 100,
-        
-        // 单主机最大空闲连接
-        MaxIdleConnsPerHost: 2,
-        
-        // 空闲连接超时时间
-        IdleConnTimeout: 90 * time.Second,
-    }
-    
-    client := &http.Client{Transport: transport}
-    // 使用client执行请求...
-}</code></pre>"
-Go启动CPU采样	"<pre><code class=""language-go"">func main() {
-    f, _ := os.Create(""cpu.pprof"")
-    
-    // 启动CPU采样
-    pprof.StartCPUProfile(f)
-    defer pprof.StopCPUProfile() // 确保停止
-    
-    // 执行需要分析的代码
-    heavyTask()
-}</code></pre>"
-Go内存采样频率设置	"<pre><code class=""language-go"">func main() {
-    // 每分配512KB内存采样一次
-    runtime.MemProfileRate = 512 * 1024
-    
-    // 收集内存分析数据
-    f, _ := os.Create(""mem.pprof"")
-    pprof.WriteHeapProfile(f)
-    f.Close()
-}</code></pre>"
-Go阻塞分析数据获取	"<pre><code class=""language-go"">func main() {
-    // 每发生一次阻塞事件采样一次
-    runtime.SetBlockProfileRate(1)
-    
-    // 模拟阻塞操作
-    doBlockingTasks()
-    
-    // 获取阻塞分析数据
-    p := pprof.Lookup(""block"")
-    f, _ := os.Create(""block.pprof"")
-    p.WriteTo(f, 0)
-}</code></pre>"
-Go添加HTTP性能分析	"<pre><code class=""language-go"">import (
-    _ ""net/http/pprof"" // 自动注册路由
-)
+        return null;
+      },
+    );
+  }
+}
 
-func main() {
-    // 自动添加以下路由:
-    // /debug/pprof/
-    // /debug/pprof/heap
-    // /debug/pprof/profile?seconds=30
-    // /debug/pprof/trace?seconds=5
-    
-    go func() {
-        log.Println(http.ListenAndServe(""localhost:6060"", nil))
-    }()
-    
-    // 主服务逻辑...
-}</code></pre>"
-GoHTTP持久连接原理	"<pre><code class=""language-go"">func main() {
-    transport := &http.Transport{
-        // 启用持久连接
-        DisableKeepAlives: false,
-        
-        // 连接复用参数
-        MaxIdleConnsPerHost: 10,
-    }
-    
-    client := &http.Client{Transport: transport}
-    
-    // 相同主机请求复用连接
-    for i := 0; i < 3; i++ {
-        resp, _ := client.Get(""https://example.com/api"")
-        io.Copy(io.Discard, resp.Body)
-        resp.Body.Close()
-    }
-}</code></pre>"
-Gogo tool pprof交互命令	"<pre><code class=""language-bash""># 启动交互分析
-go tool pprof cpu.pprof
+// 2. 首页 - 演示各种导航方式
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('导航首页')),
+      body: Column(
+        children: [
+          // 基础导航
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SecondPage()),
+              );
+            },
+            child: Text('Push导航到第二页'),
+          ),
+          
+          // 命名路由导航
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/second');
+            },
+            child: Text('命名路由导航'),
+          ),
+          
+          // 带参数导航
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/profile',
+                arguments: {'userId': 123},
+              );
+            },
+            child: Text('带参数导航'),
+          ),
+          
+          // 替换当前页面
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/third');
+            },
+            child: Text('替换当前页面'),
+          ),
+          
+          // 清空栈并导航
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/second',
+                (route) => false, // 清空所有路由
+              );
+            },
+            child: Text('清空栈并导航'),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-# 常用命令:
-(pprof) top10             # 显示最耗资源函数
-(pprof) list funcName      # 查看函数详细
-(pprof) web               # 生成调用图
-(pprof) traces            # 查看调用栈</code></pre>"
-Goruntime/trace用途	"<pre><code class=""language-go"">func main() {
-    f, _ := os.Create(""trace.out"")
-    trace.Start(f)
-    defer trace.Stop()
-    
-    // 跟踪以下操作:
-    go func() { /* goroutine调度 */ }()
-    runtime.GC()          // GC事件
-    time.Sleep(100 * time.Millisecond) // 阻塞事件
-}</code></pre>"
-Go关键HTTP性能配置	"<pre><code class=""language-go"">func createClient() *http.Client {
-    return &http.Client{
-        Timeout: 30 * time.Second, // 全局超时
-        Transport: &http.Transport{
-            // 关键连接池配置
-            MaxIdleConns:        100,
-            MaxIdleConnsPerHost: 10,  // 避免连接泄露
-            IdleConnTimeout:     90 * time.Second,
-        },
-    }
-}</code></pre>"
-Go生产环境pprof风险	"<pre><code class=""language-go"">func main() {
-    // 危险：公网暴露pprof
-    // http.ListenAndServe("":6060"", nil)
-    
-    // 安全做法：内网绑定或添加认证
-    srv := http.Server{
-        Addr:    ""127.0.0.1:6060"", // 仅本地访问
-        Handler: requireAuth(http.DefaultServeMux),
-    }
-    srv.ListenAndServe()
-}</code></pre>"
-Go采样频率权衡	"<pre><code class=""language-go"">func init() {
-    // 默认内存采样率512KB
-    // 平衡性能与精度
-    
-    // 调优建议：
-    // 1. 生产环境保持默认
-    // 2. 诊断时设为1（每分配采样）
-    runtime.MemProfileRate = 1
-}</code></pre>"
-Go未设置HTTP超时风险	"<pre><code class=""language-go"">func main() {
-    // 危险：未设置超时
-    client := &http.Client{} 
-    
-    // 请求可能永久阻塞
-    resp, err := client.Get(""http://unresponsive-host.com"")
-    // ...
-}</code></pre>"
-GoMaxIdleConnsPerHost过低	"<pre><code class=""language-go"">func main() {
-    transport := &http.Transport{
-        MaxIdleConnsPerHost: 2, // 过低
-    }
-    client := &http.Client{Transport: transport}
-    
-    // 高频请求导致频繁建连
-    for i := 0; i < 100; i++ {
-        go func() {
-            resp, _ := client.Get(""https://api.example.com"")
-            resp.Body.Close()
-        }()
-    }
-}</code></pre>"
-Go生产环境暴露pprof风险	"<pre><code class=""language-bash""># 攻击者利用pprof接口
-curl http://your-server:6060/debug/pprof/heap > heap.dump
+// 3. 第二页 - 演示返回和结果传递
+class SecondPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('第二页')),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              // 返回并传递结果
+              Navigator.pop(context, '来自第二页的数据');
+            },
+            child: Text('返回并传递数据'),
+          ),
+          
+          ElevatedButton(
+            onPressed: () async {
+              // 等待返回结果
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ThirdPage()),
+              );
+              print('收到结果: $result');
+            },
+            child: Text('导航并等待结果'),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-# 分析内存敏感信息
-go tool pprof heap.dump
-(pprof) list secretKey</code></pre>"
+class ThirdPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('第三页')),
+      body: Center(
+        child: Text('第三页内容'),
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  final int userId;
+  
+  const ProfilePage({Key? key, required this.userId}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('用户资料')),
+      body: Center(
+        child: Text('用户ID: $userId'),
+      ),
+    );
+  }
+}</code></pre>"

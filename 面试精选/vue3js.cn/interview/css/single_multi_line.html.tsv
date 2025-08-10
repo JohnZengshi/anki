@@ -1,0 +1,238 @@
+#separator:tab
+#html:true
+CSS如何实现单行文本溢出省略效果？	"<pre><code class=""language-css"">/* 单行文本溢出省略的核心CSS属性组合 */
+.single-line-ellipsis {
+    /* 必须设置固定宽度 */
+    width: 200px;
+    
+    /* 核心三件套 */
+    overflow: hidden;        /* 隐藏溢出内容 */
+    white-space: nowrap;     /* 强制不换行 */
+    text-overflow: ellipsis; /* 显示省略号 */
+    
+    /* 可选样式 */
+    border: 1px solid #ccc;
+    padding: 8px;
+}</code></pre>"
+CSS如何使用伪元素实现多行文本溢出省略？	"<pre><code class=""language-css"">/* 基于高度截断的多行文本省略 */
+.multi-line-pseudo {
+    position: relative;
+    line-height: 20px;
+    height: 40px;           /* 控制显示2行 */
+    overflow: hidden;
+    width: 300px;
+}
+
+/* 伪元素实现省略号 */
+.multi-line-pseudo::after {
+    content: ""..."";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0 20px 0 10px;
+    /* 渐变背景遮盖文字 */
+    background: linear-gradient(to right, transparent, #fff 55%);
+}</code></pre>"
+CSS如何使用webkit属性实现多行文本省略？	"<pre><code class=""language-css"">/* 基于行数截断的多行文本省略 */
+.multi-line-webkit {
+    width: 300px;
+    
+    /* webkit核心属性组合 */
+    display: -webkit-box;           /* 弹性盒子模型 */
+    -webkit-box-orient: vertical;   /* 垂直排列 */
+    -webkit-line-clamp: 3;          /* 限制显示3行 */
+    
+    /* 配合属性 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* 处理长英文单词 */
+    word-wrap: break-word;
+}</code></pre>"
+JavaScript如何检测文本是否溢出并动态添加省略样式？	"<pre><code class=""language-javascript"">// 检测文本溢出并动态处理
+function handleTextOverflow(element, maxLines = 2) {
+    // 获取元素的计算样式
+    const computedStyle = window.getComputedStyle(element);
+    const lineHeight = parseInt(computedStyle.lineHeight);
+    const maxHeight = lineHeight * maxLines;
+    
+    // 检查是否溢出
+    if (element.scrollHeight > maxHeight) {
+        // 添加省略样式类
+        element.classList.add('text-overflow');
+        
+        // 设置最大高度
+        element.style.maxHeight = maxHeight + 'px';
+        
+        // 存储完整文本用于hover显示
+        element.setAttribute('title', element.textContent);
+        
+        console.log('文本已截断，原始高度:', element.scrollHeight);
+    }
+}
+
+// 使用示例
+const textElements = document.querySelectorAll('.text-content');
+textElements.forEach(el => handleTextOverflow(el, 2));</code></pre>"
+CSS text-overflow属性有哪些值及其作用？	"<pre><code class=""language-css"">/* text-overflow属性的不同值演示 */
+
+/* 1. clip - 直接裁切，不显示省略号 */
+.text-clip {
+    width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;     /* 直接裁切 */
+}
+
+/* 2. ellipsis - 显示省略号（最常用） */
+.text-ellipsis {
+    width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* 显示... */
+}
+
+/* 3. 自定义字符串（部分浏览器支持） */
+.text-custom {
+    width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: "">>>"";    /* 自定义省略符 */
+}</code></pre>"
+CSS如何处理包含英文的多行文本换行问题？	"<pre><code class=""language-css"">/* 处理英文文本的换行策略 */
+
+/* 1. 强制单词内换行 */
+.break-all {
+    width: 200px;
+    word-break: break-all;   /* 任意位置换行 */
+    
+    /* 配合多行省略 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 2. 保持单词完整性 */
+.break-word {
+    width: 200px;
+    word-wrap: break-word;   /* 单词边界换行 */
+    word-break: normal;      /* 保持单词完整 */
+    
+    /* 配合多行省略 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}</code></pre>"
+JavaScript如何实现响应式的文本省略效果？	"<pre><code class=""language-javascript"">// 响应式文本省略处理
+class ResponsiveTextEllipsis {
+    constructor(selector, options = {}) {
+        this.elements = document.querySelectorAll(selector);
+        this.options = {
+            maxLines: options.maxLines || 2,
+            responsive: options.responsive !== false
+        };
+        
+        this.init();
+    }
+    
+    init() {
+        // 初始化处理
+        this.elements.forEach(el => this.processElement(el));
+        
+        // 响应式监听
+        if (this.options.responsive) {
+            window.addEventListener('resize', 
+                this.debounce(() => this.handleResize(), 300)
+            );
+        }
+    }
+    
+    processElement(element) {
+        // 保存原始文本
+        if (!element.dataset.originalText) {
+            element.dataset.originalText = element.textContent;
+        }
+        
+        // 应用省略样式
+        element.style.cssText = `
+            display: -webkit-box;
+            -webkit-line-clamp: ${this.options.maxLines};
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-wrap: break-word;
+        `;
+    }
+    
+    handleResize() {
+        // 重新计算所有元素
+        this.elements.forEach(el => {
+            el.textContent = el.dataset.originalText;
+            this.processElement(el);
+        });
+    }
+    
+    // 防抖函数
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+}
+
+// 使用示例
+const ellipsis = new ResponsiveTextEllipsis('.card-text', {
+    maxLines: 3,
+    responsive: true
+});</code></pre>"
+CSS如何实现带渐变遮罩的文本省略效果？	"<pre><code class=""language-css"">/* 带渐变遮罩的高级文本省略效果 */
+
+.gradient-ellipsis {
+    position: relative;
+    width: 300px;
+    max-height: 60px;        /* 控制显示行数 */
+    line-height: 20px;
+    overflow: hidden;
+    
+    /* 文本样式 */
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+}
+
+/* 渐变遮罩层 */
+.gradient-ellipsis::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 20px;
+    
+    /* 渐变背景 */
+    background: linear-gradient(
+        to right, 
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 1) 100%
+    );
+    
+    /* 省略号 */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 5px;
+}
+
+.gradient-ellipsis::after {
+    content: '...';
+    color: #666;
+    font-weight: bold;
+}</code></pre>"
