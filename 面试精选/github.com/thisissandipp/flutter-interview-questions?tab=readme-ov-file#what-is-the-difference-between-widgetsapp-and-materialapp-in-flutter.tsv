@@ -1,0 +1,412 @@
+#separator:tab
+#html:true
+Flutter中WidgetsApp和MaterialApp有什么区别？	"<pre><code class=""language-dart"">import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
+// WidgetsApp 示例 - 基础应用组件，不依赖特定设计语言
+void main() {
+  runApp(
+    // WidgetsApp 提供基本的应用功能
+    WidgetsApp(
+      // 配置应用的标题
+      title: 'My App',
+      
+      // 配置应用的颜色
+      color: const Color(0xFF1976D2),
+      
+      // 配置应用的路由表
+      routes: {
+        '/': (context) => const HomeWidget(),
+        '/details': (context) => const DetailsWidget(),
+      },
+      
+      // 配置应用的初始路由
+      initialRoute: '/',
+      
+      // 错误文本样式
+      textStyle: const TextStyle(
+        color: Color(0xFFFF0000),
+        fontFamily: 'monospace',
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+      ),
+      
+      // 构建应用的主页
+      home: const HomeWidget(),
+    ),
+  );
+}
+
+// MaterialApp 示例 - Material Design 风格的应用组件
+void mainMaterial() {
+  runApp(
+    // MaterialApp 是基于 WidgetsApp 构建的 Material Design 应用
+    MaterialApp(
+      // 应用标题
+      title: 'My Material App',
+      
+      // 应用主题
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      
+      // 暗色主题
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+      ),
+      
+      // 路由表
+      routes: {
+        '/': (context) => const MaterialHomeWidget(),
+        '/details': (context) => const DetailsWidget(),
+      },
+      
+      // 初始路由
+      initialRoute: '/',
+      
+      // 主页 - 使用 Scaffold 提供 Material Design 布局结构
+      home: const MaterialHomeWidget(),
+    ),
+  );
+}
+
+// WidgetsApp 的主页组件
+class HomeWidget extends StatelessWidget {
+  const HomeWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF1976D2),
+      child: const Center(
+        child: Text(
+          'WidgetsApp Home',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// MaterialApp 的主页组件 - 使用 Material Design 组件
+class MaterialHomeWidget extends StatelessWidget {
+  const MaterialHomeWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Scaffold 提供了 Material Design 的基本布局结构
+    return Scaffold(
+      // 应用栏
+      appBar: AppBar(
+        title: const Text('MaterialApp Home'),
+      ),
+      
+      // 主体内容
+      body: const Center(
+        child: Text('Material Design Layout'),
+      ),
+      
+      // 浮动操作按钮
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // 处理按钮点击事件
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+// 详情页组件
+class DetailsWidget extends StatelessWidget {
+  const DetailsWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder(); // 占位符组件
+  }
+}</code></pre>"
+Flutter中MaterialApp相比WidgetsApp提供了哪些额外功能？	"<pre><code class=""language-dart"">import 'package:flutter/material.dart';
+
+// MaterialApp 相比 WidgetsApp 提供的额外功能示例
+void main() {
+  runApp(
+    MaterialApp(
+      title: 'MaterialApp Extra Features',
+      
+      // 1. 主题支持 - Material Design 特定的主题
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        // Material Design 特有的视觉密度
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        // 文本主题
+        textTheme: const TextTheme(
+          headline1: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          bodyText1: TextStyle(fontSize: 16),
+        ),
+      ),
+      
+      // 2. 暗色主题支持
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+      ),
+      
+      // 3. 主题模式控制
+      themeMode: ThemeMode.system, // 跟随系统设置
+      
+      // 4. Material Design 特定的路由转场动画
+      routes: {
+        '/': (context) => const HomePage(),
+        '/details': (context) => const DetailsPage(),
+      },
+      
+      // 5. 支持自定义路由转场动画
+      onGenerateRoute: (settings) {
+        // 可以自定义路由动画
+        return MaterialPageRoute(
+          builder: (context) {
+            switch (settings.name) {
+              case '/details':
+                return const DetailsPage();
+              default:
+                return const HomePage();
+            }
+          },
+          // Material Design 页面转场动画
+          fullscreenDialog: false,
+        );
+      },
+      
+      // 6. Material Design 风格的本地化支持
+      locale: const Locale('zh', 'CN'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('zh', 'CN'),
+      ],
+      
+      // 7. Material Design 特有的构建器
+      builder: (context, child) {
+        // 可以在这里插入 Material Design 特定的组件
+        return child!;
+      },
+      
+      home: const HomePage(),
+    ),
+  );
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // AppBar 是 Material Design 特有的组件
+      appBar: AppBar(
+        title: const Text('Material Features'),
+      ),
+      
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Material Design 特有的组件
+            ElevatedButton(
+              onPressed: () {
+                // 使用 Material Design 风格的导航
+                Navigator.pushNamed(context, '/details');
+              },
+              child: const Text('Go to Details'),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Material Design 特有的图标按钮
+            IconButton(
+              icon: const Icon(Icons.favorite),
+              onPressed: () {
+                // 处理图标按钮点击
+              },
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Material Design 特有的卡片组件
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'This is a Material Design Card',
+                  style: Theme.of(context).textTheme.headline1,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      
+      // Material Design 特有的浮动操作按钮
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // FAB 点击处理
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class DetailsPage extends StatelessWidget {
+  const DetailsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Details Page'),
+      ),
+      body: const Center(
+        child: Text('Material Design Details Page'),
+      ),
+    );
+  }
+}</code></pre>"
+在Flutter中除了MaterialApp还有哪些类似的应用组件？	"<pre><code class=""language-dart"">import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+// 不同的应用组件示例
+
+// 1. WidgetsApp - 基础应用组件
+void mainWidgetsApp() {
+  runApp(
+    WidgetsApp(
+      color: const Color(0xFF1976D2),
+      title: 'WidgetsApp Example',
+      home: const HomePage(title: 'WidgetsApp'),
+      routes: {
+        '/': (context) => const HomePage(title: 'WidgetsApp'),
+      },
+    ),
+  );
+}
+
+// 2. MaterialApp - Material Design 应用组件
+void mainMaterialApp() {
+  runApp(
+    MaterialApp(
+      title: 'MaterialApp Example',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomePage(title: 'MaterialApp'),
+      routes: {
+        '/': (context) => const HomePage(title: 'MaterialApp'),
+      },
+    ),
+  );
+}
+
+// 3. CupertinoApp - iOS 风格应用组件
+void mainCupertinoApp() {
+  runApp(
+    CupertinoApp(
+      title: 'CupertinoApp Example',
+      home: const HomePage(title: 'CupertinoApp'),
+      routes: {
+        '/': (context) => const HomePage(title: 'CupertinoApp'),
+      },
+    ),
+  );
+}
+
+// 通用主页组件
+class HomePage extends StatelessWidget {
+  final String title;
+  
+  const HomePage({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: const Color(0xFF1976D2),
+      child: Center(
+        child: Text(
+          'Welcome to $title',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// 自定义应用组件示例
+void mainCustomApp() {
+  runApp(
+    // 自定义应用根组件
+    CustomApp(
+      title: 'Custom App',
+      home: const CustomHomePage(),
+    ),
+  );
+}
+
+// 自定义应用组件
+class CustomApp extends StatelessWidget {
+  final String title;
+  final Widget home;
+  
+  const CustomApp({
+    Key? key,
+    required this.title,
+    required this.home,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // 使用 WidgetsApp 作为基础
+    return WidgetsApp(
+      title: title,
+      color: const Color(0xFF1976D2),
+      home: home,
+      // 自定义路由表
+      routes: {
+        '/': (context) => home,
+      },
+      // 自定义文本样式
+      textStyle: const TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+        fontFamily: 'Roboto',
+      ),
+    );
+  }
+}
+
+// 自定义主页组件
+class CustomHomePage extends StatelessWidget {
+  const CustomHomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Colors.grey[300]!,
+      child: const Center(
+        child: Text(
+          'Welcome to Custom App',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>"

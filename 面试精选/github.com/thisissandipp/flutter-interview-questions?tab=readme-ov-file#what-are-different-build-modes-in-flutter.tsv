@@ -1,0 +1,38 @@
+#separator:tab
+#html:true
+Flutter的三种构建模式及其特点是什么？	"<pre><code class=""language-dart"">/// Flutter的三种构建模式及特点
+/// 
+/// 1. Debug模式 - 用于开发调试
+/// - 启用热重载(Hot Reload)
+/// - 包含Dart断言和调试信息
+/// - 编译速度快，运行性能较低
+/// - 应用体积较大
+/// 
+/// 2. Profile模式 - 用于性能分析
+/// - 保留性能分析所需信息
+/// - 启用跟踪信息用于DevTools
+/// - 接近Release模式性能表现
+/// - 用于真机性能调优
+/// 
+/// 3. Release模式 - 用于生产发布
+/// - 启用代码优化和混淆
+/// - 移除所有调试功能
+/// - 提供最佳性能和最小体积
+/// - 面向最终用户
+
+// 构建模式使用示例
+void main() {
+  // Debug模式下运行 (默认)
+  // flutter run
+  
+  // Profile模式下运行
+  // flutter run --profile
+  
+  // Release模式下运行
+  // flutter run --release
+  
+  // 构建不同模式的APK
+  // flutter build apk --debug
+  // flutter build apk --profile
+  // flutter build apk --release
+}</code></pre>"

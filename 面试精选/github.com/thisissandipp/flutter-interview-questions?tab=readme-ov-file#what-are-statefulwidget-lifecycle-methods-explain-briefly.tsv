@@ -1,0 +1,258 @@
+#separator:tab
+#html:true
+Flutter StatefulWidget中createState()和initState()方法的作用是什么?	"<pre><code class=""language-dart"">class MyWidget extends StatefulWidget {
+  const MyWidget({super.key});
+
+  // createState()方法创建State对象
+  // 每当创建StatefulWidget时都会调用此方法
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  int counter = 0;
+  late final StreamSubscription subscription;
+
+  // initState()是State对象插入渲染树时调用的第一个方法
+  // 仅调用一次，用于初始化变量、订阅等
+  @override
+  void initState() {
+    super.initState();
+    // 初始化变量
+    counter = 0;
+    // 可以开始订阅事件
+    subscription = Stream.periodic(Duration(seconds: 1)).listen((_) {
+      setState(() {
+        counter++;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(""Counter: $counter"");
+  }
+}</code></pre>"
+Flutter StatefulWidget中didChangeDependencies()方法有什么用途?	"<pre><code class=""language-dart"">class MyWidgetState extends State<MyWidget> {
+  late Future<String> data;
+
+  @override
+  void initState() {
+    super.initState();
+    // 在initState中不能访问BuildContext中的InheritedWidget
+  }
+
+  // didChangeDependencies在initState之后调用
+  // 当依赖的InheritedWidget改变时也会调用
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 适合执行需要BuildContext的昂贵操作
+    // 比如API调用，避免在build()中执行
+    data = fetchDataFromApi(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      future: data,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data!);
+        }
+        return CircularProgressIndicator();
+      },
+    );
+  }
+}</code></pre>"
+Flutter StatefulWidget中build()方法在什么情况下会被调用?	"<pre><code class=""language-dart"">class MyWidgetState extends State<MyWidget> {
+  int counter = 0;
+
+  // build()方法在以下情况会被调用:
+  // 1. initState()执行后
+  // 2. didChangeDependencies()执行后
+  // 3. didUpdateWidget()执行后
+  // 4. setState()被调用后
+  // 5. 组件被标记为dirty时
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Counter: $counter'),
+        ElevatedButton(
+          onPressed: () {
+            // 调用setState()会触发build()
+            setState(() {
+              counter++;
+            });
+          },
+          child: Text('Increment'),
+        )
+      ],
+    );
+  }
+
+  // 通过setState改变状态会重新调用build()
+  void incrementCounter() {
+    setState(() {
+      counter++;
+    });
+  }
+}</code></pre>"
+Flutter StatefulWidget中didUpdateWidget()方法的作用和调用时机?	"<pre><code class=""language-dart"">class MyWidget extends StatefulWidget {
+  final String title;
+  final Color color;
+
+  const MyWidget({required this.title, required this.color, super.key});
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: widget.color,
+      child: Text(widget.title),
+    );
+  }
+
+  // didUpdateWidget在widget配置改变时调用
+  // 例如父组件重建并传入新的参数时
+  @override
+  void didUpdateWidget(covariant MyWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // 典型用法：比较新旧widget的属性
+    if (oldWidget.color != widget.color) {
+      // 颜色改变时可以触发隐式动画等副作用
+      print('Color changed from ${oldWidget.color} to ${widget.color}');
+    }
+    
+    if (oldWidget.title != widget.title) {
+      // 标题改变时可以执行相应操作
+      print('Title changed from ""${oldWidget.title}"" to ""${widget.title}""');
+    }
+  }
+}</code></pre>"
+Flutter StatefulWidget中setState()方法的工作原理?	"<pre><code class=""language-dart"">class CounterWidget extends StatefulWidget {
+  @override
+  _CounterWidgetState createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
+  int _counter = 0;
+
+  // setState()通知框架状态已更改，需要重建UI
+  // 回调函数必须是同步的
+  void _incrementCounter() {
+    setState(() {
+      // 在回调中修改状态变量
+      _counter++;
+      // 框架会调度build()方法执行
+    });
+    // setState执行完毕后，build()方法会在合适时机被调用
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Count: $_counter'),
+        ElevatedButton(
+          onPressed: _incrementCounter,
+          child: Text('Increment'),
+        ),
+      ],
+    );
+  }
+}</code></pre>"
+Flutter StatefulWidget中deactivate()和dispose()方法有什么区别?	"<pre><code class=""language-dart"">class MyWidgetState extends State<MyWidget> {
+  late final StreamSubscription subscription;
+  late final Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    subscription = Stream.periodic(Duration(seconds: 1)).listen((_) {});
+    timer = Timer.periodic(Duration(seconds: 1), (_) {});
+  }
+
+  // deactivate()在State从树中移除时调用（可能是临时移除）
+  // 例如在Element重建过程中会调用
+  @override
+  void deactivate() {
+    super.deactivate();
+    print(""Widget deactivated"");
+    // 可以在这里暂停一些操作
+  }
+
+  // dispose()在State永久从树中移除时调用
+  // 是清理资源的最后机会
+  @override
+  void dispose() {
+    // 必须释放所有资源避免内存泄漏
+    subscription.cancel();  // 取消订阅
+    timer.cancel();         // 取消定时器
+    super.dispose();        // 调用父类dispose()
+    print(""Widget disposed"");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}</code></pre>"
+Flutter StatefulWidget完整的生命周期方法调用顺序是怎样的?	"<pre><code class=""language-dart"">class LifecycleDemo extends StatefulWidget {
+  const LifecycleDemo({super.key});
+
+  @override
+  State<LifecycleDemo> createState() => _LifecycleDemoState();
+}
+
+class _LifecycleDemoState extends State<LifecycleDemo> {
+  // 1. createState() - 创建State对象
+
+  @override
+  void initState() {
+    super.initState();
+    // 2. initState() - 初始化状态
+    print(""2. initState called"");
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 3. didChangeDependencies() - 依赖改变
+    print(""3. didChangeDependencies called"");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 4. build() - 构建UI
+    print(""4. build called"");
+    return Container();
+  }
+
+  @override
+  void didUpdateWidget(covariant LifecycleDemo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 5. didUpdateWidget() - widget更新
+    print(""5. didUpdateWidget called"");
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    // 6. deactivate() - 临时移除
+    print(""6. deactivate called"");
+  }
+
+  @override
+  void dispose() {
+    // 7. dispose() - 永久移除
+    print(""7. dispose called"");
+    super.dispose();
+  }
+}</code></pre>"
