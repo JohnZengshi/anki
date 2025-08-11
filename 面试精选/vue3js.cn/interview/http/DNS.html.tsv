@@ -1,0 +1,30 @@
+#separator:tab
+#html:true
+DNS递归查询与迭代查询的区别	"<pre><code class=""language-text"">递归查询：请求方必须获得最终结果（如浏览器→本地DNS）
+迭代查询：响应方返回最佳指引（如DNS服务器间查询）</code></pre>"
+DNS域名结构层级示例	"<pre><code class=""language-javascript"">// www.example.com 解析：
+const domainLevels = {
+  ""hostname"": ""www"",  // 三级域名
+  ""domain"": ""example"", // 二级域名
+  ""tld"": ""com""       // 顶级域名
+};</code></pre>"
+DNS缓存机制实现	"<pre><code class=""language-go"">type DNSCache struct {
+  BrowserCache map[string]string
+  OSCache      map[string]string
+  TTL          time.Duration
+}
+
+func (c *DNSCache) Lookup(domain string) string {
+  if ip, ok := c.BrowserCache[domain]; ok {
+    return ip
+  }
+  // 后续查询逻辑...
+}</code></pre>"
+DNS完整查询过程伪代码	"<pre><code class=""language-python"">def dns_query(domain):
+    # 检查浏览器缓存
+    if domain in browser_cache:
+        return browser_cache[domain]
+    
+    # 后续查询步骤
+    root_response = query_root_server()
+    return follow_referrals(root_response)</code></pre>"

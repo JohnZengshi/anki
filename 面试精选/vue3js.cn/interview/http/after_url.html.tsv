@@ -1,0 +1,61 @@
+#separator:tab
+#html:true
+JavaScript实现URL结构解析	"<pre><code class=""language-javascript"">function parseURL(url) {
+  // 创建URL对象
+  const urlObj = new URL(url);
+  
+  return {
+    protocol: urlObj.protocol,  // 协议头
+    hostname: urlObj.hostname,  // 域名
+    port: urlObj.port || '80',  // 端口
+    pathname: urlObj.pathname,  // 路径
+    search: urlObj.searchParams // 查询参数
+  };
+}</code></pre>"
+
+TCP三次握手过程伪代码	"<pre><code class=""language-go"">// 客户端发送SYN
+func sendSYN() {
+    seq := generateSeqNumber()
+    sendPacket(SYN_FLAG, seq)
+}
+
+// 服务端响应SYN-ACK
+func respondSYNACK() {
+    ack := receivedSeq + 1
+    sendPacket(SYN_FLAG|ACK_FLAG, generateSeqNumber(), ack)
+}
+
+// 客户端确认ACK
+func sendACK() {
+    ack := receivedSeq + 1
+    sendPacket(ACK_FLAG, ack)
+}</code></pre>"
+
+DOM树构建代码示例	"<pre><code class=""language-javascript"">function buildDOMTree(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  // 容错处理：自动补全缺失标签
+  const walker = document.createTreeWalker(doc);
+  
+  return {
+    root: doc.documentElement,
+    nodeCount: doc.childNodes.length
+  };
+}</code></pre>"
+
+HTTPS的TLS握手流程	"<pre><code class=""language-html"">&lt;!-- 安全示例：避免使用HTML注释 --&gt;
+&lt;script&gt;
+// ECDHE密钥交换伪代码
+function TLSHandshake() {
+  const clientHello = {
+    cipherSuites: [""TLS_ECDHE_RSA""]
+    // 扩展支持SNI
+  };
+  
+  const serverKeyExchange = {
+    curveType: ""secp256r1"",
+    pubKey: generateECDHEKey()
+  };
+}
+&lt;/script&gt;</code></pre>"

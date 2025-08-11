@@ -1,0 +1,29 @@
+#separator:tab
+#html:true
+HTTP/1.0持久连接如何实现	"<pre><code class=""language-http"">Connection: keep-alive</code></pre>"
+HTTP/1.1管道机制示例	"<pre><code class=""language-javascript"">// 请求1
+fetch('/api/data1');
+// 请求2
+fetch('/api/data2');  
+// 响应按请求顺序返回</code></pre>"
+HTTP/2多路复用伪代码	"<pre><code class=""language-golang"">// 客户端
+stream1 := client.NewStream()
+stream2 := client.NewStream() 
+
+// 并行发送
+stream1.Send(headersFrame)
+stream2.Send(dataFrame)
+
+// 乱序接收响应
+stream2.Receive()
+stream1.Receive()</code></pre>"
+HPACK头部压缩算法示例	"<pre><code class=""language-text"">静态表：
+:method: GET → 索引2
+动态表：
+custom-header: value → 索引62</code></pre>"
+HTTP/2服务器推送流程	"<pre><code class=""language-http"">GET /index.html HTTP/2
+
+HTTP/2 200 OK
+Link: </styles.css>; rel=preload
+
+(推送styles.css)</code></pre>"

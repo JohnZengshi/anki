@@ -1,0 +1,20 @@
+#separator:tab
+#html:true
+常用缓存控制请求头对比	"<pre><code class=""language-text"">| 请求头字段         | 缓存类型       | 典型值示例                 |
+|--------------------|----------------|--------------------------|
+| If-Modified-Since | 时间校验       | Wed, 21 Oct 2023 07:28:00 GMT |
+| If-None-Match     | 内容校验       | ""686897696a7c876b7e""      |</code></pre>"
+安全Cookie设置示例	"<pre><code class=""language-javascript"">// Node.js Express设置示例
+res.setHeader('Set-Cookie', [
+  'session=xxxx; HttpOnly; Secure',
+  'token=yyyy; SameSite=Strict'
+]);</code></pre>"
+Nginx缓存配置实例	"<pre><code class=""language-nginx"">location /static {
+    add_header Cache-Control ""public, max-age=31536000"";
+    add_header ETag ""$request_filename-$content_length"";
+    if_modified_since exact;
+}</code></pre>"
+大文件分块上传头示例	"<pre><code class=""language-http"">PUT /upload HTTP/1.1
+Content-Range: bytes 0-1048575/2097152
+Content-Type: application/octet-stream
+Content-Length: 1048576</code></pre>"

@@ -1,0 +1,78 @@
+#separator:tab
+#html:true
+WebSocket握手过程Go示例	"<pre><code class=""language-go"">// 客户端握手请求
+req, _ := http.NewRequest(""GET"", ""/chat"", nil)
+req.Header.Set(""Upgrade"", ""websocket"")
+req.Header.Set(""Connection"", ""Upgrade"")
+req.Header.Set(""Sec-WebSocket-Key"", base64.StdEncoding.EncodeToString(make([]byte, 16)))
+
+// 服务端响应校验
+func verifyKey(key string) string {
+    hash := sha1.New()
+    hash.Write([]byte(key + ""258EAFA5-E914-47DA-95CA-C5AB0DC85B11""))
+    return base64.StdEncoding.EncodeToString(hash.Sum(nil))
+}</code></pre>"
+
+WebSocket心跳检测JavaScript实现	"<pre><code class=""language-javascript"">// 心跳检测机制
+let heartbeatInterval = 30000;
+const ws = new WebSocket('wss://example.com');
+
+ws.onopen = () => {
+    setInterval(() => {
+        ws.send(JSON.stringify({ 
+            type: 'heartbeat',
+            timestamp: Date.now() 
+        }));
+    }, heartbeatInterval);
+};
+
+ws.onmessage = (event) => {
+    if(event.data === 'pong') {
+        console.log('连接状态正常');
+    }
+};</code></pre>"
+
+WebSocket二进制帧解析Python示例	"<pre><code class=""language-python"">def parse_frame(data):
+    # 解析第一个字节
+    fin = (data[0] & 0x80) >> 7
+    opcode = data[0] & 0x0F
+    
+    # 解析第二个字节
+    mask = (data[1] & 0x80) >> 7
+    payload_len = data[1] & 0x7F
+    
+    # 处理扩展长度
+    if payload_len == 126:
+        payload_len = int.from_bytes(data[2:4], 'big')
+    elif payload_len == 127:
+        payload_len = int.from_bytes(data[2:10], 'big')
+    
+    return {
+        'fin': fin,
+        'opcode': opcode,
+        'payload_length': payload_len
+    }</code></pre>"
+
+WebSocket应用场景表格	"<pre><code class=""language-html"">&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;场景&lt;/th&gt;
+    &lt;th&gt;协议选择&lt;/th&gt;
+    &lt;th&gt;延迟要求&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;股票报价&lt;/td&gt;
+    &lt;td&gt;WebSocket&lt;/td&gt;
+    &lt;td&gt;&amp;lt;100ms&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;邮件通知&lt;/td&gt;
+    &lt;td&gt;HTTP轮询&lt;/td&gt;
+    &lt;td&gt;5-60秒&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>"
+
+WebSocket与HTTP协议对比	"<pre><code class=""language-markdown"">## 协议对比差异
+- **连接方式**：WS持久化单连接 vs HTTP短连接
+- **头部开销**：WS 2-10字节 vs HTTP 800+字节
+- **消息方向**：WS双向通信 vs HTTP单向请求
+- **适用场景**：WS适合实时应用 vs HTTP适合静态资源</code></pre>"

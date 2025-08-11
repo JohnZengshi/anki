@@ -1,0 +1,30 @@
+#separator:tab
+#html:true
+GET与POST方法本质区别	"<pre><code class=""language-text"">| 方法 | 语义       | TCP数据包次数 | 主要应用场景         |
+|------|------------|---------------|----------------------|
+| GET  | 获取资源   | 1次           | 搜索查询、分页加载   |
+| POST | 提交实体   | 2次           | 表单提交、创建资源   |</code></pre>"
+GET请求参数位置示例	"<pre><code class=""language-javascript"">// 参数在URL中
+fetch('/api/search?q=keyword&page=2')
+  .then(res => res.json())
+  .then(console.log)</code></pre>"
+POST请求参数位置示例	"<pre><code class=""language-javascript"">// 参数在body中
+fetch('/api/users', {
+  method: 'POST',
+  body: JSON.stringify({
+    name: 'John',
+    age: 30
+  })
+})</code></pre>"
+Nginx反向代理配置差异	"<pre><code class=""language-nginx"">location /api {
+    # GET参数处理
+    proxy_pass http://backend/get?$args;
+
+    # POST请求转发
+    proxy_pass_request_body on;
+    proxy_pass http://backend/post;
+}</code></pre>"
+安全传输最佳实践	"<pre><code class=""language-text"">1. 敏感数据必须使用HTTPS
+2. 幂等操作使用GET
+3. 请求体超过2KB使用POST
+4. 遵循RESTful语义规范</code></pre>"

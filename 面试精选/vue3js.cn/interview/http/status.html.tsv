@@ -1,0 +1,18 @@
+#separator:tab
+#html:true
+HTTP 301状态码的典型应用场景	"<pre><code class=""language-nginx"">location /old-url {
+    return 301 https://$host/new-url;
+}</code></pre>"
+HTTP 304协商缓存机制实现原理	"<pre><code class=""language-javascript"">// 检查请求头
+if (request.headers['If-None-Match'] === etag) {
+    return response.status(304);
+}</code></pre>"
+HTTP 413状态码的客户端处理策略	"<pre><code class=""language-python"">try:
+    res = requests.post(url, data=huge_file)
+except HTTPError as e:
+    if e.code == 413:
+        split_file_upload()</code></pre>"
+HTTP 502与504状态码的差异对比	"<pre><code class=""language-text"">| 状态码 | 错误类型       | 典型场景             |
+|--------|----------------|----------------------|
+| 502    | 网关错误       | 上游服务不可用       |
+| 504    | 网关超时       | 上游服务响应超时     |</code></pre>"

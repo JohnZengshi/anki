@@ -1,0 +1,47 @@
+#separator:tab
+#html:true
+HTTPS混合加密的Golang实现示例	"<pre><code class=""language-golang"">// 生成RSA密钥对
+func generateKeyPair() (string, string) {
+	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	publicKey := &privateKey.PublicKey
+	// 编码为PEM格式
+	privPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  ""RSA PRIVATE KEY"",
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	})
+	pubPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  ""RSA PUBLIC KEY"",
+		Bytes: x509.MarshalPKCS1PublicKey(publicKey),
+	})
+	return string(privPEM), string(pubPEM)
+}</code></pre>"
+
+HTTPS握手过程分步说明	"<pre><code class=""language-http"">1. 客户端发送ClientHello
+2. 服务端返回ServerHello+证书
+3. 客户端验证证书有效性
+4. 生成会话密钥(pre-master secret)
+5. 密钥协商完成，加密通信开始</code></pre>"
+
+CA证书验证的JavaScript示例	"<pre><code class=""language-javascript"">// 验证证书链
+async function verifyCert(cert) {
+  const trustedCAs = await loadRootCAs(); // 加载根证书
+  const certChain = buildCertChain(cert); // 构建证书链
+  
+  // 验证签名链
+  for(let i=0; i < certChain.length-1; i++) {
+    const valid = crypto.verify(
+      'sha256',
+      certChain[i].body,
+      certChain[i+1].publicKey,
+      certChain[i].signature
+    );
+    if(!valid) throw new Error('证书链无效');
+  }
+}</code></pre>"
+
+HTTPS与HTTP核心差异对比	"<pre><code class=""language-markdown"">| 安全机制       | HTTP        | HTTPS         |
+|----------------|-------------|---------------|
+| 数据加密       | 无          | TLS/SSL加密   |
+| 端口号         | 80          | 443           |
+| 资源消耗       | 低          | 增加10%-20%   |
+| 证书要求       | 不需要      | 需要CA证书    |</code></pre>"

@@ -1,0 +1,50 @@
+#separator:tab
+#html:true
+CDN核心工作流程示例	"<pre><code class=""language-javascript"">// CDN节点选择算法
+function selectCDNNode(userIP) {
+  // 1. 地理定位
+  let location = geoLocate(userIP);
+  
+  // 2. 运营商匹配
+  let isp = detectISP(userIP);
+  
+  // 3. 负载检查
+  let nodes = getAvailableNodes()
+    .filter(n => n.location === location)
+    .filter(n => n.isp === isp)
+    .sort((a,b) => a.load - b.load);
+
+  // 4. 返回最优节点
+  return nodes[0]?.url || fallbackURL;
+}</code></pre>"
+
+CDN缓存层级实现	"<pre><code class=""language-go"">// CDN缓存结构体
+type CDNCache struct {
+    L1Cache []byte // 一级缓存
+    L2Cache []byte // 二级缓存
+    Expire  time.Time
+}
+
+func (c *CDNCache) Get(contentKey string) []byte {
+    // 优先查询L2缓存
+    if res := c.checkL2(contentKey); res != nil {
+        return res
+    }
+    // 回源查询L1缓存
+    return c.queryL1(contentKey)
+}</code></pre>"
+
+CDN优势对比表	"<pre><code class=""language-html"">&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;传统访问&lt;/th&gt;
+    &lt;th&gt;CDN加速&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;200-500ms延迟&lt;/td&gt;
+    &lt;td&gt;50-100ms延迟&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;100%回源率&lt;/td&gt;
+    &lt;td&gt;&amp;lt;10%回源率&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>"

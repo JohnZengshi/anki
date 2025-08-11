@@ -1,0 +1,59 @@
+#separator:tab
+#html:true
+HTTP协议特点	"<pre><code class=""language-javascript"">// 无状态示例
+const server = (request) => {
+  // 每次请求需携带sessionID
+  const session = getSession(request.headers.cookie);
+  return new Response(`Hello ${session?.user}`);
+};</code></pre>"
+HTTPS加密流程	"<pre><code class=""language-go"">// 简化版TLS握手示例
+func handshake() {
+  // 1. 客户端发送ClientHello
+  send(clientHello{...}) 
+
+  // 2. 服务端返回Certificate+ServerHello
+  cert := loadX509Cert(""server.crt"")
+  send(cert, serverHello{...})
+
+  // 3. 密钥交换（ECDHE）
+  premasterSecret := generateECDHEKey()
+  encryptedKey := rsaEncrypt(serverPubKey, premasterSecret)
+  
+  // 4. 完成握手
+  establishSession(premasterSecret)
+}</code></pre>"
+混合加密机制	"<pre><code class=""language-python""># 非对称加密交换密钥 + 对称加密数据
+from Crypto.Cipher import AES
+import rsa
+
+# 生成会话密钥
+session_key = os.urandom(32)
+
+# 非对称加密传输
+(pub_key, priv_key) = rsa.newkeys(2048)
+encrypted_key = rsa.encrypt(session_key, pub_key)
+
+# 对称加密数据
+cipher = AES.new(session_key, AES.MODE_GCM)
+ciphertext, tag = cipher.encrypt_and_digest(data)</code></pre>"
+数字证书验证	"<pre><code class=""language-javascript"">// 浏览器验证证书链示例
+async function verifyCert(cert) {
+  const caCerts = await fetchRootCAs();
+  
+  // 验证证书签名链
+  const chain = buildCertChain(cert, caCerts);
+  if (!validateChain(chain)) {
+    throw new Error('Invalid certificate chain');
+  }
+
+  // 检查吊销状态
+  const crl = await checkCRL(cert);
+  if (crl.isRevoked) {
+    throw new Error('Certificate revoked');
+  }
+
+  // 验证域名匹配
+  if (!cert.domains.includes(location.hostname)) {
+    throw new Error('Domain mismatch');
+  }
+}</code></pre>"

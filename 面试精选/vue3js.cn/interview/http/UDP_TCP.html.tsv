@@ -1,0 +1,49 @@
+#separator:tab
+#html:true
+TCP三次握手过程	"<pre><code class=""language-golang"">func threeWayHandshake() {
+    // 1. SYN：客户端发送序列号x
+    client.Send(SYN{x})
+    // 2. SYN-ACK：服务端响应序列号y，确认号x+1 
+    server.Send(SYN{y, ACK{x+1}})
+    // 3. ACK：客户端确认号y+1
+    client.Send(ACK{y+1})
+}</code></pre>"
+
+TCP四次挥手过程	"<pre><code class=""language-javascript"">function closeConnection() {
+    // 1. FIN：主动方发送终止请求
+    active.sendFIN()
+    // 2. ACK：被动方立即响应确认
+    passive.sendACK()
+    // 3. FIN：被动方发送自己的终止请求
+    passive.sendFIN()
+    // 4. ACK：主动方最终确认
+    active.sendACK()
+}</code></pre>"
+
+UDP报文结构示例	"<pre><code class=""language-python"">class UDPHeader:
+    def __init__(self):
+        self.src_port = 1234    # 16位源端口
+        self.dst_port = 53      # 16位目标端口
+        self.length = 8         # 16位长度
+        self.checksum = 0xabcd  # 16位校验和</code></pre>"
+
+TCP滑动窗口实现	"<pre><code class=""language-golang"">type SendWindow struct {
+    base   int // 窗口起始位置
+    next   int // 下一个要发送的序号
+    size   int // 窗口大小
+    buffer []Packet
+}
+
+func (w *SendWindow) slide(ack int) {
+    // 收到确认后滑动窗口
+    if ack > w.base {
+        w.size += (ack - w.base)
+        w.base = ack
+    }
+}</code></pre>"
+
+HTTP/3的QUIC协议优势	"<pre><code class=""language-text"">1. 基于UDP实现快速握手
+2. 内置TLS 1.3加密
+3. 多路复用避免队头阻塞
+4. 改进的拥塞控制算法
+5. 0-RTT快速恢复连接</code></pre>"

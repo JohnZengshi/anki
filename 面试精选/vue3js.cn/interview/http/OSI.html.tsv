@@ -1,0 +1,47 @@
+#separator:tab
+#html:true
+OSI应用层HTTP请求示例	"<pre><code class=""language-javascript"">// 应用层HTTP请求示例
+fetch('https://api.example.com/data')
+  .then(response => response.json())
+  .then(data => console.log(data))</code></pre>"
+
+传输层TCP/UDP对比	"<pre><code class=""language-go"">// 传输层协议对比
+func main() {
+  // TCP可靠传输
+  tcpConn, _ := net.Dial(""tcp"", ""example.com:80"")
+  tcpConn.Write([]byte(""ACK""))
+
+  // UDP快速传输
+  udpConn, _ := net.Dial(""udp"", ""example.com:53"")
+  udpConn.Write([]byte(""DNS Query""))
+}</code></pre>"
+
+网络层IP分片实现	"<pre><code class=""language-python""># 网络层IP分片模拟
+class IPPacket:
+    def __init__(self, data, mtu):
+        self.fragments = [data[i:i+mtu] for i in range(0, len(data), mtu)]
+
+    def reassemble(self):
+        return b''.join(self.fragments)</code></pre>"
+
+数据链路层ARP请求	"<pre><code class=""language-c"">// 数据链路层ARP协议
+struct arp_packet {
+    uint16_t htype;    // 硬件类型
+    uint16_t ptype;    // 协议类型
+    uint8_t hlen;     // 硬件地址长度
+    uint8_t plen;     // 协议地址长度
+    uint16_t oper;     // 操作码
+    uint8_t sha[6];   // 发送方MAC
+    uint32_t spa;     // 发送方IP
+    uint8_t tha[6];   // 接收方MAC
+    uint32_t tpa;     // 接收方IP
+};</code></pre>"
+
+物理层比特流示例	"<pre><code class=""language-text"">01110111 01101000 01100001 01110100 00100111 01110011 00100000 01110101 01110000 00100000 00111111</code></pre>"
+
+各层设备对应表	"<pre><code class=""language-html"">&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;层级&lt;/th&gt;&lt;th&gt;设备&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;应用层&lt;/td&gt;&lt;td&gt;网关&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;网络层&lt;/td&gt;&lt;td&gt;路由器&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;数据链路层&lt;/td&gt;&lt;td&gt;交换机&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>"
