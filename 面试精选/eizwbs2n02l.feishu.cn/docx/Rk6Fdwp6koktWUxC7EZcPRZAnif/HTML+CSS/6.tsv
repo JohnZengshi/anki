@@ -1,0 +1,172 @@
+#separator:tab
+#html:true
+使用Flex布局实现三栏布局（左右固定200px，中间自适应）	"<pre><code class=""language-css"">.container {
+  display: flex; /* 启用弹性布局 */
+  height: 100vh; /* 设置容器高度 */
+}
+
+.left, .right {
+  width: 200px; /* 左右侧栏固定宽度 */
+  background-color: #f0f0f0;
+}
+
+.main {
+  flex: 1; /* 自动填充剩余空间 */
+  background-color: #fff;
+  padding: 20px;
+}</code></pre>"
+使用浮动布局实现三栏布局的完整代码	"<pre><code class=""language-css"">.container {
+  width: 100%; /* 容器占满宽度 */
+  overflow: hidden; /* 清除浮动 */
+}
+
+.left {
+  width: 200px;
+  float: left; /* 左浮动 */
+  background-color: #f0f0f0;
+  height: 500px;
+}
+
+.right {
+  width: 200px;
+  float: right; /* 右浮动 */
+  background-color: #f0f0f0;
+  height: 500px;
+}
+
+.main {
+  margin-left: 200px; /* 避免与左侧栏重叠 */
+  margin-right: 200px; /* 避免与右侧栏重叠 */
+  background-color: #fff;
+  height: 500px;
+  padding: 20px;
+}</code></pre>"
+使用Grid布局实现三栏布局的简洁写法	"<pre><code class=""language-css"">.container {
+  display: grid; /* 启用网格布局 */
+  grid-template-columns: 200px 1fr 200px; /* 左200px 中间自适应 右200px */
+  height: 100vh;
+  gap: 10px; /* 可选：设置间距 */
+}
+
+.left {
+  background-color: #f0f0f0;
+}
+
+.main {
+  background-color: #fff;
+  padding: 20px;
+}
+
+.right {
+  background-color: #f0f0f0;
+}</code></pre>"
+使用绝对定位实现三栏布局	"<pre><code class=""language-css"">.container {
+  position: relative; /* 为子元素提供定位参考 */
+  height: 100vh;
+}
+
+.left {
+  position: absolute;
+  left: 0; /* 定位到左边 */
+  top: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #f0f0f0;
+}
+
+.right {
+  position: absolute;
+  right: 0; /* 定位到右边 */
+  top: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #f0f0f0;
+}
+
+.main {
+  margin: 0 200px; /* 左右留出侧栏空间 */
+  height: 100%;
+  background-color: #fff;
+  padding: 20px;
+}</code></pre>"
+三栏布局的HTML结构代码	"<pre><code class=""language-html"">&lt;!-- 通用的三栏布局HTML结构 --&gt;
+&lt;div class=""container""&gt;
+  &lt;div class=""left""&gt;
+    &lt;h3&gt;左侧栏&lt;/h3&gt;
+    &lt;p&gt;导航菜单或侧边栏内容&lt;/p&gt;
+  &lt;/div&gt;
+  
+  &lt;div class=""main""&gt;
+    &lt;h2&gt;主内容区域&lt;/h2&gt;
+    &lt;p&gt;这里是页面的主要内容，宽度会自适应&lt;/p&gt;
+  &lt;/div&gt;
+  
+  &lt;div class=""right""&gt;
+    &lt;h3&gt;右侧栏&lt;/h3&gt;
+    &lt;p&gt;广告位或相关链接&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>"
+比较四种三栏布局方式的优缺点	"<pre><code class=""language-javascript"">// 三栏布局方案对比分析
+const layoutComparison = {
+  flex: {
+    优点: ['代码简洁', '自适应性强', '现代浏览器支持好'],
+    缺点: ['IE9及以下不支持'],
+    适用场景: '现代项目首选方案'
+  },
+  
+  float: {
+    优点: ['兼容性极好', '支持所有浏览器'],
+    缺点: ['需要清除浮动', '代码相对复杂', '容易出现布局问题'],
+    适用场景: '需要兼容老旧浏览器'
+  },
+  
+  grid: {
+    优点: ['最强大的布局系统', '代码最简洁', '二维布局能力'],
+    缺点: ['IE不支持', '学习成本较高'],
+    适用场景: '复杂网格布局'
+  },
+  
+  absolute: {
+    优点: ['精确控制位置', '不影响文档流'],
+    缺点: ['脱离文档流', '响应式适配困难'],
+    适用场景: '特殊定位需求'
+  }
+};</code></pre>"
+实现响应式三栏布局（移动端自动变为单栏）	"<pre><code class=""language-css"">.container {
+  display: flex;
+  flex-wrap: wrap; /* 允许换行 */
+}
+
+.left, .right {
+  width: 200px;
+  background-color: #f0f0f0;
+}
+
+.main {
+  flex: 1;
+  min-width: 300px; /* 最小宽度保证可读性 */
+  background-color: #fff;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* 垂直排列 */
+  }
+  
+  .left, .right, .main {
+    width: 100%; /* 全宽显示 */
+  }
+  
+  .left {
+    order: 1; /* 左侧栏排在第一 */
+  }
+  
+  .main {
+    order: 2; /* 主内容排在第二 */
+  }
+  
+  .right {
+    order: 3; /* 右侧栏排在最后 */
+  }
+}</code></pre>"

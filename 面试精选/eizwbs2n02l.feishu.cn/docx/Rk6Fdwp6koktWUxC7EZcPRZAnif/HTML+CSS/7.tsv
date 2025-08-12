@@ -1,0 +1,125 @@
+#separator:tab
+#html:true
+CSS中如何使用calc()实现响应式宽度布局？	"<pre><code class=""language-css"">.container {
+  /* 容器宽度为100%减去固定的侧边栏宽度 */
+  width: calc(100% - 250px);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.sidebar {
+  /* 固定宽度的侧边栏 */
+  width: 250px;
+  float: left;
+}
+
+.main-content {
+  /* 主内容区域自适应剩余宽度 */
+  width: calc(100% - 270px); /* 250px侧边栏 + 20px间距 */
+  float: right;
+}</code></pre>"
+CSS calc()如何实现动态间距计算？	"<pre><code class=""language-css"">.card {
+  /* 基于视口宽度和固定值的动态外边距 */
+  margin: calc(2vw + 10px);
+  
+  /* 内边距结合字体大小和百分比 */
+  padding: calc(1rem + 2%);
+  
+  /* 动态高度计算 */
+  height: calc(100vh - 80px); /* 全屏高度减去头部导航 */
+}
+
+.grid-item {
+  /* 网格项目宽度：三等分减去间距 */
+  width: calc(33.333% - 20px);
+  margin: 10px;
+}</code></pre>"
+CSS calc()在Flexbox布局中如何应用？	"<pre><code class=""language-css"">.flex-container {
+  display: flex;
+  gap: 20px;
+}
+
+.flex-item {
+  /* Flex项目宽度：平分容器宽度减去间距 */
+  flex: 0 0 calc(50% - 10px); /* 两列布局，每列减去一半间距 */
+}
+
+.three-column {
+  /* 三列等宽布局 */
+  flex: 0 0 calc(100% / 3 - 20px);
+}
+
+.responsive-flex {
+  /* 响应式flex项目：最小宽度300px，最大占比33% */
+  flex: 1 1 calc(33.333% - 20px);
+  min-width: calc(300px - 20px);
+}</code></pre>"
+CSS calc()如何处理字体大小的动态计算？	"<pre><code class=""language-css"">.responsive-text {
+  /* 基于视口宽度的响应式字体 */
+  font-size: calc(16px + 1vw);
+  
+  /* 限制字体大小范围 */
+  font-size: clamp(14px, calc(1rem + 0.5vw), 24px);
+}
+
+.heading {
+  /* 标题字体：基础大小加上动态增量 */
+  font-size: calc(1.5rem + 0.8vw);
+  
+  /* 行高也使用calc计算 */
+  line-height: calc(1.2em + 0.2vw);
+}
+
+.button {
+  /* 按钮内边距基于字体大小计算 */
+  padding: calc(0.5em + 5px) calc(1em + 10px);
+  font-size: calc(14px + 0.25vw);
+}</code></pre>"
+CSS calc()在网格布局中的高级应用？	"<pre><code class=""language-css"">.grid-container {
+  display: grid;
+  /* 网格列：自动适应，最小250px，最大1fr */
+  grid-template-columns: repeat(auto-fit, minmax(calc(250px + 2vw), 1fr));
+  gap: calc(1rem + 1vw);
+}
+
+.grid-item {
+  /* 网格项目高度：基于宽高比计算 */
+  height: calc(100% * 0.618); /* 黄金比例 */
+}
+
+.full-height-grid {
+  /* 全屏网格：减去头部和底部 */
+  height: calc(100vh - 120px); /* 60px头部 + 60px底部 */
+  
+  grid-template-rows: auto 1fr auto;
+}
+
+.nested-grid {
+  /* 嵌套网格的动态尺寸 */
+  width: calc(100% - 40px); /* 减去父容器内边距 */
+  grid-template-columns: calc(30% - 10px) calc(70% - 10px);
+}</code></pre>"
+CSS calc()如何实现复杂的数学运算？	"<pre><code class=""language-css"">.complex-layout {
+  /* 复杂宽度计算：多个单位混合 */
+  width: calc((100% - 60px) / 3 + 2rem);
+  
+  /* 嵌套calc计算 */
+  margin-left: calc(calc(100% - 800px) / 2);
+  
+  /* 三角函数模拟（使用比例） */
+  transform: translateX(calc(50px * 0.866)); /* sin(60°) ≈ 0.866 */
+}
+
+.percentage-calc {
+  /* 百分比和固定值的复杂组合 */
+  padding: calc(5% + 1rem) calc(10% - 20px);
+  
+  /* 基于父元素的动态计算 */
+  max-width: calc(100% - 2 * 50px); /* 减去两侧固定边距 */
+}
+
+.ratio-based {
+  /* 基于比例的尺寸计算 */
+  width: calc(100% / 1.618); /* 黄金比例分割 */
+  height: calc(100% / 1.618 / 1.618); /* 二级黄金比例 */
+}</code></pre>"

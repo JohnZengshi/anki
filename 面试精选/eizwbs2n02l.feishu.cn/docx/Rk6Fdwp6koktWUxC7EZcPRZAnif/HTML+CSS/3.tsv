@@ -1,0 +1,192 @@
+#separator:tab
+#html:true
+什么是CSS中的margin塌陷问题？请用代码演示	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;style&gt;
+    .box1 {
+      width: 100px;
+      height: 100px;
+      background-color: red;
+      margin-bottom: 200px; /* 下边距200px */
+    }
+    .box2 {
+      width: 100px;
+      height: 100px;
+      background-color: blue;
+      margin-top: 100px; /* 上边距100px */
+    }
+    /* 实际间距只有200px，不是300px */
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=""box1""&gt;&lt;/div&gt;
+  &lt;div class=""box2""&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+如何通过创建BFC来解决margin塌陷问题？	"<pre><code class=""language-css"">/* 方法1：使用overflow属性创建BFC */
+.container {
+  overflow: hidden; /* 创建BFC */
+}
+
+/* 方法2：使用float属性创建BFC */
+.container {
+  float: left; /* 创建BFC */
+}
+
+/* 方法3：使用position属性创建BFC */
+.container {
+  position: absolute; /* 创建BFC */
+}
+
+/* 方法4：使用display属性创建BFC */
+.container {
+  display: inline-block; /* 创建BFC */
+}
+
+/* 应用示例 */
+.parent {
+  overflow: hidden; /* 父元素创建BFC */
+}
+.child {
+  margin: 20px; /* 子元素margin不会塌陷到父元素外 */
+}</code></pre>"
+BFC的完整定义和特性是什么？	"<pre><code class=""language-javascript"">// BFC (Block Formatting Context) 块级格式化上下文
+// 定义：CSS中一个独立的渲染区域，有自己的渲染规则
+
+// BFC的主要特性：
+const bfcFeatures = {
+  // 1. 内部块级元素垂直排列
+  verticalLayout: true,
+  
+  // 2. 同一BFC内相邻元素margin会塌陷
+  marginCollapse: true,
+  
+  // 3. BFC区域不会与浮动元素重叠
+  noFloatOverlap: true,
+  
+  // 4. 计算BFC高度时包含浮动元素
+  includeFloatHeight: true,
+  
+  // 5. BFC是页面上的独立容器
+  isolatedContainer: true
+};
+
+// 触发BFC的CSS属性：
+const bfcTriggers = [
+  'float: left/right',      // 浮动元素
+  'position: absolute/fixed', // 绝对定位
+  'display: inline-block',   // 行内块元素
+  'display: table-cell',     // 表格单元格
+  'display: flex',           // 弹性盒子
+  'overflow: hidden/auto'    // 溢出处理
+];</code></pre>"
+请用代码演示BFC解决浮动塌陷问题	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;style&gt;
+    /* 问题：父元素高度塌陷 */
+    .container-problem {
+      border: 2px solid red;
+      /* 没有设置BFC，高度为0 */
+    }
+    
+    /* 解决方案：创建BFC */
+    .container-solution {
+      border: 2px solid green;
+      overflow: hidden; /* 创建BFC，包含浮动子元素 */
+    }
+    
+    .float-child {
+      float: left;
+      width: 100px;
+      height: 100px;
+      background-color: blue;
+      margin: 10px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- 问题示例：父元素高度塌陷 --&gt;
+  &lt;div class=""container-problem""&gt;
+    &lt;div class=""float-child""&gt;浮动元素&lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- 解决方案：BFC包含浮动元素 --&gt;
+  &lt;div class=""container-solution""&gt;
+    &lt;div class=""float-child""&gt;浮动元素&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+如何利用BFC实现两栏自适应布局？	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;style&gt;
+    .container {
+      width: 100%;
+      height: 200px;
+    }
+    
+    /* 左侧固定宽度栏 */
+    .sidebar {
+      float: left;
+      width: 200px;
+      height: 100%;
+      background-color: #f0f0f0;
+    }
+    
+    /* 右侧自适应栏 - 利用BFC不与浮动元素重叠的特性 */
+    .main-content {
+      overflow: hidden; /* 创建BFC */
+      height: 100%;
+      background-color: #e0e0e0;
+      padding: 20px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=""container""&gt;
+    &lt;div class=""sidebar""&gt;
+      &lt;p&gt;固定宽度侧边栏&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=""main-content""&gt;
+      &lt;p&gt;自适应主内容区域，利用BFC特性不与左侧浮动元素重叠&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+用JavaScript检测元素是否创建了BFC	"<pre><code class=""language-javascript"">// 检测元素是否创建BFC的工具函数
+function isBFC(element) {
+  const styles = window.getComputedStyle(element);
+  
+  // 检查各种BFC触发条件
+  const checks = {
+    // 浮动元素（除了none）
+    isFloated: styles.float !== 'none',
+    
+    // 绝对定位元素
+    isAbsolute: ['absolute', 'fixed'].includes(styles.position),
+    
+    // display属性检查
+    isInlineBlock: styles.display === 'inline-block',
+    isTableCell: styles.display === 'table-cell',
+    isFlex: styles.display === 'flex',
+    isInlineFlex: styles.display === 'inline-flex',
+    
+    // overflow属性检查（除了visible）
+    hasOverflow: styles.overflow !== 'visible' || 
+                 styles.overflowX !== 'visible' || 
+                 styles.overflowY !== 'visible'
+  };
+  
+  // 如果任一条件满足，则创建了BFC
+  return Object.values(checks).some(check => check);
+}
+
+// 使用示例
+const element = document.querySelector('.my-element');
+if (isBFC(element)) {
+  console.log('该元素创建了BFC');
+} else {
+  console.log('该元素未创建BFC');
+}</code></pre>"

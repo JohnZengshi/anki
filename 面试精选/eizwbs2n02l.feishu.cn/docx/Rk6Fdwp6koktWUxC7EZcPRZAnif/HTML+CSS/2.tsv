@@ -1,0 +1,167 @@
+#separator:tab
+#html:true
+请用JavaScript代码演示什么操作会触发浏览器回流？	"<pre><code class=""language-javascript"">// 触发回流的操作示例
+const box = document.getElementById('box');
+
+// 1. 读取几何属性会强制触发回流
+const width = box.offsetWidth;   // 强制回流
+const height = box.offsetHeight; // 强制回流
+const left = box.offsetLeft;     // 强制回流
+const top = box.offsetTop;       // 强制回流
+
+// 2. 修改影响布局的样式属性
+box.style.width = '200px';       // 触发回流
+box.style.height = '100px';      // 触发回流
+box.style.left = '50px';         // 触发回流
+box.style.top = '30px';          // 触发回流
+box.style.margin = '10px';       // 触发回流
+box.style.padding = '5px';       // 触发回流</code></pre>"
+请用JavaScript代码演示最差的回流场景（交替读写操作）？	"<pre><code class=""language-javascript"">// 最差场景：交替读写操作 - 触发3次回流
+function badReflowExample() {
+  const box = document.getElementById('box');
+  
+  // 第1次回流：读取offsetLeft强制触发
+  const ol = box.offsetLeft;
+  console.log('读取offsetLeft，触发第1次回流');
+  
+  // 修改样式，标记dirty=true
+  box.style.left = (ol + 10) + 'px';
+  console.log('修改left样式');
+  
+  // 第2次回流：读取offsetTop强制触发
+  const ot = box.offsetTop;
+  console.log('读取offsetTop，触发第2次回流');
+  
+  // 修改样式，标记dirty=true
+  box.style.top = (ot + 10) + 'px';
+  console.log('修改top样式');
+  
+  // 第3次回流：在下一帧自动触发
+  console.log('下一帧触发第3次回流');
+}</code></pre>"
+请用JavaScript代码演示优化后的回流方案（先读后写）？	"<pre><code class=""language-javascript"">// 优化方案：先读后写 - 只触发2次回流
+function optimizedReflowExample() {
+  const box = document.getElementById('box');
+  
+  // 阶段1：批量读取所有需要的属性
+  const ol = box.offsetLeft;  // 第1次回流：强制触发
+  const ot = box.offsetTop;   // 不触发回流（已经是最新状态）
+  console.log('批量读取完成，触发1次回流');
+  
+  // 阶段2：批量修改样式
+  box.style.left = (ol + 10) + 'px';  // 标记dirty=true
+  box.style.top = (ot + 10) + 'px';   // 标记dirty=true
+  console.log('批量修改样式完成');
+  
+  // 第2次回流：浏览器在下一帧统一处理
+  console.log('下一帧触发第2次回流');
+  
+  // 性能提升：从3次减少到2次，提升33%
+}</code></pre>"
+请用JavaScript代码演示浏览器回流的dirty标记机制？	"<pre><code class=""language-javascript"">// 浏览器回流的dirty标记机制模拟
+class LayoutEngine {
+  constructor() {
+    this.dirty = false;  // 脏标记
+    this.layoutCount = 0; // 回流计数
+  }
+  
+  // 读取几何属性时强制回流
+  getOffsetProperty(element, property) {
+    if (this.dirty) {
+      this.forceLayout();
+    }
+    return element[property];
+  }
+  
+  // 修改样式时标记dirty
+  setStyle(element, property, value) {
+    element.style[property] = value;
+    this.dirty = true;  // 标记需要重新计算
+    console.log(`样式修改: ${property}=${value}, dirty=true`);
+  }
+  
+  // 强制触发回流
+  forceLayout() {
+    this.layoutCount++;
+    this.dirty = false;
+    console.log(`强制回流 #${this.layoutCount}, dirty=false`);
+  }
+  
+  // 下一帧检查并触发回流
+  nextFrameLayout() {
+    if (this.dirty) {
+      this.forceLayout();
+    }
+  }
+}</code></pre>"
+请用JavaScript代码演示如何避免不必要的回流？	"<pre><code class=""language-javascript"">// 避免回流的最佳实践
+class ReflowOptimizer {
+  
+  // 1. 缓存几何属性，避免重复读取
+  static cacheGeometry(element) {
+    const rect = element.getBoundingClientRect();
+    return {
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height
+    };
+  }
+  
+  // 2. 使用CSS类批量修改样式
+  static batchStyleUpdate(element, className) {
+    element.className = className;  // 一次性应用所有样式
+  }
+  
+  // 3. 使用transform代替位置属性（不触发回流）
+  static moveWithTransform(element, x, y) {
+    // 使用transform不会触发回流，只触发重绘
+    element.style.transform = `translate(${x}px, ${y}px)`;
+  }
+  
+  // 4. 离线操作：先移除，修改后再插入
+  static offlineModification(element, modifications) {
+    const parent = element.parentNode;
+    const nextSibling = element.nextSibling;
+    
+    // 从DOM中移除
+    parent.removeChild(element);
+    
+    // 离线修改（不触发回流）
+    modifications(element);
+    
+    // 重新插入DOM（只触发一次回流）
+    parent.insertBefore(element, nextSibling);
+  }
+}</code></pre>"
+什么是浏览器回流（Layout/Reflow）？它与重绘的区别是什么？	"<pre><code class=""language-javascript"">// 回流与重绘的概念说明
+
+/* 
+回流（Layout/Reflow）：
+- 当DOM元素的几何属性发生变化时触发
+- 需要重新计算元素的位置和大小
+- 影响整个页面布局
+- 性能开销大
+
+重绘（Repaint）：
+- 当元素外观发生变化但不影响布局时触发
+- 只需要重新绘制元素
+- 不影响其他元素位置
+- 性能开销相对较小
+*/
+
+// 触发回流的属性修改
+function triggerReflow(element) {
+  element.style.width = '200px';     // 回流
+  element.style.height = '100px';    // 回流
+  element.style.left = '50px';       // 回流
+  element.style.margin = '10px';     // 回流
+}
+
+// 只触发重绘的属性修改
+function triggerRepaint(element) {
+  element.style.color = 'red';           // 重绘
+  element.style.backgroundColor = 'blue'; // 重绘
+  element.style.visibility = 'hidden';    // 重绘
+  element.style.outline = '1px solid red'; // 重绘
+}</code></pre>"

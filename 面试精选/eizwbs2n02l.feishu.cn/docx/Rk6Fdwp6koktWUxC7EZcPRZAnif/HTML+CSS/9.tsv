@@ -1,0 +1,352 @@
+#separator:tab
+#html:true
+什么是渐进增强(Progressive Enhancement)？请说明其核心理念和特点	"<pre><code class=""language-plaintext"">渐进增强(Progressive Enhancement)核心理念：
+
+1. 基础优先：从基本功能开始构建
+2. 逐步增强：随着浏览器能力提升，添加更高级功能
+3. 用户体验导向：提供更富有吸引力的用户体验
+4. 核心功能保障：确保所有用户都能获得基本功能
+
+特点：
+- 从简单到复杂的开发思路
+- 保证基础可用性
+- 向上增强的兼容性策略
+- 以用户需求为出发点</code></pre>"
+JavaScript实现渐进增强的按钮交互功能	"<pre><code class=""language-javascript"">// 渐进增强示例：按钮交互功能
+function enhanceButton() {
+  // 基础功能：确保按钮在所有浏览器中可点击
+  const buttons = document.querySelectorAll('.enhance-btn');
+  
+  buttons.forEach(button => {
+    // 基础点击功能
+    button.addEventListener('click', function() {
+      console.log('按钮被点击');
+    });
+    
+    // 渐进增强：添加视觉反馈
+    if ('animate' in Element.prototype) {
+      button.addEventListener('click', function() {
+        // 现代浏览器支持动画
+        this.animate([
+          { transform: 'scale(1)' },
+          { transform: 'scale(0.95)' },
+          { transform: 'scale(1)' }
+        ], {
+          duration: 150,
+          easing: 'ease-out'
+        });
+      });
+    }
+    
+    // 进一步增强：触觉反馈
+    if ('vibrate' in navigator) {
+      button.addEventListener('click', function() {
+        // 支持振动的设备提供触觉反馈
+        navigator.vibrate(50);
+      });
+    }
+  });
+}
+
+// 页面加载后执行增强
+document.addEventListener('DOMContentLoaded', enhanceButton);</code></pre>"
+什么是优雅降级(Graceful Degradation)？请说明其核心理念和特点	"<pre><code class=""language-plaintext"">优雅降级(Graceful Degradation)核心理念：
+
+1. 先进构建：首先构建功能丰富的现代版本
+2. 向下兼容：为旧浏览器提供简化但可用的版本
+3. 功能保障：确保核心功能在所有环境下可用
+4. 简化适配：在完整版本基础上创建简化版本
+
+特点：
+- 从复杂到简单的开发思路
+- 保证核心功能可用性
+- 向下简化的兼容性策略
+- 以现代功能为起点</code></pre>"
+CSS实现优雅降级的网格布局	"<pre><code class=""language-css"">/* 优雅降级示例：网格布局 */
+
+/* 现代浏览器：使用CSS Grid */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+/* 降级方案1：不支持Grid的浏览器使用Flexbox */
+@supports not (display: grid) {
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px; /* 补偿gap */
+  }
+  
+  .container > * {
+    flex: 1 1 300px;
+    margin: 10px; /* 模拟gap */
+  }
+}
+
+/* 降级方案2：更老的浏览器使用浮动布局 */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .container {
+    display: block;
+  }
+  
+  .container > * {
+    float: left;
+    width: calc(33.333% - 20px);
+    margin: 10px;
+  }
+  
+  /* 清除浮动 */
+  .container::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+/* 最基础降级：线性布局 */
+.no-css3 .container {
+  display: block;
+}
+
+.no-css3 .container > * {
+  display: block;
+  margin-bottom: 20px;
+}</code></pre>"
+Go语言实现特性检测的渐进增强模式	"<pre><code class=""language-go"">package main
+
+import (
+	""fmt""
+	""runtime""
+	""strings""
+)
+
+// 浏览器能力结构体
+type BrowserCapability struct {
+	SupportsES6    bool
+	SupportsCSS3   bool
+	SupportsCanvas bool
+	IsMobile       bool
+}
+
+// 渐进增强功能管理器
+type ProgressiveEnhancer struct {
+	capability BrowserCapability
+}
+
+// 检测浏览器能力（模拟）
+func detectCapability(userAgent string) BrowserCapability {
+	cap := BrowserCapability{}
+	
+	// 基于User-Agent检测能力
+	if strings.Contains(userAgent, ""Chrome"") {
+		cap.SupportsES6 = true
+		cap.SupportsCSS3 = true
+		cap.SupportsCanvas = true
+	}
+	
+	if strings.Contains(userAgent, ""Mobile"") {
+		cap.IsMobile = true
+	}
+	
+	return cap
+}
+
+// 渐进增强：根据能力提供不同级别的功能
+func (pe *ProgressiveEnhancer) GetFeatures() []string {
+	features := []string{}
+	
+	// 基础功能：所有浏览器都支持
+	features = append(features, ""基础HTML内容"")
+	features = append(features, ""基础CSS样式"")
+	
+	// 增强功能：根据能力逐步添加
+	if pe.capability.SupportsCSS3 {
+		features = append(features, ""CSS3动画"")
+		features = append(features, ""响应式布局"")
+	}
+	
+	if pe.capability.SupportsES6 {
+		features = append(features, ""ES6交互功能"")
+		features = append(features, ""异步数据加载"")
+	}
+	
+	if pe.capability.SupportsCanvas {
+		features = append(features, ""Canvas图形"")
+		features = append(features, ""数据可视化"")
+	}
+	
+	// 移动端特殊增强
+	if pe.capability.IsMobile {
+		features = append(features, ""触摸手势"")
+		features = append(features, ""设备方向感知"")
+	}
+	
+	return features
+}
+
+func main() {
+	// 模拟不同的用户代理
+	userAgents := []string{
+		""Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0"",
+		""Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) Mobile Safari"",
+		""Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1)"",
+	}
+	
+	fmt.Printf(""系统信息: %s %s\n\n"", runtime.GOOS, runtime.GOARCH)
+	
+	for i, ua := range userAgents {
+		fmt.Printf(""=== 浏览器 %d 渐进增强示例 ===\n"", i+1)
+		
+		// 检测能力
+		cap := detectCapability(ua)
+		enhancer := &ProgressiveEnhancer{capability: cap}
+		
+		// 获取可用功能
+		features := enhancer.GetFeatures()
+		
+		fmt.Printf(""用户代理: %s\n"", ua[:50]+""..."")
+		fmt.Printf(""检测到的能力: ES6=%t, CSS3=%t, Canvas=%t, Mobile=%t\n"",
+			cap.SupportsES6, cap.SupportsCSS3, cap.SupportsCanvas, cap.IsMobile)
+		
+		fmt.Println(""提供的功能:"")
+		for _, feature := range features {
+			fmt.Printf(""  - %s\n"", feature)
+		}
+		fmt.Println()
+	}
+}</code></pre>"
+渐进增强与优雅降级的区别和选择策略	"<pre><code class=""language-plaintext"">渐进增强 vs 优雅降级对比：
+
+| 特性 | 渐进增强 | 优雅降级 |
+|------|----------|----------|
+| 起点 | 基础功能 | 完整功能 |
+| 方向 | 向上增强 | 向下简化 |
+| 兼容性 | 保证基础可用性 | 保证核心功能 |
+| 开发思路 | 从简单到复杂 | 从复杂到简单 |
+| 测试重点 | 功能增强效果 | 降级方案可用性 |
+
+选择策略：
+
+1. 推荐渐进增强的场景：
+   - 用户群体设备差异大
+   - 网络环境不稳定
+   - 可访问性要求高
+   - 新项目开发
+
+2. 适合优雅降级的场景：
+   - 现有项目改造
+   - 主要面向现代浏览器
+   - 功能复杂度高
+   - 开发资源有限
+
+3. 最佳实践：
+   - 结合使用两种策略
+   - 核心功能用渐进增强
+   - 高级特性用优雅降级
+   - 持续测试各种环境</code></pre>"
+JavaScript实现优雅降级的媒体播放器	"<pre><code class=""language-javascript"">// 优雅降级示例：媒体播放器
+class MediaPlayer {
+  constructor(container, mediaUrl) {
+    this.container = container;
+    this.mediaUrl = mediaUrl;
+    this.init();
+  }
+  
+  init() {
+    // 检测浏览器能力并选择合适的实现
+    if (this.supportsHTML5Video()) {
+      this.createHTML5Player();
+    } else if (this.supportsFlash()) {
+      this.createFlashPlayer();
+    } else {
+      this.createFallbackPlayer();
+    }
+  }
+  
+  // 检测HTML5视频支持
+  supportsHTML5Video() {
+    const video = document.createElement('video');
+    return !!(video.canPlayType && video.canPlayType('video/mp4'));
+  }
+  
+  // 检测Flash支持
+  supportsFlash() {
+    try {
+      return !!(navigator.plugins['Shockwave Flash'] || 
+                new ActiveXObject('ShockwaveFlash.ShockwaveFlash'));
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  // 现代浏览器：HTML5视频播放器
+  createHTML5Player() {
+    const video = document.createElement('video');
+    video.src = this.mediaUrl;
+    video.controls = true;
+    video.style.width = '100%';
+    
+    // 高级功能：画中画
+    if ('pictureInPictureEnabled' in document) {
+      const pipButton = document.createElement('button');
+      pipButton.textContent = '画中画';
+      pipButton.onclick = () => video.requestPictureInPicture();
+      this.container.appendChild(pipButton);
+    }
+    
+    // 高级功能：全屏
+    if (video.requestFullscreen) {
+      const fullscreenButton = document.createElement('button');
+      fullscreenButton.textContent = '全屏';
+      fullscreenButton.onclick = () => video.requestFullscreen();
+      this.container.appendChild(fullscreenButton);
+    }
+    
+    this.container.appendChild(video);
+    console.log('使用HTML5播放器');
+  }
+  
+  // 降级方案1：Flash播放器
+  createFlashPlayer() {
+    const flashObject = document.createElement('object');
+    flashObject.data = 'player.swf';
+    flashObject.type = 'application/x-shockwave-flash';
+    flashObject.style.width = '100%';
+    flashObject.style.height = '300px';
+    
+    const param = document.createElement('param');
+    param.name = 'movie';
+    param.value = this.mediaUrl;
+    flashObject.appendChild(param);
+    
+    this.container.appendChild(flashObject);
+    console.log('使用Flash播放器');
+  }
+  
+  // 最终降级方案：下载链接
+  createFallbackPlayer() {
+    const message = document.createElement('div');
+    message.innerHTML = `
+      <p>您的浏览器不支持视频播放</p>
+      <p><a href=""${this.mediaUrl}"" download>点击下载视频文件</a></p>
+      <p>建议升级到现代浏览器以获得更好的体验</p>
+    `;
+    message.style.textAlign = 'center';
+    message.style.padding = '20px';
+    message.style.border = '1px solid #ccc';
+    
+    this.container.appendChild(message);
+    console.log('使用降级方案：下载链接');
+  }
+}
+
+// 使用示例
+document.addEventListener('DOMContentLoaded', function() {
+  const playerContainer = document.getElementById('media-player');
+  const mediaUrl = 'https://example.com/video.mp4';
+  
+  new MediaPlayer(playerContainer, mediaUrl);
+});</code></pre>"

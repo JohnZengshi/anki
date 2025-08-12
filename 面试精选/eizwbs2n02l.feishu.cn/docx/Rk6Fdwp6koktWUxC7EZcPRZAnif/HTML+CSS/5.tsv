@@ -1,0 +1,257 @@
+#separator:tab
+#html:true
+CSS overflow属性有哪些值？分别有什么作用？	"<pre><code class=""language-css"">/* CSS overflow 属性的所有可能值 */
+.container {
+  width: 200px;
+  height: 100px;
+  border: 1px solid #ccc;
+}
+
+/* 1. visible - 默认值，内容溢出时显示在容器外 */
+.overflow-visible {
+  overflow: visible; /* 溢出内容会覆盖其他元素 */
+}
+
+/* 2. hidden - 隐藏溢出内容 */
+.overflow-hidden {
+  overflow: hidden; /* 超出部分被截断并隐藏 */
+}
+
+/* 3. scroll - 总是显示滚动条 */
+.overflow-scroll {
+  overflow: scroll; /* 即使内容未溢出也显示滚动条 */
+}
+
+/* 4. auto - 仅在需要时显示滚动条 */
+.overflow-auto {
+  overflow: auto; /* 最常用，智能显示滚动条 */
+}
+
+/* 5. inherit - 继承父元素的overflow值 */
+.overflow-inherit {
+  overflow: inherit;
+}</code></pre>"
+实现一个可滚动的聊天窗口容器（CSS+HTML）	"<pre><code class=""language-html"">&lt;!-- 聊天窗口HTML结构 --&gt;
+&lt;div class=""chat-container""&gt;
+  &lt;div class=""chat-messages""&gt;
+    &lt;div class=""message""&gt;用户消息1&lt;/div&gt;
+    &lt;div class=""message""&gt;用户消息2&lt;/div&gt;
+    &lt;div class=""message""&gt;用户消息3&lt;/div&gt;
+    &lt;!-- 更多消息... --&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.chat-container {
+  width: 300px;
+  height: 400px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.chat-messages {
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto; /* 垂直方向自动滚动 */
+  overflow-x: hidden; /* 水平方向隐藏溢出 */
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 4px;
+  word-wrap: break-word; /* 长文本自动换行 */
+}
+
+/* 自定义滚动条样式 */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+&lt;/style&gt;</code></pre>"
+用JavaScript动态控制元素的overflow属性	"<pre><code class=""language-javascript"">// 动态控制overflow属性的JavaScript函数
+class OverflowController {
+  constructor(elementId) {
+    this.element = document.getElementById(elementId);
+    this.originalOverflow = this.element.style.overflow;
+  }
+
+  // 设置overflow为hidden，常用于禁止页面滚动
+  hideOverflow() {
+    this.element.style.overflow = 'hidden';
+    console.log('已隐藏溢出内容');
+  }
+
+  // 设置overflow为auto，智能显示滚动条
+  autoOverflow() {
+    this.element.style.overflow = 'auto';
+    console.log('已启用自动滚动');
+  }
+
+  // 设置overflow为scroll，强制显示滚动条
+  forceScroll() {
+    this.element.style.overflow = 'scroll';
+    console.log('已强制显示滚动条');
+  }
+
+  // 恢复原始overflow值
+  restoreOverflow() {
+    this.element.style.overflow = this.originalOverflow;
+    console.log('已恢复原始overflow设置');
+  }
+
+  // 检查元素是否有溢出内容
+  hasOverflow() {
+    const hasVerticalOverflow = this.element.scrollHeight > this.element.clientHeight;
+    const hasHorizontalOverflow = this.element.scrollWidth > this.element.clientWidth;
+    
+    return {
+      vertical: hasVerticalOverflow,
+      horizontal: hasHorizontalOverflow,
+      any: hasVerticalOverflow || hasHorizontalOverflow
+    };
+  }
+}
+
+// 使用示例
+const controller = new OverflowController('myContainer');
+
+// 检查是否有溢出
+if (controller.hasOverflow().any) {
+  controller.autoOverflow(); // 启用自动滚动
+} else {
+  controller.hideOverflow(); // 隐藏滚动条
+}</code></pre>"
+overflow-x和overflow-y的区别及应用场景	"<pre><code class=""language-css"">/* overflow-x 和 overflow-y 分别控制水平和垂直方向的溢出 */
+
+/* 场景1: 数据表格 - 水平滚动，垂直固定高度 */
+.data-table {
+  width: 100%;
+  height: 300px;
+  overflow-x: auto;   /* 水平方向自动滚动 */
+  overflow-y: hidden; /* 垂直方向隐藏溢出 */
+  white-space: nowrap; /* 防止表格内容换行 */
+}
+
+/* 场景2: 代码编辑器 - 双向滚动 */
+.code-editor {
+  width: 500px;
+  height: 400px;
+  overflow-x: auto; /* 水平自动滚动（长代码行） */
+  overflow-y: auto; /* 垂直自动滚动（多行代码） */
+  font-family: 'Courier New', monospace;
+  white-space: pre; /* 保持代码格式 */
+}
+
+/* 场景3: 移动端卡片滑动 - 仅水平滚动 */
+.card-slider {
+  display: flex;
+  width: 100%;
+  overflow-x: scroll; /* 强制水平滚动 */
+  overflow-y: hidden; /* 禁止垂直滚动 */
+  scroll-snap-type: x mandatory; /* 滚动吸附效果 */
+}
+
+.card {
+  flex: 0 0 80%; /* 卡片宽度固定 */
+  scroll-snap-align: start;
+}
+
+/* 场景4: 聊天消息列表 - 仅垂直滚动 */
+.message-list {
+  height: 300px;
+  overflow-x: hidden; /* 隐藏水平滚动 */
+  overflow-y: auto;   /* 垂直自动滚动 */
+  word-wrap: break-word; /* 长消息自动换行 */
+}</code></pre>"
+如何解决overflow:hidden导致的内容无法访问问题？	"<pre><code class=""language-javascript"">// 解决overflow:hidden导致内容无法访问的多种方案
+
+// 方案1: 动态切换overflow属性
+class AccessibilityOverflowManager {
+  constructor(containerId) {
+    this.container = document.getElementById(containerId);
+    this.isExpanded = false;
+  }
+
+  // 切换展开/收起状态
+  toggleExpansion() {
+    if (this.isExpanded) {
+      this.container.style.overflow = 'hidden';
+      this.container.style.height = '200px'; // 限制高度
+      this.isExpanded = false;
+    } else {
+      this.container.style.overflow = 'visible';
+      this.container.style.height = 'auto'; // 自动高度
+      this.isExpanded = true;
+    }
+  }
+
+  // 添加""展开更多""按钮
+  addExpandButton() {
+    const button = document.createElement('button');
+    button.textContent = this.isExpanded ? '收起' : '展开更多';
+    button.onclick = () => {
+      this.toggleExpansion();
+      button.textContent = this.isExpanded ? '收起' : '展开更多';
+    };
+    
+    this.container.parentNode.appendChild(button);
+  }
+}
+
+// 方案2: 使用渐变遮罩提示有更多内容
+function addGradientMask(elementId) {
+  const element = document.getElementById(elementId);
+  
+  // 创建渐变遮罩
+  const mask = document.createElement('div');
+  mask.style.cssText = `
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(transparent, white);
+    pointer-events: none;
+  `;
+  
+  element.style.position = 'relative';
+  element.appendChild(mask);
+}
+
+// 方案3: 检测内容是否被截断
+function detectTruncation(elementId) {
+  const element = document.getElementById(elementId);
+  
+  const isTruncated = {
+    vertical: element.scrollHeight > element.clientHeight,
+    horizontal: element.scrollWidth > element.clientWidth
+  };
+  
+  if (isTruncated.vertical || isTruncated.horizontal) {
+    // 添加提示信息
+    const hint = document.createElement('span');
+    hint.textContent = '内容被截断，点击查看完整内容';
+    hint.style.cssText = 'color: #666; font-size: 12px; cursor: pointer;';
+    
+    hint.onclick = () => {
+      element.style.overflow = 'auto';
+      element.style.maxHeight = 'none';
+      hint.remove();
+    };
+    
+    element.parentNode.appendChild(hint);
+  }
+}
+
+// 使用示例
+const manager = new AccessibilityOverflowManager('content');
+manager.addExpandButton();
+addGradientMask('content');
+detectTruncation('content');</code></pre>"

@@ -1,0 +1,538 @@
+#separator:tab
+#html:true
+请用HTML创建一个基本的iframe嵌入YouTube视频	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;iframe示例&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;嵌入YouTube视频&lt;/h1&gt;
+    
+    &lt;iframe 
+        width=""560"" 
+        height=""315"" 
+        src=""https://www.youtube.com/embed/dQw4w9WgXcQ"" 
+        title=""YouTube video player"" 
+        frameborder=""0"" 
+        allow=""accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"" 
+        allowfullscreen&gt;
+    &lt;/iframe&gt;
+    
+    &lt;p&gt;如果您无法看到视频，请&lt;a href=""https://www.youtube.com/watch?v=dQw4w9WgXcQ""&gt;点击这里&lt;/a&gt;直接观看。&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"
+iframe有哪些主要优点？	"<pre><code class=""language-text"">iframe的主要优点包括：
+
+1. **分离内容**
+   - 允许将不同来源或不同内容的页面嵌套在一起
+   - 有助于将内容分隔开，允许不同团队提供各自的内容
+
+2. **实现跨域通信**
+   - 可用于实现跨域通信
+   - 在父页面和嵌套的iframe页面之间传递数据
+   - 创建丰富的嵌入式应用程序
+
+3. **安全性**
+   - 提高安全性，将来自不受信任来源的内容隔离
+   - 在独立的沙盒中运行，防止对主页面的恶意攻击
+
+4. **无需刷新**
+   - 允许在不刷新整个页面的情况下加载新内容
+   - 对于实现动态添加内容或应用程序非常有用</code></pre>"
+请用JavaScript实现iframe与父页面的跨域通信	"<pre><code class=""language-javascript"">// 父页面代码 (parent.html)
+function setupIframeCommunication() {
+    const iframe = document.getElementById('myIframe');
+    
+    // 监听来自iframe的消息
+    window.addEventListener('message', function(event) {
+        // 验证消息来源（安全考虑）
+        if (event.origin !== 'https://trusted-domain.com') {
+            return;
+        }
+        
+        console.log('收到iframe消息:', event.data);
+        
+        // 处理不同类型的消息
+        switch(event.data.type) {
+            case 'resize':
+                // 调整iframe高度
+                iframe.style.height = event.data.height + 'px';
+                break;
+            case 'navigate':
+                // 处理导航请求
+                window.location.href = event.data.url;
+                break;
+        }
+    });
+    
+    // 向iframe发送消息
+    function sendMessageToIframe(data) {
+        iframe.contentWindow.postMessage(data, 'https://trusted-domain.com');
+    }
+    
+    // 示例：发送配置信息给iframe
+    iframe.onload = function() {
+        sendMessageToIframe({
+            type: 'config',
+            theme: 'dark',
+            language: 'zh-CN'
+        });
+    };
+}
+
+// iframe内部代码 (iframe.html)
+function setupParentCommunication() {
+    // 监听来自父页面的消息
+    window.addEventListener('message', function(event) {
+        // 验证消息来源
+        if (event.origin !== 'https://parent-domain.com') {
+            return;
+        }
+        
+        console.log('收到父页面消息:', event.data);
+        
+        // 处理配置消息
+        if (event.data.type === 'config') {
+            applyTheme(event.data.theme);
+            setLanguage(event.data.language);
+        }
+    });
+    
+    // 向父页面发送消息
+    function sendMessageToParent(data) {
+        window.parent.postMessage(data, 'https://parent-domain.com');
+    }
+    
+    // 示例：通知父页面调整iframe大小
+    function notifyResize() {
+        const height = document.body.scrollHeight;
+        sendMessageToParent({
+            type: 'resize',
+            height: height
+        });
+    }
+    
+    // 页面加载完成后通知父页面
+    window.onload = function() {
+        notifyResize();
+        sendMessageToParent({
+            type: 'loaded',
+            message: 'iframe内容已加载完成'
+        });
+    };
+}</code></pre>"
+iframe有哪些主要缺点和限制？	"<pre><code class=""language-text"">iframe的主要缺点包括：
+
+1. **性能问题**
+   - 每个iframe都会加载一个新页面
+   - 可能导致性能问题，特别是多个嵌套iframe时
+   - 增加内存和CPU使用量
+
+2. **可访问性问题**
+   - 屏幕阅读器可能不会正确处理嵌套页面
+   - 需要提供替代文本和合适的ARIA标记
+   - 键盘导航可能受到影响
+
+3. **不利于SEO**
+   - 搜索引擎通常不会索引iframe中的内容
+   - 对网站的搜索引擎优化产生负面影响
+   - 内容无法被正确爬取和索引
+
+4. **兼容性问题**
+   - 某些浏览器和设备可能不正确支持iframe
+   - 移动设备上可能需要特殊处理
+   - 可能需要降级方案</code></pre>"
+请用Go语言实现一个安全的iframe内容过滤器	"<pre><code class=""language-go"">package main
+
+import (
+    ""fmt""
+    ""net/http""
+    ""net/url""
+    ""regexp""
+    ""strings""
+)
+
+// IframeSanitizer iframe内容安全过滤器
+type IframeSanitizer struct {
+    // 允许的域名白名单
+    AllowedDomains []string
+    // 允许的协议
+    AllowedProtocols []string
+    // 危险属性黑名单
+    DangerousAttrs []string
+}
+
+// NewIframeSanitizer 创建新的iframe过滤器
+func NewIframeSanitizer() *IframeSanitizer {
+    return &IframeSanitizer{
+        AllowedDomains: []string{
+            ""youtube.com"",
+            ""www.youtube.com"",
+            ""vimeo.com"",
+            ""maps.google.com"",
+        },
+        AllowedProtocols: []string{""https""},
+        DangerousAttrs: []string{
+            ""onload"",
+            ""onerror"",
+            ""onclick"",
+            ""javascript:"",
+        },
+    }
+}
+
+// ValidateIframeURL 验证iframe URL是否安全
+func (s *IframeSanitizer) ValidateIframeURL(rawURL string) (bool, error) {
+    // 解析URL
+    parsedURL, err := url.Parse(rawURL)
+    if err != nil {
+        return false, fmt.Errorf(""无效的URL: %v"", err)
+    }
+    
+    // 检查协议
+    if !s.isAllowedProtocol(parsedURL.Scheme) {
+        return false, fmt.Errorf(""不允许的协议: %s"", parsedURL.Scheme)
+    }
+    
+    // 检查域名
+    if !s.isAllowedDomain(parsedURL.Host) {
+        return false, fmt.Errorf(""不允许的域名: %s"", parsedURL.Host)
+    }
+    
+    return true, nil
+}
+
+// isAllowedProtocol 检查协议是否被允许
+func (s *IframeSanitizer) isAllowedProtocol(protocol string) bool {
+    for _, allowed := range s.AllowedProtocols {
+        if protocol == allowed {
+            return true
+        }
+    }
+    return false
+}
+
+// isAllowedDomain 检查域名是否在白名单中
+func (s *IframeSanitizer) isAllowedDomain(domain string) bool {
+    for _, allowed := range s.AllowedDomains {
+        if domain == allowed || strings.HasSuffix(domain, "".""+allowed) {
+            return true
+        }
+    }
+    return false
+}
+
+// SanitizeIframeHTML 清理iframe HTML内容
+func (s *IframeSanitizer) SanitizeIframeHTML(html string) string {
+    // 移除危险属性
+    for _, attr := range s.DangerousAttrs {
+        // 使用正则表达式移除危险属性
+        re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(attr) + `[^>]*`)
+        html = re.ReplaceAllString(html, """")
+    }
+    
+    // 确保iframe有安全属性
+    if !strings.Contains(html, ""sandbox="") {
+        // 添加sandbox属性限制iframe功能
+        html = strings.Replace(html, ""<iframe"", 
+            `<iframe sandbox=""allow-scripts allow-same-origin""`, 1)
+    }
+    
+    return html
+}
+
+// IframeHandler HTTP处理器示例
+func (s *IframeSanitizer) IframeHandler(w http.ResponseWriter, r *http.Request) {
+    // 获取要嵌入的URL
+    targetURL := r.URL.Query().Get(""url"")
+    if targetURL == """" {
+        http.Error(w, ""缺少URL参数"", http.StatusBadRequest)
+        return
+    }
+    
+    // 验证URL安全性
+    valid, err := s.ValidateIframeURL(targetURL)
+    if !valid {
+        http.Error(w, fmt.Sprintf(""不安全的URL: %v"", err), http.StatusForbidden)
+        return
+    }
+    
+    // 生成安全的iframe HTML
+    iframeHTML := fmt.Sprintf(`
+        <iframe 
+            src=""%s"" 
+            width=""100%%"" 
+            height=""400"" 
+            frameborder=""0"" 
+            sandbox=""allow-scripts allow-same-origin allow-popups""
+            referrerpolicy=""strict-origin-when-cross-origin"">
+        </iframe>
+    `, targetURL)
+    
+    // 设置安全头
+    w.Header().Set(""Content-Type"", ""text/html; charset=utf-8"")
+    w.Header().Set(""X-Frame-Options"", ""SAMEORIGIN"")
+    w.Header().Set(""Content-Security-Policy"", ""frame-ancestors 'self'"")
+    
+    // 返回安全的iframe内容
+    fmt.Fprintf(w, `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>安全iframe嵌入</title>
+        <meta charset=""utf-8"">
+    </head>
+    <body>
+        <h1>安全iframe内容</h1>
+        %s
+    </body>
+    </html>
+    `, iframeHTML)
+}
+
+func main() {
+    // 创建iframe过滤器
+    sanitizer := NewIframeSanitizer()
+    
+    // 设置HTTP路由
+    http.HandleFunc(""/iframe"", sanitizer.IframeHandler)
+    
+    // 启动服务器
+    fmt.Println(""服务器启动在 :8080"")
+    http.ListenAndServe("":8080"", nil)
+}</code></pre>"
+iframe的常见使用场景有哪些？	"<pre><code class=""language-text"">iframe的常见使用场景：
+
+1. **嵌入外部内容**
+   - YouTube、Vimeo等视频平台嵌入
+   - Google地图嵌入
+   - 社交媒体小部件（Twitter、Facebook等）
+   - 在线文档查看器
+
+2. **分离组件开发**
+   - 微前端架构中的模块隔离
+   - 第三方插件和小部件
+   - 独立的功能模块
+   - 团队协作开发的不同部分
+
+3. **安全沙盒**
+   - 隔离不受信任的第三方内容
+   - 广告内容的安全展示
+   - 用户生成内容的安全渲染
+   - 防止XSS攻击
+
+4. **跨域通信**
+   - 不同域名间的数据交换
+   - 单点登录(SSO)实现
+   - 支付网关集成
+   - 第三方服务集成</code></pre>"
+请用JavaScript实现iframe的动态高度调整	"<pre><code class=""language-javascript"">// 父页面：动态调整iframe高度的完整解决方案
+class IframeResizer {
+    constructor(iframeSelector, options = {}) {
+        this.iframe = document.querySelector(iframeSelector);
+        this.options = {
+            minHeight: options.minHeight || 200,
+            maxHeight: options.maxHeight || window.innerHeight,
+            padding: options.padding || 20,
+            interval: options.interval || 100, // 轮询间隔
+            ...options
+        };
+        this.lastHeight = 0;
+        this.init();
+    }
+    
+    init() {
+        if (!this.iframe) {
+            console.error('找不到指定的iframe元素');
+            return;
+        }
+        
+        // 监听iframe加载完成
+        this.iframe.addEventListener('load', () => {
+            this.setupCommunication();
+            this.startHeightMonitoring();
+        });
+        
+        // 监听窗口大小变化
+        window.addEventListener('resize', () => {
+            this.adjustHeight();
+        });
+    }
+    
+    // 设置与iframe的通信
+    setupCommunication() {
+        // 监听来自iframe的高度变化消息
+        window.addEventListener('message', (event) => {
+            // 验证消息来源（根据实际情况调整）
+            if (event.source !== this.iframe.contentWindow) {
+                return;
+            }
+            
+            if (event.data && event.data.type === 'resize') {
+                this.setHeight(event.data.height);
+            }
+        });
+        
+        // 向iframe发送初始化消息
+        this.sendMessage({
+            type: 'init',
+            parentHeight: window.innerHeight
+        });
+    }
+    
+    // 开始高度监控（轮询方式，作为备选方案）
+    startHeightMonitoring() {
+        this.heightMonitor = setInterval(() => {
+            try {
+                // 尝试获取iframe内容高度（同域情况下）
+                const iframeDoc = this.iframe.contentDocument || this.iframe.contentWindow.document;
+                const height = Math.max(
+                    iframeDoc.body.scrollHeight,
+                    iframeDoc.body.offsetHeight,
+                    iframeDoc.documentElement.clientHeight,
+                    iframeDoc.documentElement.scrollHeight,
+                    iframeDoc.documentElement.offsetHeight
+                );
+                
+                if (height !== this.lastHeight) {
+                    this.setHeight(height);
+                }
+            } catch (e) {
+                // 跨域情况下无法访问，依赖postMessage
+                console.log('跨域iframe，使用postMessage通信');
+            }
+        }, this.options.interval);
+    }
+    
+    // 设置iframe高度
+    setHeight(height) {
+        const newHeight = Math.max(
+            this.options.minHeight,
+            Math.min(height + this.options.padding, this.options.maxHeight)
+        );
+        
+        if (newHeight !== this.lastHeight) {
+            this.iframe.style.height = newHeight + 'px';
+            this.lastHeight = newHeight;
+            
+            // 触发自定义事件
+            this.iframe.dispatchEvent(new CustomEvent('heightChanged', {
+                detail: { height: newHeight }
+            }));
+        }
+    }
+    
+    // 手动调整高度
+    adjustHeight() {
+        this.sendMessage({ type: 'requestHeight' });
+    }
+    
+    // 向iframe发送消息
+    sendMessage(data) {
+        if (this.iframe.contentWindow) {
+            this.iframe.contentWindow.postMessage(data, '*');
+        }
+    }
+    
+    // 销毁监听器
+    destroy() {
+        if (this.heightMonitor) {
+            clearInterval(this.heightMonitor);
+        }
+    }
+}
+
+// iframe内部代码：报告高度变化
+class IframeHeightReporter {
+    constructor(options = {}) {
+        this.options = {
+            throttle: options.throttle || 100,
+            ...options
+        };
+        this.lastHeight = 0;
+        this.throttleTimer = null;
+        this.init();
+    }
+    
+    init() {
+        // 监听来自父页面的消息
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'requestHeight') {
+                this.reportHeight();
+            }
+        });
+        
+        // 监听DOM变化
+        this.observeChanges();
+        
+        // 初始报告高度
+        this.reportHeight();
+    }
+    
+    // 观察DOM变化
+    observeChanges() {
+        // 使用MutationObserver监听DOM变化
+        const observer = new MutationObserver(() => {
+            this.throttledReportHeight();
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+        
+        // 监听窗口大小变化
+        window.addEventListener('resize', () => {
+            this.throttledReportHeight();
+        });
+        
+        // 监听图片加载
+        document.addEventListener('load', () => {
+            this.throttledReportHeight();
+        }, true);
+    }
+    
+    // 节流报告高度
+    throttledReportHeight() {
+        if (this.throttleTimer) {
+            clearTimeout(this.throttleTimer);
+        }
+        
+        this.throttleTimer = setTimeout(() => {
+            this.reportHeight();
+        }, this.options.throttle);
+    }
+    
+    // 报告当前高度给父页面
+    reportHeight() {
+        const height = Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.clientHeight,
+            document.documentElement.scrollHeight,
+            document.documentElement.offsetHeight
+        );
+        
+        if (height !== this.lastHeight) {
+            window.parent.postMessage({
+                type: 'resize',
+                height: height
+            }, '*');
+            
+            this.lastHeight = height;
+        }
+    }
+}
+
+// 使用示例
+// 在父页面中：
+// const resizer = new IframeResizer('#myIframe', {
+//     minHeight: 300,
+//     maxHeight: 800,
+//     padding: 10
+// });
+
+// 在iframe页面中：
+// const reporter = new IframeHeightReporter({ throttle: 150 });</code></pre>"

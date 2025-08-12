@@ -1,0 +1,198 @@
+#separator:tab
+#html:true
+请用JavaScript实现display:none隐藏元素的功能	"<pre><code class=""language-javascript"">// 使用display:none隐藏元素
+function hideElementWithDisplay(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.display = 'none'; // 完全移除元素，不占据空间
+    console.log('元素已隐藏，不占位，无法点击');
+  }
+}
+
+// 显示元素
+function showElementWithDisplay(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.display = 'block'; // 恢复显示
+  }
+}
+
+// 使用示例
+hideElementWithDisplay('myDiv');</code></pre>"
+请用JavaScript实现opacity:0隐藏元素的功能	"<pre><code class=""language-javascript"">// 使用opacity:0隐藏元素
+function hideElementWithOpacity(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.opacity = '0'; // 透明但占据空间
+    console.log('元素已透明，仍占位，仍可点击');
+    
+    // 添加点击事件验证仍可交互
+    element.addEventListener('click', function() {
+      alert('透明元素仍可点击！');
+    });
+  }
+}
+
+// 显示元素
+function showElementWithOpacity(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.opacity = '1'; // 恢复不透明
+  }
+}
+
+// 使用示例
+hideElementWithOpacity('myDiv');</code></pre>"
+请用JavaScript实现visibility:hidden隐藏元素的功能	"<pre><code class=""language-javascript"">// 使用visibility:hidden隐藏元素
+function hideElementWithVisibility(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.visibility = 'hidden'; // 不可见但占据空间
+    console.log('元素已隐藏，仍占位，无法点击');
+  }
+}
+
+// 显示元素
+function showElementWithVisibility(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.visibility = 'visible'; // 恢复可见
+  }
+}
+
+// 检测点击事件（验证无法点击）
+function testVisibilityClick(elementId) {
+  const element = document.getElementById(elementId);
+  element.addEventListener('click', function() {
+    console.log('这个事件不会在visibility:hidden时触发');
+  });
+}
+
+// 使用示例
+hideElementWithVisibility('myDiv');</code></pre>"
+请用JavaScript实现clip-path:circle(0)隐藏元素的功能	"<pre><code class=""language-javascript"">// 使用clip-path:circle(0)隐藏元素
+function hideElementWithClipPath(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.clipPath = 'circle(0)'; // 裁剪为0大小圆形
+    console.log('元素已裁剪隐藏，仍占位，无法点击');
+  }
+}
+
+// 显示元素
+function showElementWithClipPath(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.clipPath = 'circle(100%)'; // 恢复完整显示
+  }
+}
+
+// 渐进式裁剪动画效果
+function animateClipPath(elementId, hide = true) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    const targetSize = hide ? '0' : '100%';
+    element.style.transition = 'clip-path 0.3s ease';
+    element.style.clipPath = `circle(${targetSize})`;
+  }
+}
+
+// 使用示例
+hideElementWithClipPath('myDiv');</code></pre>"
+请用JavaScript实现position绝对定位隐藏元素的功能	"<pre><code class=""language-javascript"">// 使用绝对定位隐藏元素
+function hideElementWithPosition(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.position = 'absolute';
+    element.style.top = '-999px'; // 移出可视区域
+    element.style.left = '-999px';
+    console.log('元素已移出视窗，不占原位，理论上仍可点击');
+  }
+}
+
+// 显示元素
+function showElementWithPosition(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.position = 'static'; // 恢复正常定位
+    element.style.top = 'auto';
+    element.style.left = 'auto';
+  }
+}
+
+// 屏幕阅读器友好的隐藏方式
+function hideForScreenReader(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.position = 'absolute';
+    element.style.left = '-10000px';
+    element.style.width = '1px';
+    element.style.height = '1px';
+    element.style.overflow = 'hidden';
+  }
+}
+
+// 使用示例
+hideElementWithPosition('myDiv');</code></pre>"
+比较CSS隐藏元素的五种方式的特性差异	"<pre><code class=""language-javascript"">// CSS隐藏元素方式对比工具
+class ElementHideComparison {
+  constructor(elementId) {
+    this.element = document.getElementById(elementId);
+    this.originalStyles = {};
+    this.saveOriginalStyles();
+  }
+  
+  // 保存原始样式
+  saveOriginalStyles() {
+    const computed = getComputedStyle(this.element);
+    this.originalStyles = {
+      display: computed.display,
+      opacity: computed.opacity,
+      visibility: computed.visibility,
+      clipPath: computed.clipPath,
+      position: computed.position,
+      top: computed.top,
+      left: computed.left
+    };
+  }
+  
+  // 方式1: display:none - 不占位，不可点击
+  hideWithDisplay() {
+    this.element.style.display = 'none';
+    return { occupiesSpace: false, clickable: false };
+  }
+  
+  // 方式2: opacity:0 - 占位，可点击
+  hideWithOpacity() {
+    this.element.style.opacity = '0';
+    return { occupiesSpace: true, clickable: true };
+  }
+  
+  // 方式3: visibility:hidden - 占位，不可点击
+  hideWithVisibility() {
+    this.element.style.visibility = 'hidden';
+    return { occupiesSpace: true, clickable: false };
+  }
+  
+  // 方式4: clip-path - 占位，不可点击
+  hideWithClipPath() {
+    this.element.style.clipPath = 'circle(0)';
+    return { occupiesSpace: true, clickable: false };
+  }
+  
+  // 方式5: 绝对定位 - 不占原位，可点击
+  hideWithPosition() {
+    this.element.style.position = 'absolute';
+    this.element.style.top = '-999px';
+    return { occupiesSpace: false, clickable: true };
+  }
+  
+  // 恢复显示
+  restore() {
+    Object.assign(this.element.style, this.originalStyles);
+  }
+}
+
+// 使用示例
+const hideDemo = new ElementHideComparison('testElement');
+console.log('display:none特性:', hideDemo.hideWithDisplay());</code></pre>"
