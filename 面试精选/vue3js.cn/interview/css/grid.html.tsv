@@ -1,67 +1,45 @@
 #separator:tab
 #html:true
 如何创建一个基本的CSS Grid容器并设置3列2行的网格布局？	"<pre><code class=""language-css"">.container {
-  /* 创建网格容器 */
   display: grid;
-  
-  /* 设置3列，每列200px */
   grid-template-columns: 200px 200px 200px;
-  
-  /* 设置2行，每行100px */
   grid-template-rows: 100px 100px;
-  
-  /* 设置网格间距 */
   grid-gap: 10px;
 }</code></pre>"
 使用repeat()函数简化CSS Grid的列和行定义	"<pre><code class=""language-css"">.grid-container {
   display: grid;
-  
-  /* 使用repeat函数创建4列，每列1fr */
   grid-template-columns: repeat(4, 1fr);
-  
-  /* 使用repeat函数创建3行，每行150px */
   grid-template-rows: repeat(3, 150px);
   
-  /* 混合使用：固定列 + 重复列 */
+  /* 混合使用 */
   grid-template-columns: 200px repeat(2, 1fr) 100px;
 }</code></pre>"
 如何使用fr单位创建响应式的Grid布局？	"<pre><code class=""language-css"">.responsive-grid {
   display: grid;
-  
-  /* 第一列固定200px，剩余空间按1:2分配 */
-  grid-template-columns: 200px 1fr 2fr;
-  
-  /* 所有列等分可用空间 */
-  grid-template-columns: repeat(3, 1fr);
-  
-  /* 混合单位：固定 + 比例 + 自适应 */
-  grid-template-columns: 100px 2fr auto 1fr;
+  grid-template-columns: 200px 1fr 2fr; /* 固定+比例 */
+  grid-template-columns: repeat(3, 1fr); /* 等分 */
+  grid-template-columns: 100px 2fr auto 1fr; /* 混合单位 */
 }</code></pre>"
 使用minmax()函数设置Grid列的最小和最大宽度	"<pre><code class=""language-css"">.flexible-grid {
   display: grid;
-  
-  /* 列宽最小100px，最大不超过1fr */
   grid-template-columns: minmax(100px, 1fr) minmax(200px, 2fr);
   
-  /* 自适应列数，每列最小250px */
+  /* 自适应列数 */
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   
-  /* 自动填充，每列最小200px，最大300px */
+  /* 自动填充 */
   grid-template-columns: repeat(auto-fill, minmax(200px, 300px));
 }</code></pre>"
 如何使用grid-template-areas定义命名网格区域？	"<pre><code class=""language-css"">.layout-grid {
   display: grid;
   grid-template-columns: 200px 1fr 200px;
   grid-template-rows: 80px 1fr 60px;
-  
-  /* 定义命名区域 */
   grid-template-areas: 
     ""header header header""
     ""sidebar main aside""
     ""footer footer footer"";
 }
 
-/* 将元素分配到指定区域 */
 .header { grid-area: header; }
 .sidebar { grid-area: sidebar; }
 .main { grid-area: main; }
@@ -70,115 +48,66 @@
 实现Grid项目的对齐控制（justify-items和align-items）	"<pre><code class=""language-css"">.aligned-grid {
   display: grid;
   grid-template-columns: repeat(3, 200px);
-  grid-template-rows: repeat(2, 150px);
   
-  /* 水平对齐：start | end | center | stretch */
-  justify-items: center;
-  
-  /* 垂直对齐：start | end | center | stretch */
-  align-items: center;
-  
-  /* 简写形式：align-items justify-items */
-  place-items: center center;
+  justify-items: center; /* 水平对齐 */
+  align-items: center; /* 垂直对齐 */
+  place-items: center center; /* 简写 */
 }
 
-/* 单个项目的对齐 */
 .grid-item {
-  justify-self: end;    /* 单独设置水平对齐 */
-  align-self: start;    /* 单独设置垂直对齐 */
+  justify-self: end; /* 单独水平对齐 */
+  align-self: start; /* 单独垂直对齐 */
 }</code></pre>"
 如何控制Grid容器整体在父容器中的对齐？	"<pre><code class=""language-css"">.container {
   display: grid;
   grid-template-columns: repeat(3, 200px);
-  grid-template-rows: repeat(2, 100px);
   height: 500px;
-  width: 800px;
   
-  /* 水平对齐整个网格：start | end | center | stretch | space-around | space-between | space-evenly */
-  justify-content: center;
-  
-  /* 垂直对齐整个网格 */
-  align-content: center;
-  
-  /* 简写形式 */
-  place-content: center center;
+  justify-content: center; /* 水平对齐整个网格 */
+  align-content: center; /* 垂直对齐整个网格 */
+  place-content: center center; /* 简写 */
 }</code></pre>"
 使用grid-auto-flow控制Grid项目的排列方向	"<pre><code class=""language-css"">.flow-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 100px);
   
-  /* 默认值：先填满行再换行 */
-  grid-auto-flow: row;
-  
-  /* 先填满列再换列 */
-  grid-auto-flow: column;
-  
-  /* 密集填充，尽量填满空隙 */
-  grid-auto-flow: row dense;
-  
-  /* 列方向密集填充 */
-  grid-auto-flow: column dense;
+  grid-auto-flow: row; /* 先填满行 */
+  grid-auto-flow: column; /* 先填满列 */
+  grid-auto-flow: row dense; /* 密集填充 */
 }</code></pre>"
 实现一个完整的响应式Grid布局页面结构	"<pre><code class=""language-css"">.page-layout {
   display: grid;
   min-height: 100vh;
-  
-  /* 移动端：单列布局 */
   grid-template-columns: 1fr;
   grid-template-areas:
-    ""header""
-    ""nav""
-    ""main""
-    ""aside""
-    ""footer"";
+    ""header"" ""nav"" ""main"" ""aside"" ""footer"";
 }
 
-/* 平板端：两列布局 */
 @media (min-width: 768px) {
   .page-layout {
     grid-template-columns: 200px 1fr;
     grid-template-areas:
-      ""header header""
-      ""nav main""
-      ""nav aside""
-      ""footer footer"";
+      ""header header"" ""nav main"" ""nav aside"" ""footer footer"";
   }
 }
 
-/* 桌面端：三列布局 */
 @media (min-width: 1024px) {
   .page-layout {
     grid-template-columns: 200px 1fr 250px;
     grid-template-areas:
-      ""header header header""
-      ""nav main aside""
-      ""footer footer footer"";
+      ""header header header"" ""nav main aside"" ""footer footer footer"";
   }
 }</code></pre>"
-CSS Grid与Flexbox的主要区别是什么？	"<pre><code class=""language-javascript"">// CSS Grid vs Flexbox 对比
-const layoutComparison = {
-  // 维度差异
+CSS Grid与Flexbox的主要区别是什么？	"<pre><code class=""language-javascript"">// Grid vs Flexbox
+const comparison = {
   dimensions: {
     grid: '二维布局 - 同时控制行和列',
     flexbox: '一维布局 - 主要控制一个方向'
   },
-  
-  // 适用场景
   useCases: {
-    grid: [
-      '整体页面布局',
-      '复杂的二维排列',
-      '需要精确控制行列的场景'
-    ],
-    flexbox: [
-      '组件内部布局',
-      '一维排列（水平或垂直）',
-      '内容大小未知的场景'
-    ]
+    grid: ['整体页面布局', '复杂二维排列', '精确控制行列'],
+    flexbox: ['组件内部布局', '一维排列', '内容大小未知']
   },
-  
-  // 控制方式
   control: {
     grid: '从容器角度定义布局结构',
     flexbox: '从内容角度调整排列方式'
@@ -187,48 +116,30 @@ const layoutComparison = {
 Grid布局中auto-fill和auto-fit的区别	"<pre><code class=""language-css"">/* auto-fill：创建尽可能多的轨道，即使为空 */
 .auto-fill-grid {
   display: grid;
-  /* 会创建多个200px的列，即使没有内容填充 */
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* 效果：[item1][item2][empty][empty]... */
 }
 
 /* auto-fit：只创建需要的轨道，空轨道会被移除 */
 .auto-fit-grid {
   display: grid;
-  /* 只创建有内容的列，空列会被移除并拉伸现有列 */
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-/* 实际效果对比 */
-.comparison {
-  /* auto-fill: [item1][item2][empty][empty]... */
-  /* auto-fit:  [item1 stretched][item2 stretched] */
+  /* 效果：[item1 stretched][item2 stretched] */
 }</code></pre>"
 如何使用Grid实现瀑布流布局？	"<pre><code class=""language-css"">.masonry-grid {
   display: grid;
-  
-  /* 设置列数和列宽 */
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  
-  /* 设置行高为较小值，让内容自动跨越多行 */
-  grid-auto-rows: 10px;
-  
-  /* 设置列间距 */
+  grid-auto-rows: 10px; /* 小行高，让内容跨越多行 */
   grid-gap: 15px;
 }
 
 .masonry-item {
-  /* 使用JavaScript动态计算每个项目需要跨越的行数 */
+  /* 使用JS动态计算跨越行数 */
   /* grid-row-end: span var(--row-span); */
 }
 
-/* JavaScript计算行跨度 */
-/*
-function setMasonryItemHeight() {
-  const items = document.querySelectorAll('.masonry-item');
-  items.forEach(item => {
-    const height = item.getBoundingClientRect().height;
-    const rowSpan = Math.ceil(height / 10);
-    item.style.gridRowEnd = `span ${rowSpan}`;
-  });
-}
+/* JS计算示例：
+const height = item.getBoundingClientRect().height;
+const rowSpan = Math.ceil(height / 10);
+item.style.gridRowEnd = `span ${rowSpan}`;
 */</code></pre>"

@@ -1,151 +1,78 @@
 #separator:tab
 #html:true
-CSS3中如何实现圆角边框效果？	"<pre><code class=""language-css"">/* CSS3圆角边框实现 */
-.rounded-box {
-  /* 基本圆角 */
-  border-radius: 10px;
-  
-  /* 不同角度的圆角 */
+CSS3中如何实现圆角边框效果？	"<pre><code class=""language-css"">.rounded-box {
+  border-radius: 10px; /* 基本圆角 */
   border-radius: 10px 20px 30px 40px; /* 左上 右上 右下 左下 */
-  
-  /* 椭圆形圆角 */
-  border-radius: 50px / 25px; /* 水平半径 / 垂直半径 */
-  
-  /* 完全圆形 */
-  border-radius: 50%;
-  
-  /* 单独设置某个角 */
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  border-radius: 50px / 25px; /* 椭圆形 */
+  border-radius: 50%; /* 完全圆形 */
+  border-top-left-radius: 15px; /* 单独设置 */
 }</code></pre>"
-CSS3中box-shadow的完整语法和用法？	"<pre><code class=""language-css"">/* CSS3阴影效果完整语法 */
-.shadow-examples {
-  /* 基本外阴影：水平偏移 垂直偏移 模糊半径 阴影颜色 */
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
-  
-  /* 完整语法：水平 垂直 模糊 扩展 颜色 内/外 */
-  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.2);
-  
-  /* 内阴影 */
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+CSS3中box-shadow的完整语法和用法？	"<pre><code class=""language-css"">.shadow-examples {
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* 基本外阴影 */
+  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.2); /* 完整语法 */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* 内阴影 */
+  box-shadow: 0 0 20px #00ff00; /* 发光效果 */
   
   /* 多重阴影 */
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.1),
-    0 8px 16px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  
-  /* 发光效果 */
-  box-shadow: 0 0 20px #00ff00;
+    0 8px 16px rgba(0, 0, 0, 0.1);
 }</code></pre>"
-CSS3中background-clip属性的不同取值效果？	"<pre><code class=""language-css"">/* CSS3背景裁剪区域控制 */
-.bg-clip-demo {
-  padding: 20px;
-  border: 10px dashed #333;
+CSS3中background-clip属性的不同取值效果？	"<pre><code class=""language-css"">.bg-clip-demo {
   background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-  
-  /* 默认值：背景从边框开始显示 */
-  background-clip: border-box;
+  background-clip: border-box; /* 默认：从边框开始 */
+  background-clip: padding-box; /* 从内边距开始 */
+  background-clip: content-box; /* 只在内容区域 */
 }
 
-.bg-clip-padding {
-  /* 背景从内边距开始显示，不包含边框 */
-  background-clip: padding-box;
-}
-
-.bg-clip-content {
-  /* 背景只在内容区域显示 */
-  background-clip: content-box;
-}
-
-/* 实际应用：文字背景裁剪 */
+/* 文字背景裁剪 */
 .text-gradient {
   background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  font-size: 2em;
-  font-weight: bold;
 }</code></pre>"
-CSS3中background-size的各种取值含义？	"<pre><code class=""language-css"">/* CSS3背景尺寸控制 */
-.bg-size-examples {
-  width: 300px;
-  height: 200px;
+CSS3中background-size的各种取值含义？	"<pre><code class=""language-css"">.bg-size-examples {
   background-image: url('image.jpg');
   background-repeat: no-repeat;
   
-  /* 保持比例，完全包含在容器内 */
-  background-size: contain;
-}
-
-.bg-size-cover {
-  /* 保持比例，完全覆盖容器 */
-  background-size: cover;
-}
-
-.bg-size-exact {
-  /* 精确尺寸 */
-  background-size: 100px 150px;
-}
-
-.bg-size-percentage {
-  /* 百分比相对于容器 */
-  background-size: 50% 100%;
-}
-
-.bg-size-auto {
-  /* 自动尺寸（原始大小） */
-  background-size: auto;
+  background-size: contain; /* 完全包含 */
+  background-size: cover; /* 完全覆盖 */
+  background-size: 100px 150px; /* 精确尺寸 */
+  background-size: 50% 100%; /* 百分比 */
+  background-size: auto; /* 原始大小 */
 }</code></pre>"
-CSS3中如何实现文字阴影效果？	"<pre><code class=""language-css"">/* CSS3文字阴影效果 */
-.text-shadow-examples {
-  /* 基本文字阴影：水平偏移 垂直偏移 模糊半径 颜色 */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+CSS3中如何实现文字阴影效果？	"<pre><code class=""language-css"">.text-shadow-examples {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 基本阴影 */
 }
 
 .text-glow {
-  /* 发光效果 */
   color: #fff;
-  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; /* 发光 */
 }
 
 .text-3d {
-  /* 3D立体效果 */
   color: #fff;
   text-shadow: 
     1px 1px 0 #ccc,
     2px 2px 0 #c9c9c9,
-    3px 3px 0 #bbb,
-    4px 4px 0 #b9b9b9,
-    5px 5px 0 #aaa,
-    6px 6px 1px rgba(0,0,0,.1);
+    3px 3px 0 #bbb; /* 3D立体 */
 }
 
 .text-outline {
-  /* 文字描边效果 */
   color: #fff;
-  text-shadow: 
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000; /* 描边 */
 }</code></pre>"
-CSS3中RGBA和HSLA颜色模式的使用？	"<pre><code class=""language-css"">/* CSS3新颜色模式 */
-.rgba-examples {
-  /* RGBA：红 绿 蓝 透明度 */
+CSS3中RGBA和HSLA颜色模式的使用？	"<pre><code class=""language-css"">.rgba-examples {
   background-color: rgba(255, 0, 0, 0.5); /* 半透明红色 */
-  border-color: rgba(0, 255, 0, 0.8);     /* 80%透明度绿色 */
-  color: rgba(0, 0, 255, 1);              /* 完全不透明蓝色 */
+  border-color: rgba(0, 255, 0, 0.8); /* 80%透明度绿色 */
 }
 
 .hsla-examples {
-  /* HSLA：色相 饱和度 亮度 透明度 */
   background-color: hsla(120, 100%, 50%, 0.7); /* 绿色系 */
-  border-color: hsla(240, 100%, 50%, 0.5);     /* 蓝色系 */
-  color: hsla(0, 100%, 50%, 1);                /* 红色系 */
+  border-color: hsla(240, 100%, 50%, 0.5); /* 蓝色系 */
 }
 
-/* 实际应用：渐变背景 */
 .gradient-bg {
   background: linear-gradient(
     45deg,
@@ -153,14 +80,10 @@ CSS3中RGBA和HSLA颜色模式的使用？	"<pre><code class=""language-css"">/*
     hsla(240, 100%, 50%, 0.8)
   );
 }</code></pre>"
-CSS3 transition过渡效果的完整用法？	"<pre><code class=""language-css"">/* CSS3过渡效果 */
-.transition-basic {
+CSS3 transition过渡效果的完整用法？	"<pre><code class=""language-css"">.transition-basic {
   width: 100px;
-  height: 100px;
   background-color: #3498db;
-  
-  /* 简写语法：属性 时间 函数 延迟 */
-  transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s; /* 简写语法 */
 }
 
 .transition-basic:hover {
@@ -170,255 +93,107 @@ CSS3 transition过渡效果的完整用法？	"<pre><code class=""language-css""
 }
 
 .transition-detailed {
-  /* 分别设置各个属性 */
-  transition-property: width, background-color, transform;
-  transition-duration: 0.3s, 0.5s, 0.2s;
-  transition-timing-function: ease, ease-in-out, linear;
-  transition-delay: 0s, 0.1s, 0.2s;
-}
-
-/* 多属性过渡 */
-.multi-transition {
-  transition: 
-    width 0.3s ease,
-    height 0.5s ease-in-out 0.1s,
-    background-color 0.2s linear,
-    transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition-property: width, background-color;
+  transition-duration: 0.3s, 0.5s;
+  transition-timing-function: ease, ease-in-out;
+  transition-delay: 0s, 0.1s;
 }</code></pre>"
-CSS3 transform变换的各种用法？	"<pre><code class=""language-css"">/* CSS3 2D变换 */
-.transform-examples {
-  width: 100px;
-  height: 100px;
-  background-color: #3498db;
-  margin: 50px;
+CSS3 transform变换的各种用法？	"<pre><code class=""language-css"">.transform-examples {
+  transform-origin: center center;
   
-  /* 设置变换原点 */
-  transform-origin: center center; /* 默认值 */
-}
-
-.translate-demo {
-  /* 位移变换 */
-  transform: translate(50px, 30px);     /* X轴50px，Y轴30px */
-  transform: translateX(50px);          /* 只在X轴移动 */
-  transform: translateY(30px);          /* 只在Y轴移动 */
-}
-
-.scale-demo {
-  /* 缩放变换 */
-  transform: scale(1.5);                /* 等比例缩放1.5倍 */
-  transform: scale(2, 0.5);             /* X轴2倍，Y轴0.5倍 */
-  transform: scaleX(1.5);               /* 只在X轴缩放 */
-}
-
-.rotate-demo {
-  /* 旋转变换 */
-  transform: rotate(45deg);             /* 顺时针旋转45度 */
-  transform: rotate(-30deg);            /* 逆时针旋转30度 */
-}
-
-.skew-demo {
-  /* 倾斜变换 */
-  transform: skew(30deg, 20deg);        /* X轴倾斜30度，Y轴20度 */
-  transform: skewX(30deg);              /* 只在X轴倾斜 */
-}
-
-/* 组合变换 */
-.combined-transform {
+  transform: translate(50px, 30px); /* 位移 */
+  transform: scale(1.5); /* 缩放 */
+  transform: rotate(45deg); /* 旋转 */
+  transform: skew(30deg, 20deg); /* 倾斜 */
+  
+  /* 组合变换 */
   transform: translate(50px, 30px) rotate(45deg) scale(1.2);
 }</code></pre>"
-CSS3 animation动画的完整语法？	"<pre><code class=""language-css"">/* CSS3关键帧动画 */
-@keyframes slideIn {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    transform: translateX(10px);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
+CSS3 animation动画的完整语法？	"<pre><code class=""language-css"">@keyframes slideIn {
+  0% { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
 }
 
 .animation-basic {
-  /* 简写语法：名称 时间 函数 延迟 次数 方向 填充模式 播放状态 */
-  animation: slideIn 2s ease-in-out 0.5s infinite alternate both running;
+  animation: slideIn 2s ease-in-out 0.5s infinite alternate both;
 }
 
 .animation-detailed {
-  /* 分别设置各个属性 */
-  animation-name: slideIn;                    /* 动画名称 */
-  animation-duration: 2s;                     /* 持续时间 */
-  animation-timing-function: ease-in-out;     /* 时间函数 */
-  animation-delay: 0.5s;                      /* 延迟时间 */
-  animation-iteration-count: infinite;        /* 执行次数 */
-  animation-direction: alternate;             /* 播放方向 */
-  animation-fill-mode: both;                  /* 填充模式 */
-  animation-play-state: running;              /* 播放状态 */
-}
-
-/* 复杂动画示例 */
-@keyframes bounce {
-  0%, 20%, 53%, 80%, 100% {
-    transform: translate3d(0, 0, 0);
-  }
-  40%, 43% {
-    transform: translate3d(0, -30px, 0);
-  }
-  70% {
-    transform: translate3d(0, -15px, 0);
-  }
-  90% {
-    transform: translate3d(0, -4px, 0);
-  }
+  animation-name: slideIn;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
 }</code></pre>"
-CSS3中text-overflow属性的使用场景？	"<pre><code class=""language-css"">/* CSS3文本溢出处理 */
-.text-overflow-basic {
-  width: 200px;
-  white-space: nowrap;      /* 不换行 */
-  overflow: hidden;         /* 隐藏溢出 */
-  text-overflow: ellipsis;  /* 显示省略号 */
-}
-
-.text-overflow-clip {
+CSS3中text-overflow属性的使用场景？	"<pre><code class=""language-css"">.text-overflow-basic {
   width: 200px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: clip;      /* 直接裁剪，不显示省略号 */
+  text-overflow: ellipsis; /* 省略号 */
+}
+
+.text-overflow-clip {
+  text-overflow: clip; /* 直接裁剪 */
 }
 
 /* 多行文本省略 */
 .multiline-ellipsis {
-  width: 200px;
   display: -webkit-box;
-  -webkit-line-clamp: 3;              /* 显示3行 */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 实际应用：卡片标题 */
-.card-title {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 18px;
-  font-weight: bold;
 }</code></pre>"
-CSS3中word-wrap属性解决长单词换行问题？	"<pre><code class=""language-css"">/* CSS3单词换行控制 */
-.word-wrap-normal {
-  width: 200px;
-  border: 1px solid #ccc;
-  
-  /* 默认值：不在单词内换行 */
-  word-wrap: normal;
-  /* 长单词会溢出容器 */
+CSS3中word-wrap属性解决长单词换行问题？	"<pre><code class=""language-css"">.word-wrap-normal {
+  word-wrap: normal; /* 默认：不在单词内换行 */
 }
 
 .word-wrap-break {
-  width: 200px;
-  border: 1px solid #ccc;
-  
-  /* 允许在单词内换行 */
-  word-wrap: break-word;
-  /* 长单词会被强制换行 */
+  word-wrap: break-word; /* 允许在单词内换行 */
 }
 
-/* 现代语法（推荐使用） */
+/* 现代语法 */
 .overflow-wrap-demo {
-  width: 200px;
-  border: 1px solid #ccc;
-  
-  /* overflow-wrap 是 word-wrap 的标准名称 */
   overflow-wrap: break-word;
 }
 
-/* 配合其他属性使用 */
 .text-break-complete {
-  width: 200px;
-  word-wrap: break-word;      /* 长单词换行 */
-  word-break: break-all;      /* 任意字符间换行 */
-  hyphens: auto;              /* 自动连字符 */
+  word-wrap: break-word;
+  word-break: break-all;
+  hyphens: auto;
 }</code></pre>"
-CSS3中border-image的使用方法？	"<pre><code class=""language-css"">/* CSS3图片边框 */
-.border-image-basic {
-  width: 200px;
-  height: 150px;
+CSS3中border-image的使用方法？	"<pre><code class=""language-css"">.border-image-basic {
   border: 30px solid transparent;
-  
-  /* 简写语法：图片 切片 宽度 外扩 重复方式 */
   border-image: url('border.png') 30 30 repeat;
 }
 
 .border-image-detailed {
-  border: 20px solid transparent;
-  
-  /* 分别设置各个属性 */
-  border-image-source: url('decorative-border.png');
-  border-image-slice: 20 20 20 20;        /* 切片：上 右 下 左 */
-  border-image-width: 20px;               /* 边框宽度 */
-  border-image-outset: 0;                 /* 外扩距离 */
-  border-image-repeat: stretch;           /* 重复方式 */
-}
-
-/* 不同重复方式 */
-.border-repeat-stretch {
-  border-image-repeat: stretch;           /* 拉伸 */
-}
-
-.border-repeat-repeat {
-  border-image-repeat: repeat;            /* 重复 */
-}
-
-.border-repeat-round {
-  border-image-repeat: round;             /* 环绕重复 */
-}
-
-.border-repeat-space {
-  border-image-repeat: space;             /* 间隔重复 */
+  border-image-source: url('border.png');
+  border-image-slice: 20 20 20 20;
+  border-image-width: 20px;
+  border-image-repeat: stretch; /* stretch | repeat | round | space */
 }</code></pre>"
-CSS3渐变背景的实现方法？	"<pre><code class=""language-css"">/* CSS3线性渐变 */
-.linear-gradient-basic {
-  /* 基本线性渐变：从上到下 */
+CSS3渐变背景的实现方法？	"<pre><code class=""language-css"">/* 线性渐变 */
+.linear-gradient {
   background: linear-gradient(to bottom, #ff6b6b, #4ecdc4);
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
 }
 
-.linear-gradient-direction {
-  /* 不同方向的渐变 */
-  background: linear-gradient(to right, #ff6b6b, #4ecdc4);     /* 从左到右 */
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);        /* 45度角 */
-  background: linear-gradient(to top right, #ff6b6b, #4ecdc4); /* 到右上角 */
-}
-
-.linear-gradient-multi {
-  /* 多色渐变 */
+.multi-color {
   background: linear-gradient(
     90deg,
     #ff6b6b 0%,
     #feca57 25%,
     #48dbfb 50%,
-    #ff9ff3 75%,
     #54a0ff 100%
   );
 }
 
-/* CSS3径向渐变 */
-.radial-gradient-basic {
-  /* 基本径向渐变 */
+/* 径向渐变 */
+.radial-gradient {
   background: radial-gradient(circle, #ff6b6b, #4ecdc4);
-}
-
-.radial-gradient-position {
-  /* 指定渐变中心和形状 */
-  background: radial-gradient(
-    ellipse at top left,
-    #ff6b6b 0%,
-    #4ecdc4 50%,
-    #45b7d1 100%
-  );
+  background: radial-gradient(ellipse at top left, #ff6b6b, #4ecdc4);
 }
 
 /* 重复渐变 */
@@ -431,134 +206,79 @@ CSS3渐变背景的实现方法？	"<pre><code class=""language-css"">/* CSS3线
     #4ecdc4 20px
   );
 }</code></pre>"
-CSS3中如何实现响应式设计的媒体查询？	"<pre><code class=""language-css"">/* CSS3媒体查询实现响应式设计 */
-
-/* 基本媒体查询 */
+CSS3中如何实现响应式设计的媒体查询？	"<pre><code class=""language-css"">/* 基本媒体查询 */
 @media screen and (max-width: 768px) {
-  .container {
-    width: 100%;
-    padding: 10px;
-  }
-  
-  .sidebar {
-    display: none; /* 小屏幕隐藏侧边栏 */
-  }
+  .container { width: 100%; padding: 10px; }
+  .sidebar { display: none; }
 }
 
 /* 多断点响应式 */
-/* 手机端 */
 @media screen and (max-width: 480px) {
-  .grid {
-    grid-template-columns: 1fr; /* 单列布局 */
-  }
-  
-  .font-size {
-    font-size: 14px;
-  }
+  .grid { grid-template-columns: 1fr; }
 }
 
-/* 平板端 */
 @media screen and (min-width: 481px) and (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
-  }
+  .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* 桌面端 */
 @media screen and (min-width: 769px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr); /* 三列布局 */
-  }
+  .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* 高分辨率屏幕 */
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
-  .logo {
-    background-image: url('logo@2x.png');
-    background-size: 100px 50px;
-  }
-}
-
-/* 打印样式 */
-@media print {
-  .no-print {
-    display: none;
-  }
-  
-  body {
-    font-size: 12pt;
-    color: black;
-  }
+  .logo { background-image: url('logo@2x.png'); }
 }</code></pre>"
-CSS3 Flexbox布局的核心概念和用法？	"<pre><code class=""language-css"">/* CSS3 Flexbox弹性布局 */
-
-/* 容器属性 */
+CSS3 Flexbox布局的核心概念和用法？	"<pre><code class=""language-css"">/* 容器属性 */
 .flex-container {
-  display: flex;                    /* 启用flex布局 */
-  flex-direction: row;              /* 主轴方向：row | column */
-  flex-wrap: nowrap;                /* 换行：nowrap | wrap */
-  justify-content: center;          /* 主轴对齐：center | space-between */
-  align-items: center;              /* 交叉轴对齐：center | stretch */
-  align-content: center;            /* 多行对齐 */
-  gap: 10px;                        /* 项目间距 */
+  display: flex;
+  flex-direction: row; /* row | column */
+  flex-wrap: nowrap; /* nowrap | wrap */
+  justify-content: center; /* 主轴对齐 */
+  align-items: center; /* 交叉轴对齐 */
+  gap: 10px;
 }
 
 /* 项目属性 */
 .flex-item {
-  flex-grow: 1;                     /* 放大比例 */
-  flex-shrink: 1;                   /* 缩小比例 */
-  flex-basis: auto;                 /* 基础尺寸 */
-  flex: 1 1 auto;                   /* 简写：grow shrink basis */
-  align-self: center;               /* 单独对齐方式 */
-  order: 2;                         /* 排序 */
+  flex-grow: 1; /* 放大比例 */
+  flex-shrink: 1; /* 缩小比例 */
+  flex-basis: auto; /* 基础尺寸 */
+  flex: 1 1 auto; /* 简写 */
+  align-self: center;
+  order: 2;
 }
 
-/* 常用布局模式 */
+/* 常用布局 */
 .navbar {
   display: flex;
-  justify-content: space-between;   /* 两端对齐 */
+  justify-content: space-between;
   align-items: center;
 }
 
-.card-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.card-grid .card {
-  flex: 1 1 300px;                  /* 最小300px，自动伸缩 */
-}
-
-/* 垂直居中 */
 .center-content {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }</code></pre>"
-CSS3 Grid布局的基本用法？	"<pre><code class=""language-css"">/* CSS3 Grid网格布局 */
-
-/* 基本网格容器 */
+CSS3 Grid布局的基本用法？	"<pre><code class=""language-css"">/* 基本网格容器 */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);    /* 3列等宽 */
-  grid-template-rows: 100px auto 50px;      /* 3行不同高度 */
-  gap: 20px;                                /* 网格间距 */
-  grid-template-areas:                      /* 命名网格区域 */
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 100px auto 50px;
+  gap: 20px;
+  grid-template-areas:
     ""header header header""
     ""sidebar main main""
     ""footer footer footer"";
 }
 
 /* 网格项目定位 */
-.grid-item-1 {
-  grid-column: 1 / 3;                       /* 占据第1到第3列 */
-  grid-row: 1;                              /* 占据第1行 */
-}
-
-.grid-item-2 {
-  grid-area: sidebar;                       /* 使用命名区域 */
+.grid-item {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  grid-area: sidebar;
 }
 
 /* 响应式网格 */
@@ -568,23 +288,10 @@ CSS3 Grid布局的基本用法？	"<pre><code class=""language-css"">/* CSS3 Gri
   gap: 20px;
 }
 
-/* 复杂网格布局 */
-.complex-grid {
-  display: grid;
-  grid-template-columns: 200px 1fr 100px;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas:
-    ""nav nav nav""
-    ""aside content sidebar""
-    ""footer footer footer"";
-  min-height: 100vh;
-}
-
 /* 网格对齐 */
 .grid-alignment {
-  display: grid;
-  justify-items: center;                    /* 水平对齐 */
-  align-items: center;                      /* 垂直对齐 */
-  justify-content: space-around;            /* 整体水平分布 */
-  align-content: space-between;             /* 整体垂直分布 */
+  justify-items: center;
+  align-items: center;
+  justify-content: space-around;
+  align-content: space-between;
 }</code></pre>"

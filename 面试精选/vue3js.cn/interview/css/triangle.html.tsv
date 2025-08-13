@@ -1,21 +1,13 @@
 #separator:tab
 #html:true
 CSS如何实现一个向下的实心三角形？	"<pre><code class=""language-css"">.triangle-down {
-  /* 设置宽高为0，形成三角形基础 */
   width: 0;
   height: 0;
-  
-  /* 设置边框样式 */
   border-style: solid;
-  
-  /* 上边框50px，左右边框50px，下边框0 */
   border-width: 50px 50px 0;
-  
-  /* 左右边框透明，上边框红色 */
   border-color: #d9534f transparent transparent;
 }</code></pre>"
 CSS如何实现一个空心三角形？	"<pre><code class=""language-css"">.hollow-triangle {
-  /* 外层三角形 */
   width: 0;
   height: 0;
   border-style: solid;
@@ -25,72 +17,51 @@ CSS如何实现一个空心三角形？	"<pre><code class=""language-css"">.holl
 }
 
 .hollow-triangle:after {
-  /* 内层小三角形，形成空心效果 */
   content: '';
   border-style: solid;
   border-width: 0 40px 40px;
   border-color: transparent transparent #fff;
   position: absolute;
-  /* 微调位置实现空心效果 */
   top: 6px;
   left: -40px;
 }</code></pre>"
 CSS如何实现一个直角三角形？	"<pre><code class=""language-css"">.right-triangle {
-  /* 宽高设为0 */
   width: 0;
   height: 0;
-  
-  /* 只设置两条相邻的边框 */
   border-top: 85px solid #4285f4;
   border-right: 85px solid transparent;
-  
-  /* 其他边框不设置 */
-  margin: 50px;
 }</code></pre>"
 用JavaScript动态生成CSS三角形	"<pre><code class=""language-javascript"">function createTriangle(direction, size, color) {
-  // 创建三角形元素
   const triangle = document.createElement('div');
-  
-  // 基础样式
   triangle.style.width = '0';
   triangle.style.height = '0';
   triangle.style.borderStyle = 'solid';
   
-  // 根据方向设置不同的边框
   switch(direction) {
     case 'up':
-      // 向上三角形
       triangle.style.borderWidth = `0 ${size}px ${size}px`;
       triangle.style.borderColor = `transparent transparent ${color}`;
       break;
     case 'down':
-      // 向下三角形
       triangle.style.borderWidth = `${size}px ${size}px 0`;
       triangle.style.borderColor = `${color} transparent transparent`;
       break;
     case 'left':
-      // 向左三角形
       triangle.style.borderWidth = `${size}px ${size}px ${size}px 0`;
       triangle.style.borderColor = `transparent ${color} transparent transparent`;
       break;
     case 'right':
-      // 向右三角形
       triangle.style.borderWidth = `${size}px 0 ${size}px ${size}px`;
       triangle.style.borderColor = `transparent transparent transparent ${color}`;
       break;
   }
-  
   return triangle;
-}
-
-// 使用示例
-const redTriangle = createTriangle('down', 30, '#ff0000');
-document.body.appendChild(redTriangle);</code></pre>"
+}</code></pre>"
 CSS三角形的实现原理是什么？	"<pre><code class=""language-html"">CSS三角形实现原理：
 
-1. **边框特性**：CSS边框不是直线，而是梯形结构
-2. **盒模型操作**：将元素的width和height设为0
-3. **边框控制**：通过设置不同方向的边框宽度和颜色来形成三角形
+1. **边框特性**：CSS边框呈梯形结构
+2. **盒模型操作**：将元素width和height设为0
+3. **边框控制**：通过设置不同方向的边框宽度和颜色形成三角形
 
 **关键规律**：
 - 四边框同时存在时，每条边框呈梯形
@@ -98,37 +69,30 @@ CSS三角形的实现原理是什么？	"<pre><code class=""language-html"">CSS�
 - 仅保留邻边时，形成对分三角形
 - 通过transparent设置透明边框
 
-**应用场景**：
-- 下拉菜单箭头
-- 播放按钮
-- tooltip指向箭头
-- 面包屑导航分隔符</code></pre>"
+**应用场景**：下拉菜单箭头、播放按钮、tooltip指向箭头、面包屑导航分隔符</code></pre>"
 用Go语言模拟CSS三角形边框计算逻辑	"<pre><code class=""language-go"">package main
 
 import ""fmt""
 
-// 边框结构体
 type Border struct {
-	Width int    // 边框宽度
-	Color string // 边框颜色
-	Style string // 边框样式
+	Width int
+	Color string
+	Style string
 }
 
-// 三角形元素结构体
 type TriangleElement struct {
-	Width  int    // 元素宽度
-	Height int    // 元素高度
-	Top    Border // 上边框
-	Right  Border // 右边框
-	Bottom Border // 下边框
-	Left   Border // 左边框
+	Width  int
+	Height int
+	Top    Border
+	Right  Border
+	Bottom Border
+	Left   Border
 }
 
-// 创建向下三角形
 func CreateDownTriangle(size int, color string) TriangleElement {
 	return TriangleElement{
-		Width:  0, // 宽度设为0
-		Height: 0, // 高度设为0
+		Width:  0,
+		Height: 0,
 		Top:    Border{Width: size, Color: color, Style: ""solid""},
 		Right:  Border{Width: size, Color: ""transparent"", Style: ""solid""},
 		Bottom: Border{Width: 0, Color: ""transparent"", Style: ""solid""},
@@ -136,72 +100,42 @@ func CreateDownTriangle(size int, color string) TriangleElement {
 	}
 }
 
-// 创建向右三角形
-func CreateRightTriangle(size int, color string) TriangleElement {
-	return TriangleElement{
-		Width:  0,
-		Height: 0,
-		Top:    Border{Width: size, Color: ""transparent"", Style: ""solid""},
-		Right:  Border{Width: 0, Color: ""transparent"", Style: ""solid""},
-		Bottom: Border{Width: size, Color: ""transparent"", Style: ""solid""},
-		Left:   Border{Width: size, Color: color, Style: ""solid""},
-	}
-}
-
-// 生成CSS样式
 func (t TriangleElement) GenerateCSS() string {
-	return fmt.Sprintf(`
-.triangle {
+	return fmt.Sprintf(`.triangle {
   width: %dpx;
   height: %dpx;
   border-style: %s;
   border-width: %dpx %dpx %dpx %dpx;
   border-color: %s %s %s %s;
-}`,
-		t.Width, t.Height,
-		t.Top.Style,
+}`, t.Width, t.Height, t.Top.Style,
 		t.Top.Width, t.Right.Width, t.Bottom.Width, t.Left.Width,
 		t.Top.Color, t.Right.Color, t.Bottom.Color, t.Left.Color)
 }
 
 func main() {
-	// 创建向下红色三角形
 	downTriangle := CreateDownTriangle(50, ""#ff0000"")
 	fmt.Println(""向下三角形CSS:"", downTriangle.GenerateCSS())
-	
-	// 创建向右蓝色三角形
-	rightTriangle := CreateRightTriangle(30, ""#0000ff"")
-	fmt.Println(""向右三角形CSS:"", rightTriangle.GenerateCSS())
 }</code></pre>"
 如何实现响应式的CSS三角形？	"<pre><code class=""language-css"">.responsive-triangle {
-  /* 使用相对单位实现响应式 */
   width: 0;
   height: 0;
-  
-  /* 使用vw单位，相对于视口宽度 */
   border-style: solid;
   border-width: 0 5vw 5vw;
   border-color: transparent transparent #3498db;
-  
-  /* 媒体查询优化不同屏幕 */
 }
 
-/* 移动端优化 */
 @media (max-width: 768px) {
   .responsive-triangle {
     border-width: 0 3vw 3vw;
   }
 }
 
-/* 大屏幕优化 */
 @media (min-width: 1200px) {
   .responsive-triangle {
     border-width: 0 60px 60px;
-    /* 大屏幕使用固定像素值 */
   }
 }
 
-/* 使用CSS变量实现动态控制 */
 .dynamic-triangle {
   --triangle-size: 40px;
   width: 0;
@@ -210,8 +144,7 @@ func main() {
   border-width: 0 var(--triangle-size) var(--triangle-size);
   border-color: transparent transparent var(--triangle-color, #e74c3c);
 }</code></pre>"
-CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language-css"">/* 基础三角形 - 兼容所有现代浏览器 */
-.triangle-base {
+CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language-css"">.triangle-base {
   width: 0;
   height: 0;
   border-style: solid;
@@ -219,31 +152,23 @@ CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language
   border-color: transparent transparent #333;
 }
 
-/* IE6-8 兼容性处理 */
 .triangle-ie {
   width: 0;
   height: 0;
   border-style: solid;
   border-width: 0 25px 25px;
   border-color: transparent transparent #333;
-  
-  /* IE6-7 需要额外的hack */
   _border-color: transparent transparent #333;
   _filter: chroma(color=transparent);
 }
 
-/* 使用CSS Hack确保兼容性 */
 .triangle-compatible {
   width: 0;
   height: 0;
   border-style: solid;
   border-width: 0 25px 25px;
   border-color: transparent transparent #333;
-  
-  /* 针对IE的特殊处理 */
   *border-color: transparent transparent #333;
-  
-  /* 确保在所有浏览器中正确显示 */
   font-size: 0;
   line-height: 0;
 }</code></pre>"
@@ -252,10 +177,8 @@ CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language
     this.element = element;
     this.currentSize = 0;
     this.targetSize = 50;
-    this.animationSpeed = 2;
   }
   
-  // 设置三角形大小
   setTriangleSize(size, color = '#3498db') {
     this.element.style.width = '0';
     this.element.style.height = '0';
@@ -264,11 +187,10 @@ CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language
     this.element.style.borderColor = `transparent transparent ${color}`;
   }
   
-  // 动画放大效果
   animateGrow() {
     const animate = () => {
       if (this.currentSize < this.targetSize) {
-        this.currentSize += this.animationSpeed;
+        this.currentSize += 2;
         this.setTriangleSize(this.currentSize);
         requestAnimationFrame(animate);
       }
@@ -276,11 +198,9 @@ CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language
     animate();
   }
   
-  // 脉冲动画效果
   pulseAnimation() {
     let growing = true;
-    const minSize = 20;
-    const maxSize = 60;
+    const minSize = 20, maxSize = 60;
     
     const pulse = () => {
       if (growing) {
@@ -290,36 +210,9 @@ CSS三角形在不同浏览器中的兼容性处理	"<pre><code class=""language
         this.currentSize -= 1;
         if (this.currentSize <= minSize) growing = true;
       }
-      
       this.setTriangleSize(this.currentSize);
       requestAnimationFrame(pulse);
     };
     pulse();
   }
-  
-  // 旋转三角形（通过改变方向）
-  rotateTriangle() {
-    const directions = [
-      { width: '0 50px 50px', color: 'transparent transparent #e74c3c' },
-      { width: '50px 50px 0 0', color: 'transparent #e74c3c transparent transparent' },
-      { width: '50px 0 0 50px', color: '#e74c3c transparent transparent transparent' },
-      { width: '0 0 50px 50px', color: 'transparent transparent transparent #e74c3c' }
-    ];
-    
-    let currentDirection = 0;
-    
-    setInterval(() => {
-      const direction = directions[currentDirection];
-      this.element.style.borderWidth = direction.width;
-      this.element.style.borderColor = direction.color;
-      currentDirection = (currentDirection + 1) % directions.length;
-    }, 500);
-  }
-}
-
-// 使用示例
-const triangleElement = document.getElementById('triangle');
-const animator = new TriangleAnimator(triangleElement);
-
-// 启动脉冲动画
-animator.pulseAnimation();</code></pre>"
+}</code></pre>"
