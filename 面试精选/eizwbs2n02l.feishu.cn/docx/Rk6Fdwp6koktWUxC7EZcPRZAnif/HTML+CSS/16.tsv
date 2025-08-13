@@ -1,0 +1,199 @@
+#separator:tab
+#html:true
+CSS中哪些属性具有继承性？请用代码演示文本相关的可继承属性	"<pre><code class=""language-css"">/* 可继承的文本属性 */
+.parent {
+  color: blue;           /* 文本颜色 */
+  font-family: Arial;    /* 字体族 */
+  font-size: 16px;       /* 字体大小 */
+  font-weight: bold;     /* 字体粗细 */
+  line-height: 1.5;      /* 行高 */
+  text-align: center;    /* 文本对齐 */
+  text-indent: 2em;      /* 首行缩进 */
+  text-transform: uppercase; /* 文本转换 */
+  visibility: visible;   /* 可见性 */
+}
+
+/* 子元素自动继承父元素的这些属性 */
+.child {
+  /* 无需重复设置，自动继承父元素样式 */
+}</code></pre>"
+CSS中哪些属性不具有继承性？请用代码演示布局相关的不可继承属性	"<pre><code class=""language-css"">/* 不可继承的布局属性 */
+.parent {
+  /* 边框相关 */
+  border: 2px solid red;
+  border-width: 3px;
+  border-style: dashed;
+  border-color: green;
+  
+  /* 外边距和内边距 */
+  margin: 20px;
+  margin-top: 10px;
+  padding: 15px;
+  padding-left: 25px;
+  
+  /* 背景相关 */
+  background-color: yellow;
+  background-image: url('bg.jpg');
+  
+  /* 尺寸相关 */
+  width: 300px;
+  height: 200px;
+  
+  /* 定位相关 */
+  position: absolute;
+  top: 50px;
+  left: 100px;
+  
+  /* 显示相关 */
+  display: block;
+  float: left;
+}
+
+/* 子元素不会继承这些属性 */
+.child {
+  /* 需要单独设置布局属性 */
+}</code></pre>"
+如何在CSS中强制继承父元素的属性？请用代码演示inherit关键字的使用	"<pre><code class=""language-css"">/* 使用inherit关键字强制继承 */
+.parent {
+  border: 2px solid blue;  /* 边框通常不继承 */
+  background-color: lightgray;
+  width: 400px;
+}
+
+.child {
+  /* 强制继承父元素的边框 */
+  border: inherit;
+  
+  /* 强制继承父元素的背景色 */
+  background-color: inherit;
+  
+  /* 强制继承父元素的宽度 */
+  width: inherit;
+  
+  /* 也可以用于可继承属性 */
+  color: inherit;
+  font-size: inherit;
+}</code></pre>"
+如何阻止CSS属性的继承？请用代码演示initial和unset关键字	"<pre><code class=""language-css"">/* 阻止属性继承 */
+.parent {
+  color: red;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.child {
+  /* 重置为初始值，阻止继承 */
+  color: initial;        /* 重置为黑色 */
+  font-size: initial;    /* 重置为默认大小 */
+  
+  /* unset：可继承属性重置为继承值，不可继承属性重置为初始值 */
+  font-weight: unset;    /* 重置为继承值(bold) */
+  text-align: unset;     /* 重置为继承值(center) */
+  
+  /* 显式设置新值覆盖继承 */
+  color: blue;           /* 覆盖继承的红色 */
+}</code></pre>"
+请用JavaScript代码演示如何检测CSS属性的继承性	"<pre><code class=""language-javascript"">// 检测CSS属性继承性的函数
+function checkInheritance() {
+  // 创建父子元素
+  const parent = document.createElement('div');
+  const child = document.createElement('div');
+  parent.appendChild(child);
+  document.body.appendChild(parent);
+  
+  // 设置父元素样式
+  parent.style.color = 'red';           // 可继承
+  parent.style.fontSize = '20px';       // 可继承
+  parent.style.border = '1px solid blue'; // 不可继承
+  parent.style.margin = '10px';         // 不可继承
+  
+  // 获取子元素计算样式
+  const childStyles = getComputedStyle(child);
+  
+  console.log('继承检测结果:');
+  console.log('color继承:', childStyles.color);     // 应该是red
+  console.log('fontSize继承:', childStyles.fontSize); // 应该是20px
+  console.log('border继承:', childStyles.border);   // 应该是初始值
+  console.log('margin继承:', childStyles.margin);   // 应该是初始值
+  
+  // 清理DOM
+  document.body.removeChild(parent);
+}
+
+// 执行检测
+checkInheritance();</code></pre>"
+CSS继承的层级传递是如何工作的？请用代码演示多层级继承	"<pre><code class=""language-html"">&lt;!-- HTML结构 --&gt;
+&lt;div class=""grandparent""&gt;
+  &lt;div class=""parent""&gt;
+    &lt;div class=""child""&gt;
+      &lt;span class=""grandchild""&gt;文本内容&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+/* 祖父元素设置样式 */
+.grandparent {
+  color: blue;           /* 会传递到所有后代 */
+  font-family: Arial;    /* 会传递到所有后代 */
+  font-size: 18px;       /* 会传递到所有后代 */
+}
+
+/* 父元素部分覆盖 */
+.parent {
+  color: red;            /* 覆盖祖父的颜色 */
+  /* font-family和font-size继续继承 */
+}
+
+/* 子元素选择性覆盖 */
+.child {
+  font-size: 16px;       /* 覆盖继承的字体大小 */
+  /* color和font-family继续继承 */
+}
+
+/* 孙子元素完全继承 */
+.grandchild {
+  /* 继承: color(red), font-family(Arial), font-size(16px) */
+}
+&lt;/style&gt;</code></pre>"
+CSS继承在实际开发中有什么最佳实践？	"<pre><code class=""language-css"">/* CSS继承最佳实践 */
+
+/* 1. 在根元素设置全局样式 */
+html {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* 2. 利用继承减少重复代码 */
+.article {
+  font-family: Georgia, serif;  /* 文章使用衬线字体 */
+  line-height: 1.8;            /* 增加行高提高可读性 */
+}
+
+/* 3. 合理使用inherit关键字 */
+.button {
+  font-family: inherit;        /* 继承父元素字体 */
+  font-size: inherit;          /* 继承父元素字体大小 */
+  color: inherit;              /* 继承父元素颜色 */
+  background: transparent;
+  border: 1px solid currentColor; /* 使用当前文字颜色 */
+}
+
+/* 4. 避免过度依赖继承 */
+.special-text {
+  color: #007bff;              /* 明确设置特殊颜色 */
+  font-weight: bold;           /* 明确设置字体粗细 */
+}
+
+/* 5. 使用CSS自定义属性增强继承 */
+:root {
+  --primary-color: #007bff;
+  --text-color: #333;
+}
+
+.component {
+  color: var(--text-color);    /* 使用自定义属性 */
+}</code></pre>"

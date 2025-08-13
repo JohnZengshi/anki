@@ -1,0 +1,85 @@
+#separator:tab
+#html:true
+CSS line-height基本用法	"<pre><code class=""language-css"">/* line-height控制行间距 */
+.text {
+  line-height: 1.5;    /* 相对值，推荐 */
+  line-height: 24px;   /* 绝对值 */
+  line-height: 150%;   /* 百分比 */
+  line-height: normal; /* 默认值 */
+}</code></pre>"
+CSS height基本用法	"<pre><code class=""language-css"">/* height控制元素整体高度 */
+.container {
+  height: 200px;    /* 固定高度 */
+  height: 100%;     /* 相对父元素 */
+  height: auto;     /* 自动高度(默认) */
+  height: 50vh;     /* 视口高度的50% */
+}</code></pre>"
+line-height实现文本垂直居中	"<pre><code class=""language-css"">/* 单行文本垂直居中 */
+.center-text {
+  height: 50px;
+  line-height: 50px; /* 与height相等 */
+  text-align: center;
+}
+
+/* 多行文本居中需要其他方法 */
+.multi-line {
+  display: flex;
+  align-items: center;
+  height: 100px;
+}</code></pre>"
+height与line-height的区别演示	"<pre><code class=""language-html"">&lt;div class=""demo""&gt;
+  &lt;div class=""height-only""&gt;只设置height&lt;/div&gt;
+  &lt;div class=""lineheight-only""&gt;只设置line-height&lt;/div&gt;
+  &lt;div class=""both""&gt;两者都设置&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.height-only {
+  height: 60px;        /* 元素高度60px */
+  background: #f0f0f0;
+}
+
+.lineheight-only {
+  line-height: 60px;   /* 行高60px，元素高度自适应 */
+  background: #e0e0e0;
+}
+
+.both {
+  height: 60px;        /* 元素高度固定 */
+  line-height: 60px;   /* 文本垂直居中 */
+  background: #d0d0d0;
+}
+&lt;/style&gt;</code></pre>"
+JavaScript动态设置line-height和height	"<pre><code class=""language-javascript"">// 动态调整行高和高度
+function adjustTextLayout(element) {
+  const fontSize = parseInt(getComputedStyle(element).fontSize);
+  
+  // 设置合适的行高（通常是字体大小的1.2-1.6倍）
+  element.style.lineHeight = fontSize * 1.4 + 'px';
+  
+  // 根据内容设置最小高度
+  const lineCount = element.textContent.split('\n').length;
+  const minHeight = lineCount * fontSize * 1.4;
+  element.style.minHeight = minHeight + 'px';
+}
+
+// 使用示例
+const textElement = document.querySelector('.text-content');
+adjustTextLayout(textElement);</code></pre>"
+line-height继承特性	"<pre><code class=""language-css"">/* line-height的继承规则 */
+.parent {
+  font-size: 16px;
+  line-height: 1.5;    /* 无单位值，子元素继承比例 */
+}
+
+.parent-px {
+  font-size: 16px;
+  line-height: 24px;   /* 像素值，子元素继承固定值 */
+}
+
+.child {
+  font-size: 20px;
+  /* 继承父元素line-height */
+  /* 情况1: 继承1.5，实际行高 = 20px * 1.5 = 30px */
+  /* 情况2: 继承24px，实际行高 = 24px */
+}</code></pre>"

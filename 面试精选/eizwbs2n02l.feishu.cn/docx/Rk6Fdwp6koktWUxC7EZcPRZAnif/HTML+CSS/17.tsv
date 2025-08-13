@@ -1,0 +1,60 @@
+#separator:tab
+#html:true
+CSS如何实现0.5px细线？	"<pre><code class=""language-css"">.thin-line {
+  height: 1px;
+  background: #000;
+  transform: scaleY(0.5);
+  transform-origin: 0 0;
+}</code></pre>"
+用伪元素创建0.5px线	"<pre><code class=""language-css"">.container::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+  transform: scaleY(0.5);
+}</code></pre>"
+用border实现0.5px线	"<pre><code class=""language-css"">.border-line {
+  border-top: 0.5px solid #ddd;
+}
+
+/* 兼容性处理 */
+@media (-webkit-min-device-pixel-ratio: 2) {
+  .border-line {
+    border-top: 0.5px solid #ddd;
+  }
+}</code></pre>"
+用box-shadow实现细线	"<pre><code class=""language-css"">.shadow-line {
+  box-shadow: 0 0.5px 0 #ccc;
+}
+
+/* 四边细线 */
+.all-sides {
+  box-shadow: 
+    0 0.5px 0 #ccc,
+    0 -0.5px 0 #ccc;
+}</code></pre>"
+移动端0.5px最佳实践	"<pre><code class=""language-css"">.mobile-line::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: #e0e0e0;
+  transform: scaleY(0.5);
+}
+
+@media (-webkit-min-device-pixel-ratio: 3) {
+  .mobile-line::after {
+    transform: scaleY(0.33);
+  }
+}</code></pre>"
+JS检测0.5px支持	"<pre><code class=""language-javascript"">function supportsHalfPixel() {
+  const test = document.createElement('div');
+  test.style.border = '0.5px solid transparent';
+  document.body.appendChild(test);
+  
+  const supported = getComputedStyle(test).borderTopWidth === '0.5px';
+  document.body.removeChild(test);
+  
+  return supported;
+}</code></pre>"

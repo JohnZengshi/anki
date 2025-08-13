@@ -1,0 +1,117 @@
+#separator:tab
+#html:true
+CSS选择器优先级的权重计算规则是什么？	"内联样式：1000分<br>ID选择器：100分<br>类选择器、属性选择器、伪类：10分<br>元素选择器、伪元素：1分<br>通用选择器(*)：0分"
+CSS中!important声明的作用和使用示例？	"<pre><code class=""language-css"">/* !important具有最高优先级 */
+.normal {
+  color: blue;
+}
+
+.important {
+  color: red !important; /* 覆盖其他所有规则 */
+}
+
+/* 即使特异性更高，也会被!important覆盖 */
+#header .important {
+  color: green; /* 不会生效 */
+}</code></pre>"
+如何计算CSS选择器的特异性值？	"<pre><code class=""language-css"">/* 计算示例 */
+#header { /* 特异性: 100 (1个ID) */
+  color: red;
+}
+
+.menu-item { /* 特异性: 10 (1个类) */
+  color: blue;
+}
+
+ul li { /* 特异性: 2 (2个元素) */
+  color: green;
+}
+
+#nav .menu-item a { /* 特异性: 111 (1个ID + 1个类 + 1个元素) */
+  color: purple;
+}
+
+/* 内联样式 */
+/* <div style=""color: orange;""> 特异性: 1000 */</code></pre>"
+CSS中相同特异性的规则如何确定优先级？	"<pre><code class=""language-css"">/* 相同特异性时，后定义的规则覆盖前面的 */
+.button {
+  background-color: blue; /* 先定义 */
+}
+
+.button {
+  background-color: red;  /* 后定义，会覆盖上面的蓝色 */
+}
+
+/* 在不同CSS文件中也遵循此规则 */
+/* style1.css */
+.text { color: green; }
+
+/* style2.css (后加载) */
+.text { color: orange; } /* 会覆盖绿色 */</code></pre>"
+演示CSS选择器优先级的完整示例？	"<pre><code class=""language-html"">&lt;!-- HTML结构 --&gt;
+&lt;div id=""container"" class=""wrapper""&gt;
+  &lt;p class=""text highlight"" style=""color: purple;""&gt;优先级测试&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+/* 各种选择器的优先级比较 */
+p { color: black; }                    /* 特异性: 1 */
+.text { color: blue; }                 /* 特异性: 10 */
+.highlight { color: green !important; } /* !important最高 */
+#container p { color: red; }           /* 特异性: 101 */
+.wrapper .text { color: orange; }      /* 特异性: 20 */
+
+/* 最终显示绿色，因为!important优先级最高 */
+&lt;/style&gt;</code></pre>"
+CSS继承和优先级的关系是什么？	"<pre><code class=""language-css"">/* 继承的样式优先级最低 */
+body {
+  color: gray;        /* 会被子元素继承 */
+  font-size: 16px;
+}
+
+/* 直接指定的样式会覆盖继承的样式 */
+p {
+  color: black;       /* 覆盖继承的gray */
+  /* font-size继续继承16px */
+}
+
+/* 即使是通用选择器也比继承优先级高 */
+* {
+  color: blue;        /* 会覆盖继承的颜色 */
+}
+
+/* 继承无法覆盖直接指定的样式 */
+.parent {
+  color: red !important;
+}
+
+.child {
+  color: green;       /* 不会被父元素的!important影响 */
+}</code></pre>"
+如何避免CSS优先级冲突的最佳实践？	"<pre><code class=""language-css"">/* 1. 避免使用!important */
+.bad {
+  color: red !important; /* 难以维护 */
+}
+
+.good {
+  color: red;           /* 推荐方式 */
+}
+
+/* 2. 使用合理的选择器特异性 */
+/* 避免过度具体化 */
+.header .nav .menu .item .link { /* 过度具体 */
+  color: blue;
+}
+
+/* 推荐：使用类选择器 */
+.nav-link {
+  color: blue;
+}
+
+/* 3. 使用CSS模块化或BEM命名 */
+.block__element--modifier {
+  color: green;
+}
+
+/* 4. 合理组织CSS文件顺序 */
+/* base.css -> components.css -> pages.css -> utilities.css */</code></pre>"

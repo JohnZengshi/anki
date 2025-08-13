@@ -1,0 +1,51 @@
+#separator:tab
+#html:true
+CSS position有哪些值？	"<pre><code class=""language-css"">/* position的5个值 */
+.static { position: static; }     /* 默认值，文档流 */
+.relative { position: relative; } /* 相对定位 */
+.absolute { position: absolute; } /* 绝对定位 */
+.fixed { position: fixed; }       /* 固定定位 */
+.sticky { position: sticky; }     /* 粘性定位 */</code></pre>"
+relative相对定位特点	"<pre><code class=""language-css"">.relative-box {
+  position: relative;
+  top: 20px;        /* 相对原位置偏移 */
+  left: 30px;
+  /* 原空间仍保留，不脱离文档流 */
+}</code></pre>"
+absolute绝对定位用法	"<pre><code class=""language-css"">.container {
+  position: relative;  /* 定位上下文 */
+}
+
+.absolute-box {
+  position: absolute;
+  top: 0;
+  right: 0;           /* 相对于container定位 */
+  /* 脱离文档流 */
+}</code></pre>"
+fixed固定定位应用	"<pre><code class=""language-css"">.fixed-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;     /* 固定在视口，不随滚动 */
+}</code></pre>"
+sticky粘性定位实现	"<pre><code class=""language-css"">.sticky-header {
+  position: sticky;
+  top: 0;            /* 滚动到顶部时粘性 */
+  background: white;
+  /* 跨越阈值前relative，后fixed */
+}</code></pre>"
+z-index层叠顺序	"<pre><code class=""language-css"">.layer1 { position: relative; z-index: 1; }
+.layer2 { position: absolute; z-index: 2; }
+.layer3 { position: fixed; z-index: 3; }
+
+/* 数值越大层级越高，只对定位元素有效 */</code></pre>"
+JS动态改变position	"<pre><code class=""language-javascript"">const element = document.querySelector('.box');
+
+// 切换定位方式
+element.style.position = 'absolute';
+element.style.top = '50px';
+element.style.left = '100px';
+
+// 重置
+element.style.position = 'static';</code></pre>"

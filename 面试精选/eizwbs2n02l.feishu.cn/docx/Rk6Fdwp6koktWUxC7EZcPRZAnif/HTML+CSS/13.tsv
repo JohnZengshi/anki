@@ -1,0 +1,103 @@
+#separator:tab
+#html:true
+CSS3圆角边框如何实现？	"<pre><code class=""language-css"">/* 圆角边框 */
+.rounded {
+  border-radius: 10px; /* 四角圆角 */
+}
+
+.circle {
+  border-radius: 50%; /* 圆形 */
+}</code></pre>"
+CSS3阴影效果如何创建？	"<pre><code class=""language-css"">/* 盒子阴影 */
+.shadow {
+  box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+}
+
+/* 文字阴影 */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}</code></pre>"
+CSS3渐变背景如何设置？	"<pre><code class=""language-css"">/* 线性渐变 */
+.linear {
+  background: linear-gradient(to right, #ff0000, #0000ff);
+}
+
+/* 径向渐变 */
+.radial {
+  background: radial-gradient(circle, #ff0000, #0000ff);
+}</code></pre>"
+CSS3变换transform有哪些？	"<pre><code class=""language-css"">/* 2D变换 */
+.transform {
+  transform: rotate(45deg);        /* 旋转 */
+  transform: scale(1.5);           /* 缩放 */
+  transform: translate(50px, 100px); /* 平移 */
+  transform: skew(30deg, 20deg);   /* 倾斜 */
+}</code></pre>"
+CSS3过渡动画如何实现？	"<pre><code class=""language-css"">/* 过渡效果 */
+.transition {
+  transition: all 0.3s ease;
+}
+
+.transition:hover {
+  transform: scale(1.2);
+  background-color: red;
+}</code></pre>"
+CSS3关键帧动画如何创建？	"<pre><code class=""language-css"">/* 关键帧动画 */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animated {
+  animation: fadeIn 2s ease-in-out;
+}</code></pre>"
+CSS3多列布局如何设置？	"<pre><code class=""language-css"">/* 多列布局 */
+.columns {
+  column-count: 3;     /* 3列 */
+  column-gap: 20px;    /* 列间距 */
+  column-rule: 1px solid #ccc; /* 分割线 */
+}</code></pre>"
+CSS3网格布局Grid如何使用？	"<pre><code class=""language-css"">/* 网格布局 */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* 3列等分 */
+  gap: 20px;           /* 间距 */
+}
+
+.item {
+  grid-column: 1 / 3;  /* 跨2列 */
+}</code></pre>"
+CSS3自定义字体如何嵌入？	"<pre><code class=""language-css"">/* 自定义字体 */
+@font-face {
+  font-family: 'MyFont';
+  src: url('font.woff2') format('woff2');
+}
+
+.custom-font {
+  font-family: 'MyFont', sans-serif;
+}</code></pre>"
+CSS3变量如何定义和使用？	"<pre><code class=""language-css"">/* CSS变量 */
+:root {
+  --primary-color: #3498db;
+  --font-size: 16px;
+}
+
+.element {
+  color: var(--primary-color);
+  font-size: var(--font-size);
+}</code></pre>"
+CSS3透明度opacity有什么用？	"<pre><code class=""language-css"">/* 透明度 */
+.transparent {
+  opacity: 0.5;        /* 50%透明 */
+}
+
+.rgba-bg {
+  background: rgba(255, 0, 0, 0.3); /* 背景透明 */
+}</code></pre>"
+CSS3的3D变换有哪些？	"<pre><code class=""language-css"">/* 3D变换 */
+.transform-3d {
+  perspective: 1000px;  /* 透视 */
+  transform: rotateX(45deg); /* X轴旋转 */
+  transform: rotateY(45deg); /* Y轴旋转 */
+  transform: translateZ(100px); /* Z轴平移 */
+}</code></pre>"

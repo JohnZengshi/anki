@@ -1,0 +1,48 @@
+#separator:tab
+#html:true
+CSS浮动基本用法	"<pre><code class=""language-css"">/* 浮动三个值 */
+.left { float: left; }   /* 左浮动 */
+.right { float: right; } /* 右浮动 */
+.none { float: none; }   /* 不浮动(默认) */</code></pre>"
+浮动导致高度塌陷问题	"<pre><code class=""language-html"">&lt;div class=""parent""&gt;
+  &lt;div class=""child""&gt;&lt;/div&gt; &lt;!-- 浮动子元素 --&gt;
+&lt;/div&gt;
+&lt;!-- 父元素高度变为0 --&gt;
+
+&lt;style&gt;
+.child { float: left; width: 100px; height: 100px; }
+&lt;/style&gt;</code></pre>"
+清除浮动：clearfix方法	"<pre><code class=""language-css"">/* 经典clearfix */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* 使用 */
+.container { /* 添加clearfix类 */ }</code></pre>"
+清除浮动：overflow方法	"<pre><code class=""language-css"">/* 触发BFC解决塌陷 */
+.container {
+  overflow: hidden; /* 包含浮动子元素 */
+}
+
+.float-child {
+  float: left;
+  width: 100px;
+}</code></pre>"
+BFC实现两栏布局	"<pre><code class=""language-css"">/* 左固定右自适应 */
+.sidebar {
+  float: left;
+  width: 200px;
+}
+
+.main {
+  overflow: hidden; /* BFC不与浮动重叠 */
+}</code></pre>"
+现代替代方案：Flexbox	"<pre><code class=""language-css"">/* 推荐使用Flex替代浮动 */
+.container {
+  display: flex;
+}
+
+.sidebar { width: 200px; }
+.main { flex: 1; } /* 自适应 */</code></pre>"

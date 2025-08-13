@@ -1,0 +1,111 @@
+#separator:tab
+#html:true
+HTML5中text类型input的基本用法？	"<pre><code class=""language-html"">&lt;!-- 基本文本输入 --&gt;
+&lt;input type=""text"" name=""username"" placeholder=""请输入用户名"" maxlength=""20"" required&gt;
+
+&lt;!-- 带验证的文本输入 --&gt;
+&lt;input type=""text"" pattern=""[A-Za-z0-9]+"" title=""只能包含字母和数字""&gt;</code></pre>"
+HTML5中password类型input如何使用？	"<pre><code class=""language-html"">&lt;!-- 密码输入框 --&gt;
+&lt;input type=""password"" name=""password"" placeholder=""请输入密码"" minlength=""6"" required&gt;
+
+&lt;!-- 确认密码 --&gt;
+&lt;input type=""password"" name=""confirm-password"" placeholder=""确认密码""&gt;</code></pre>"
+HTML5中radio单选按钮如何实现？	"<pre><code class=""language-html"">&lt;!-- 单选按钮组 --&gt;
+&lt;input type=""radio"" id=""male"" name=""gender"" value=""male"" checked&gt;
+&lt;label for=""male""&gt;男&lt;/label&gt;
+
+&lt;input type=""radio"" id=""female"" name=""gender"" value=""female""&gt;
+&lt;label for=""female""&gt;女&lt;/label&gt;</code></pre>"
+HTML5中checkbox复选框如何使用？	"<pre><code class=""language-html"">&lt;!-- 复选框 --&gt;
+&lt;input type=""checkbox"" id=""hobby1"" name=""hobbies"" value=""reading""&gt;
+&lt;label for=""hobby1""&gt;阅读&lt;/label&gt;
+
+&lt;input type=""checkbox"" id=""hobby2"" name=""hobbies"" value=""music"" checked&gt;
+&lt;label for=""hobby2""&gt;音乐&lt;/label&gt;
+
+&lt;input type=""checkbox"" id=""agree"" name=""agreement"" required&gt;
+&lt;label for=""agree""&gt;我同意条款&lt;/label&gt;</code></pre>"
+HTML5中number数字输入如何设置？	"<pre><code class=""language-html"">&lt;!-- 数字输入 --&gt;
+&lt;input type=""number"" name=""age"" min=""1"" max=""120"" step=""1"" value=""25""&gt;
+
+&lt;!-- 小数输入 --&gt;
+&lt;input type=""number"" name=""price"" min=""0"" step=""0.01"" placeholder=""0.00""&gt;
+
+&lt;!-- 带单位的数字 --&gt;
+&lt;input type=""number"" name=""quantity"" min=""1"" max=""100"" value=""1""&gt;</code></pre>"
+HTML5中range滑动条如何实现？	"<pre><code class=""language-html"">&lt;!-- 基本滑动条 --&gt;
+&lt;input type=""range"" name=""volume"" min=""0"" max=""100"" value=""50""&gt;
+
+&lt;!-- 带步长的滑动条 --&gt;
+&lt;input type=""range"" name=""brightness"" min=""0"" max=""255"" step=""5"" value=""128""&gt;
+
+&lt;!-- 显示当前值 --&gt;
+&lt;input type=""range"" id=""slider"" oninput=""document.getElementById('output').value = this.value""&gt;
+&lt;output id=""output""&gt;50&lt;/output&gt;</code></pre>"
+HTML5中date和time日期时间输入如何使用？	"<pre><code class=""language-html"">&lt;!-- 日期输入 --&gt;
+&lt;input type=""date"" name=""birthday"" min=""1900-01-01"" max=""2023-12-31""&gt;
+
+&lt;!-- 时间输入 --&gt;
+&lt;input type=""time"" name=""appointment"" min=""09:00"" max=""18:00"" step=""900""&gt;
+
+&lt;!-- 日期时间组合 --&gt;
+&lt;input type=""datetime-local"" name=""meeting""&gt;</code></pre>"
+HTML5中file文件上传如何实现？	"<pre><code class=""language-html"">&lt;!-- 单文件上传 --&gt;
+&lt;input type=""file"" name=""avatar"" accept=""image/*""&gt;
+
+&lt;!-- 多文件上传 --&gt;
+&lt;input type=""file"" name=""documents"" multiple accept="".pdf,.doc,.docx""&gt;
+
+&lt;!-- 指定文件类型 --&gt;
+&lt;input type=""file"" name=""photo"" accept=""image/jpeg,image/png""&gt;</code></pre>"
+HTML5中color颜色选择器如何使用？	"<pre><code class=""language-html"">&lt;!-- 颜色选择器 --&gt;
+&lt;input type=""color"" name=""theme-color"" value=""#ff0000""&gt;
+
+&lt;!-- 带标签的颜色选择 --&gt;
+&lt;label for=""bg-color""&gt;背景颜色：&lt;/label&gt;
+&lt;input type=""color"" id=""bg-color"" name=""background"" value=""#ffffff""&gt;</code></pre>"
+HTML5中hidden、submit、reset、button类型如何使用？	"<pre><code class=""language-html"">&lt;!-- 隐藏字段 --&gt;
+&lt;input type=""hidden"" name=""csrf_token"" value=""abc123""&gt;
+
+&lt;!-- 表单控制按钮 --&gt;
+&lt;input type=""submit"" value=""提交表单""&gt;
+&lt;input type=""reset"" value=""重置表单""&gt;
+&lt;input type=""button"" value=""自定义按钮"" onclick=""alert('点击了按钮')""&gt;
+
+&lt;!-- 图片按钮 --&gt;
+&lt;input type=""image"" src=""submit.png"" alt=""提交"" width=""100"" height=""30""&gt;</code></pre>"
+HTML5新增input类型的验证和移动端优化？	"<pre><code class=""language-html"">&lt;!-- 邮箱验证 --&gt;
+&lt;input type=""email"" name=""email"" placeholder=""user@example.com"" required&gt;
+
+&lt;!-- URL验证 --&gt;
+&lt;input type=""url"" name=""website"" placeholder=""https://example.com""&gt;
+
+&lt;!-- 电话号码（移动端显示数字键盘） --&gt;
+&lt;input type=""tel"" name=""phone"" placeholder=""138-0000-0000""&gt;
+
+&lt;!-- 搜索框（移动端显示搜索键盘） --&gt;
+&lt;input type=""search"" name=""query"" placeholder=""搜索内容""&gt;</code></pre>"
+如何使用JavaScript处理HTML5 input事件？	"<pre><code class=""language-javascript"">// 监听input事件
+document.getElementById('myInput').addEventListener('input', function(e) {
+  console.log('输入值：', e.target.value);
+});
+
+// 表单验证
+function validateForm() {
+  const email = document.querySelector('input[type=""email""]');
+  const number = document.querySelector('input[type=""number""]');
+  
+  // 检查HTML5内置验证
+  if (!email.checkValidity()) {
+    alert('请输入有效的邮箱地址');
+    return false;
+  }
+  
+  // 自定义验证
+  if (number.value < 18) {
+    alert('年龄必须大于18岁');
+    return false;
+  }
+  
+  return true;
+}</code></pre>"

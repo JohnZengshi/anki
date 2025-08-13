@@ -1,298 +1,89 @@
 #separator:tab
 #html:true
-什么是重绘（Repaint）和回流（Reflow）？请用代码示例说明	"<pre><code class=""language-javascript"">// 重绘（Repaint）- 只改变外观，不影响布局
-function triggerRepaint() {
-  const element = document.getElementById('box');
-  // 以下操作只会触发重绘
-  element.style.color = 'red';           // 改变文字颜色
-  element.style.backgroundColor = 'blue'; // 改变背景色
-  element.style.visibility = 'hidden';    // 隐藏元素但保持占位
-}
+什么是重绘（Repaint）和回流（Reflow）？请用代码示例说明	"<pre><code class=""language-javascript"">// 重绘 - 只改变外观
+element.style.color = 'red';
+element.style.backgroundColor = 'blue';
 
-// 回流（Reflow）- 改变布局属性，成本更高
-function triggerReflow() {
-  const element = document.getElementById('box');
-  // 以下操作会触发回流（同时也会重绘）
-  element.style.width = '200px';    // 改变宽度
-  element.style.height = '100px';   // 改变高度
-  element.style.padding = '10px';   // 改变内边距
-  element.style.margin = '20px';    // 改变外边距
-  element.style.display = 'none';   // 完全移除元素
-}</code></pre>"
-如何使用CSS动画代替JavaScript动画来优化性能？	"<pre><code class=""language-css"">/* 推荐：使用CSS动画，利用GPU加速 */
-.optimized-animation {
-  /* 使用transform和opacity，不会触发回流 */
-  transition: transform 0.3s ease, opacity 0.3s ease;
+// 回流 - 改变布局，成本更高
+element.style.width = '200px';
+element.style.height = '100px';</code></pre>"
+如何使用CSS动画代替JavaScript动画来优化性能？	"<pre><code class=""language-css"">/* 推荐：使用transform，不触发回流 */
+.optimized {
+  transition: transform 0.3s ease;
 }
-
-.optimized-animation:hover {
-  /* 只触发重绘，性能更好 */
+.optimized:hover {
   transform: translateX(100px) scale(1.2);
-  opacity: 0.8;
 }
 
-/* 避免：直接改变布局属性 */
-.bad-animation {
-  transition: width 0.3s ease, left 0.3s ease;
-}
-
-.bad-animation:hover {
-  /* 会触发回流，性能较差 */
-  width: 200px;
-  left: 100px;
+/* 避免：改变布局属性 */
+.bad:hover {
+  width: 200px; /* 触发回流 */
 }</code></pre>"
-如何使用translate3d开启硬件加速？请提供代码示例	"<pre><code class=""language-javascript"">// 方法1：直接设置translate3d强制开启GPU加速
-function enableHardwareAcceleration() {
-  const element = document.querySelector('.animated-element');
-  
-  // 设置translate3d(0,0,0)开启硬件加速
-  element.style.transform = 'translate3d(0, 0, 0)';
-  
-  // 后续动画将利用GPU加速
-  element.addEventListener('click', () => {
-    element.style.transform = 'translate3d(100px, 50px, 0)';
-  });
-}
-
-// 方法2：CSS方式开启硬件加速
-/* CSS代码 */
+如何使用translate3d开启硬件加速？请提供代码示例	"<pre><code class=""language-javascript"">// 开启GPU加速
+element.style.transform = 'translate3d(0, 0, 0)';
+// 或使用CSS
 .gpu-accelerated {
-  /* 强制开启硬件加速 */
   transform: translate3d(0, 0, 0);
-  /* 或者使用 will-change 属性 */
   will-change: transform;
 }
 
-.gpu-accelerated.move {
-  /* 动画将在GPU上执行 */
-  transform: translate3d(200px, 100px, 0);
-  transition: transform 0.3s ease;
-}</code></pre>"
-如何使用requestAnimationFrame优化动画性能？	"<pre><code class=""language-javascript"">// 错误方式：使用setTimeout/setInterval
-function badAnimation() {
-  let position = 0;
-  const element = document.getElementById('box');
-  
-  // 问题：不与浏览器刷新率同步，可能造成卡顿
-  const timer = setInterval(() => {
-    position += 2;
-    element.style.left = position + 'px';
-    
-    if (position >= 300) {
-      clearInterval(timer);
-    }
-  }, 16); // 约60fps，但不精确
-}
+// 动画将在GPU上执行
+element.style.transform = 'translate3d(100px, 50px, 0)';</code></pre>"
+如何使用requestAnimationFrame优化动画性能？	"<pre><code class=""language-javascript"">// 错误：使用setInterval
+setInterval(() => {
+  element.style.left = position + 'px'; // 不同步
+}, 16);
 
-// 正确方式：使用requestAnimationFrame
-function goodAnimation() {
-  let position = 0;
-  const element = document.getElementById('box');
-  
-  function animate() {
-    position += 2;
-    // 使用transform避免回流
-    element.style.transform = `translateX(${position}px)`;
-    
-    if (position < 300) {
-      // 与浏览器刷新率同步，性能更好
-      requestAnimationFrame(animate);
-    }
-  }
-  
-  // 启动动画
-  requestAnimationFrame(animate);
-}</code></pre>"
-如何使用DocumentFragment减少DOM操作引起的回流？	"<pre><code class=""language-javascript"">// 错误方式：频繁操作DOM，触发多次回流
-function badDOMOperation() {
-  const container = document.getElementById('container');
-  
-  // 每次appendChild都会触发回流
-  for (let i = 0; i < 1000; i++) {
-    const div = document.createElement('div');
-    div.textContent = `Item ${i}`;
-    div.className = 'list-item';
-    container.appendChild(div); // 触发1000次回流！
-  }
-}
-
-// 正确方式：使用DocumentFragment批量操作
-function goodDOMOperation() {
-  const container = document.getElementById('container');
-  // 创建文档片段，不在DOM树中
-  const fragment = document.createDocumentFragment();
-  
-  // 在内存中构建DOM结构
-  for (let i = 0; i < 1000; i++) {
-    const div = document.createElement('div');
-    div.textContent = `Item ${i}`;
-    div.className = 'list-item';
-    fragment.appendChild(div); // 不触发回流
-  }
-  
-  // 一次性插入，只触发一次回流
-  container.appendChild(fragment);
-}
-
-// 进一步优化：结合CSS类批量修改样式
-function optimizedStyleChange() {
-  const elements = document.querySelectorAll('.target');
-  
-  // 避免逐个修改样式
-  elements.forEach(el => {
-    // 通过添加CSS类一次性改变多个样式
-    el.classList.add('optimized-style');
-  });
-}</code></pre>"
- position属性如何影响回流？请对比不同定位方式的性能	"<pre><code class=""language-javascript"">// 演示不同position属性对回流的影响
-function demonstratePositionImpact() {
-  const normalElement = document.querySelector('.normal');
-  const absoluteElement = document.querySelector('.absolute');
-  const fixedElement = document.querySelector('.fixed');
-  
-  // 1. 普通文档流元素 - 影响其他元素布局
-  function moveNormalElement() {
-    // 会影响后续元素的位置，触发大范围回流
-    normalElement.style.marginLeft = '100px';
-    console.log('普通元素移动：影响后续所有元素');
-  }
-  
-  // 2. 绝对定位元素 - 脱离文档流，减少回流影响
-  function moveAbsoluteElement() {
-    // 只影响自身和子元素，不影响其他元素
-    absoluteElement.style.left = '200px';
-    absoluteElement.style.top = '100px';
-    console.log('绝对定位元素移动：只影响自身');
-  }
-  
-  // 3. 固定定位元素 - 相对视口定位，影响最小
-  function moveFixedElement() {
-    // 相对于视口定位，几乎不影响其他元素
-    fixedElement.style.right = '50px';
-    fixedElement.style.bottom = '50px';
-    console.log('固定定位元素移动：影响最小');
-  }
-  
-  // 4. 使用transform优化 - 最佳性能
-  function optimizedMove() {
-    // 使用transform不会触发回流，只触发重绘
-    absoluteElement.style.transform = 'translate(100px, 50px)';
-    console.log('使用transform：性能最佳');
+// 正确：使用requestAnimationFrame
+function animate() {
+  element.style.transform = `translateX(${position}px)`;
+  if (position < 300) {
+    requestAnimationFrame(animate); // 与刷新率同步
   }
 }</code></pre>"
-visibility:hidden与display:none在性能上有什么区别？	"<pre><code class=""language-javascript"">// 对比visibility和display对性能的影响
-function compareVisibilityMethods() {
-  const element1 = document.querySelector('.test-element-1');
-  const element2 = document.querySelector('.test-element-2');
-  
-  // 方法1：使用display:none - 会触发回流
-  function hideWithDisplay() {
-    console.time('display-none');
-    element1.style.display = 'none'; // 元素完全移除，触发回流
-    console.timeEnd('display-none');
-    console.log('display:none - 元素从渲染树移除，触发回流');
-  }
-  
-  function showWithDisplay() {
-    console.time('display-block');
-    element1.style.display = 'block'; // 重新插入，再次触发回流
-    console.timeEnd('display-block');
-    console.log('display:block - 元素重新插入，再次触发回流');
-  }
-  
-  // 方法2：使用visibility:hidden - 只触发重绘
-  function hideWithVisibility() {
-    console.time('visibility-hidden');
-    element2.style.visibility = 'hidden'; // 元素不可见但占据空间，只触发重绘
-    console.timeEnd('visibility-hidden');
-    console.log('visibility:hidden - 元素保持占位，只触发重绘');
-  }
-  
-  function showWithVisibility() {
-    console.time('visibility-visible');
-    element2.style.visibility = 'visible'; // 重新可见，只触发重绘
-    console.timeEnd('visibility-visible');
-    console.log('visibility:visible - 元素重新可见，只触发重绘');
-  }
-  
-  // 方法3：使用opacity - 性能最佳
-  function hideWithOpacity() {
-    console.time('opacity-0');
-    element2.style.opacity = '0'; // 可以利用GPU加速
-    console.timeEnd('opacity-0');
-    console.log('opacity:0 - 可利用GPU加速，性能最佳');
-  }
-  
-  // 性能对比总结
-  console.log(`
-  性能排序（从好到差）：
-  1. opacity: 可GPU加速，只触发重绘
-  2. visibility: 只触发重绘
-  3. display: 触发回流和重绘
-  `);
-}</code></pre>"
-如何批量修改样式以减少回流次数？	"<pre><code class=""language-javascript"">// 错误方式：逐个修改样式属性
-function badStyleModification() {
-  const element = document.getElementById('target');
-  
-  // 每行都会触发一次回流，总共4次回流
-  element.style.width = '200px';    // 回流 1
-  element.style.height = '100px';   // 回流 2
-  element.style.padding = '10px';   // 回流 3
-  element.style.margin = '20px';    // 回流 4
-  
-  console.log('错误方式：触发了4次回流');
+如何使用DocumentFragment减少DOM操作引起的回流？	"<pre><code class=""language-javascript"">// 错误：频繁操作DOM
+for (let i = 0; i < 1000; i++) {
+  container.appendChild(div); // 1000次回流
 }
 
-// 正确方式1：使用cssText一次性修改
-function goodStyleModification1() {
-  const element = document.getElementById('target');
-  
-  // 一次性设置所有样式，只触发一次回流
-  element.style.cssText = `
-    width: 200px;
-    height: 100px;
-    padding: 10px;
-    margin: 20px;
-  `;
-  
-  console.log('正确方式1：只触发1次回流');
+// 正确：使用DocumentFragment
+const fragment = document.createDocumentFragment();
+for (let i = 0; i < 1000; i++) {
+  fragment.appendChild(div); // 内存中操作
 }
+container.appendChild(fragment); // 只有1次回流</code></pre>"
+position属性如何影响回流？请对比不同定位方式的性能	"<pre><code class=""language-javascript"">// 普通元素 - 影响后续元素
+normalElement.style.marginLeft = '100px'; // 大范围回流
 
-// 正确方式2：使用CSS类
-function goodStyleModification2() {
-  const element = document.getElementById('target');
-  
-  // 预定义CSS类
-  // .optimized-style {
-  //   width: 200px;
-  //   height: 100px;
-  //   padding: 10px;
-  //   margin: 20px;
-  // }
-  
-  // 通过添加类名一次性应用所有样式
-  element.classList.add('optimized-style');
-  
-  console.log('正确方式2：使用CSS类，只触发1次回流');
-}
+// 绝对定位 - 脱离文档流
+absoluteElement.style.left = '200px'; // 只影响自身
 
-// 正确方式3：离线操作DOM
-function goodStyleModification3() {
-  const element = document.getElementById('target');
-  const parent = element.parentNode;
-  
-  // 1. 将元素从DOM中移除（触发1次回流）
-  parent.removeChild(element);
-  
-  // 2. 离线修改样式（不触发回流）
-  element.style.width = '200px';
-  element.style.height = '100px';
-  element.style.padding = '10px';
-  element.style.margin = '20px';
-  
-  // 3. 重新插入DOM（触发1次回流）
-  parent.appendChild(element);
-  
-  console.log('正确方式3：离线操作，总共只触发2次回流');
-}</code></pre>"
+// 固定定位 - 相对视口
+fixedElement.style.right = '50px'; // 影响最小
+
+// 最佳：使用transform
+element.style.transform = 'translate(100px, 50px)'; // 只重绘</code></pre>"
+visibility:hidden与display:none在性能上有什么区别？	"<pre><code class=""language-javascript"">// display:none - 触发回流
+element.style.display = 'none'; // 元素完全移除
+
+// visibility:hidden - 只触发重绘
+element.style.visibility = 'hidden'; // 保持占位
+
+// opacity - 性能最佳
+element.style.opacity = '0'; // 可GPU加速
+
+// 性能排序：opacity > visibility > display</code></pre>"
+如何批量修改样式以减少回流次数？	"<pre><code class=""language-javascript"">// 错误：逐个修改
+element.style.width = '200px';  // 回流1
+element.style.height = '100px'; // 回流2
+
+// 正确1：使用cssText
+element.style.cssText = 'width:200px; height:100px;'; // 1次回流
+
+// 正确2：使用CSS类
+element.classList.add('optimized-style'); // 1次回流
+
+// 正确3：离线操作
+parent.removeChild(element); // 移除
+// 修改样式...
+parent.appendChild(element); // 重新插入</code></pre>"

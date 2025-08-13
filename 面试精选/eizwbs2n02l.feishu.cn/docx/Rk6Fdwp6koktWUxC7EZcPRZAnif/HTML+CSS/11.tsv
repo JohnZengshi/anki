@@ -1,0 +1,217 @@
+#separator:tab
+#html:true
+请用CSS实现一个完整的盒子模型示例，包含内容、内边距、边框和外边距	"<pre><code class=""language-css"">.box-model-example {
+  /* 内容区域大小 */
+  width: 200px;
+  height: 100px;
+  
+  /* 内边距 - 内容与边框之间的空间 */
+  padding: 20px;
+  
+  /* 边框 - 围绕内边距和内容 */
+  border: 3px solid #333;
+  
+  /* 外边距 - 元素与其他元素之间的空间 */
+  margin: 15px;
+  
+  /* 背景色用于可视化内容区域 */
+  background-color: #f0f0f0;
+}</code></pre>"
+请用JavaScript计算元素的盒子模型各部分尺寸	"<pre><code class=""language-javascript"">function getBoxModelInfo(element) {
+  // 获取元素的计算样式
+  const styles = window.getComputedStyle(element);
+  
+  // 内容区域尺寸
+  const contentWidth = element.clientWidth - 
+    parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
+  const contentHeight = element.clientHeight - 
+    parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+  
+  // 内边距
+  const padding = {
+    top: parseFloat(styles.paddingTop),
+    right: parseFloat(styles.paddingRight),
+    bottom: parseFloat(styles.paddingBottom),
+    left: parseFloat(styles.paddingLeft)
+  };
+  
+  // 边框
+  const border = {
+    top: parseFloat(styles.borderTopWidth),
+    right: parseFloat(styles.borderRightWidth),
+    bottom: parseFloat(styles.borderBottomWidth),
+    left: parseFloat(styles.borderLeftWidth)
+  };
+  
+  // 外边距
+  const margin = {
+    top: parseFloat(styles.marginTop),
+    right: parseFloat(styles.marginRight),
+    bottom: parseFloat(styles.marginBottom),
+    left: parseFloat(styles.marginLeft)
+  };
+  
+  return {
+    content: { width: contentWidth, height: contentHeight },
+    padding: padding,
+    border: border,
+    margin: margin
+  };
+}</code></pre>"
+请用CSS实现box-sizing属性的不同效果对比	"<pre><code class=""language-css"">/* 标准盒模型 - content-box（默认） */
+.content-box {
+  box-sizing: content-box;
+  width: 200px;  /* 仅内容区域宽度 */
+  height: 100px; /* 仅内容区域高度 */
+  padding: 20px;
+  border: 5px solid #333;
+  /* 实际总宽度 = 200 + 40(padding) + 10(border) = 250px */
+}
+
+/* IE盒模型 - border-box */
+.border-box {
+  box-sizing: border-box;
+  width: 200px;  /* 包含内容+内边距+边框的总宽度 */
+  height: 100px; /* 包含内容+内边距+边框的总高度 */
+  padding: 20px;
+  border: 5px solid #333;
+  /* 实际总宽度 = 200px（内容区域会自动调整） */
+  /* 内容区域宽度 = 200 - 40(padding) - 10(border) = 150px */
+}</code></pre>"
+请用JavaScript动态修改元素的盒子模型属性	"<pre><code class=""language-javascript"">function modifyBoxModel(elementId, options) {
+  const element = document.getElementById(elementId);
+  
+  if (!element) {
+    console.error('元素未找到');
+    return;
+  }
+  
+  // 修改内容尺寸
+  if (options.width) {
+    element.style.width = options.width + 'px';
+  }
+  if (options.height) {
+    element.style.height = options.height + 'px';
+  }
+  
+  // 修改内边距
+  if (options.padding) {
+    if (typeof options.padding === 'number') {
+      element.style.padding = options.padding + 'px';
+    } else {
+      // 支持对象形式 {top: 10, right: 15, bottom: 10, left: 15}
+      element.style.paddingTop = (options.padding.top || 0) + 'px';
+      element.style.paddingRight = (options.padding.right || 0) + 'px';
+      element.style.paddingBottom = (options.padding.bottom || 0) + 'px';
+      element.style.paddingLeft = (options.padding.left || 0) + 'px';
+    }
+  }
+  
+  // 修改边框
+  if (options.border) {
+    element.style.border = options.border;
+  }
+  
+  // 修改外边距
+  if (options.margin) {
+    if (typeof options.margin === 'number') {
+      element.style.margin = options.margin + 'px';
+    } else {
+      element.style.marginTop = (options.margin.top || 0) + 'px';
+      element.style.marginRight = (options.margin.right || 0) + 'px';
+      element.style.marginBottom = (options.margin.bottom || 0) + 'px';
+      element.style.marginLeft = (options.margin.left || 0) + 'px';
+    }
+  }
+  
+  // 修改盒模型类型
+  if (options.boxSizing) {
+    element.style.boxSizing = options.boxSizing;
+  }
+}
+
+// 使用示例
+modifyBoxModel('myBox', {
+  width: 300,
+  height: 200,
+  padding: {top: 15, right: 20, bottom: 15, left: 20},
+  border: '2px solid #666',
+  margin: 10,
+  boxSizing: 'border-box'
+});</code></pre>"
+CSS盒子模型的四个组成部分及其作用	"<pre><code class=""language-text"">1. Content（内容）
+   - 元素的实际内容区域
+   - 包含文本、图像等媒体内容
+   - 通过width和height属性控制大小
+
+2. Padding（内边距）
+   - 内容与边框之间的空白区域
+   - 增加元素内部空间
+   - 背景色会延伸到内边距区域
+   - 使用padding属性设置
+
+3. Border（边框）
+   - 围绕内边距和内容的边界线
+   - 可设置宽度、样式、颜色
+   - 使用border属性设置
+   - 边框会增加元素的总尺寸
+
+4. Margin（外边距）
+   - 元素与相邻元素之间的空白区域
+   - 控制元素间的距离
+   - 透明区域，不显示背景色
+   - 使用margin属性设置
+   - 相邻元素的外边距会发生合并</code></pre>"
+请用CSS实现响应式盒子模型布局	"<pre><code class=""language-css"">/* 响应式盒子模型容器 */
+.responsive-container {
+  /* 使用border-box确保尺寸计算一致 */
+  box-sizing: border-box;
+  
+  /* 基础样式 */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto; /* 水平居中 */
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+/* 响应式卡片 */
+.responsive-card {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* 平板设备 */
+@media (min-width: 768px) {
+  .responsive-card {
+    width: calc(50% - 10px); /* 两列布局，考虑间距 */
+    margin-right: 20px;
+    padding: 20px;
+  }
+  
+  .responsive-card:nth-child(even) {
+    margin-right: 0; /* 偶数项右边距为0 */
+  }
+}
+
+/* 桌面设备 */
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding: 40px;
+  }
+  
+  .responsive-card {
+    width: calc(33.333% - 14px); /* 三列布局 */
+    margin-right: 20px;
+    padding: 25px;
+  }
+  
+  .responsive-card:nth-child(3n) {
+    margin-right: 0; /* 每三个一组的最后一个右边距为0 */
+  }
+}</code></pre>"
