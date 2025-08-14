@@ -1,0 +1,105 @@
+#separator:tab
+#html:true
+React Hook解决了哪些问题？	"<pre><code class=""language-javascript"">// Hook解决的三大问题：
+// 1. 逻辑复用困难
+// 2. 生命周期管理复杂
+// 3. Class Component不友好
+
+// 传统Class组件问题示例
+class OldComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this); // this绑定
+  }
+}</code></pre>"
+Hook如何解决逻辑复用问题？	"<pre><code class=""language-javascript"">// 自定义Hook实现逻辑复用
+function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+  
+  const increment = () =&gt; setCount(count + 1);
+  const decrement = () =&gt; setCount(count - 1);
+  
+  return { count, increment, decrement };
+}
+
+// 在多个组件中复用
+function ComponentA() {
+  const { count, increment } = useCounter(0);
+  return &lt;button onClick={increment}&gt;{count}&lt;/button&gt;;
+}</code></pre>"
+Hook如何简化副作用管理？	"<pre><code class=""language-javascript"">// 使用useEffect统一管理副作用
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() =&gt; {
+    // 订阅
+    const subscription = fetchUser(userId);
+    
+    // 清理函数
+    return () =&gt; {
+      subscription.unsubscribe();
+    };
+  }, [userId]);
+  
+  return &lt;div&gt;{user?.name}&lt;/div&gt;;
+}</code></pre>"
+Class Component vs Function Component对比	"<pre><code class=""language-javascript"">// Class Component（复杂）
+class Counter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0 };
+  }
+  
+  render() {
+    return &lt;div&gt;{this.state.count}&lt;/div&gt;;
+  }
+}
+
+// Function Component + Hook（简洁）
+function Counter() {
+  const [count, setCount] = useState(0);
+  return &lt;div&gt;{count}&lt;/div&gt;;
+}</code></pre>"
+Hook的逻辑复用优势示例	"<pre><code class=""language-javascript"">// 可复用的数据获取Hook
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() =&gt; {
+    fetch(url)
+      .then(res =&gt; res.json())
+      .then(data =&gt; {
+        setData(data);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading };
+}</code></pre>"
+useEffect解决生命周期分散问题	"<pre><code class=""language-javascript"">// 传统方式：逻辑分散在多个生命周期
+componentDidMount() {
+  this.subscribe();
+}
+componentWillUnmount() {
+  this.unsubscribe();
+}
+
+// Hook方式：相关逻辑集中管理
+useEffect(() =&gt; {
+  const subscription = subscribe();
+  return () =&gt; subscription.unsubscribe();
+}, []);</code></pre>"
+Hook带来的开发体验提升	"<pre><code class=""language-javascript"">// Hook的优势：
+// 1. 无需this绑定
+// 2. 代码更简洁
+// 3. 更好的TypeScript支持
+// 4. 更容易测试
+
+function MyComponent() {
+  const [state, setState] = useState(0);
+  
+  // 直接使用，无需绑定this
+  const handleClick = () =&gt; setState(state + 1);
+  
+  return &lt;button onClick={handleClick}&gt;{state}&lt;/button&gt;;
+}</code></pre>"

@@ -1,0 +1,100 @@
+#separator:tab
+#html:true
+算法的定义和核心特征	"<pre><code class=""language-javascript"">// 算法定义：解题方案的准确而完整的描述
+// 核心特征：
+// 1. 有限性 - 有限步骤后结束
+// 2. 确切性 - 每步都有确切定义
+// 3. 输入 - 零个或多个输入
+// 4. 输出 - 一个或多个输出
+// 5. 可行性 - 步骤可执行
+
+// 公式：程序 = 算法 + 数据结构</code></pre>"
+算法的五大特性详解	"<pre><code class=""language-javascript"">// 算法五大特性
+const algorithmProperties = {
+  finiteness: '有限性 - 必须在有限步骤内结束',
+  definiteness: '确切性 - 每步都有明确定义',
+  input: '输入 - 零个或多个输入参数',
+  output: '输出 - 至少一个输出结果',
+  effectiveness: '可行性 - 每步都可实际执行'
+};</code></pre>"
+前端中虚拟DOM的数据结构	"<pre><code class=""language-javascript"">// 虚拟DOM数据结构示例
+const virtualDOM = {
+  type: 'div',
+  props: {
+    name: 'lucifer'
+  },
+  children: [{
+    type: 'span',
+    props: {},
+    children: []
+  }]
+};
+
+// Vue和React基于此结构实现diff算法</code></pre>"
+前缀树在前端联想功能中的应用	"<pre><code class=""language-javascript"">// 前缀树实现输入联想
+class TrieNode {
+  constructor() {
+    this.children = {};
+    this.isEndOfWord = false;
+    this.suggestions = [];
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+  
+  insert(word) {
+    // 插入单词到前缀树
+  }
+  
+  search(prefix) {
+    // 根据前缀返回建议
+  }
+}</code></pre>"
+最小编辑距离算法应用	"<pre><code class=""language-javascript"">// 字符串相似度检测
+function editDistance(str1, str2) {
+  const m = str1.length;
+  const n = str2.length;
+  const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+  
+  // 动态规划计算最小编辑距离
+  for (let i = 0; i &lt;= m; i++) {
+    for (let j = 0; j &lt;= n; j++) {
+      // 计算逻辑
+    }
+  }
+  
+  return dp[m][n];
+}
+
+// 示例："每日一题" vs "js每日一题"</code></pre>"
+抽象语法树AST在前端的作用	"<pre><code class=""language-javascript"">// AST在前端工具中的应用
+const astApplications = {
+  babel: '代码转换和编译',
+  postCSS: 'CSS处理和转换',
+  prettier: '代码格式化',
+  typescript: '类型检查和转换',
+  eslint: '代码质量检查'
+};
+
+// AST不涉及具体语法，可实现任意语法转换</code></pre>"
+算法在前端性能优化中的重要性	"<pre><code class=""language-javascript"">// 算法选择对性能的影响
+const performanceComparison = {
+  '暴力搜索': 'O(n²) - 性能较差',
+  '二分搜索': 'O(log n) - 性能优秀',
+  '哈希查找': 'O(1) - 性能最佳'
+};
+
+// 良好的算法思维能让程序效率更高
+// 选择合适的数据结构和算法是关键</code></pre>"
+前端常见算法应用场景总结	"<pre><code class=""language-javascript"">// 前端算法应用场景
+const frontendAlgorithms = {
+  '虚拟DOM': 'diff算法优化渲染性能',
+  '路由匹配': '字符串匹配算法',
+  '搜索功能': '前缀树、模糊匹配',
+  '数据排序': '快排、归并排序',
+  '缓存策略': 'LRU算法',
+  '防抖节流': '时间算法优化'
+};</code></pre>"

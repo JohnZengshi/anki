@@ -1,0 +1,108 @@
+#separator:tab
+#html:true
+时间复杂度和空间复杂度的定义	"<pre><code class=""language-javascript"">// 算法复杂度的两个维度
+const complexity = {
+  time: '执行算法所消耗的时间 - 时间复杂度',
+  space: '执行算法需要占用的内存空间 - 空间复杂度'
+};
+
+// 表示方法：T(n) = O(f(n))
+// 关注最坏情况下的复杂度</code></pre>"
+常见时间复杂度排序	"<pre><code class=""language-javascript"">// 时间复杂度从优到劣排序
+const timeComplexity = [
+  'O(1)',      // 常数型
+  'O(log n)',  // 对数型
+  'O(n)',      // 线性型
+  'O(nlog n)', // 线性对数型
+  'O(n²)',     // 平方型
+  'O(n³)',     // 立方型
+  'O(2^n)',    // 指数型
+  'O(n!)'      // 阶乘型
+];</code></pre>"
+时间复杂度计算示例-线性	"<pre><code class=""language-javascript"">function process(n) {
+  let a = 1;        // O(1)
+  let b = 2;        // O(1)
+  let sum = a + b;  // O(1)
+  
+  for(let i = 0; i &lt; n; i++) {  // O(n)
+    sum += i;
+  }
+  
+  return sum;       // O(1)
+}
+
+// T(n) = 3 + n + 1 = O(n)</code></pre>"
+时间复杂度计算示例-平方	"<pre><code class=""language-javascript"">function process(n) {
+  let count = 0;
+  
+  // 嵌套循环
+  for(let i = 0; i &lt; n; i++) {      // 外层循环 n 次
+    for(let j = 0; j &lt; n; j++) {    // 内层循环 n 次
+      count += 1;                   // 执行 n*n 次
+    }
+  }
+}
+
+// T(n) = n * n * 1 = O(n²)</code></pre>"
+时间复杂度计算示例-对数	"<pre><code class=""language-javascript"">function process(n) {
+  let i = 1;
+  
+  while (i &lt;= n) {
+    i = i * 2;  // 每次乘以2
+  }
+}
+
+// 循环条件：2^x &lt;= n
+// 解得：x &lt;= log₂n
+// 时间复杂度：O(log n)</code></pre>"
+顺序执行的时间复杂度计算	"<pre><code class=""language-javascript"">function process(n) {
+  // 第一部分：O(n)
+  for(let i = 0; i &lt; n; i++) {
+    console.log(i);
+  }
+  
+  // 第二部分：O(n²)
+  for(let i = 0; i &lt; n; i++) {
+    for(let j = 0; j &lt; n; j++) {
+      console.log(i, j);
+    }
+  }
+}
+
+// 总复杂度 = max(O(n), O(n²)) = O(n²)</code></pre>"
+空间复杂度O(1)示例	"<pre><code class=""language-javascript"">// 空间复杂度 O(1) - 常数空间
+function constantSpace() {
+  let a = 1;  // 固定空间
+  let b = 2;  // 固定空间
+  let c = 3;  // 固定空间
+  
+  return a + b + c;
+}
+
+// 临时空间不随n变化，空间复杂度为O(1)</code></pre>"
+空间复杂度O(n)示例	"<pre><code class=""language-javascript"">// 空间复杂度 O(n) - 线性空间
+function linearSpace(n) {
+  let arr = [];  // 动态数组
+  
+  for(let i = 1; i &lt;= n; i++) {
+    arr.push(i);  // 数组大小随n增长
+  }
+  
+  return arr;
+}
+
+// 一维数组空间复杂度：O(n)
+// 二维数组空间复杂度：O(n²)</code></pre>"
+算法复杂度权衡考虑	"<pre><code class=""language-javascript"">// 时间与空间的权衡
+const tradeOff = {
+  '时间优先': {
+    strategy: '用空间换时间',
+    example: '哈希表查找 O(1)时间，O(n)空间'
+  },
+  '空间优先': {
+    strategy: '用时间换空间',
+    example: '遍历查找 O(n)时间，O(1)空间'
+  }
+};
+
+// 需要根据实际场景选择合适的算法</code></pre>"

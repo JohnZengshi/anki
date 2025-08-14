@@ -1,0 +1,137 @@
+#separator:tab
+#html:true
+数据结构的定义和作用是什么？	"<pre><code class=""language-javascript"">// 数据结构定义
+// 计算机存储、组织数据的方式
+// 相互之间存在特定关系的数据元素集合
+
+// 核心公式
+程序 = 算法 + 数据结构
+
+// 作用
+// 1. 提高运行效率
+// 2. 提高存储效率
+// 3. 是实现算法的基础</code></pre>"
+数据结构有哪四类基本结构？	"<pre><code class=""language-javascript"">// 四类基本结构
+
+// 1. 集合结构
+// 数据元素间关系：""属于同一个集合""
+const set = new Set([1, 2, 3, 4]);
+
+// 2. 线性结构
+// 数据元素间关系：一对一
+const array = [1, 2, 3, 4];
+
+// 3. 树型结构
+// 数据元素间关系：一对多
+const tree = {
+  value: 1,
+  children: [
+    { value: 2, children: [] },
+    { value: 3, children: [] }
+  ]
+};
+
+// 4. 图形结构（网状结构）
+// 数据元素间关系：多对多
+const graph = {
+  A: ['B', 'C'],
+  B: ['A', 'D'],
+  C: ['A', 'D'],
+  D: ['B', 'C']
+};</code></pre>"
+线性结构有哪些？各有什么特点？	"<pre><code class=""language-javascript"">// 线性结构：有序数据元素集合，一对一关系
+
+// 1. 数组 - 相同类型变量的有序集合
+const arr = [1, 2, 3, 4, 5];
+console.log(arr[0]); // 随机访问，O(1)
+
+// 2. 栈 - 先进后出（LIFO）
+class Stack {
+  constructor() {
+    this.items = [];
+  }
+  push(item) { this.items.push(item); }
+  pop() { return this.items.pop(); }
+}
+
+// 3. 队列 - 先进先出（FIFO）
+class Queue {
+  constructor() {
+    this.items = [];
+  }
+  enqueue(item) { this.items.push(item); }
+  dequeue() { return this.items.shift(); }
+}
+
+// 4. 链表 - 非连续存储，指针连接
+class ListNode {
+  constructor(val) {
+    this.val = val;
+    this.next = null;
+  }
+}</code></pre>"
+非线性结构有哪些？各有什么特点？	"<pre><code class=""language-javascript"">// 非线性结构：不保持线性序列
+
+// 1. 树 - 一对多关系，有且仅有一个根节点
+class TreeNode {
+  constructor(val) {
+    this.val = val;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+// 2. 图 - 多对多关系，顶点和边
+class Graph {
+  constructor() {
+    this.vertices = {};
+  }
+  addVertex(vertex) {
+    this.vertices[vertex] = [];
+  }
+  addEdge(v1, v2) {
+    this.vertices[v1].push(v2);
+    this.vertices[v2].push(v1);
+  }
+}
+
+// 3. 堆 - 特殊树形结构，根节点值最小/最大
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+  getMin() { return this.heap[0]; }
+}
+
+// 4. 散列表 - 键值对存储，哈希函数映射
+const hashTable = new Map();
+hashTable.set('key', 'value');</code></pre>"
+如何选择合适的数据结构？	"<pre><code class=""language-javascript"">// 数据结构选择原则
+
+// 1. 根据数据访问模式
+if (需要随机访问) {
+  使用数组; // O(1)访问
+} else if (需要频繁插入删除) {
+  使用链表; // O(1)插入删除
+}
+
+// 2. 根据操作特性
+if (需要LIFO操作) {
+  使用栈; // 函数调用、表达式求值
+} else if (需要FIFO操作) {
+  使用队列; // 任务调度、BFS
+}
+
+// 3. 根据查找需求
+if (需要快速查找) {
+  使用散列表; // O(1)平均查找
+} else if (需要有序查找) {
+  使用二叉搜索树; // O(log n)查找
+}
+
+// 4. 根据关系复杂度
+if (一对多关系) {
+  使用树结构; // 文件系统、组织架构
+} else if (多对多关系) {
+  使用图结构; // 社交网络、路径规划
+}</code></pre>"
