@@ -1,0 +1,66 @@
+#separator:tab
+#html:true
+CSS display属性三种值的区别	"<pre><code class=""language-css"">/* 三种display值的基本用法 */
+.block {
+  display: block;        /* 块级：独占一行，可设宽高 */
+}
+
+.inline {
+  display: inline;       /* 内联：同行排列，不可设宽高 */
+}
+
+.inline-block {
+  display: inline-block; /* 内联块：同行排列，可设宽高 */
+}</code></pre>"
+block元素特性演示	"<pre><code class=""language-css"">/* 块级元素特点 */
+.block-demo {
+  display: block;
+  width: 200px;          /* 可设置宽度 */
+  height: 100px;         /* 可设置高度 */
+  margin: 20px;          /* 四个方向margin都生效 */
+  padding: 15px;         /* 四个方向padding都生效 */
+  background: #f0f0f0;
+  /* 自动独占一行 */
+}</code></pre>"
+inline元素特性演示	"<pre><code class=""language-css"">/* 内联元素特点 */
+.inline-demo {
+  display: inline;
+  /* width: 200px;  无效，不能设置宽度 */
+  /* height: 100px; 无效，不能设置高度 */
+  margin: 0 20px;        /* 只有左右margin生效 */
+  padding: 0 15px;       /* 只有左右padding生效 */
+  background: #e0e0e0;
+  /* 在同一行内排列 */
+}</code></pre>"
+inline-block元素特性演示	"<pre><code class=""language-css"">/* 内联块元素特点 */
+.inline-block-demo {
+  display: inline-block;
+  width: 150px;          /* 可设置宽度 */
+  height: 80px;          /* 可设置高度 */
+  margin: 10px;          /* 四个方向margin都生效 */
+  padding: 10px;         /* 四个方向padding都生效 */
+  background: #d0d0d0;
+  vertical-align: top;   /* 可控制垂直对齐 */
+  /* 在同一行内排列但可控制尺寸 */
+}</code></pre>"
+JavaScript动态切换display	"<pre><code class=""language-javascript"">// 动态切换元素的display属性
+function toggleDisplay(element, displayType) {
+  const currentDisplay = getComputedStyle(element).display;
+  
+  // 切换不同的display值
+  switch(displayType) {
+    case 'block':
+      element.style.display = 'block';
+      break;
+    case 'inline':
+      element.style.display = 'inline';
+      break;
+    case 'inline-block':
+      element.style.display = 'inline-block';
+      break;
+    default:
+      element.style.display = 'block';
+  }
+  
+  console.log(`Display changed from ${currentDisplay} to ${displayType}`);
+}</code></pre>"

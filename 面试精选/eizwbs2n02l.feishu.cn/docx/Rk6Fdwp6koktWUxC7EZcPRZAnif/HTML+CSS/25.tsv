@@ -1,0 +1,129 @@
+#separator:tab
+#html:true
+CSS定义关键帧动画的基本语法	"<pre><code class=""language-css"">/* 定义关键帧动画 */
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%); /* 起始位置 */
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-20%); /* 中间位置 */
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0); /* 结束位置 */
+    opacity: 1;
+  }
+}
+
+/* 应用动画到元素 */
+.animated-element {
+  animation: slideIn 2s ease-in-out;
+}</code></pre>"
+CSS动画的完整属性设置	"<pre><code class=""language-css"">.element {
+  /* 动画名称 */
+  animation-name: myAnimation;
+  /* 持续时间 */
+  animation-duration: 2s;
+  /* 缓动函数 */
+  animation-timing-function: ease-in-out;
+  /* 延迟时间 */
+  animation-delay: 0.5s;
+  /* 重复次数 */
+  animation-iteration-count: infinite;
+  /* 播放方向 */
+  animation-direction: alternate;
+  /* 填充模式 */
+  animation-fill-mode: forwards;
+  /* 播放状态 */
+  animation-play-state: running;
+}
+
+/* 简写形式 */
+.element-short {
+  animation: myAnimation 2s ease-in-out 0.5s infinite alternate forwards;
+}</code></pre>"
+JavaScript控制CSS动画的播放和暂停	"<pre><code class=""language-javascript"">// 获取元素
+const element = document.querySelector('.animated-element');
+
+// 动态添加动画类
+function startAnimation() {
+  element.classList.add('slide-in');
+  console.log('动画开始');
+}
+
+// 暂停动画
+function pauseAnimation() {
+  element.style.animationPlayState = 'paused';
+  console.log('动画暂停');
+}
+
+// 恢复动画
+function resumeAnimation() {
+  element.style.animationPlayState = 'running';
+  console.log('动画恢复');
+}
+
+// 监听动画事件
+element.addEventListener('animationstart', () => {
+  console.log('动画开始事件触发');
+});
+
+element.addEventListener('animationend', () => {
+  console.log('动画结束事件触发');
+});</code></pre>"
+CSS实现淡入淡出动画效果	"<pre><code class=""language-css"">/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 淡出动画 */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}</code></pre>"
+JavaScript检测动画完成并执行回调	"<pre><code class=""language-javascript"">// 动画完成后执行回调函数
+function animateElement(element, animationName, callback) {
+  // 添加动画类
+  element.style.animation = `${animationName} 1s ease-in-out forwards`;
+  
+  // 监听动画结束事件
+  element.addEventListener('animationend', function handler() {
+    console.log(`动画 ${animationName} 完成`);
+    
+    // 移除事件监听器
+    element.removeEventListener('animationend', handler);
+    
+    // 执行回调函数
+    if (callback && typeof callback === 'function') {
+      callback();
+    }
+  });
+}
+
+// 使用示例
+const box = document.querySelector('.box');
+animateElement(box, 'slideIn', () => {
+  console.log('动画完成，执行后续操作');
+});</code></pre>"

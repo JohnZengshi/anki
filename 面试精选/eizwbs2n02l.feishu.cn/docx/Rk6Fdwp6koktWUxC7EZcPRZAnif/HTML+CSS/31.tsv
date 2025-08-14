@@ -1,0 +1,95 @@
+#separator:tab
+#html:true
+如何在Less中定义和使用变量？	"<pre><code class=""language-css"">/* Less变量定义和使用 */
+@primary-color: #007acc; /* 定义变量 */
+@font-size: 16px;
+@border-radius: 4px;
+
+.button {
+  background-color: @primary-color; /* 使用变量 */
+  font-size: @font-size;
+  border-radius: @border-radius;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+}
+
+/* 变量运算 */
+.large-button {
+  font-size: @font-size * 1.2; /* 变量计算 */
+  padding: (@font-size / 2) (@font-size * 1.5);
+}</code></pre>"
+如何在SCSS中定义和使用变量？	"<pre><code class=""language-css"">/* SCSS变量定义和使用 */
+$primary-color: #007acc; /* 定义变量 */
+$font-size: 16px;
+$border-radius: 4px;
+
+.button {
+  background-color: $primary-color; /* 使用变量 */
+  font-size: $font-size;
+  border-radius: $border-radius;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+}
+
+/* 变量运算 */
+.large-button {
+  font-size: $font-size * 1.2; /* 变量计算 */
+  padding: ($font-size / 2) ($font-size * 1.5);
+}</code></pre>"
+如何在Less中实现嵌套和Mixin？	"<pre><code class=""language-css"">/* Less嵌套和Mixin */
+.border-radius(@radius: 5px) { /* 定义Mixin */
+  border-radius: @radius;
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  .border-radius(8px); /* 使用Mixin */
+  
+  .header { /* 嵌套选择器 */
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    
+    &:hover { /* 父选择器引用 */
+      color: #007acc;
+    }
+  }
+  
+  .content {
+    line-height: 1.6;
+    color: #666;
+  }
+}</code></pre>"
+如何在SCSS中实现嵌套和Mixin？	"<pre><code class=""language-css"">/* SCSS嵌套和Mixin */
+@mixin border-radius($radius: 5px) { /* 定义Mixin */
+  border-radius: $radius;
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  @include border-radius(8px); /* 使用Mixin */
+  
+  .header { /* 嵌套选择器 */
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    
+    &:hover { /* 父选择器引用 */
+      color: #007acc;
+    }
+  }
+  
+  .content {
+    line-height: 1.6;
+    color: #666;
+  }
+}</code></pre>"
+Less和SCSS的主要语法区别有哪些？	"• **变量定义**：Less使用@符号，SCSS使用$符号\n• **Mixin定义**：Less直接用类名定义，SCSS使用@mixin关键字\n• **Mixin调用**：Less直接调用类名，SCSS使用@include关键字\n• **文件扩展名**：Less使用.less，SCSS使用.scss\n• **编译工具**：Less可在浏览器端编译，SCSS需要预编译\n• **语法风格**：SCSS更接近标准CSS语法，Less语法更简洁"

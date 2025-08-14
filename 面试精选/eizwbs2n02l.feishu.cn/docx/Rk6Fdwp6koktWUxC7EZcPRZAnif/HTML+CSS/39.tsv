@@ -1,0 +1,68 @@
+#separator:tab
+#html:true
+CSS中px单位的特点	"<pre><code class=""language-css"">/* px是绝对单位，不会自动缩放 */
+.element {
+  width: 200px;
+  height: 100px;
+  font-size: 16px;
+}
+/* 在高分辨率屏幕上可能显得很小 */</code></pre>"
+CSS中rpx单位的使用场景	"<pre><code class=""language-css"">/* rpx主要用于微信小程序 */
+.container {
+  width: 750rpx; /* 等于屏幕宽度 */
+  height: 200rpx;
+}
+/* 基于屏幕宽度自动缩放 */</code></pre>"
+CSS中vw单位的计算方式	"<pre><code class=""language-css"">/* 1vw = 视窗宽度的1% */
+.full-width {
+  width: 100vw; /* 占满整个视窗宽度 */
+}
+.half-width {
+  width: 50vw; /* 占视窗宽度的一半 */
+}</code></pre>"
+CSS中vh单位的应用示例	"<pre><code class=""language-css"">/* 1vh = 视窗高度的1% */
+.full-height {
+  height: 100vh; /* 占满整个视窗高度 */
+}
+.hero-section {
+  height: 80vh; /* 占视窗高度的80% */
+}</code></pre>"
+CSS中rem单位的基准和用法	"<pre><code class=""language-css"">/* rem基于根元素(html)的字体大小 */
+html {
+  font-size: 16px; /* 根元素字体大小 */
+}
+.title {
+  font-size: 2rem; /* 32px */
+  margin: 1rem; /* 16px */
+}</code></pre>"
+CSS中em单位的继承特性	"<pre><code class=""language-css"">/* em基于当前元素的字体大小 */
+.parent {
+  font-size: 20px;
+}
+.child {
+  font-size: 1.5em; /* 30px (20px × 1.5) */
+  padding: 0.5em; /* 15px */
+}</code></pre>"
+vw和vh单位的响应式布局应用	"<pre><code class=""language-css"">/* 创建响应式的全屏布局 */
+.responsive-container {
+  width: 90vw;
+  height: 80vh;
+  margin: 5vh auto;
+}
+/* 自动适应不同屏幕尺寸 */</code></pre>"
+rem和em单位的区别对比	"<pre><code class=""language-css"">/* rem：基于根元素 */
+.rem-example {
+  font-size: 1.2rem; /* 基于html字体大小 */
+}
+
+/* em：基于父元素 */
+.em-example {
+  font-size: 1.2em; /* 基于父元素字体大小 */
+}</code></pre>"
+CSS单位选择的最佳实践	"<pre><code class=""language-css"">/* 推荐使用场景 */
+.layout {
+  width: 100vw; /* 视窗相关用vw/vh */
+  font-size: 1rem; /* 字体用rem */
+  padding: 0.5em; /* 内边距用em */
+  border: 1px solid #ccc; /* 边框用px */
+}</code></pre>"

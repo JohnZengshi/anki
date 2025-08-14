@@ -1,0 +1,71 @@
+#separator:tab
+#html:true
+如何实现CSS相对定位布局？	"<pre><code class=""language-css"">.container {
+  position: relative; /* 设置为相对定位的父容器 */
+  width: 300px;
+  height: 200px;
+  background-color: #ccc;
+}
+
+.relative-element {
+  position: relative; /* 相对定位 */
+  top: 20px; /* 相对于原始位置向下偏移20px */
+  left: 30px; /* 相对于原始位置向右偏移30px */
+  background-color: #f00;
+}</code></pre>"
+如何实现CSS绝对定位布局？	"<pre><code class=""language-css"">.container {
+  position: relative; /* 父容器设置相对定位作为定位上下文 */
+  width: 300px;
+  height: 200px;
+  background-color: #ccc;
+}
+
+.absolute-element {
+  position: absolute; /* 绝对定位 */
+  top: 50px; /* 相对于父容器顶部50px */
+  left: 100px; /* 相对于父容器左侧100px */
+  background-color: #f00;
+}</code></pre>"
+如何通过JavaScript动态切换元素的定位方式？	"<pre><code class=""language-javascript"">// 动态切换定位方式
+function togglePosition() {
+  const element = document.querySelector('.target-element');
+  const currentPosition = getComputedStyle(element).position;
+  
+  if (currentPosition === 'relative') {
+    // 切换为绝对定位
+    element.style.position = 'absolute';
+    element.style.top = '50px';
+    element.style.left = '100px';
+  } else {
+    // 切换为相对定位
+    element.style.position = 'relative';
+    element.style.top = '20px';
+    element.style.left = '30px';
+  }
+}
+
+// 绑定点击事件
+document.querySelector('.toggle-btn').addEventListener('click', togglePosition);</code></pre>"
+相对定位和绝对定位的主要区别是什么？	"<pre><code class=""language-javascript"">// 相对定位特点演示
+function demonstrateRelative() {
+  // 1. 保留原始空间
+  // 2. 相对于自身原始位置偏移
+  // 3. 不影响其他元素布局
+  // 4. 可作为绝对定位的定位上下文
+  
+  const relativeEl = document.createElement('div');
+  relativeEl.style.position = 'relative';
+  relativeEl.style.top = '10px'; // 向下偏移但保留原始空间
+}
+
+// 绝对定位特点演示
+function demonstrateAbsolute() {
+  // 1. 脱离文档流
+  // 2. 相对于最近的已定位祖先元素
+  // 3. 不占用原始空间
+  // 4. 可能覆盖其他元素
+  
+  const absoluteEl = document.createElement('div');
+  absoluteEl.style.position = 'absolute';
+  absoluteEl.style.top = '0'; // 相对于定位父元素
+}</code></pre>"

@@ -1,0 +1,82 @@
+#separator:tab
+#html:true
+CSS实现单行文本省略号的完整方法	"<pre><code class=""language-css"">/* 单行文本省略号 - 四个关键属性 */
+.ellipsis-text {
+  white-space: nowrap;        /* 防止文本换行 */
+  overflow: hidden;           /* 隐藏溢出的文本 */
+  text-overflow: ellipsis;    /* 显示省略号 */
+  width: 200px;              /* 设置文本容器的宽度 */
+}
+
+/* 应用示例 */
+.title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}</code></pre>"
+HTML中单行文本省略号的使用示例	"<pre><code class=""language-html"">&lt;!-- HTML结构 --&gt;
+&lt;div class=""ellipsis-text""&gt;
+  这是一段很长的文本，当它超出容器宽度时会显示省略号
+&lt;/div&gt;
+
+&lt;p class=""title""&gt;
+  这是一个很长的标题，超出部分会被省略号替代
+&lt;/p&gt;
+
+&lt;!-- 在表格中的应用 --&gt;
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;td class=""ellipsis-text""&gt;很长的表格内容会被截断&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>"
+不同容器宽度下的文本省略号实现	"<pre><code class=""language-css"">/* 固定宽度的省略号 */
+.fixed-width {
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 百分比宽度的省略号 */
+.percent-width {
+  width: 80%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 最大宽度限制的省略号 */
+.max-width {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}</code></pre>"
+文本省略号在Flexbox布局中的应用	"<pre><code class=""language-css"">/* Flexbox容器中的文本省略 */
+.flex-container {
+  display: flex;
+  width: 400px;
+}
+
+.flex-item {
+  flex: 1;                    /* 弹性增长 */
+  min-width: 0;              /* 重要：允许收缩到0 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 固定部分 + 省略部分 */
+.fixed-part {
+  flex-shrink: 0;            /* 不收缩 */
+  margin-right: 10px;
+}
+
+.ellipsis-part {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}</code></pre>"

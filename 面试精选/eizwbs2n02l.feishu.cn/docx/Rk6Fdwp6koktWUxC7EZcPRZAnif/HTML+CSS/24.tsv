@@ -1,0 +1,83 @@
+#separator:tab
+#html:true
+CSS box-sizing属性的作用和两种取值	"<pre><code class=""language-css"">/* content-box: 默认值，宽高只包括内容区域 */
+.content-box {
+  box-sizing: content-box;
+  width: 100px; /* 实际宽度 = 100px + padding + border */
+  padding: 10px;
+  border: 2px solid #000;
+}
+
+/* border-box: 宽高包括内容、padding和border */
+.border-box {
+  box-sizing: border-box;
+  width: 100px; /* 实际宽度 = 100px（包含padding和border）*/
+  padding: 10px;
+  border: 2px solid #000;
+}</code></pre>"
+CSS实现两个相同宽度的盒子，一个使用content-box，一个使用border-box	"<pre><code class=""language-html"">&lt;div class=""container""&gt;
+  &lt;div class=""box content-box""&gt;Content Box&lt;/div&gt;
+  &lt;div class=""box border-box""&gt;Border Box&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 5px solid blue;
+  margin: 10px 0;
+  background: lightblue;
+}
+
+.content-box {
+  box-sizing: content-box; /* 总宽度: 200 + 40 + 10 = 250px */
+}
+
+.border-box {
+  box-sizing: border-box; /* 总宽度: 200px */
+}
+&lt;/style&gt;</code></pre>"
+JavaScript动态切换元素的box-sizing属性	"<pre><code class=""language-javascript"">// 动态切换box-sizing属性
+function toggleBoxSizing(element) {
+  const currentBoxSizing = getComputedStyle(element).boxSizing;
+  
+  if (currentBoxSizing === 'content-box') {
+    element.style.boxSizing = 'border-box';
+    console.log('切换到border-box模式');
+  } else {
+    element.style.boxSizing = 'content-box';
+    console.log('切换到content-box模式');
+  }
+}
+
+// 计算元素实际占用空间
+function calculateActualSize(element) {
+  const styles = getComputedStyle(element);
+  const width = parseFloat(styles.width);
+  const padding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+  const border = parseFloat(styles.borderLeftWidth) + parseFloat(styles.borderRightWidth);
+  
+  return {
+    contentWidth: width,
+    totalWidth: width + padding + border
+  };
+}</code></pre>"
+CSS全局设置border-box的最佳实践	"<pre><code class=""language-css"">/* 全局设置border-box的推荐方式 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 或者使用继承方式 */
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* 这样设置的好处：
+   1. 更直观的尺寸控制
+   2. 避免宽度计算错误
+   3. 响应式布局更容易
+   4. 第三方组件可以覆盖设置 */</code></pre>"

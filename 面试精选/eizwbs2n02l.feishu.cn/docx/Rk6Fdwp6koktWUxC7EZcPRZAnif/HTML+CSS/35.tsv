@@ -1,0 +1,44 @@
+#separator:tab
+#html:true
+HTML中link标签引入CSS的基本语法	"<pre><code class=""language-html"">&lt;!-- HTML文档中使用link标签 --&gt;
+&lt;head&gt;
+  &lt;link rel=""stylesheet"" type=""text/css"" href=""styles.css""&gt;
+  &lt;link rel=""stylesheet"" href=""main.css""&gt;
+  &lt;link rel=""stylesheet"" href=""responsive.css"" media=""screen and (max-width: 768px)""&gt;
+&lt;/head&gt;</code></pre>"
+CSS中@import规则引入样式表的方法	"<pre><code class=""language-css"">/* CSS文件中使用@import规则 */
+@import url(""styles.css"");
+@import ""base.css"";
+@import url(""fonts.css"") screen;
+@import ""mobile.css"" (max-width: 768px);
+
+/* @import必须在所有其他CSS规则之前 */
+body {
+  font-family: Arial, sans-serif;
+}</code></pre>"
+link标签和@import在加载性能上的区别	"<pre><code class=""language-html"">&lt;!-- link标签：并行加载，不阻塞渲染 --&gt;
+&lt;head&gt;
+  &lt;link rel=""stylesheet"" href=""style1.css""&gt;
+  &lt;link rel=""stylesheet"" href=""style2.css""&gt;
+&lt;/head&gt;
+
+&lt;!-- CSS中的@import：串行加载，可能阻塞 --&gt;
+&lt;style&gt;
+  @import url(""style1.css"");
+  @import url(""style2.css"");
+  /* 这种方式加载较慢 */
+&lt;/style&gt;</code></pre>"
+link标签的完整属性和用法示例	"<pre><code class=""language-html"">&lt;!-- link标签的各种属性 --&gt;
+&lt;head&gt;
+  &lt;!-- 基本样式表 --&gt;
+  &lt;link rel=""stylesheet"" href=""main.css""&gt;
+  
+  &lt;!-- 媒体查询 --&gt;
+  &lt;link rel=""stylesheet"" href=""print.css"" media=""print""&gt;
+  
+  &lt;!-- 预加载 --&gt;
+  &lt;link rel=""preload"" href=""critical.css"" as=""style""&gt;
+  
+  &lt;!-- 网站图标 --&gt;
+  &lt;link rel=""icon"" href=""favicon.ico""&gt;
+&lt;/head&gt;</code></pre>"

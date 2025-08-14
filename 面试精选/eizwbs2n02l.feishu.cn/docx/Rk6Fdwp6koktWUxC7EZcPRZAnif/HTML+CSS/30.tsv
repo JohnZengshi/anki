@@ -1,0 +1,86 @@
+#separator:tab
+#html:true
+如何创建基本的Flexbox布局容器？	"<pre><code class=""language-css"">.container {
+  display: flex; /* 设置容器为Flexbox布局 */
+  justify-content: center; /* 主轴居中对齐 */
+  align-items: center; /* 交叉轴居中对齐 */
+  height: 300px;
+  background-color: #f0f0f0;
+}
+
+.item {
+  padding: 20px;
+  margin: 10px;
+  background-color: #007acc;
+  color: white;
+}</code></pre>"
+如何实现Flexbox项目的弹性伸缩？	"<pre><code class=""language-css"">.flex-container {
+  display: flex;
+  width: 100%;
+}
+
+.flex-item {
+  flex-grow: 1; /* 项目放大比例，平分剩余空间 */
+  flex-shrink: 1; /* 项目缩小比例 */
+  flex-basis: 0; /* 项目初始大小 */
+  padding: 20px;
+  background-color: #4CAF50;
+  margin: 5px;
+}
+
+/* 简写形式 */
+.flex-item-short {
+  flex: 1; /* 等同于 flex: 1 1 0 */
+}</code></pre>"
+如何通过JavaScript动态控制Flexbox布局？	"<pre><code class=""language-javascript"">// 动态改变Flex容器的主轴方向
+function toggleFlexDirection() {
+  const container = document.querySelector('.flex-container');
+  const currentDirection = getComputedStyle(container).flexDirection;
+  
+  // 在row和column之间切换
+  if (currentDirection === 'row') {
+    container.style.flexDirection = 'column';
+  } else {
+    container.style.flexDirection = 'row';
+  }
+}
+
+// 动态调整项目的flex属性
+function adjustFlexGrow(itemIndex, growValue) {
+  const items = document.querySelectorAll('.flex-item');
+  if (items[itemIndex]) {
+    items[itemIndex].style.flexGrow = growValue;
+  }
+}
+
+// 切换对齐方式
+function toggleAlignment() {
+  const container = document.querySelector('.flex-container');
+  container.style.justifyContent = 
+    container.style.justifyContent === 'center' ? 'space-between' : 'center';
+}</code></pre>"
+如何实现Flexbox的换行和多行布局？	"<pre><code class=""language-css"">.flex-wrap-container {
+  display: flex;
+  flex-wrap: wrap; /* 允许项目换行 */
+  justify-content: space-around; /* 项目间距分布 */
+  align-content: flex-start; /* 多行内容对齐 */
+  width: 100%;
+  max-width: 600px;
+}
+
+.flex-wrap-item {
+  flex: 0 0 200px; /* 不放大不缩小，基础宽度200px */
+  height: 100px;
+  margin: 10px;
+  background-color: #FF9800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 响应式Flex项目 */
+@media (max-width: 768px) {
+  .flex-wrap-item {
+    flex: 0 0 calc(50% - 20px); /* 小屏幕时每行两个 */
+  }
+}</code></pre>"

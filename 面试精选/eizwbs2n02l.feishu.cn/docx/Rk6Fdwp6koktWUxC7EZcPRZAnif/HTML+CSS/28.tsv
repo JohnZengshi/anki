@@ -1,0 +1,80 @@
+#separator:tab
+#html:true
+如何通过CSS修改DOM元素的字体颜色？	"<pre><code class=""language-css"">.content {
+  color: red; /* 设置字体颜色为红色 */
+}
+
+/* 其他颜色设置方式 */
+.blue-text {
+  color: #0066cc; /* 十六进制颜色 */
+}
+
+.green-text {
+  color: rgb(0, 128, 0); /* RGB颜色 */
+}
+
+.transparent-text {
+  color: rgba(0, 0, 0, 0.5); /* 带透明度的颜色 */
+}</code></pre>"
+如何通过JavaScript动态修改DOM元素的字体颜色？	"<pre><code class=""language-javascript"">// 通过ID获取元素并修改颜色
+const element = document.getElementById('content');
+element.style.color = 'blue';
+
+// 通过类名获取元素并修改颜色
+const elements = document.getElementsByClassName('content');
+for (let i = 0; i < elements.length; i++) {
+  elements[i].style.color = 'green';
+}
+
+// 使用querySelector修改颜色
+document.querySelector('.content').style.color = '#ff6600';
+
+// 批量修改多个元素颜色
+document.querySelectorAll('.content').forEach(el => {
+  el.style.color = 'purple';
+});</code></pre>"
+如何实现鼠标悬停时改变字体颜色的效果？	"<pre><code class=""language-css"">/* CSS悬停效果 */
+.hover-text {
+  color: black;
+  transition: color 0.3s ease; /* 平滑过渡效果 */
+}
+
+.hover-text:hover {
+  color: red; /* 悬停时变为红色 */
+}
+
+/* 更复杂的悬停效果 */
+.fancy-hover {
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.fancy-hover:hover {
+  color: #ff4444;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}</code></pre>"
+如何通过JavaScript实现点击切换字体颜色？	"<pre><code class=""language-javascript"">// 点击切换颜色功能
+function toggleTextColor() {
+  const element = document.querySelector('.content');
+  const currentColor = element.style.color;
+  
+  // 在红色和蓝色之间切换
+  if (currentColor === 'red') {
+    element.style.color = 'blue';
+  } else {
+    element.style.color = 'red';
+  }
+}
+
+// 绑定点击事件
+document.querySelector('.content').addEventListener('click', toggleTextColor);
+
+// 多种颜色循环切换
+const colors = ['red', 'blue', 'green', 'purple', 'orange'];
+let colorIndex = 0;
+
+function cycleColors() {
+  const element = document.querySelector('.content');
+  element.style.color = colors[colorIndex];
+  colorIndex = (colorIndex + 1) % colors.length; // 循环索引
+}</code></pre>"

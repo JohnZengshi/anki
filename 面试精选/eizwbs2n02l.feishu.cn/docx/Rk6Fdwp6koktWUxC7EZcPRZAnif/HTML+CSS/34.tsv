@@ -1,0 +1,83 @@
+#separator:tab
+#html:true
+CSS媒体查询实现响应式布局的基本语法	"<pre><code class=""language-css"">/* 小屏幕上应用的样式 */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+/* 中等屏幕上应用的样式 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
+/* 大屏幕上应用的样式 */
+@media (min-width: 1025px) {
+  .container {
+    width: 1200px;
+    margin: 0 auto;
+  }
+}</code></pre>"
+流式布局实现响应式设计的方法	"<pre><code class=""language-css"">/* 流式布局 - 使用百分比 */
+.container {
+  width: 100%; /* 容器占满父元素 */
+  max-width: 1200px; /* 最大宽度限制 */
+}
+
+.column {
+  width: 33.33%; /* 三列布局，每列占1/3 */
+  float: left;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* 清除浮动 */
+.container::after {
+  content: '';
+  display: table;
+  clear: both;
+}</code></pre>"
+Flexbox实现响应式弹性布局	"<pre><code class=""language-css"">/* Flexbox弹性布局 */
+.container {
+  display: flex;
+  flex-wrap: wrap; /* 允许换行 */
+  justify-content: space-between; /* 水平分布 */
+  align-items: center; /* 垂直居中 */
+}
+
+.item {
+  flex: 1 1 300px; /* 弹性增长、收缩、基础宽度 */
+  margin: 10px;
+  min-width: 250px; /* 最小宽度 */
+}
+
+/* 小屏幕调整 */
+@media (max-width: 768px) {
+  .item {
+    flex: 1 1 100%; /* 小屏幕时占满一行 */
+  }
+}</code></pre>"
+响应式图片处理的最佳实践	"<pre><code class=""language-css"">/* 响应式图片 */
+img {
+  max-width: 100%; /* 图片最大宽度不超过容器 */
+  height: auto; /* 保持宽高比 */
+  display: block;
+}
+
+/* 不同屏幕尺寸的图片优化 */
+.responsive-img {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .responsive-img {
+    max-width: 100%;
+    height: auto;
+  }
+}</code></pre>"

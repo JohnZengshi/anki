@@ -1,0 +1,62 @@
+#separator:tab
+#html:true
+img元素的特殊性演示	"<pre><code class=""language-html"">&lt;!-- img是inline但可设宽高 --&gt;
+&lt;img src=""image.jpg"" width=""200"" height=""150"" alt=""示例图片""&gt;
+
+&lt;style&gt;
+img {
+  display: inline;     /* 默认inline */
+  width: 300px;        /* 可以设置宽度 */
+  height: 200px;       /* 可以设置高度 */
+  margin: 10px;        /* 可以设置margin */
+  border: 2px solid red; /* 可以设置border */
+}
+&lt;/style&gt;</code></pre>"
+替换元素的特性	"<pre><code class=""language-css"">/* 替换元素都可以设置宽高 */
+img, input, textarea, select, video, audio, canvas {
+  /* 这些都是替换元素 */
+  width: 200px;        /* 可设置宽度 */
+  height: 100px;       /* 可设置高度 */
+  display: inline;     /* 保持inline特性 */
+}
+
+/* 普通inline元素不能设置宽高 */
+span, a, strong {
+  /* width: 200px;  无效 */
+  /* height: 100px; 无效 */
+}</code></pre>"
+JavaScript检测替换元素	"<pre><code class=""language-javascript"">// 检测元素是否为替换元素
+function isReplacedElement(element) {
+  const replacedTags = [
+    'IMG', 'INPUT', 'TEXTAREA', 'SELECT', 
+    'VIDEO', 'AUDIO', 'CANVAS', 'OBJECT', 'EMBED'
+  ];
+  
+  const tagName = element.tagName.toUpperCase();
+  const isReplaced = replacedTags.includes(tagName);
+  
+  console.log(`${tagName} 是替换元素: ${isReplaced}`);
+  return isReplaced;
+}
+
+// 使用示例
+const img = document.querySelector('img');
+const span = document.querySelector('span');
+
+isReplacedElement(img);  // true
+isReplacedElement(span); // false</code></pre>"
+模拟img的inline-block行为	"<pre><code class=""language-css"">/* 普通元素模拟img的行为 */
+.fake-img {
+  display: inline-block; /* 关键：inline-block */
+  width: 200px;
+  height: 150px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  vertical-align: top;   /* 对齐方式 */
+}
+
+/* 真实img的默认行为 */
+img {
+  /* 浏览器内部实现类似于 inline-block */
+  /* 但仍然是 display: inline */
+}</code></pre>"

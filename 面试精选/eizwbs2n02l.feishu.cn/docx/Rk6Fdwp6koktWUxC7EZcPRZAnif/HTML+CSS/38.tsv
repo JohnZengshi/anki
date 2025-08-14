@@ -1,0 +1,70 @@
+#separator:tab
+#html:true
+HTML语义化标签的作用是什么？	"<pre><code class=""language-html"">语义化标签的作用：
+1. 提高代码可读性和可维护性
+2. 增强搜索引擎优化（SEO）
+3. 改善网页可访问性
+4. 帮助开发人员和浏览器理解文档结构
+5. 支持屏幕阅读器等辅助技术</code></pre>"
+HTML中&lt;header&gt;标签的用途	"<pre><code class=""language-html"">&lt;header&gt;
+  &lt;h1&gt;网站标题&lt;/h1&gt;
+  &lt;nav&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=""#home""&gt;首页&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=""#about""&gt;关于&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</code></pre>"
+HTML中&lt;nav&gt;标签的使用方法	"<pre><code class=""language-html"">&lt;nav&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=""#section1""&gt;章节1&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=""#section2""&gt;章节2&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=""#section3""&gt;章节3&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;</code></pre>"
+HTML中&lt;main&gt;标签的特点	"<pre><code class=""language-html"">&lt;main&gt;
+  &lt;h1&gt;主要内容标题&lt;/h1&gt;
+  &lt;p&gt;这里是页面的主要内容区域&lt;/p&gt;
+  &lt;!-- 每个文档只能有一个main元素 --&gt;
+&lt;/main&gt;</code></pre>"
+HTML中&lt;article&gt;和&lt;section&gt;的区别	"<pre><code class=""language-html"">&lt;!-- article：独立的内容块 --&gt;
+&lt;article&gt;
+  &lt;h2&gt;新闻标题&lt;/h2&gt;
+  &lt;p&gt;新闻内容...&lt;/p&gt;
+&lt;/article&gt;
+
+&lt;!-- section：文档的章节或主题区域 --&gt;
+&lt;section&gt;
+  &lt;h2&gt;产品介绍&lt;/h2&gt;
+  &lt;p&gt;产品详情...&lt;/p&gt;
+&lt;/section&gt;</code></pre>"
+HTML中&lt;aside&gt;标签的应用场景	"<pre><code class=""language-html"">&lt;aside&gt;
+  &lt;h3&gt;相关链接&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href=""#""&gt;推荐文章1&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=""#""&gt;推荐文章2&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;!-- 用于侧边栏、广告、引用等附属内容 --&gt;
+&lt;/aside&gt;</code></pre>"
+HTML中&lt;figure&gt;和&lt;figcaption&gt;的组合使用	"<pre><code class=""language-html"">&lt;figure&gt;
+  &lt;img src=""chart.png"" alt=""销售图表""&gt;
+  &lt;figcaption&gt;2024年第一季度销售数据图表&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>"
+HTML中&lt;time&gt;标签的使用方法	"<pre><code class=""language-html"">&lt;!-- 表示具体日期时间 --&gt;
+&lt;time datetime=""2024-03-15T10:30:00""&gt;2024年3月15日上午10:30&lt;/time&gt;
+
+&lt;!-- 表示日期 --&gt;
+&lt;time datetime=""2024-03-15""&gt;今天&lt;/time&gt;</code></pre>"
+HTML语义化页面结构的完整示例	"<pre><code class=""language-html"">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  &lt;header&gt;&lt;h1&gt;网站标题&lt;/h1&gt;&lt;/header&gt;
+  &lt;nav&gt;&lt;!-- 导航菜单 --&gt;&lt;/nav&gt;
+  &lt;main&gt;
+    &lt;article&gt;&lt;!-- 主要文章内容 --&gt;&lt;/article&gt;
+    &lt;section&gt;&lt;!-- 相关章节 --&gt;&lt;/section&gt;
+  &lt;/main&gt;
+  &lt;aside&gt;&lt;!-- 侧边栏 --&gt;&lt;/aside&gt;
+  &lt;footer&gt;&lt;!-- 页脚信息 --&gt;&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>"

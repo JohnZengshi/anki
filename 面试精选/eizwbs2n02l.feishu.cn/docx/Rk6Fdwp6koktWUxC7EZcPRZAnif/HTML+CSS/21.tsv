@@ -1,0 +1,42 @@
+#separator:tab
+#html:true
+CSS背景颜色填充区域演示	"<pre><code class=""language-css"">/* 背景色填充：内容+padding+border */
+.box {
+  background-color: #f0f0f0;
+  padding: 20px;        /* 填充 */
+  border: 5px solid red; /* 填充 */
+  margin: 10px;         /* 不填充 */
+}</code></pre>"
+background-clip属性控制填充范围	"<pre><code class=""language-css"">/* 控制背景填充范围 */
+.content-box {
+  background-clip: content-box; /* 仅内容区域 */
+}
+
+.padding-box {
+  background-clip: padding-box; /* 内容+padding */
+}
+
+.border-box {
+  background-clip: border-box;  /* 内容+padding+border(默认) */
+}</code></pre>"
+透明边框显示背景色	"<pre><code class=""language-css"">/* 透明边框让背景色透过 */
+.transparent-border {
+  background-color: blue;
+  border: 10px solid transparent; /* 背景色会透过 */
+  padding: 15px;
+}</code></pre>"
+JavaScript检测背景填充区域	"<pre><code class=""language-javascript"">// 获取元素的背景填充信息
+function getBackgroundArea(element) {
+  const styles = getComputedStyle(element);
+  
+  return {
+    // 背景色填充的区域
+    contentArea: true,           // 总是填充内容区域
+    paddingArea: true,           // 总是填充padding区域
+    borderArea: true,            // 总是填充border区域
+    marginArea: false,           // 永远不填充margin区域
+    
+    // 当前背景裁剪设置
+    backgroundClip: styles.backgroundClip
+  };
+}</code></pre>"

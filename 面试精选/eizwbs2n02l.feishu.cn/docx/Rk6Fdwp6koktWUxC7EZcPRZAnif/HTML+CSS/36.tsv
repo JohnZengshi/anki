@@ -1,0 +1,63 @@
+#separator:tab
+#html:true
+HTML中块级元素的特点和常见标签	"<pre><code class=""language-html"">&lt;!-- 块级元素：独占一行，可设置宽高 --&gt;
+&lt;div&gt;这是一个div块级元素&lt;/div&gt;
+&lt;p&gt;这是一个段落块级元素&lt;/p&gt;
+&lt;h1&gt;这是标题块级元素&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;列表项也是块级元素&lt;/li&gt;
+  &lt;li&gt;每个li独占一行&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- 块级元素可以包含其他元素 --&gt;
+&lt;div&gt;
+  &lt;p&gt;块级元素可以包含其他块级和内联元素&lt;/p&gt;
+  &lt;span&gt;内联元素&lt;/span&gt;
+&lt;/div&gt;</code></pre>"
+HTML中内联元素的特点和使用方法	"<pre><code class=""language-html"">&lt;!-- 内联元素：不独占行，只占内容宽度 --&gt;
+&lt;p&gt;
+  这是一个段落，包含
+  &lt;span&gt;内联span元素&lt;/span&gt;，
+  &lt;a href=""#""&gt;链接元素&lt;/a&gt;，
+  &lt;strong&gt;加粗文本&lt;/strong&gt;，
+  &lt;em&gt;斜体文本&lt;/em&gt;。
+&lt;/p&gt;
+
+&lt;!-- 内联元素在同一行显示 --&gt;
+&lt;span&gt;第一个span&lt;/span&gt;
+&lt;span&gt;第二个span&lt;/span&gt;
+&lt;a href=""#""&gt;链接&lt;/a&gt;</code></pre>"
+HTML中置换元素的特性和示例	"<pre><code class=""language-html"">&lt;!-- 置换元素：内容由外部资源替代 --&gt;
+&lt;img src=""image.jpg"" alt=""图片"" width=""300"" height=""200""&gt;
+
+&lt;video width=""400"" height=""300"" controls&gt;
+  &lt;source src=""movie.mp4"" type=""video/mp4""&gt;
+&lt;/video&gt;
+
+&lt;iframe src=""https://example.com"" width=""500"" height=""400""&gt;&lt;/iframe&gt;
+
+&lt;!-- 置换元素的尺寸通常由属性或外部资源决定 --&gt;
+&lt;input type=""text"" placeholder=""输入框也是置换元素""&gt;</code></pre>"
+CSS中display属性改变元素显示类型	"<pre><code class=""language-css"">/* 改变元素的显示类型 */
+
+/* 将内联元素转为块级元素 */
+span {
+  display: block; /* span变为块级元素 */
+  width: 200px;
+  height: 50px;
+  background-color: #f0f0f0;
+}
+
+/* 将块级元素转为内联元素 */
+div {
+  display: inline; /* div变为内联元素 */
+  background-color: yellow;
+}
+
+/* 内联块元素：既可设置宽高，又不独占行 */
+.inline-block {
+  display: inline-block;
+  width: 100px;
+  height: 50px;
+  background-color: lightblue;
+}</code></pre>"
